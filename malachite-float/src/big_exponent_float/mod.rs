@@ -221,6 +221,9 @@ pub mod comparison;
 pub mod conversion;
 /// Iterators that generate [`BigExponentFloat`]s without repetition.
 pub mod exhaustive;
+/// Exponential functions of [`BigExponentFloat`]s: $e^x$, $2^x$, $10^x$, and their counterparts
+/// minus 1.
+pub mod exponential;
 #[cfg(feature = "random")]
 /// Iterators that generate [`BigExponentFloat`]s randomly.
 pub mod random;

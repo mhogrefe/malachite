@@ -12,6 +12,7 @@ use crate::float::exponential::log_base::{dyadic_1p_log_of_root, rational_root_p
 use crate::float::exponential::log_base_2::extended_log_base_2_of_rational;
 use crate::{Float, emulate_float_to_float_fn};
 use core::cmp::Ordering::{self, *};
+use malachite_base::num::arithmetic::traits::IsPowerOf2;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero as ZeroTrait;
@@ -96,6 +97,14 @@ fn log_base_rational_base_1_plus_x_prec_round_normal(
         Less => return (float_nan!(), Equal),
         _ => {}
     }
+    // A base 2^pow is handled by `log_base_power_of_2_1_plus_x`: for x = 2^k, log_2(1 + x) / pow is
+    // within about 2^-k of k / pow, which is often exactly representable, and the Ziv loop below
+    // would then need about k bits of precision.
+    if base.is_power_of_2()
+        && let Ok(pow) = i64::try_from(base.numerator_ref().significant_bits() - 1)
+    {
+        return x.log_base_power_of_2_1_plus_x_prec_round_ref(pow, prec, rm);
+    }
     // If 1 + x = g^m, then log_base(1 + x) = m / e_base is rational and exact.
     if let Some(q) = rational_log_base_rational_base_1_plus_x(x, base) {
         return Float::from_rational_prec_round(q, prec, rm);
@@ -146,11 +155,12 @@ impl Float {
     ///
     /// $\log_b(1+x)$ is undefined for $x<-1$, so whenever $x<-1$, `NaN` is returned.
     ///
-    /// This computes $\log_2(1+x) / \log_2 b$, routing through
-    /// [`Float::log_base_2_1_plus_x_prec_ref`] to preserve accuracy for $x$ near 0, and evaluating
-    /// $\log_2 b$ in an extended exponent range so that a base near 1 (where $\log_2 b$ is tiny)
-    /// does not lose accuracy. The single conversion of the quotient back to a [`Float`] performs
-    /// the one correctly-rounded clamp.
+    /// When $b$ is a power of 2, this function delegates to
+    /// [`Float::log_base_power_of_2_1_plus_x_prec_round`]. Otherwise it computes $\log_2(1+x) /
+    /// \log_2 b$, routing through [`Float::log_base_2_1_plus_x_prec_ref`] to preserve accuracy for
+    /// $x$ near 0, and evaluating $\log_2 b$ in an extended exponent range so that a base near 1
+    /// (where $\log_2 b$ is tiny) does not lose accuracy. The single conversion of the quotient
+    /// back to a [`Float`] performs the one correctly-rounded clamp.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///

@@ -13,6 +13,7 @@ use crate::float::exponential::log_base::{
 };
 use crate::{Float, emulate_float_float_to_float_fn};
 use core::cmp::Ordering::{self, *};
+use malachite_base::num::arithmetic::traits::IsPowerOf2;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{NegativeZero, Zero as ZeroTrait};
@@ -192,7 +193,14 @@ fn log_base_float_base_1_plus_x_helper(
             (Float::NEGATIVE_ZERO, Equal)
         };
     }
-    // x is finite in (-1, 0) or positive (not 0), and base is positive finite and not 1.
+    // x is finite in (-1, 0) or positive (not 0), and base is positive finite and not 1. A base
+    // 2^pow is handled by `log_base_power_of_2_1_plus_x`: for x = 2^k, log_2(1 + x) / pow is within
+    // about 2^-k of k / pow, which is often exactly representable, and the Ziv loop below would
+    // then need about k bits of precision.
+    if base.is_power_of_2() {
+        let pow = i64::from(base.get_exponent().unwrap()) - 1;
+        return x.log_base_power_of_2_1_plus_x_prec_round_ref(pow, prec, rm);
+    }
     log_base_float_base_1_plus_x_normal(x, base, prec, rm)
 }
 
@@ -210,10 +218,11 @@ impl Float {
     /// particular a base in $(0,1)$ gives a (sign-flipped) logarithm, and the non-normal and
     /// degenerate bases follow the limits below.
     ///
-    /// This computes $\log_2(1+x) / \log_2 b$, routing through
-    /// [`Float::log_base_2_1_plus_x_prec_ref`] to preserve accuracy for $x$ near 0, and wrapping
-    /// the quotient so it may overflow (base near 1) or underflow (x near 0) and be clamped exactly
-    /// once.
+    /// When $b$ is a power of 2, this function delegates to
+    /// [`Float::log_base_power_of_2_1_plus_x_prec_round`]. Otherwise it computes $\log_2(1+x) /
+    /// \log_2 b$, routing through [`Float::log_base_2_1_plus_x_prec_ref`] to preserve accuracy for
+    /// $x$ near 0, and wrapping the quotient so it may overflow (base near 1) or underflow (x near
+    /// 0) and be clamped exactly once.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///

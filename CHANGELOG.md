@@ -1181,6 +1181,24 @@ documented by git history.
 - The documentation of `Float`'s `agm` functions now gives the correct result for an infinite
   argument: $\text{AGM}(\infty, x) = \infty$ when $x > 0$. It had said `NaN` for every finite $x$,
   though the functions have always returned $\infty$.
+- `Float::exp_x_minus_1_rational_prec_round`, `power_of_2_x_minus_1_rational_prec_round`, and
+  `power_of_10_x_minus_1_rational_prec_round`, with their other forms, are much faster for a
+  `Rational` $x$ with $|x| < 2^m$, where $m$ is `Float::MIN_EXPONENT`, too small for $e^x - 1$ to
+  be bracketed between `Float`s.
+  They used to sum the Taylor series in exact `Rational` arithmetic, whose denominators reach about
+  $2^{30}$ bits (tens of seconds and several GB per call). Now $cx$ (with $c$ equal to 1, $\log 2$,
+  or $\log 10$) is bracketed between two numbers with an unbounded exponent, and since $e^t - 1$
+  lies in $(t, t + t^2]$, the result is the common rounding of two cheap bounds. The exact method
+  remains as a fallback for the rare inputs the bracket cannot decide. Results are unchanged.
+- `Float::power_of_10_x_minus_1_rational_prec_round`, with its other forms, no longer computes
+  $10^n - 1$ in full for a positive integer $n$, which took about $3.3n$ bits (up to about $10^9$).
+  It now calls `power_of_10_x_minus_1_prec_round` on $n$ as a `Float`, which computes $10^n$ only
+  to a working precision above the target. Results are unchanged.
+- `Float::log_base_float_base_1_plus_x_prec_round` and
+  `Float::log_base_rational_base_1_plus_x_prec_round`, with their other forms, now delegate to
+  `log_base_power_of_2_1_plus_x_prec_round` when the base is a power of 2. Previously, for an $x$
+  such as $2^k$ their Ziv loop needed a working precision of about $k$ bits, so $x = 2^{2^{26}}$
+  took gigabytes. Results are unchanged.
 
 ## 0.14.0 — 2026-10-13
 

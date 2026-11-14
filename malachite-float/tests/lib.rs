@@ -195,6 +195,31 @@ pub mod big_exponent_float {
         pub mod exhaustive_positive_big_exponent_floats_with_sci_exponent_and_precision;
         pub mod exhaustive_positive_finite_big_exponent_floats;
     }
+    pub mod exponential {
+        pub mod compound;
+        pub mod exp;
+        pub mod exp_x_minus_1;
+        pub mod ln;
+        pub mod ln_1_plus_x;
+        pub mod log_base;
+        pub mod log_base_10;
+        pub mod log_base_10_1_plus_x;
+        pub mod log_base_1_plus_x;
+        pub mod log_base_2;
+        pub mod log_base_2_1_plus_x;
+        pub mod log_base_big_exponent_float_base;
+        pub mod log_base_big_exponent_float_base_1_plus_x;
+        pub mod log_base_power_of_2;
+        pub mod log_base_power_of_2_1_plus_x;
+        pub mod log_base_rational_base;
+        pub mod log_base_rational_base_1_plus_x;
+        pub mod log_base_rational_big_exponent_float_base;
+        pub mod log_base_rational_rational_base;
+        pub mod power_of_10;
+        pub mod power_of_10_x_minus_1;
+        pub mod power_of_2_of_big_exponent_float;
+        pub mod power_of_2_x_minus_1;
+    }
     pub mod random {
         pub mod random_big_exponent_floats;
         pub mod random_finite_big_exponent_floats;

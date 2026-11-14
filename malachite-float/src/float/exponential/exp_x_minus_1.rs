@@ -14,9 +14,13 @@
 
 use crate::InnerFloat::{Infinity, NaN, Zero};
 use crate::TWICE_WIDTH;
+use crate::big_exponent_float::BigExponentFloat;
 use crate::float::arithmetic::round_near_x::float_round_near_x;
 use crate::float::exponential::exp::{exp_overflow, one_neighbor};
-use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn, floor_and_ceiling};
+use crate::{
+    ComparableFloatRef, Float, emulate_float_to_float_fn, emulate_rational_to_float_fn,
+    floor_and_ceiling,
+};
 use core::cmp::Ordering::{self, *};
 use core::cmp::max;
 use malachite_base::num::arithmetic::traits::{PowerOf2, Sign};
@@ -213,12 +217,138 @@ fn exp_x_minus_1_deep_negative(
     }
 }
 
-// Computes `exp(x) - 1` for a nonzero `Rational` `x` with `|x| < 2^MIN_EXPONENT`, by summing its
-// Taylor series `sum_{k>=1} x^k / k!`. Used when `x` is so small that `expm1(x) ~ x` underflows:
-// the squeeze in `exp_x_minus_1_rational_helper` cannot bracket such an `x` (its Float bounds
-// collapse to 0). The series is bracketed between two rationals which are rounded with
-// `from_rational_prec_round` (which performs the underflow rounding) until both ends agree.
+// `Float`'s rounding of e^t - 1, with its underflow rules, to `prec` bits with `rm`, for a t known
+// only to lie in [t_lo, t_hi], where t_lo and t_hi are nonzero, of the same sign, and have at most
+// `wp` bits; or `None` if the bracket does not decide the result.
+//
+// Let m = max(prec, wp) + 4, and let e be the larger of the exponents of t_lo and t_hi (|t| < 2^e).
+// This needs 2e <= min(EXP(t_lo), EXP(t_hi)) - m, which `exp_x_minus_1_near_zero_applies` checks.
+// For |t| <= 1/2, e^t - 1 lies in (t, t + t^2], and t^2 < 2^(2e) <= 2^(EXP(t_hi) - m), so e^t - 1
+// lies in (t_lo, t_hi + 2^(EXP(t_hi) - m)]. Every step of the rounding function (a number with at
+// most prec + 1 bits, which includes the powers of 2 that bound the underflow range) is at least
+// 2^(EXP(t_lo) - m + 2) away from t_lo, which has at most wp bits, so rounding is constant on
+// (t_lo, t_lo + 2^(EXP(t_lo) - m)]. Rounding is monotonic, so e^t - 1 rounds to the common result
+// of the two cheap, exact bounds t_lo + 2^(EXP(t_lo) - m) and t_hi + 2^(EXP(t_hi) - m) whenever
+// they agree. Without this, a dyadic t (such as 2^(MIN_EXPONENT - 1), a rounding threshold) would
+// never be separated from e^t - 1 = t + t^2/2 + ... by any practical working precision.
+fn exp_x_minus_1_near_zero_bracket(
+    t_lo: &BigExponentFloat,
+    t_hi: &BigExponentFloat,
+    prec: u64,
+    wp: u64,
+    rm: RoundingMode,
+) -> Option<(Float, Ordering)> {
+    let m = i64::exact_from(max(prec, wp)) + 4;
+    let e_lo = i64::exact_from(t_lo.get_exponent().unwrap());
+    let e_hi = i64::exact_from(t_hi.get_exponent().unwrap());
+    let lower = t_lo + BigExponentFloat::power_of_2(e_lo - m);
+    let upper = t_hi + BigExponentFloat::power_of_2(e_hi - m);
+    let (f_lo, mut o_lo) = Float::from_big_exponent_float_prec_round(lower, prec, rm);
+    let (f_hi, mut o_hi) = Float::from_big_exponent_float_prec_round(upper, prec, rm);
+    // A bound that is exactly representable rounds with `Equal`; since e^t - 1 is strictly between
+    // the bounds' common rounding and the other bound, it agrees with the other bound.
+    if o_lo == Equal {
+        o_lo = o_hi;
+    }
+    if o_hi == Equal {
+        o_hi = o_lo;
+    }
+    (o_lo == o_hi && ComparableFloatRef(&f_lo) == ComparableFloatRef(&f_hi)).then_some((f_lo, o_lo))
+}
+
+// Whether `exp_x_minus_1_near_zero_bracket` applies to t_lo and t_hi at the working precision `wp`:
+// the condition 2e <= min(EXP(t_lo), EXP(t_hi)) - m described there.
+fn exp_x_minus_1_near_zero_applies(
+    t_lo: &BigExponentFloat,
+    t_hi: &BigExponentFloat,
+    prec: u64,
+    wp: u64,
+) -> bool {
+    let e_lo = t_lo.get_exponent().unwrap();
+    let e_hi = t_hi.get_exponent().unwrap();
+    let (min, max_e) = if e_lo <= e_hi {
+        (e_lo, e_hi)
+    } else {
+        (e_hi, e_lo)
+    };
+    (max_e << 1u32) <= min - Integer::from(max(prec, wp) + 4)
+}
+
+// e^(c x) - 1, rounded to `prec` bits with `rm` using `Float`'s underflow rules, for a nonzero
+// `Rational` x with |x| < 2^MIN_EXPONENT and a positive constant c: 1 if `c_bounds` is `None`, and
+// otherwise bracketed at precision wp by `c_bounds(wp)`. x is rounded down and up to wp bits as
+// `BigExponentFloat`s, so its (possibly enormous) denominator is only read by those two roundings;
+// the products with the bounds of c are rounded outward, giving a bracket for t = c x, which
+// `exp_x_minus_1_near_zero_bracket` rounds. The working precision grows until the bracket decides
+// the result. If the bracket method stops applying (only at precisions near 2^30), or in the
+// pathological case of an x within about x^2 of a rounding step, `fallback` computes the result
+// with exact `Rational` arithmetic.
+pub(crate) fn exp_x_minus_1_scaled_rational_near_zero<F: FnOnce() -> (Float, Ordering)>(
+    x: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+    c_bounds: Option<fn(u64) -> (Float, Float)>,
+    fallback: F,
+) -> (Float, Ordering) {
+    let positive = *x > 0u32;
+    let mut wp = prec + Limb::WIDTH;
+    let mut increment = Limb::WIDTH;
+    // A bracket that has not decided after this many bits beyond `prec` is pathological.
+    let limit = prec.saturating_mul(4).saturating_add(1 << 12);
+    loop {
+        let (x_lo, o) = BigExponentFloat::from_rational_prec_round_ref(x, wp, Floor);
+        let x_hi = if o == Equal {
+            x_lo.clone()
+        } else {
+            BigExponentFloat::from_rational_prec_round_ref(x, wp, Ceiling).0
+        };
+        let (t_lo, t_hi) = if let Some(c_bounds) = c_bounds {
+            let (c_lo, c_hi) = c_bounds(wp);
+            let (c_lo, c_hi) = (BigExponentFloat::from(c_lo), BigExponentFloat::from(c_hi));
+            if positive {
+                (
+                    x_lo.mul_prec_round_ref_ref(&c_lo, wp, Floor).0,
+                    x_hi.mul_prec_round_ref_ref(&c_hi, wp, Ceiling).0,
+                )
+            } else {
+                (
+                    x_lo.mul_prec_round_ref_ref(&c_hi, wp, Floor).0,
+                    x_hi.mul_prec_round_ref_ref(&c_lo, wp, Ceiling).0,
+                )
+            }
+        } else {
+            (x_lo, x_hi)
+        };
+        if wp > limit || !exp_x_minus_1_near_zero_applies(&t_lo, &t_hi, prec, wp) {
+            return fallback();
+        }
+        if let Some(result) = exp_x_minus_1_near_zero_bracket(&t_lo, &t_hi, prec, wp, rm) {
+            return result;
+        }
+        wp += increment;
+        increment = wp >> 1;
+    }
+}
+
+// Computes `exp(x) - 1` for a nonzero `Rational` `x` with `|x| < 2^MIN_EXPONENT`, where `expm1(x) ~
+// x` underflows: the squeeze in `exp_x_minus_1_rational_helper` cannot bracket such an `x` (its
+// Float bounds collapse to 0). See `exp_x_minus_1_scaled_rational_near_zero`.
 pub(crate) fn exp_x_minus_1_rational_near_zero(
+    x: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    exp_x_minus_1_scaled_rational_near_zero(x, prec, rm, None, || {
+        exp_x_minus_1_rational_near_zero_exact(x, prec, rm)
+    })
+}
+
+// Computes `exp(x) - 1` for a nonzero `Rational` `x` with `|x| < 2^MIN_EXPONENT`, by summing its
+// Taylor series `sum_{k>=1} x^k / k!` in exact `Rational` arithmetic. The series is bracketed
+// between two rationals which are rounded with `from_rational_prec_round` (which performs the
+// underflow rounding) until both ends agree. This is the fallback of
+// `exp_x_minus_1_scaled_rational_near_zero`: it is slow when x has a huge denominator.
+fn exp_x_minus_1_rational_near_zero_exact(
     x: &Rational,
     prec: u64,
     rm: RoundingMode,

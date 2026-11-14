@@ -2263,7 +2263,7 @@ fn test_power_of_10_x_minus_1_rational_prec() {
         assert_eq!(to_hex_string(&f), out_hex);
         assert_eq!(o, out_o);
     };
-    // - integer x > MAX_EXPONENT: 2^x - 1 overflows
+    // - integer x > MAX_EXPONENT: 10^x - 1 overflows
     test_big(
         Rational::power_of_2(31i64),
         1,
@@ -2278,8 +2278,8 @@ fn test_power_of_10_x_minus_1_rational_prec() {
         "Infinity",
         Greater,
     );
-    // - integer x = MAX_EXPONENT: 2^x - 1 is representable, but needs at least MAX_EXPONENT bits;
-    //   at smaller precisions it rounds exactly like an overflow
+    // - integer x = MAX_EXPONENT: 10^x - 1 overflows too, since x log2(10) > MAX_EXPONENT (unlike
+    //   2^x - 1, which is representable with MAX_EXPONENT bits)
     test_big(
         Rational::from(Float::MAX_EXPONENT),
         1,
@@ -2287,7 +2287,7 @@ fn test_power_of_10_x_minus_1_rational_prec() {
         "Infinity",
         Greater,
     );
-    // - integer x < -MAX_EXPONENT: 2^x - 1 rounds from -1
+    // - integer x < -MAX_EXPONENT: 10^x is far below ulp(-1), so 10^x - 1 rounds from -1
     test_big(-Rational::power_of_2(31i64), 1, "-1.0", "-0x1.0#1", Less);
     test_big(
         -Rational::power_of_2(31i64),
@@ -2296,8 +2296,8 @@ fn test_power_of_10_x_minus_1_rational_prec() {
         "-0x1.000#10",
         Less,
     );
-    // - integer x = MIN_EXPONENT - 1: 2^x is the smallest positive Float, and the exact difference
-    //   2^x - 1 is rounded directly
+    // - integer x = MIN_EXPONENT - 1: 10^x is far below the smallest positive Float and below
+    //   ulp(-1), so 10^x - 1 rounds from -1
     test_big(
         Rational::from(i64::from(Float::MIN_EXPONENT) - 1),
         1,
@@ -2312,8 +2312,7 @@ fn test_power_of_10_x_minus_1_rational_prec() {
         "-0x1.000#10",
         Less,
     );
-    // - integer x = MIN_EXPONENT - 2: 2^x is below the smallest positive Float, and the result is
-    //   resolved by rounding from -1
+    // - integer x = MIN_EXPONENT - 2: likewise, 10^x - 1 rounds from -1
     test_big(
         Rational::from(i64::from(Float::MIN_EXPONENT) - 2),
         1,
@@ -2321,10 +2320,10 @@ fn test_power_of_10_x_minus_1_rational_prec() {
         "-0x1.0#1",
         Less,
     );
-    // - non-integer |x| < 2^MIN_EXPONENT: 2^x - 1 ~ x ln(2) is smaller than the smallest positive
-    //   Float, resolved by the ln(2)-bracketing helper; for |x| in the smallest binade the result
-    //   magnitude is in (min_positive / 2, min_positive), so `Nearest` rounds away from zero, while
-    //   for smaller |x| it rounds to zero
+    // - non-integer |x| < 2^MIN_EXPONENT: 10^x - 1 ~ x ln(10) is near the bottom of the exponent
+    //   range, resolved by the near-zero helper, which brackets x ln(10); for |x| in the smallest
+    //   binade the result magnitude is in (min_positive / 2, min_positive), so `Nearest` rounds
+    //   away from zero, while for smaller |x| it rounds to zero
     test_big(
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
         1,
@@ -2786,7 +2785,7 @@ fn test_power_of_10_x_minus_1_rational_prec_round() {
         assert_eq!(to_hex_string(&f), out_hex);
         assert_eq!(o, out_o);
     };
-    // - integer x > MAX_EXPONENT: 2^x - 1 overflows. Directed-down rounding returns the largest
+    // - integer x > MAX_EXPONENT: 10^x - 1 overflows. Directed-down rounding returns the largest
     //   finite Float; the other modes return +inf
     test_big(
         Rational::power_of_2(31i64),
@@ -2820,8 +2819,8 @@ fn test_power_of_10_x_minus_1_rational_prec_round() {
         "0x7.feE+268435455#10",
         Less,
     );
-    // - integer x = MAX_EXPONENT: 2^x - 1 is representable but needs at least MAX_EXPONENT bits; at
-    //   smaller precisions it rounds exactly like an overflow
+    // - integer x = MAX_EXPONENT: 10^x - 1 overflows too, since x log2(10) > MAX_EXPONENT (unlike
+    //   2^x - 1, which is representable with MAX_EXPONENT bits)
     test_big(
         Rational::from(Float::MAX_EXPONENT),
         1,
@@ -2879,8 +2878,8 @@ fn test_power_of_10_x_minus_1_rational_prec_round() {
         "-0x0.ffc#10",
         Greater,
     );
-    // - integer x = MIN_EXPONENT - 1: 2^x is the smallest positive Float, and the exact difference
-    //   2^x - 1 is rounded directly
+    // - integer x = MIN_EXPONENT - 1: 10^x is far below the smallest positive Float and below
+    //   ulp(-1), so 10^x - 1 rounds from -1
     test_big(
         Rational::from(i64::from(Float::MIN_EXPONENT) - 1),
         1,
@@ -2905,8 +2904,7 @@ fn test_power_of_10_x_minus_1_rational_prec_round() {
         "-0x1.0#1",
         Less,
     );
-    // - integer x = MIN_EXPONENT - 2: 2^x is below the smallest positive Float, and the result is
-    //   resolved by rounding from -1
+    // - integer x = MIN_EXPONENT - 2: likewise, 10^x - 1 rounds from -1
     test_big(
         Rational::from(i64::from(Float::MIN_EXPONENT) - 2),
         1,
@@ -2931,7 +2929,7 @@ fn test_power_of_10_x_minus_1_rational_prec_round() {
         "-0x1.0#1",
         Less,
     );
-    // - non-integer x > 2^(MAX_EXPONENT - 1): 2^x - 1 overflows
+    // - non-integer x > 2^(MAX_EXPONENT - 1): 10^x - 1 overflows
     test_big(
         Rational::power_of_2(i64::from(Float::MAX_EXPONENT)) + Rational::from_unsigneds(1u32, 3),
         1,
@@ -2981,8 +2979,9 @@ fn test_power_of_10_x_minus_1_rational_prec_round() {
         "-0x1.000#10",
         Less,
     );
-    // - non-integer |x| < 2^MIN_EXPONENT: 2^x - 1 ~ x ln(2) underflows, via the ln(2)-bracketing
-    //   helper. For x > 0 the toward-zero modes give 0; for x < 0 they give -0
+    // - non-integer |x| < 2^MIN_EXPONENT: 10^x - 1 ~ x ln(10) is near the bottom of the exponent
+    //   range, resolved by the near-zero helper, which brackets x ln(10). For x > 0 the toward-zero
+    //   modes give 0; for x < 0 they give -0
     test_big(
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
         1,
@@ -3031,7 +3030,7 @@ fn test_power_of_10_x_minus_1_rational_prec_round() {
         "-0x2.0E-268435456#1",
         Greater,
     );
-    // - |x ln(2)| below half the smallest positive Float: `Nearest` rounds to zero
+    // - |x ln(10)| below half the smallest positive Float: `Nearest` rounds to zero
     test_big(
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 10),
         1,
@@ -3305,12 +3304,12 @@ fn primitive_float_power_of_10_x_minus_1_rational_properties() {
     apply_fn_to_primitive_floats!(primitive_float_power_of_10_x_minus_1_rational_properties_helper);
 }
 
-// Regression test: for x = MAX_EXPONENT the intermediate 2^x overflows at any working precision,
-// unlike base 2, 10^MAX_EXPONENT always overflows, so this exercises the deep-negative regime
-// instead: at prec = MAX_EXPONENT, x = -340000000 has 10^x below the smallest positive Float (x *
-// log2(10) < MIN_EXPONENT) without triggering the huge-negative shortcut (|x| < 2 + (prec - 1) /
-// 3), so the Float path materializes -1 + 10^x over Rationals while the Rational integer path
-// rounds from -1 by a different mechanism; the two must agree. (~128 MB results.)
+// Regression test for the deep-negative regime. (The counterpart test for 2^x - 1 uses x =
+// MAX_EXPONENT, where 2^x - 1 is representable; 10^MAX_EXPONENT always overflows.) At prec =
+// MAX_EXPONENT, x = -340000000 has 10^x below the smallest positive Float (x * log2(10) <
+// MIN_EXPONENT) without triggering the huge-negative shortcut (|x| < 2 + (prec - 1) / 3), so the
+// Float path materializes -1 + 10^x over Rationals while the Rational integer path rounds from -1
+// by a different mechanism; the two must agree. (~128 MB results.)
 #[test]
 fn test_power_of_10_x_minus_1_deep_negative_regression() {
     let prec = u64::exact_from(Float::MAX_EXPONENT);

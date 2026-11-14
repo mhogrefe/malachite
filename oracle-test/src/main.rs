@@ -11,10 +11,10 @@
 // disagreement. The FLINT oracle is a small C program (the sources in `oracle/`) built against a
 // FLINT source tree located through the `MALACHITE_FLINT_DIR` environment variable, defaulting to
 // `../../flint-3.6.0`, and against the MPFR installation that FLINT links, located through
-// `MALACHITE_MPFR_DIR`, defaulting to Homebrew's `/opt/homebrew/opt/mpfr`. The Azurite oracle is the `oracle` executable of the Azurite repository
-// (formally verified Lean arithmetic), located through `MALACHITE_AZURITE_DIR`, defaulting to
-// `../../../azurite`. `cargo run --release -- flint` or `-- azurite` runs one backend; with no
-// argument both run. See README.md.
+// `MALACHITE_MPFR_DIR`, defaulting to Homebrew's `/opt/homebrew/opt/mpfr`. The Azurite oracle is
+// the `oracle` executable of the Azurite repository (formally verified Lean arithmetic), located
+// through `MALACHITE_AZURITE_DIR`, defaulting to `../../../azurite`. `cargo run --release -- flint`
+// or `-- azurite` runs one backend; with no argument both run. See README.md.
 
 use std::env;
 use std::fs::{self, File};
@@ -44,9 +44,8 @@ fn mpfr_dir() -> PathBuf {
     })
 }
 
-// Compiles the oracle sources in `oracle/` against the FLINT tree if the binary is missing or
-// stale (judged against the newest source or header), returning
-// the binary's path.
+// Compiles the oracle sources in `oracle/` against the FLINT tree if the binary is missing or stale
+// (judged against the newest source or header), returning the binary's path.
 fn build_oracle() -> PathBuf {
     let flint = flint_dir();
     let mpfr = mpfr_dir();
@@ -151,8 +150,8 @@ fn check_demo_against_flint(oracle: &Path, crate_dir: &str, demo_name: &str, fli
     }
 }
 
-// Like `check_demo_against_flint`, but with a line limit other than `LIMIT`, for demos whose
-// lines are long.
+// Like `check_demo_against_flint`, but with a line limit other than `LIMIT`, for demos whose lines
+// are long.
 fn check_demo_against_flint_with_limit(
     oracle: &Path,
     crate_dir: &str,
@@ -1301,9 +1300,9 @@ const AZURITE_INTEGER_STAGES_NO_SPECIAL: &[(&str, &str)] = &[
     ("demo_integer_from_str_targeted", "az_int_from_str"),
 ];
 
-// The UnsignedVector demos checked against Azurite: the modular ones, read by the same modes as
-// the NaturalVector ones, and those of UnsignedVector<u64>'s interface and strings, read as
-// vectors of AzZModPow2 64.
+// The UnsignedVector demos checked against Azurite: the modular ones, read by the same modes as the
+// NaturalVector ones, and those of UnsignedVector<u64>'s interface and strings, read as vectors of
+// AzZModPow2 64.
 const AZURITE_UNSIGNED_VECTOR_STAGES: &[(&str, &str)] = &[
     ("demo_unsigned_vector_mod_add", "az_nat_vector_mod_add"),
     (
@@ -1967,8 +1966,8 @@ const AZURITE_MOD_STAGES: &[(&str, &str)] = &[
 ];
 
 // The Rational demos (in malachite-q) checked against Azurite's `AzRat`, with the oracle mode that
-// reads each one. The modes follow the rows of the "Malachite for Azurite Users: Rationals"
-// mapping page; `rounding_from` is an Integer demo whose input is a Rational.
+// reads each one. The modes follow the rows of the "Malachite for Azurite Users: Rationals" mapping
+// page; `rounding_from` is an Integer demo whose input is a Rational.
 const AZURITE_RATIONAL_STAGES: &[(&str, &str)] = &[
     ("demo_rational_sum", "az_rat_sum"),
     ("demo_rational_ref_sum", "az_rat_sum"),
@@ -6269,8 +6268,8 @@ fn test_against_flint() {
             "fmpq_poly_compose_series",
         );
     }
-    // The generated cases from compose_properties in malachite-nz's NaturalPolynomial tests: all six
-    // forms, long polynomials, and linear inner polynomials.
+    // The generated cases from compose_properties in malachite-nz's NaturalPolynomial tests: all
+    // six forms, long polynomials, and linear inner polynomials.
     for demo_name in [
         "demo_natural_polynomial_compose",
         "demo_natural_polynomial_compose_val_ref",
@@ -6543,8 +6542,8 @@ fn test_against_flint() {
         );
     }
     // The Euclidean division demos of malachite-base's UnsignedPolynomial and malachite-nz's
-    // NaturalPolynomial, modulo m and modulo powers of 2: quotient and remainder, quotient, and remainder, by value, by reference, in
-    // place, and checked.
+    // NaturalPolynomial, modulo m and modulo powers of 2: quotient and remainder, quotient, and
+    // remainder, by value, by reference, in place, and checked.
     for demo_name in [
         "demo_unsigned_polynomial_mod_div_rem_u8",
         "demo_unsigned_polynomial_mod_div_rem_u64",
@@ -6908,7 +6907,8 @@ fn test_against_flint() {
         );
     }
     // The power series division demos of malachite-base's UnsignedPolynomial and malachite-nz's
-    // NaturalPolynomial, modulo m and modulo powers of 2: by value, by reference, in place, checked, and with lengths up to 1000.
+    // NaturalPolynomial, modulo m and modulo powers of 2: by value, by reference, in place,
+    // checked, and with lengths up to 1000.
     for demo_name in [
         "demo_unsigned_polynomial_mod_div_truncated_u8",
         "demo_unsigned_polynomial_mod_div_truncated_u64",
@@ -6962,8 +6962,8 @@ fn test_against_flint() {
         );
     }
     // The power series inversion demos of malachite-base's UnsignedPolynomial and malachite-nz's
-    // NaturalPolynomial, modulo m and modulo powers of 2: by value, by reference, and with lengths up
-    // to 1000.
+    // NaturalPolynomial, modulo m and modulo powers of 2: by value, by reference, and with lengths
+    // up to 1000.
     for demo_name in [
         "demo_unsigned_polynomial_mod_inverse_truncated_u8",
         "demo_unsigned_polynomial_mod_inverse_truncated_u64",
@@ -7199,9 +7199,8 @@ fn test_against_flint() {
     ] {
         check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "mod_power_of_2_gcd");
     }
-    // GCDs and LCMs over the integers, against fmpz_poly_gcd and fmpz_poly_lcm, and GCDs,
-    // extended GCDs, and LCMs over the rationals, against fmpq_poly_gcd, fmpq_poly_xgcd, and
-    // fmpq_poly_lcm.
+    // GCDs and LCMs over the integers, against fmpz_poly_gcd and fmpz_poly_lcm, and GCDs, extended
+    // GCDs, and LCMs over the rationals, against fmpq_poly_gcd, fmpq_poly_xgcd, and fmpq_poly_lcm.
     for demo_name in [
         "demo_integer_polynomial_gcd",
         "demo_integer_polynomial_gcd_ref_ref",
@@ -7229,8 +7228,8 @@ fn test_against_flint() {
             "rational_polynomial_gcd",
         );
     }
-    // The generated cases from compose_properties in malachite-q's RationalPolynomial tests: all six
-    // forms, long polynomials, and linear inner polynomials.
+    // The generated cases from compose_properties in malachite-q's RationalPolynomial tests: all
+    // six forms, long polynomials, and linear inner polynomials.
     for demo_name in [
         "demo_rational_polynomial_compose",
         "demo_rational_polynomial_compose_val_ref",
@@ -7260,9 +7259,8 @@ fn test_against_flint() {
         );
     }
     // The generated cases from taylor_shift_properties in malachite-nz's IntegerPolynomial and
-    // NaturalPolynomial tests:
-    // by value, by reference, and in place, with long polynomials, and with shifts between -3 and
-    // 3, so that the special shifts 0, 1, and -1 are common.
+    // NaturalPolynomial tests: by value, by reference, and in place, with long polynomials, and
+    // with shifts between -3 and 3, so that the special shifts 0, 1, and -1 are common.
     for demo_name in [
         "demo_integer_polynomial_taylor_shift",
         "demo_integer_polynomial_taylor_shift_ref",
@@ -7930,6 +7928,106 @@ fn test_against_flint() {
             "arf_misc_rational",
         );
     }
+    // `BigExponentFloat`'s exponential functions, checked with FLINT's arb ball arithmetic.
+    for demo_name in [
+        "demo_big_exponent_float_exp_prec_round",
+        "demo_big_exponent_float_exp_prec",
+        "demo_big_exponent_float_exp_x_minus_1_prec_round",
+        "demo_big_exponent_float_exp_x_minus_1_prec",
+        "demo_big_exponent_float_power_of_2_of_big_exponent_float_prec_round",
+        "demo_big_exponent_float_power_of_2_of_big_exponent_float_prec",
+        "demo_big_exponent_float_power_of_2_x_minus_1_prec_round",
+        "demo_big_exponent_float_power_of_2_x_minus_1_prec",
+        "demo_big_exponent_float_power_of_10_of_big_exponent_float_prec_round",
+        "demo_big_exponent_float_power_of_10_of_big_exponent_float_prec",
+        "demo_big_exponent_float_power_of_10_x_minus_1_prec_round",
+        "demo_big_exponent_float_power_of_10_x_minus_1_prec",
+        "demo_big_exponent_float_exp_rational_prec_round",
+        "demo_big_exponent_float_exp_rational_prec",
+        "demo_big_exponent_float_exp_x_minus_1_rational_prec_round",
+        "demo_big_exponent_float_exp_x_minus_1_rational_prec",
+        "demo_big_exponent_float_power_of_2_rational_prec_round",
+        "demo_big_exponent_float_power_of_2_rational_prec",
+        "demo_big_exponent_float_power_of_2_x_minus_1_rational_prec_round",
+        "demo_big_exponent_float_power_of_2_x_minus_1_rational_prec",
+        "demo_big_exponent_float_power_of_10_rational_prec_round",
+        "demo_big_exponent_float_power_of_10_rational_prec",
+        "demo_big_exponent_float_power_of_10_x_minus_1_rational_prec_round",
+        "demo_big_exponent_float_power_of_10_x_minus_1_rational_prec",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-float", demo_name, "arf_exponential");
+    }
+    // `BigExponentFloat`'s logarithms, checked with FLINT's arb ball arithmetic.
+    for demo_name in [
+        "demo_big_exponent_float_ln_prec_round",
+        "demo_big_exponent_float_ln_prec",
+        "demo_big_exponent_float_ln_1_plus_x_prec_round",
+        "demo_big_exponent_float_ln_1_plus_x_prec",
+        "demo_big_exponent_float_log_base_2_prec_round",
+        "demo_big_exponent_float_log_base_2_prec",
+        "demo_big_exponent_float_log_base_2_1_plus_x_prec_round",
+        "demo_big_exponent_float_log_base_2_1_plus_x_prec",
+        "demo_big_exponent_float_log_base_10_prec_round",
+        "demo_big_exponent_float_log_base_10_prec",
+        "demo_big_exponent_float_log_base_10_1_plus_x_prec_round",
+        "demo_big_exponent_float_log_base_10_1_plus_x_prec",
+        "demo_big_exponent_float_log_base_power_of_2_prec_round",
+        "demo_big_exponent_float_log_base_power_of_2_prec",
+        "demo_big_exponent_float_log_base_power_of_2_1_plus_x_prec_round",
+        "demo_big_exponent_float_log_base_power_of_2_1_plus_x_prec",
+        "demo_big_exponent_float_ln_rational_prec_round",
+        "demo_big_exponent_float_ln_rational_prec",
+        "demo_big_exponent_float_log_base_2_rational_prec_round",
+        "demo_big_exponent_float_log_base_2_rational_prec",
+        "demo_big_exponent_float_log_base_10_rational_prec_round",
+        "demo_big_exponent_float_log_base_10_rational_prec",
+        "demo_big_exponent_float_log_base_power_of_2_rational_prec_round",
+        "demo_big_exponent_float_log_base_power_of_2_rational_prec",
+        "demo_big_exponent_float_ln_unsigned_prec_round",
+        "demo_big_exponent_float_ln_unsigned_prec",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-float", demo_name, "arf_logarithm");
+    }
+    // `BigExponentFloat`'s general-base logarithms and `compound`, checked with FLINT's arb ball
+    // arithmetic.
+    for demo_name in [
+        "demo_big_exponent_float_log_base_prec_round",
+        "demo_big_exponent_float_log_base_prec",
+        "demo_big_exponent_float_log_base_prec_round_in_domain",
+        "demo_big_exponent_float_log_base_rational_prec_round",
+        "demo_big_exponent_float_log_base_rational_prec",
+        "demo_big_exponent_float_log_base_rational_prec_round_in_domain",
+        "demo_big_exponent_float_log_base_1_plus_x_prec_round",
+        "demo_big_exponent_float_log_base_1_plus_x_prec",
+        "demo_big_exponent_float_log_base_1_plus_x_prec_round_in_domain",
+        "demo_big_exponent_float_log_base_big_exponent_float_base_prec_round",
+        "demo_big_exponent_float_log_base_big_exponent_float_base_prec",
+        "demo_big_exponent_float_log_base_big_exponent_float_base_prec_round_in_domain",
+        "demo_big_exponent_float_log_base_big_exponent_float_base_1_plus_x_prec_round",
+        "demo_big_exponent_float_log_base_big_exponent_float_base_1_plus_x_prec",
+        "demo_big_exponent_float_log_base_big_exponent_float_base_1_plus_x_prec_round_in_domain",
+        "demo_big_exponent_float_log_base_rational_base_prec_round",
+        "demo_big_exponent_float_log_base_rational_base_prec",
+        "demo_big_exponent_float_log_base_rational_base_prec_round_in_domain",
+        "demo_big_exponent_float_log_base_rational_base_1_plus_x_prec_round",
+        "demo_big_exponent_float_log_base_rational_base_1_plus_x_prec",
+        "demo_big_exponent_float_log_base_rational_base_1_plus_x_prec_round_in_domain",
+        "demo_big_exponent_float_log_base_rational_big_exponent_float_base_prec_round",
+        "demo_big_exponent_float_log_base_rational_big_exponent_float_base_prec",
+        "demo_big_exponent_float_log_base_rational_big_exponent_float_base_prec_round_in_domain",
+        "demo_big_exponent_float_log_base_rational_rational_base_prec_round",
+        "demo_big_exponent_float_log_base_rational_rational_base_prec",
+        "demo_big_exponent_float_log_base_rational_rational_base_prec_round_in_domain",
+        "demo_big_exponent_float_compound_prec_round",
+        "demo_big_exponent_float_compound_prec",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-float",
+            demo_name,
+            "arf_logarithm_general",
+        );
+    }
     // Malachite's internal `Mag` (FLINT's `mag_t`).
     for (demo_name, flint_mode) in [
         ("demo_mag_from_u64", "mag_set_ui"),
@@ -8153,8 +8251,8 @@ fn test_against_flint() {
     // Edge rows for the multi-modulus CRT quirks: a single modulus of 1 is usable, but a 1 or a
 
     // Every case from test_balanced_mod in malachite-nz's IntegerPolynomial tests, including the
-    // The generated cases from balanced_mod_properties: the (polynomial, nonzero modulus) pairs,
-    // by value, by reference, and in place, and every polynomial against the moduli 1, -1, and 2.
+    // The generated cases from balanced_mod_properties: the (polynomial, nonzero modulus) pairs, by
+    // value, by reference, and in place, and every polynomial against the moduli 1, -1, and 2.
     for demo_name in [
         "demo_integer_polynomial_balanced_mod",
         "demo_integer_polynomial_balanced_mod_ref",
@@ -8186,9 +8284,8 @@ fn test_against_flint() {
         );
     }
 
-    // Every case from test_mod_op in malachite-nz's IntegerPolynomial tests, and the
-    // The generated cases from mod_op_properties, and the u128 ones from
-    // mod_op_unsigned_properties.
+    // Every case from test_mod_op in malachite-nz's IntegerPolynomial tests, and the The generated
+    // cases from mod_op_properties, and the u128 ones from mod_op_unsigned_properties.
     for demo_name in [
         "demo_integer_polynomial_mod_op",
         "demo_integer_polynomial_mod_op_ref",
@@ -8203,8 +8300,8 @@ fn test_against_flint() {
         );
     }
 
-    // The cases from test_mod_op_unsigned whose modulus fits in a word.
-    // The generated cases from mod_op_unsigned_properties, for every word-sized type.
+    // The cases from test_mod_op_unsigned whose modulus fits in a word. The generated cases from
+    // mod_op_unsigned_properties, for every word-sized type.
     for demo_name in [
         "demo_integer_polynomial_mod_op_unsigned_u8",
         "demo_integer_polynomial_mod_op_unsigned_u16",
@@ -8220,8 +8317,8 @@ fn test_against_flint() {
         );
     }
 
-    // Every case from test_rem, test_rem_lowers_the_degree, test_rem_unsigned, and test_mod_op
-    // The generated cases from rem_properties and rem_unsigned_properties, in every form.
+    // Every case from test_rem, test_rem_lowers_the_degree, test_rem_unsigned, and test_mod_op The
+    // generated cases from rem_properties and rem_unsigned_properties, in every form.
     for demo_name in [
         "demo_natural_polynomial_rem",
         "demo_natural_polynomial_rem_ref",
@@ -8265,12 +8362,11 @@ fn test_against_flint() {
         );
     }
 
-    // Every case from test_evaluate in malachite-nz's IntegerPolynomial and NaturalPolynomial tests,
-    // checked against
-    // FLINT's evaluation and against each of the two algorithms it chooses between.
-    // The generated cases from evaluate_properties: by value and by reference, polynomials of
-    // degree at least 50 (which take the divide-and-conquer path), and each algorithm on its own.
-    // The generated cases from evaluate_integer_polynomial_rational_properties.
+    // Every case from test_evaluate in malachite-nz's IntegerPolynomial and NaturalPolynomial
+    // tests, checked against FLINT's evaluation and against each of the two algorithms it chooses
+    // between. The generated cases from evaluate_properties: by value and by reference, polynomials
+    // of degree at least 50 (which take the divide-and-conquer path), and each algorithm on its
+    // own. The generated cases from evaluate_integer_polynomial_rational_properties.
     for (demo_name, flint_mode) in [
         (
             "demo_integer_polynomial_evaluate_rational",
@@ -8326,7 +8422,8 @@ fn test_against_flint() {
         );
     }
 
-    // Every case from test_mod_power_of_2_evaluate in malachite-nz's NaturalPolynomial tests, and the
+    // Every case from test_mod_power_of_2_evaluate in malachite-nz's NaturalPolynomial tests, and
+    // the
     for demo_name in [
         "demo_natural_polynomial_mod_power_of_2_evaluate",
         "demo_natural_polynomial_mod_power_of_2_evaluate_ref",
@@ -8373,7 +8470,8 @@ fn test_against_flint() {
         );
     }
 
-    // Every case from test_mod_evaluate in malachite-nz's NaturalPolynomial tests, and the generated
+    // Every case from test_mod_evaluate in malachite-nz's NaturalPolynomial tests, and the
+    // generated
     for demo_name in [
         "demo_natural_polynomial_mod_evaluate",
         "demo_natural_polynomial_mod_evaluate_ref",
@@ -8529,8 +8627,8 @@ fn test_against_flint() {
         );
     }
 
-    // Every case from test_mul_to_out_classical in malachite-nz's IntegerPolynomial tests, and the generated cases
-    // from its demos, against _fmpz_poly_mul_classical.
+    // Every case from test_mul_to_out_classical in malachite-nz's IntegerPolynomial tests, and the
+    // generated cases from its demos, against _fmpz_poly_mul_classical.
     check_demo_against_flint(
         &oracle,
         "../malachite-nz",
@@ -8538,8 +8636,8 @@ fn test_against_flint() {
         "_fmpz_poly_mul_classical",
     );
 
-    // Every case from test_mul_to_out_tiny_1 in malachite-nz's IntegerPolynomial tests, and the generated cases
-    // from its demos, against _fmpz_poly_mul.
+    // Every case from test_mul_to_out_tiny_1 in malachite-nz's IntegerPolynomial tests, and the
+    // generated cases from its demos, against _fmpz_poly_mul.
     check_demo_against_flint(
         &oracle,
         "../malachite-nz",
@@ -8547,8 +8645,8 @@ fn test_against_flint() {
         "_fmpz_poly_mul",
     );
 
-    // Every case from test_mul_to_out_tiny_2 in malachite-nz's IntegerPolynomial tests, and the generated cases
-    // from its demos, against _fmpz_poly_mul.
+    // Every case from test_mul_to_out_tiny_2 in malachite-nz's IntegerPolynomial tests, and the
+    // generated cases from its demos, against _fmpz_poly_mul.
     check_demo_against_flint(
         &oracle,
         "../malachite-nz",
@@ -8556,8 +8654,8 @@ fn test_against_flint() {
         "_fmpz_poly_mul",
     );
 
-    // Every case from test_mul_greater_to_out in malachite-nz's IntegerPolynomial tests, and the generated cases
-    // from its demos, against _fmpz_poly_mul.
+    // Every case from test_mul_greater_to_out in malachite-nz's IntegerPolynomial tests, and the
+    // generated cases from its demos, against _fmpz_poly_mul.
     check_demo_against_flint(
         &oracle,
         "../malachite-nz",
@@ -8578,8 +8676,8 @@ fn test_against_flint() {
         check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "fmpz_poly_mul");
     }
 
-    // Every case from test_mul_truncated_to_out_classical in malachite-nz's IntegerPolynomial tests, and the generated cases
-    // from its demos, against _fmpz_poly_mullow_classical.
+    // Every case from test_mul_truncated_to_out_classical in malachite-nz's IntegerPolynomial
+    // tests, and the generated cases from its demos, against _fmpz_poly_mullow_classical.
     check_demo_against_flint(
         &oracle,
         "../malachite-nz",
@@ -8587,8 +8685,8 @@ fn test_against_flint() {
         "_fmpz_poly_mullow_classical",
     );
 
-    // Every case from test_mul_truncated_to_out_tiny_1 in malachite-nz's IntegerPolynomial tests, and the generated cases
-    // from its demos, against _fmpz_poly_mullow.
+    // Every case from test_mul_truncated_to_out_tiny_1 in malachite-nz's IntegerPolynomial tests,
+    // and the generated cases from its demos, against _fmpz_poly_mullow.
     check_demo_against_flint(
         &oracle,
         "../malachite-nz",
@@ -8596,8 +8694,8 @@ fn test_against_flint() {
         "_fmpz_poly_mullow",
     );
 
-    // Every case from test_mul_truncated_to_out_tiny_2 in malachite-nz's IntegerPolynomial tests, and the generated cases
-    // from its demos, against _fmpz_poly_mullow.
+    // Every case from test_mul_truncated_to_out_tiny_2 in malachite-nz's IntegerPolynomial tests,
+    // and the generated cases from its demos, against _fmpz_poly_mullow.
     check_demo_against_flint(
         &oracle,
         "../malachite-nz",
@@ -8605,8 +8703,8 @@ fn test_against_flint() {
         "_fmpz_poly_mullow",
     );
 
-    // Every case from test_mul_truncated_to_out in malachite-nz's IntegerPolynomial tests, and the generated cases
-    // from its demos, against _fmpz_poly_mullow.
+    // Every case from test_mul_truncated_to_out in malachite-nz's IntegerPolynomial tests, and the
+    // generated cases from its demos, against _fmpz_poly_mullow.
     check_demo_against_flint(
         &oracle,
         "../malachite-nz",
@@ -8614,8 +8712,8 @@ fn test_against_flint() {
         "_fmpz_poly_mullow",
     );
 
-    // Every case from test_mul_truncated in malachite-nz's IntegerPolynomial tests, and the generated cases
-    // from its demos, against fmpz_poly_mullow.
+    // Every case from test_mul_truncated in malachite-nz's IntegerPolynomial tests, and the
+    // generated cases from its demos, against fmpz_poly_mullow.
     for demo_name in [
         "demo_integer_polynomial_mul_truncated",
         "demo_integer_polynomial_mul_truncated_val_ref",
@@ -8627,8 +8725,8 @@ fn test_against_flint() {
         check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "fmpz_poly_mullow");
     }
 
-    // Every case from test_mul_middle in malachite-nz's IntegerPolynomial and NaturalPolynomial tests, and
-    // the generated cases from their demos, against fmpz_poly_mulmid.
+    // Every case from test_mul_middle in malachite-nz's IntegerPolynomial and NaturalPolynomial
+    // tests, and the generated cases from their demos, against fmpz_poly_mulmid.
     for demo_name in [
         "demo_integer_polynomial_mul_middle",
         "demo_integer_polynomial_mul_middle_val_ref",
@@ -8769,8 +8867,8 @@ fn test_against_flint() {
         );
     }
 
-    // Every case from test_mul_high_to_out_classical in malachite-nz's IntegerPolynomial tests, and the generated cases
-    // from its demos, against _fmpz_poly_mulhigh_classical.
+    // Every case from test_mul_high_to_out_classical in malachite-nz's IntegerPolynomial tests, and
+    // the generated cases from its demos, against _fmpz_poly_mulhigh_classical.
     check_demo_against_flint(
         &oracle,
         "../malachite-nz",
@@ -8778,8 +8876,8 @@ fn test_against_flint() {
         "_fmpz_poly_mulhigh_classical",
     );
 
-    // Every case from test_mul_middle_to_out_classical in malachite-nz's IntegerPolynomial tests, and the generated cases
-    // from its demos, against _fmpz_poly_mulmid_classical.
+    // Every case from test_mul_middle_to_out_classical in malachite-nz's IntegerPolynomial tests,
+    // and the generated cases from its demos, against _fmpz_poly_mulmid_classical.
     for demo_name in [
         "demo_mul_middle_to_out_classical",
         "demo_mul_middle_to_out_classical_square",
@@ -8792,8 +8890,8 @@ fn test_against_flint() {
         );
     }
 
-    // Every case from test_mul_middle_to_out_tiny_1 in malachite-nz's IntegerPolynomial tests, and the generated cases
-    // from its demos, against _fmpz_poly_mulmid.
+    // Every case from test_mul_middle_to_out_tiny_1 in malachite-nz's IntegerPolynomial tests, and
+    // the generated cases from its demos, against _fmpz_poly_mulmid.
     for demo_name in [
         "demo_mul_middle_to_out_tiny_1",
         "demo_mul_middle_to_out_tiny_1_square",
@@ -8801,8 +8899,8 @@ fn test_against_flint() {
         check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "_fmpz_poly_mulmid");
     }
 
-    // Every case from test_mul_middle_to_out_tiny_2 in malachite-nz's IntegerPolynomial tests, and the generated cases
-    // from its demos, against _fmpz_poly_mulmid.
+    // Every case from test_mul_middle_to_out_tiny_2 in malachite-nz's IntegerPolynomial tests, and
+    // the generated cases from its demos, against _fmpz_poly_mulmid.
     for demo_name in [
         "demo_mul_middle_to_out_tiny_2",
         "demo_mul_middle_to_out_tiny_2_square",
@@ -8810,8 +8908,8 @@ fn test_against_flint() {
         check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "_fmpz_poly_mulmid");
     }
 
-    // Every case from test_mul_middle_to_out in malachite-nz's IntegerPolynomial tests, and the generated cases
-    // from its demos, against _fmpz_poly_mulmid.
+    // Every case from test_mul_middle_to_out in malachite-nz's IntegerPolynomial tests, and the
+    // generated cases from its demos, against _fmpz_poly_mulmid.
     check_demo_against_flint(
         &oracle,
         "../malachite-nz",
@@ -8819,8 +8917,8 @@ fn test_against_flint() {
         "_fmpz_poly_mulmid",
     );
 
-    // Every case from test_square_to_out_classical in malachite-nz's IntegerPolynomial tests, and the generated cases
-    // from its demos, against _fmpz_poly_sqr_classical.
+    // Every case from test_square_to_out_classical in malachite-nz's IntegerPolynomial tests, and
+    // the generated cases from its demos, against _fmpz_poly_sqr_classical.
     check_demo_against_flint(
         &oracle,
         "../malachite-nz",
@@ -8828,8 +8926,8 @@ fn test_against_flint() {
         "_fmpz_poly_sqr_classical",
     );
 
-    // Every case from test_square_to_out_tiny_1 in malachite-nz's IntegerPolynomial tests, and the generated cases
-    // from its demos, against _fmpz_poly_sqr.
+    // Every case from test_square_to_out_tiny_1 in malachite-nz's IntegerPolynomial tests, and the
+    // generated cases from its demos, against _fmpz_poly_sqr.
     check_demo_against_flint(
         &oracle,
         "../malachite-nz",
@@ -8837,8 +8935,8 @@ fn test_against_flint() {
         "_fmpz_poly_sqr",
     );
 
-    // Every case from test_square_to_out_tiny_2 in malachite-nz's IntegerPolynomial tests, and the generated cases
-    // from its demos, against _fmpz_poly_sqr.
+    // Every case from test_square_to_out_tiny_2 in malachite-nz's IntegerPolynomial tests, and the
+    // generated cases from its demos, against _fmpz_poly_sqr.
     check_demo_against_flint(
         &oracle,
         "../malachite-nz",
@@ -8846,8 +8944,8 @@ fn test_against_flint() {
         "_fmpz_poly_sqr",
     );
 
-    // Every case from test_square_to_out in malachite-nz's IntegerPolynomial tests, and the generated cases
-    // from its demos, against _fmpz_poly_sqr.
+    // Every case from test_square_to_out in malachite-nz's IntegerPolynomial tests, and the
+    // generated cases from its demos, against _fmpz_poly_sqr.
     check_demo_against_flint(
         &oracle,
         "../malachite-nz",
@@ -8855,8 +8953,8 @@ fn test_against_flint() {
         "_fmpz_poly_sqr",
     );
 
-    // Every case from test_square in malachite-nz's IntegerPolynomial tests, and the generated cases
-    // from its demos, against fmpz_poly_sqr.
+    // Every case from test_square in malachite-nz's IntegerPolynomial tests, and the generated
+    // cases from its demos, against fmpz_poly_sqr.
     for demo_name in [
         "demo_integer_polynomial_square",
         "demo_integer_polynomial_square_ref",
@@ -8865,8 +8963,8 @@ fn test_against_flint() {
         check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "fmpz_poly_sqr");
     }
 
-    // Every case from test_square_truncated_to_out_classical in malachite-nz's IntegerPolynomial tests, and the generated cases
-    // from its demos, against _fmpz_poly_sqrlow_classical.
+    // Every case from test_square_truncated_to_out_classical in malachite-nz's IntegerPolynomial
+    // tests, and the generated cases from its demos, against _fmpz_poly_sqrlow_classical.
     check_demo_against_flint(
         &oracle,
         "../malachite-nz",
@@ -8874,8 +8972,8 @@ fn test_against_flint() {
         "_fmpz_poly_sqrlow_classical",
     );
 
-    // Every case from test_square_truncated_to_out_tiny_1 in malachite-nz's IntegerPolynomial tests, and the generated cases
-    // from its demos, against _fmpz_poly_sqrlow.
+    // Every case from test_square_truncated_to_out_tiny_1 in malachite-nz's IntegerPolynomial
+    // tests, and the generated cases from its demos, against _fmpz_poly_sqrlow.
     check_demo_against_flint(
         &oracle,
         "../malachite-nz",
@@ -8883,8 +8981,8 @@ fn test_against_flint() {
         "_fmpz_poly_sqrlow",
     );
 
-    // Every case from test_square_truncated_to_out_tiny_2 in malachite-nz's IntegerPolynomial tests, and the generated cases
-    // from its demos, against _fmpz_poly_sqrlow.
+    // Every case from test_square_truncated_to_out_tiny_2 in malachite-nz's IntegerPolynomial
+    // tests, and the generated cases from its demos, against _fmpz_poly_sqrlow.
     check_demo_against_flint(
         &oracle,
         "../malachite-nz",
@@ -8892,8 +8990,8 @@ fn test_against_flint() {
         "_fmpz_poly_sqrlow",
     );
 
-    // Every case from test_square_truncated_to_out in malachite-nz's IntegerPolynomial tests, and the generated cases
-    // from its demos, against _fmpz_poly_sqrlow.
+    // Every case from test_square_truncated_to_out in malachite-nz's IntegerPolynomial tests, and
+    // the generated cases from its demos, against _fmpz_poly_sqrlow.
     check_demo_against_flint(
         &oracle,
         "../malachite-nz",
@@ -8901,8 +8999,8 @@ fn test_against_flint() {
         "_fmpz_poly_sqrlow",
     );
 
-    // Every case from test_square_truncated in malachite-nz's IntegerPolynomial tests, and the generated cases
-    // from its demos, against fmpz_poly_sqrlow.
+    // Every case from test_square_truncated in malachite-nz's IntegerPolynomial tests, and the
+    // generated cases from its demos, against fmpz_poly_sqrlow.
     for demo_name in [
         "demo_integer_polynomial_square_truncated",
         "demo_integer_polynomial_square_truncated_ref",
@@ -8911,8 +9009,8 @@ fn test_against_flint() {
         check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "fmpz_poly_sqrlow");
     }
 
-    // Every case from test_mul_to_out_karatsuba in malachite-nz's IntegerPolynomial tests, and the generated cases
-    // from its demo, against _fmpz_poly_mul_karatsuba.
+    // Every case from test_mul_to_out_karatsuba in malachite-nz's IntegerPolynomial tests, and the
+    // generated cases from its demo, against _fmpz_poly_mul_karatsuba.
     check_demo_against_flint(
         &oracle,
         "../malachite-nz",
@@ -8920,8 +9018,8 @@ fn test_against_flint() {
         "_fmpz_poly_mul_karatsuba",
     );
 
-    // Every case from test_mul_truncated_to_out_karatsuba_n in malachite-nz's IntegerPolynomial tests, and the generated cases
-    // from its demo, against _fmpz_poly_mullow_karatsuba_n.
+    // Every case from test_mul_truncated_to_out_karatsuba_n in malachite-nz's IntegerPolynomial
+    // tests, and the generated cases from its demo, against _fmpz_poly_mullow_karatsuba_n.
     check_demo_against_flint(
         &oracle,
         "../malachite-nz",
@@ -8929,8 +9027,8 @@ fn test_against_flint() {
         "_fmpz_poly_mullow_karatsuba_n",
     );
 
-    // Every case from test_mul_truncated_to_out_karatsuba in malachite-nz's IntegerPolynomial tests, and the generated cases
-    // from its demo, against _fmpz_poly_mullow_karatsuba.
+    // Every case from test_mul_truncated_to_out_karatsuba in malachite-nz's IntegerPolynomial
+    // tests, and the generated cases from its demo, against _fmpz_poly_mullow_karatsuba.
     check_demo_against_flint(
         &oracle,
         "../malachite-nz",
@@ -8938,8 +9036,8 @@ fn test_against_flint() {
         "_fmpz_poly_mullow_karatsuba",
     );
 
-    // Every case from test_mul_high_to_out_karatsuba_n in malachite-nz's IntegerPolynomial tests, and the generated cases
-    // from its demo, against _fmpz_poly_mulhigh_karatsuba_n.
+    // Every case from test_mul_high_to_out_karatsuba_n in malachite-nz's IntegerPolynomial tests,
+    // and the generated cases from its demo, against _fmpz_poly_mulhigh_karatsuba_n.
     check_demo_against_flint(
         &oracle,
         "../malachite-nz",
@@ -8947,8 +9045,8 @@ fn test_against_flint() {
         "_fmpz_poly_mulhigh_karatsuba_n",
     );
 
-    // Every case from test_mul_high_to_out in malachite-nz's IntegerPolynomial tests, and the generated cases
-    // from its demo, against _fmpz_poly_mulhigh.
+    // Every case from test_mul_high_to_out in malachite-nz's IntegerPolynomial tests, and the
+    // generated cases from its demo, against _fmpz_poly_mulhigh.
     check_demo_against_flint(
         &oracle,
         "../malachite-nz",
@@ -8956,8 +9054,8 @@ fn test_against_flint() {
         "_fmpz_poly_mulhigh",
     );
 
-    // Every case from test_square_to_out_karatsuba in malachite-nz's IntegerPolynomial tests, and the generated cases
-    // from its demo, against _fmpz_poly_sqr_karatsuba.
+    // Every case from test_square_to_out_karatsuba in malachite-nz's IntegerPolynomial tests, and
+    // the generated cases from its demo, against _fmpz_poly_sqr_karatsuba.
     check_demo_against_flint(
         &oracle,
         "../malachite-nz",
@@ -8965,8 +9063,8 @@ fn test_against_flint() {
         "_fmpz_poly_sqr_karatsuba",
     );
 
-    // Every case from test_square_truncated_to_out_karatsuba_n in malachite-nz's IntegerPolynomial tests, and the generated cases
-    // from its demo, against _fmpz_poly_sqrlow_karatsuba_n.
+    // Every case from test_square_truncated_to_out_karatsuba_n in malachite-nz's IntegerPolynomial
+    // tests, and the generated cases from its demo, against _fmpz_poly_sqrlow_karatsuba_n.
     check_demo_against_flint(
         &oracle,
         "../malachite-nz",
@@ -8974,8 +9072,8 @@ fn test_against_flint() {
         "_fmpz_poly_sqrlow_karatsuba_n",
     );
 
-    // Every case from test_square_truncated_to_out_karatsuba in malachite-nz's IntegerPolynomial tests, and the generated cases
-    // from its demo, against _fmpz_poly_sqrlow_karatsuba.
+    // Every case from test_square_truncated_to_out_karatsuba in malachite-nz's IntegerPolynomial
+    // tests, and the generated cases from its demo, against _fmpz_poly_sqrlow_karatsuba.
     check_demo_against_flint(
         &oracle,
         "../malachite-nz",
@@ -8983,8 +9081,8 @@ fn test_against_flint() {
         "_fmpz_poly_sqrlow_karatsuba",
     );
 
-    // Every case from test_mul_to_out_kronecker in malachite-nz's IntegerPolynomial tests, and the generated cases
-    // from its demos, against _fmpz_poly_mul_KS.
+    // Every case from test_mul_to_out_kronecker in malachite-nz's IntegerPolynomial tests, and the
+    // generated cases from its demos, against _fmpz_poly_mul_KS.
     check_demo_against_flint(
         &oracle,
         "../malachite-nz",
@@ -8992,8 +9090,8 @@ fn test_against_flint() {
         "_fmpz_poly_mul_KS",
     );
 
-    // Every case from test_mul_truncated_to_out_kronecker in malachite-nz's IntegerPolynomial tests, and the generated cases
-    // from its demos, against _fmpz_poly_mullow_KS.
+    // Every case from test_mul_truncated_to_out_kronecker in malachite-nz's IntegerPolynomial
+    // tests, and the generated cases from its demos, against _fmpz_poly_mullow_KS.
     check_demo_against_flint(
         &oracle,
         "../malachite-nz",
@@ -9001,8 +9099,8 @@ fn test_against_flint() {
         "_fmpz_poly_mullow_KS",
     );
 
-    // Every case from test_mul_middle_to_out_kronecker in malachite-nz's IntegerPolynomial tests, and the generated cases
-    // from its demos, against _fmpz_poly_mulmid_KS.
+    // Every case from test_mul_middle_to_out_kronecker in malachite-nz's IntegerPolynomial tests,
+    // and the generated cases from its demos, against _fmpz_poly_mulmid_KS.
     for demo_name in [
         "demo_mul_middle_to_out_kronecker",
         "demo_mul_middle_to_out_kronecker_square",
@@ -9015,8 +9113,8 @@ fn test_against_flint() {
         );
     }
 
-    // Every case from test_square_to_out_kronecker in malachite-nz's IntegerPolynomial tests, and the generated cases
-    // from its demos, against _fmpz_poly_sqr_KS.
+    // Every case from test_square_to_out_kronecker in malachite-nz's IntegerPolynomial tests, and
+    // the generated cases from its demos, against _fmpz_poly_sqr_KS.
     check_demo_against_flint(
         &oracle,
         "../malachite-nz",
@@ -9024,8 +9122,8 @@ fn test_against_flint() {
         "_fmpz_poly_sqr_KS",
     );
 
-    // Every case from test_square_truncated_to_out_kronecker in malachite-nz's IntegerPolynomial tests, and the generated cases
-    // from its demos, against _fmpz_poly_sqrlow_KS.
+    // Every case from test_square_truncated_to_out_kronecker in malachite-nz's IntegerPolynomial
+    // tests, and the generated cases from its demos, against _fmpz_poly_sqrlow_KS.
     check_demo_against_flint(
         &oracle,
         "../malachite-nz",
@@ -9396,9 +9494,9 @@ fn test_against_flint() {
     }
 
     // The products of IntegerMatrixes and NaturalMatrixes, against fmpz_mat_mul. The `_large_*`
-    // demos enlarge the random dimensions and element sizes to reach the dispatcher's algorithms for
-    // large inputs (the blocked and double-word kernels, Waksman's and Strassen's algorithms, and
-    // the multimodular algorithm); their lines are long, so they print fewer.
+    // demos enlarge the random dimensions and element sizes to reach the dispatcher's algorithms
+    // for large inputs (the blocked and double-word kernels, Waksman's and Strassen's algorithms,
+    // and the multimodular algorithm); their lines are long, so they print fewer.
     for matrix in ["integer_matrix", "natural_matrix"] {
         for suffix in [
             "",
@@ -9516,8 +9614,8 @@ fn test_against_flint() {
         );
     }
     // Reduced row echelon forms and nullspaces of UnsignedMatrixes, against nmod_mat_rref,
-    // nmod_mat_nullspace, and nmod_mat_left_nullspace. Both forms are unique, and the nullspace bases
-    // are built from them in the same way, so the results must match exactly.
+    // nmod_mat_nullspace, and nmod_mat_left_nullspace. Both forms are unique, and the nullspace
+    // bases are built from them in the same way, so the results must match exactly.
     for (op, flint_mode) in [
         ("mod_reduced_row_echelon_form", "nmod_mat_rref"),
         ("mod_reduced_row_echelon_form_ref", "nmod_mat_rref"),
@@ -9561,8 +9659,8 @@ fn test_against_flint() {
         );
     }
     // LU decompositions, ranks, and determinants of NaturalMatrixes, against fmpz_mod_mat_lu,
-    // fmpz_mod_mat_rank, and fmpz_mod_mat_det. The LU and rank demos' moduli are prime, half of them
-    // with more than 64 bits; the determinant demo's moduli are mostly composite, so that LU
+    // fmpz_mod_mat_rank, and fmpz_mod_mat_det. The LU and rank demos' moduli are prime, half of
+    // them with more than 64 bits; the determinant demo's moduli are mostly composite, so that LU
     // decomposition often meets a pivot that is not invertible and Berkowitz's algorithm is used.
     for (op, flint_mode) in [
         ("mod_lu_decomposition", "fmpz_mod_mat_lu"),
@@ -9608,8 +9706,8 @@ fn test_against_flint() {
             300,
         );
     }
-    // Hadamard bounds for IntegerMatrixes, against fmpz_mat_det_bound, fmpz_mat_det_bound_submatrix,
-    // and fmpz_mat_solve_bound.
+    // Hadamard bounds for IntegerMatrixes, against fmpz_mat_det_bound,
+    // fmpz_mat_det_bound_submatrix, and fmpz_mat_solve_bound.
     for (op, flint_mode) in [
         ("determinant_bound", "fmpz_mat_det_bound"),
         (
@@ -9626,9 +9724,9 @@ fn test_against_flint() {
         );
     }
     // Fraction-free LU decompositions, determinants, and fraction-free reduced row echelon form
-    // checks for IntegerMatrixes, against fmpz_mat_fflu, fmpz_mat_det_bareiss, fmpz_mat_det_cofactor,
-    // and fmpz_mat_is_in_rref_with_rank. The `_low_rank` demo multiplies matrices to get many of less
-    // than full rank.
+    // checks for IntegerMatrixes, against fmpz_mat_fflu, fmpz_mat_det_bareiss,
+    // fmpz_mat_det_cofactor, and fmpz_mat_is_in_rref_with_rank. The `_low_rank` demo multiplies
+    // matrices to get many of less than full rank.
     for (op, flint_mode) in [
         ("fraction_free_lu_decomposition", "fmpz_mat_fflu"),
         ("fraction_free_lu_decomposition_low_rank", "fmpz_mat_fflu"),
@@ -9647,8 +9745,8 @@ fn test_against_flint() {
         );
     }
     // Solutions of linear systems with IntegerMatrixes, against fmpz_mat_solve_fflu,
-    // fmpz_mat_solve_cramer, and fmpz_mat_solve_fflu_precomp. The `_low_rank` demos make many systems
-    // singular.
+    // fmpz_mat_solve_cramer, and fmpz_mat_solve_fflu_precomp. The `_low_rank` demos make many
+    // systems singular.
     for (op, flint_mode) in [
         ("solve_fflu", "fmpz_mat_solve_fflu"),
         ("solve_fflu_low_rank", "fmpz_mat_solve_fflu"),
@@ -9710,8 +9808,8 @@ fn test_against_flint() {
             flint_mode,
         );
     }
-    // Solutions of linear systems with RationalMatrixes and inverses, against fmpq_mat_solve and its
-    // fraction-free, Dixon, and multimodular forms, fmpq_mat_can_solve and its fraction-free,
+    // Solutions of linear systems with RationalMatrixes and inverses, against fmpq_mat_solve and
+    // its fraction-free, Dixon, and multimodular forms, fmpq_mat_can_solve and its fraction-free,
     // multimodular, and Dixon forms, fmpq_mat_inv, and, for the public `Solve`, fmpq_mat_solve
     // falling back to fmpq_mat_can_solve. The `_low_rank` demos make many systems singular.
     for (op, flint_mode) in [
@@ -10069,12 +10167,12 @@ fn test_against_flint() {
             flint_mode,
         );
     }
-    // Smith normal forms of IntegerMatrixes, against fmpz_mat_snf and its diagonal,
-    // Kannan-Bachem, and Iliopoulos forms (the iterative Hermite one, static in FLINT, against
-    // fmpz_mat_snf, since the form is unique), fmpz_mat_snf_transform (U and V are not unique, and
-    // match FLINT's), fmpz_mat_is_in_snf, and fmpz_mat_elementary_divisors. The `_low_rank` demos
-    // make many matrices rank deficient. Also Integer's extended GCD, which the transforms use,
-    // against fmpz_xgcd_canonical_bezout.
+    // Smith normal forms of IntegerMatrixes, against fmpz_mat_snf and its diagonal, Kannan-Bachem,
+    // and Iliopoulos forms (the iterative Hermite one, static in FLINT, against fmpz_mat_snf, since
+    // the form is unique), fmpz_mat_snf_transform (U and V are not unique, and match FLINT's),
+    // fmpz_mat_is_in_snf, and fmpz_mat_elementary_divisors. The `_low_rank` demos make many
+    // matrices rank deficient. Also Integer's extended GCD, which the transforms use, against
+    // fmpz_xgcd_canonical_bezout.
     for (demo, flint_mode) in [
         ("integer_matrix_smith_normal_form", "fmpz_mat_snf"),
         ("integer_matrix_smith_normal_form_low_rank", "fmpz_mat_snf"),

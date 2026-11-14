@@ -462,6 +462,26 @@ pub fn triple_1_2_rational_bit_u64_max_bucketer<'a, T>(
     }
 }
 
+pub fn quadruple_1_3_rational_bit_u64_max_bucketer<'a, T, U>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (Rational, T, u64, U)> {
+    Bucketer {
+        bucketing_function: &|(x, _, y, _)| usize::exact_from(max(x.significant_bits(), *y)),
+        bucketing_label: format!("max({x_name}.significant_bits(), {y_name})"),
+    }
+}
+
+pub fn quadruple_2_3_rational_bit_u64_max_bucketer<'a, T, U>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (T, Rational, u64, U)> {
+    Bucketer {
+        bucketing_function: &|(_, x, y, _)| usize::exact_from(max(x.significant_bits(), *y)),
+        bucketing_label: format!("max({x_name}.significant_bits(), {y_name})"),
+    }
+}
+
 pub fn triple_rational_bit_i64_u64_max_bucketer<'a>(
     x_name: &'a str,
     y_name: &'a str,

@@ -43,7 +43,7 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::string::options::{FromSciStringOptions, ToSciOptions};
 use malachite_base::num::conversion::traits::ConvertibleFrom;
 use malachite_base::rounding_modes::RoundingMode;
-use malachite_base::test_util::generators::common::Generator;
+use malachite_base::test_util::generators::common::{Generator, It};
 use malachite_nz::gaussian_integer::GaussianInteger;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
@@ -693,6 +693,171 @@ pub fn big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_12()
     )
 }
 
+// All valid inputs to `BigExponentFloat::log_base_rational_base_prec_round`.
+pub fn big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_13()
+-> Generator<(BigExponentFloat, Rational, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_13,
+        &random_big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_13,
+        &special_random_big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_13,
+    )
+}
+
+// Like `big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_13`, paired with the
+// equal `Float`s, excluding `Exact`.
+pub fn big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_13_float() -> Generator<
+    (
+        (Float, Rational, u64, RoundingMode),
+        (BigExponentFloat, Rational, u64, RoundingMode),
+    ),
+> {
+    Generator::new(
+        &|| {
+            big_exponent_float_value_unsigned_rounding_mode_quadruple_float(
+                exhaustive_big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_13(
+                ),
+            )
+        },
+        &|config| {
+            big_exponent_float_value_unsigned_rounding_mode_quadruple_float(
+                random_big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_13(
+                    config,
+                ),
+            )
+        },
+        &|config| {
+            big_exponent_float_value_unsigned_rounding_mode_quadruple_float(special_random_big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_13(config))
+        },
+    )
+}
+
+// Like `big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_13`, but with x > 0,
+// so that the logarithm is a real number.
+pub fn big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_16()
+-> Generator<(BigExponentFloat, Rational, u64, RoundingMode)> {
+    Generator::new(
+        &|| {
+            let xs =
+                exhaustive_big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_13(
+                );
+            Box::new(xs.filter(|(x, _, _, _)| *x > 0u32))
+        },
+        &|config| {
+            let xs = random_big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_13(
+                config,
+            );
+            Box::new(xs.filter(|(x, _, _, _)| *x > 0u32))
+        },
+        &|config| {
+            let xs = special_random_big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_13(config);
+            Box::new(xs.filter(|(x, _, _, _)| *x > 0u32))
+        },
+    )
+}
+
+// All valid inputs to `BigExponentFloat::log_base_rational_base_1_plus_x_prec_round`.
+pub fn big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_14()
+-> Generator<(BigExponentFloat, Rational, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_14,
+        &random_big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_14,
+        &special_random_big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_14,
+    )
+}
+
+// Like `big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_14`, paired with the
+// equal `Float`s, excluding `Exact`.
+pub fn big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_14_float() -> Generator<
+    (
+        (Float, Rational, u64, RoundingMode),
+        (BigExponentFloat, Rational, u64, RoundingMode),
+    ),
+> {
+    Generator::new(
+        &|| {
+            big_exponent_float_value_unsigned_rounding_mode_quadruple_float(
+                exhaustive_big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_14(
+                ),
+            )
+        },
+        &|config| {
+            big_exponent_float_value_unsigned_rounding_mode_quadruple_float(
+                random_big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_14(
+                    config,
+                ),
+            )
+        },
+        &|config| {
+            big_exponent_float_value_unsigned_rounding_mode_quadruple_float(special_random_big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_14(config))
+        },
+    )
+}
+
+// Like `big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_14`, but with x > -1,
+// so that the logarithm is a real number.
+pub fn big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_17()
+-> Generator<(BigExponentFloat, Rational, u64, RoundingMode)> {
+    Generator::new(
+        &|| {
+            let xs =
+                exhaustive_big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_14(
+                );
+            Box::new(xs.filter(|(x, _, _, _)| *x > -1i32))
+        },
+        &|config| {
+            let xs = random_big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_14(
+                config,
+            );
+            Box::new(xs.filter(|(x, _, _, _)| *x > -1i32))
+        },
+        &|config| {
+            let xs = special_random_big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_14(config);
+            Box::new(xs.filter(|(x, _, _, _)| *x > -1i32))
+        },
+    )
+}
+
+// All valid inputs to `BigExponentFloat::log_base_rational_big_exponent_float_base_prec_round`
+// (with the `Rational` as x and the `BigExponentFloat` as the base).
+pub fn big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_15()
+-> Generator<(BigExponentFloat, Rational, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_15,
+        &random_big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_15,
+        &special_random_big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_15,
+    )
+}
+
+// Like `big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_15`, but with x > 0
+// (the `Rational`) and a finite positive base other than 1, so that the logarithm is a real number.
+pub fn big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_18()
+-> Generator<(BigExponentFloat, Rational, u64, RoundingMode)> {
+    Generator::new(
+        &|| {
+            let xs =
+                exhaustive_big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_15(
+                );
+            Box::new(
+                xs.filter(|(b, x, _, _)| *x > 0u32 && b.is_finite() && *b > 0u32 && *b != 1u32),
+            )
+        },
+        &|config| {
+            let xs = random_big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_15(
+                config,
+            );
+            Box::new(
+                xs.filter(|(b, x, _, _)| *x > 0u32 && b.is_finite() && *b > 0u32 && *b != 1u32),
+            )
+        },
+        &|config| {
+            let xs = special_random_big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_15(config);
+            Box::new(
+                xs.filter(|(b, x, _, _)| *x > 0u32 && b.is_finite() && *b > 0u32 && *b != 1u32),
+            )
+        },
+    )
+}
+
 pub fn big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_12_float() -> Generator<
     (
         (Float, Rational, u64, RoundingMode),
@@ -916,6 +1081,118 @@ pub fn big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_ge
     )
 }
 
+// All valid inputs to `BigExponentFloat::log_base_big_exponent_float_base_prec_round`.
+pub fn big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_11()
+-> Generator<(BigExponentFloat, BigExponentFloat, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_11,
+        &random_big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_11,
+        &special_random_big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_11,
+    )
+}
+
+// Like `big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_11`, paired
+// with the equal `Float`s, excluding `Exact`.
+pub fn big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_11_float()
+-> Generator<(
+    (Float, Float, u64, RoundingMode),
+    (BigExponentFloat, BigExponentFloat, u64, RoundingMode),
+)> {
+    Generator::new(
+        &|| {
+            big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_float(exhaustive_big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_11())
+        },
+        &|config| {
+            big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_float(random_big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_11(config))
+        },
+        &|config| {
+            big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_float(special_random_big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_11(config))
+        },
+    )
+}
+
+// Like `big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_11`, but
+// with x > 0 and a finite positive base other than 1, so that the logarithm is a real number.
+pub fn big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_13()
+-> Generator<(BigExponentFloat, BigExponentFloat, u64, RoundingMode)> {
+    Generator::new(
+        &|| {
+            let xs = exhaustive_big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_11();
+            Box::new(
+                xs.filter(|(x, b, _, _)| *x > 0u32 && b.is_finite() && *b > 0u32 && *b != 1u32),
+            )
+        },
+        &|config| {
+            let xs = random_big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_11(config);
+            Box::new(
+                xs.filter(|(x, b, _, _)| *x > 0u32 && b.is_finite() && *b > 0u32 && *b != 1u32),
+            )
+        },
+        &|config| {
+            let xs = special_random_big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_11(config);
+            Box::new(
+                xs.filter(|(x, b, _, _)| *x > 0u32 && b.is_finite() && *b > 0u32 && *b != 1u32),
+            )
+        },
+    )
+}
+
+// All valid inputs to `BigExponentFloat::log_base_big_exponent_float_base_1_plus_x_prec_round`.
+pub fn big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_12()
+-> Generator<(BigExponentFloat, BigExponentFloat, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_12,
+        &random_big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_12,
+        &special_random_big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_12,
+    )
+}
+
+// Like `big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_12`, paired
+// with the equal `Float`s, excluding `Exact`.
+pub fn big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_12_float()
+-> Generator<(
+    (Float, Float, u64, RoundingMode),
+    (BigExponentFloat, BigExponentFloat, u64, RoundingMode),
+)> {
+    Generator::new(
+        &|| {
+            big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_float(exhaustive_big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_12())
+        },
+        &|config| {
+            big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_float(random_big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_12(config))
+        },
+        &|config| {
+            big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_float(special_random_big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_12(config))
+        },
+    )
+}
+
+// Like `big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_12`, but
+// with x > -1 and a finite positive base other than 1, so that the logarithm is a real number.
+pub fn big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_14()
+-> Generator<(BigExponentFloat, BigExponentFloat, u64, RoundingMode)> {
+    Generator::new(
+        &|| {
+            let xs = exhaustive_big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_12();
+            Box::new(
+                xs.filter(|(x, b, _, _)| *x > -1i32 && b.is_finite() && *b > 0u32 && *b != 1u32),
+            )
+        },
+        &|config| {
+            let xs = random_big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_12(config);
+            Box::new(
+                xs.filter(|(x, b, _, _)| *x > -1i32 && b.is_finite() && *b > 0u32 && *b != 1u32),
+            )
+        },
+        &|config| {
+            let xs = special_random_big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_12(config);
+            Box::new(
+                xs.filter(|(x, b, _, _)| *x > -1i32 && b.is_finite() && *b > 0u32 && *b != 1u32),
+            )
+        },
+    )
+}
+
 pub fn big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_10_float()
 -> Generator<(
     (Float, Float, u64, RoundingMode),
@@ -973,6 +1250,464 @@ pub fn big_exponent_float_unsigned_rounding_mode_triple_gen_var_8()
         &random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_8,
         &special_random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_8,
     )
+}
+
+// All `(BigExponentFloat, u64, RoundingMode)` that are valid inputs to
+// `BigExponentFloat::exp_prec_round`, with exponents at most 2^10.
+pub fn big_exponent_float_unsigned_rounding_mode_triple_gen_var_9()
+-> Generator<(BigExponentFloat, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_big_exponent_float_unsigned_rounding_mode_triple_gen_var_9,
+        &random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_9,
+        &special_random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_9,
+    )
+}
+
+// All `(BigExponentFloat, u64, RoundingMode)` that are valid inputs to
+// `BigExponentFloat::exp_x_minus_1_prec_round`, with exponents at most 2^10.
+pub fn big_exponent_float_unsigned_rounding_mode_triple_gen_var_10()
+-> Generator<(BigExponentFloat, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_big_exponent_float_unsigned_rounding_mode_triple_gen_var_10,
+        &random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_10,
+        &special_random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_10,
+    )
+}
+
+// All `(BigExponentFloat, u64, RoundingMode)` that are valid inputs to
+// `BigExponentFloat::power_of_2_of_big_exponent_float_prec_round`, with exponents at most 2^10.
+pub fn big_exponent_float_unsigned_rounding_mode_triple_gen_var_11()
+-> Generator<(BigExponentFloat, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_big_exponent_float_unsigned_rounding_mode_triple_gen_var_11,
+        &random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_11,
+        &special_random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_11,
+    )
+}
+
+// All `(BigExponentFloat, u64, RoundingMode)` that are valid inputs to
+// `BigExponentFloat::power_of_2_x_minus_1_prec_round`, with exponents at most 2^10.
+pub fn big_exponent_float_unsigned_rounding_mode_triple_gen_var_12()
+-> Generator<(BigExponentFloat, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_big_exponent_float_unsigned_rounding_mode_triple_gen_var_12,
+        &random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_12,
+        &special_random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_12,
+    )
+}
+
+// All `(BigExponentFloat, u64, RoundingMode)` that are valid inputs to
+// `BigExponentFloat::power_of_10_of_big_exponent_float_prec_round`, with exponents at most 2^10.
+pub fn big_exponent_float_unsigned_rounding_mode_triple_gen_var_13()
+-> Generator<(BigExponentFloat, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_big_exponent_float_unsigned_rounding_mode_triple_gen_var_13,
+        &random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_13,
+        &special_random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_13,
+    )
+}
+
+// All `(BigExponentFloat, u64, RoundingMode)` that are valid inputs to
+// `BigExponentFloat::power_of_10_x_minus_1_prec_round`, with exponents at most 2^10.
+pub fn big_exponent_float_unsigned_rounding_mode_triple_gen_var_14()
+-> Generator<(BigExponentFloat, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_big_exponent_float_unsigned_rounding_mode_triple_gen_var_14,
+        &random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_14,
+        &special_random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_14,
+    )
+}
+
+// All `(BigExponentFloat, u64, RoundingMode)` that are valid inputs to
+// `BigExponentFloat::ln_prec_round`.
+pub fn big_exponent_float_unsigned_rounding_mode_triple_gen_var_15()
+-> Generator<(BigExponentFloat, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_big_exponent_float_unsigned_rounding_mode_triple_gen_var_15,
+        &random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_15,
+        &special_random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_15,
+    )
+}
+
+// All `(BigExponentFloat, u64, RoundingMode)` that are valid inputs to
+// `BigExponentFloat::ln_1_plus_x_prec_round`.
+pub fn big_exponent_float_unsigned_rounding_mode_triple_gen_var_16()
+-> Generator<(BigExponentFloat, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_big_exponent_float_unsigned_rounding_mode_triple_gen_var_16,
+        &random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_16,
+        &special_random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_16,
+    )
+}
+
+// All `(BigExponentFloat, u64, RoundingMode)` that are valid inputs to
+// `BigExponentFloat::log_base_2_prec_round`.
+pub fn big_exponent_float_unsigned_rounding_mode_triple_gen_var_17()
+-> Generator<(BigExponentFloat, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_big_exponent_float_unsigned_rounding_mode_triple_gen_var_17,
+        &random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_17,
+        &special_random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_17,
+    )
+}
+
+// All `(BigExponentFloat, u64, RoundingMode)` that are valid inputs to
+// `BigExponentFloat::log_base_2_1_plus_x_prec_round`.
+pub fn big_exponent_float_unsigned_rounding_mode_triple_gen_var_18()
+-> Generator<(BigExponentFloat, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_big_exponent_float_unsigned_rounding_mode_triple_gen_var_18,
+        &random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_18,
+        &special_random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_18,
+    )
+}
+
+// All `(BigExponentFloat, u64, RoundingMode)` that are valid inputs to
+// `BigExponentFloat::log_base_10_prec_round`.
+pub fn big_exponent_float_unsigned_rounding_mode_triple_gen_var_19()
+-> Generator<(BigExponentFloat, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_big_exponent_float_unsigned_rounding_mode_triple_gen_var_19,
+        &random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_19,
+        &special_random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_19,
+    )
+}
+
+// All `(BigExponentFloat, u64, RoundingMode)` that are valid inputs to
+// `BigExponentFloat::log_base_10_1_plus_x_prec_round`.
+pub fn big_exponent_float_unsigned_rounding_mode_triple_gen_var_20()
+-> Generator<(BigExponentFloat, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_big_exponent_float_unsigned_rounding_mode_triple_gen_var_20,
+        &random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_20,
+        &special_random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_20,
+    )
+}
+
+// Like `big_exponent_float_unsigned_rounding_mode_triple_gen_var_15`, paired with the equal
+// `Float`s, excluding `Exact`.
+pub fn big_exponent_float_unsigned_rounding_mode_triple_gen_var_15_float() -> Generator<(
+    (Float, u64, RoundingMode),
+    (BigExponentFloat, u64, RoundingMode),
+)> {
+    Generator::new(
+        &|| {
+            big_exponent_float_unsigned_rounding_mode_triple_float_no_exact(
+                exhaustive_big_exponent_float_unsigned_rounding_mode_triple_gen_var_15(),
+            )
+        },
+        &|config| {
+            big_exponent_float_unsigned_rounding_mode_triple_float_no_exact(
+                random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_15(config),
+            )
+        },
+        &|config| {
+            big_exponent_float_unsigned_rounding_mode_triple_float_no_exact(
+                special_random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_15(config),
+            )
+        },
+    )
+}
+
+// Like `big_exponent_float_unsigned_rounding_mode_triple_gen_var_16`, paired with the equal
+// `Float`s, excluding `Exact`.
+pub fn big_exponent_float_unsigned_rounding_mode_triple_gen_var_16_float() -> Generator<(
+    (Float, u64, RoundingMode),
+    (BigExponentFloat, u64, RoundingMode),
+)> {
+    Generator::new(
+        &|| {
+            big_exponent_float_unsigned_rounding_mode_triple_float_no_exact(
+                exhaustive_big_exponent_float_unsigned_rounding_mode_triple_gen_var_16(),
+            )
+        },
+        &|config| {
+            big_exponent_float_unsigned_rounding_mode_triple_float_no_exact(
+                random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_16(config),
+            )
+        },
+        &|config| {
+            big_exponent_float_unsigned_rounding_mode_triple_float_no_exact(
+                special_random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_16(config),
+            )
+        },
+    )
+}
+
+// Like `big_exponent_float_unsigned_rounding_mode_triple_gen_var_17`, paired with the equal
+// `Float`s, excluding `Exact`.
+pub fn big_exponent_float_unsigned_rounding_mode_triple_gen_var_17_float() -> Generator<(
+    (Float, u64, RoundingMode),
+    (BigExponentFloat, u64, RoundingMode),
+)> {
+    Generator::new(
+        &|| {
+            big_exponent_float_unsigned_rounding_mode_triple_float_no_exact(
+                exhaustive_big_exponent_float_unsigned_rounding_mode_triple_gen_var_17(),
+            )
+        },
+        &|config| {
+            big_exponent_float_unsigned_rounding_mode_triple_float_no_exact(
+                random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_17(config),
+            )
+        },
+        &|config| {
+            big_exponent_float_unsigned_rounding_mode_triple_float_no_exact(
+                special_random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_17(config),
+            )
+        },
+    )
+}
+
+// Like `big_exponent_float_unsigned_rounding_mode_triple_gen_var_18`, paired with the equal
+// `Float`s, excluding `Exact`.
+pub fn big_exponent_float_unsigned_rounding_mode_triple_gen_var_18_float() -> Generator<(
+    (Float, u64, RoundingMode),
+    (BigExponentFloat, u64, RoundingMode),
+)> {
+    Generator::new(
+        &|| {
+            big_exponent_float_unsigned_rounding_mode_triple_float_no_exact(
+                exhaustive_big_exponent_float_unsigned_rounding_mode_triple_gen_var_18(),
+            )
+        },
+        &|config| {
+            big_exponent_float_unsigned_rounding_mode_triple_float_no_exact(
+                random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_18(config),
+            )
+        },
+        &|config| {
+            big_exponent_float_unsigned_rounding_mode_triple_float_no_exact(
+                special_random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_18(config),
+            )
+        },
+    )
+}
+
+// Like `big_exponent_float_unsigned_rounding_mode_triple_gen_var_19`, paired with the equal
+// `Float`s, excluding `Exact`.
+pub fn big_exponent_float_unsigned_rounding_mode_triple_gen_var_19_float() -> Generator<(
+    (Float, u64, RoundingMode),
+    (BigExponentFloat, u64, RoundingMode),
+)> {
+    Generator::new(
+        &|| {
+            big_exponent_float_unsigned_rounding_mode_triple_float_no_exact(
+                exhaustive_big_exponent_float_unsigned_rounding_mode_triple_gen_var_19(),
+            )
+        },
+        &|config| {
+            big_exponent_float_unsigned_rounding_mode_triple_float_no_exact(
+                random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_19(config),
+            )
+        },
+        &|config| {
+            big_exponent_float_unsigned_rounding_mode_triple_float_no_exact(
+                special_random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_19(config),
+            )
+        },
+    )
+}
+
+// Like `big_exponent_float_unsigned_rounding_mode_triple_gen_var_20`, paired with the equal
+// `Float`s, excluding `Exact`.
+pub fn big_exponent_float_unsigned_rounding_mode_triple_gen_var_20_float() -> Generator<(
+    (Float, u64, RoundingMode),
+    (BigExponentFloat, u64, RoundingMode),
+)> {
+    Generator::new(
+        &|| {
+            big_exponent_float_unsigned_rounding_mode_triple_float_no_exact(
+                exhaustive_big_exponent_float_unsigned_rounding_mode_triple_gen_var_20(),
+            )
+        },
+        &|config| {
+            big_exponent_float_unsigned_rounding_mode_triple_float_no_exact(
+                random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_20(config),
+            )
+        },
+        &|config| {
+            big_exponent_float_unsigned_rounding_mode_triple_float_no_exact(
+                special_random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_20(config),
+            )
+        },
+    )
+}
+
+// Like `big_exponent_float_unsigned_rounding_mode_triple_gen_var_9`, paired with the equal
+// `Float`s, excluding `Exact` and the exponents above 29, where `Float`'s results may overflow.
+pub fn big_exponent_float_unsigned_rounding_mode_triple_gen_var_9_float() -> Generator<(
+    (Float, u64, RoundingMode),
+    (BigExponentFloat, u64, RoundingMode),
+)> {
+    Generator::new(
+        &|| {
+            big_exponent_float_unsigned_rounding_mode_triple_float_no_exact(exponent_at_most(
+                29,
+                exhaustive_big_exponent_float_unsigned_rounding_mode_triple_gen_var_9(),
+            ))
+        },
+        &|config| {
+            big_exponent_float_unsigned_rounding_mode_triple_float_no_exact(exponent_at_most(
+                29,
+                random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_9(config),
+            ))
+        },
+        &|config| {
+            big_exponent_float_unsigned_rounding_mode_triple_float_no_exact(exponent_at_most(
+                29,
+                special_random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_9(config),
+            ))
+        },
+    )
+}
+
+// Like `big_exponent_float_unsigned_rounding_mode_triple_gen_var_10`, paired with the equal
+// `Float`s, excluding `Exact` and the exponents above 29, where `Float`'s results may overflow.
+pub fn big_exponent_float_unsigned_rounding_mode_triple_gen_var_10_float() -> Generator<(
+    (Float, u64, RoundingMode),
+    (BigExponentFloat, u64, RoundingMode),
+)> {
+    Generator::new(
+        &|| {
+            big_exponent_float_unsigned_rounding_mode_triple_float_no_exact(exponent_at_most(
+                29,
+                exhaustive_big_exponent_float_unsigned_rounding_mode_triple_gen_var_10(),
+            ))
+        },
+        &|config| {
+            big_exponent_float_unsigned_rounding_mode_triple_float_no_exact(exponent_at_most(
+                29,
+                random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_10(config),
+            ))
+        },
+        &|config| {
+            big_exponent_float_unsigned_rounding_mode_triple_float_no_exact(exponent_at_most(
+                29,
+                special_random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_10(config),
+            ))
+        },
+    )
+}
+
+// Like `big_exponent_float_unsigned_rounding_mode_triple_gen_var_11`, paired with the equal
+// `Float`s, excluding `Exact` and the exponents above 29, where `Float`'s results may overflow.
+pub fn big_exponent_float_unsigned_rounding_mode_triple_gen_var_11_float() -> Generator<(
+    (Float, u64, RoundingMode),
+    (BigExponentFloat, u64, RoundingMode),
+)> {
+    Generator::new(
+        &|| {
+            big_exponent_float_unsigned_rounding_mode_triple_float_no_exact(exponent_at_most(
+                29,
+                exhaustive_big_exponent_float_unsigned_rounding_mode_triple_gen_var_11(),
+            ))
+        },
+        &|config| {
+            big_exponent_float_unsigned_rounding_mode_triple_float_no_exact(exponent_at_most(
+                29,
+                random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_11(config),
+            ))
+        },
+        &|config| {
+            big_exponent_float_unsigned_rounding_mode_triple_float_no_exact(exponent_at_most(
+                29,
+                special_random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_11(config),
+            ))
+        },
+    )
+}
+
+// Like `big_exponent_float_unsigned_rounding_mode_triple_gen_var_12`, paired with the equal
+// `Float`s, excluding `Exact` and the exponents above 29, where `Float`'s results may overflow.
+pub fn big_exponent_float_unsigned_rounding_mode_triple_gen_var_12_float() -> Generator<(
+    (Float, u64, RoundingMode),
+    (BigExponentFloat, u64, RoundingMode),
+)> {
+    Generator::new(
+        &|| {
+            big_exponent_float_unsigned_rounding_mode_triple_float_no_exact(exponent_at_most(
+                29,
+                exhaustive_big_exponent_float_unsigned_rounding_mode_triple_gen_var_12(),
+            ))
+        },
+        &|config| {
+            big_exponent_float_unsigned_rounding_mode_triple_float_no_exact(exponent_at_most(
+                29,
+                random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_12(config),
+            ))
+        },
+        &|config| {
+            big_exponent_float_unsigned_rounding_mode_triple_float_no_exact(exponent_at_most(
+                29,
+                special_random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_12(config),
+            ))
+        },
+    )
+}
+
+// Like `big_exponent_float_unsigned_rounding_mode_triple_gen_var_13`, paired with the equal
+// `Float`s, excluding `Exact` and the exponents above 28, where `Float`'s results may overflow.
+pub fn big_exponent_float_unsigned_rounding_mode_triple_gen_var_13_float() -> Generator<(
+    (Float, u64, RoundingMode),
+    (BigExponentFloat, u64, RoundingMode),
+)> {
+    Generator::new(
+        &|| {
+            big_exponent_float_unsigned_rounding_mode_triple_float_no_exact(exponent_at_most(
+                28,
+                exhaustive_big_exponent_float_unsigned_rounding_mode_triple_gen_var_13(),
+            ))
+        },
+        &|config| {
+            big_exponent_float_unsigned_rounding_mode_triple_float_no_exact(exponent_at_most(
+                28,
+                random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_13(config),
+            ))
+        },
+        &|config| {
+            big_exponent_float_unsigned_rounding_mode_triple_float_no_exact(exponent_at_most(
+                28,
+                special_random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_13(config),
+            ))
+        },
+    )
+}
+
+// Like `big_exponent_float_unsigned_rounding_mode_triple_gen_var_14`, paired with the equal
+// `Float`s, excluding `Exact` and the exponents above 28, where `Float`'s results may overflow.
+pub fn big_exponent_float_unsigned_rounding_mode_triple_gen_var_14_float() -> Generator<(
+    (Float, u64, RoundingMode),
+    (BigExponentFloat, u64, RoundingMode),
+)> {
+    Generator::new(
+        &|| {
+            big_exponent_float_unsigned_rounding_mode_triple_float_no_exact(exponent_at_most(
+                28,
+                exhaustive_big_exponent_float_unsigned_rounding_mode_triple_gen_var_14(),
+            ))
+        },
+        &|config| {
+            big_exponent_float_unsigned_rounding_mode_triple_float_no_exact(exponent_at_most(
+                28,
+                random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_14(config),
+            ))
+        },
+        &|config| {
+            big_exponent_float_unsigned_rounding_mode_triple_float_no_exact(exponent_at_most(
+                28,
+                special_random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_14(config),
+            ))
+        },
+    )
+}
+
+// The triples whose `BigExponentFloat`'s exponent, if it has one, is at most `limit`.
+fn exponent_at_most(
+    limit: u32,
+    xs: It<(BigExponentFloat, u64, RoundingMode)>,
+) -> It<(BigExponentFloat, u64, RoundingMode)> {
+    Box::new(xs.filter(move |(x, _, _)| x.get_exponent().is_none_or(|e| *e <= limit)))
 }
 
 pub fn big_exponent_float_unsigned_rounding_mode_triple_gen_var_8_float() -> Generator<(
@@ -1183,6 +1918,126 @@ pub fn big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_3()
     )
 }
 
+// All valid inputs to `BigExponentFloat::log_base_prec_round`.
+pub fn big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_4()
+-> Generator<(BigExponentFloat, u64, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_4,
+        &random_big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_4,
+        &special_random_big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_4,
+    )
+}
+
+// Like `big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_4`, paired with the
+// equal `Float`s, excluding `Exact`.
+pub fn big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_4_float() -> Generator<
+    (
+        (Float, u64, u64, RoundingMode),
+        (BigExponentFloat, u64, u64, RoundingMode),
+    ),
+> {
+    Generator::new(
+        &|| {
+            big_exponent_float_value_unsigned_rounding_mode_quadruple_float(
+                exhaustive_big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_4(),
+            )
+        },
+        &|config| {
+            big_exponent_float_value_unsigned_rounding_mode_quadruple_float(
+                random_big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_4(
+                    config,
+                ),
+            )
+        },
+        &|config| {
+            big_exponent_float_value_unsigned_rounding_mode_quadruple_float(special_random_big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_4(config))
+        },
+    )
+}
+
+// Like `big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_4`, but with x > 0, so
+// that the logarithm is a real number.
+pub fn big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_6()
+-> Generator<(BigExponentFloat, u64, u64, RoundingMode)> {
+    Generator::new(
+        &|| {
+            let xs =
+                exhaustive_big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_4();
+            Box::new(xs.filter(|(x, _, _, _)| *x > 0u32))
+        },
+        &|config| {
+            let xs = random_big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_4(
+                config,
+            );
+            Box::new(xs.filter(|(x, _, _, _)| *x > 0u32))
+        },
+        &|config| {
+            let xs = special_random_big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_4(config);
+            Box::new(xs.filter(|(x, _, _, _)| *x > 0u32))
+        },
+    )
+}
+
+// All valid inputs to `BigExponentFloat::log_base_1_plus_x_prec_round`.
+pub fn big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_5()
+-> Generator<(BigExponentFloat, u64, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_5,
+        &random_big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_5,
+        &special_random_big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_5,
+    )
+}
+
+// Like `big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_5`, paired with the
+// equal `Float`s, excluding `Exact`.
+pub fn big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_5_float() -> Generator<
+    (
+        (Float, u64, u64, RoundingMode),
+        (BigExponentFloat, u64, u64, RoundingMode),
+    ),
+> {
+    Generator::new(
+        &|| {
+            big_exponent_float_value_unsigned_rounding_mode_quadruple_float(
+                exhaustive_big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_5(),
+            )
+        },
+        &|config| {
+            big_exponent_float_value_unsigned_rounding_mode_quadruple_float(
+                random_big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_5(
+                    config,
+                ),
+            )
+        },
+        &|config| {
+            big_exponent_float_value_unsigned_rounding_mode_quadruple_float(special_random_big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_5(config))
+        },
+    )
+}
+
+// Like `big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_5`, but with x > -1,
+// so that the logarithm is a real number.
+pub fn big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_7()
+-> Generator<(BigExponentFloat, u64, u64, RoundingMode)> {
+    Generator::new(
+        &|| {
+            let xs =
+                exhaustive_big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_5();
+            Box::new(xs.filter(|(x, _, _, _)| *x > -1i32))
+        },
+        &|config| {
+            let xs = random_big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_5(
+                config,
+            );
+            Box::new(xs.filter(|(x, _, _, _)| *x > -1i32))
+        },
+        &|config| {
+            let xs = special_random_big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_5(config);
+            Box::new(xs.filter(|(x, _, _, _)| *x > -1i32))
+        },
+    )
+}
+
 pub fn big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_3_float() -> Generator<
     (
         (Float, u64, u64, RoundingMode),
@@ -1257,6 +2112,119 @@ pub fn big_exponent_float_signed_unsigned_rounding_mode_quadruple_gen_var_2()
         &exhaustive_big_exponent_float_signed_unsigned_rounding_mode_quadruple_gen_var_2,
         &random_big_exponent_float_signed_unsigned_rounding_mode_quadruple_gen_var_2,
         &special_random_big_exponent_float_signed_unsigned_rounding_mode_quadruple_gen_var_2,
+    )
+}
+
+// All `(BigExponentFloat, i64, u64, RoundingMode)` that are valid inputs to
+// `BigExponentFloat::log_base_power_of_2_prec_round`.
+pub fn big_exponent_float_signed_unsigned_rounding_mode_quadruple_gen_var_3()
+-> Generator<(BigExponentFloat, i64, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_big_exponent_float_signed_unsigned_rounding_mode_quadruple_gen_var_3,
+        &random_big_exponent_float_signed_unsigned_rounding_mode_quadruple_gen_var_3,
+        &special_random_big_exponent_float_signed_unsigned_rounding_mode_quadruple_gen_var_3,
+    )
+}
+
+// All `(BigExponentFloat, i64, u64, RoundingMode)` that are valid inputs to
+// `BigExponentFloat::log_base_power_of_2_1_plus_x_prec_round`.
+pub fn big_exponent_float_signed_unsigned_rounding_mode_quadruple_gen_var_4()
+-> Generator<(BigExponentFloat, i64, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_big_exponent_float_signed_unsigned_rounding_mode_quadruple_gen_var_4,
+        &random_big_exponent_float_signed_unsigned_rounding_mode_quadruple_gen_var_4,
+        &special_random_big_exponent_float_signed_unsigned_rounding_mode_quadruple_gen_var_4,
+    )
+}
+
+// All valid inputs to `BigExponentFloat::compound_prec_round`.
+pub fn big_exponent_float_signed_unsigned_rounding_mode_quadruple_gen_var_5()
+-> Generator<(BigExponentFloat, i64, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_big_exponent_float_signed_unsigned_rounding_mode_quadruple_gen_var_5,
+        &random_big_exponent_float_signed_unsigned_rounding_mode_quadruple_gen_var_5,
+        &special_random_big_exponent_float_signed_unsigned_rounding_mode_quadruple_gen_var_5,
+    )
+}
+
+// Like `big_exponent_float_signed_unsigned_rounding_mode_quadruple_gen_var_5`, paired with the
+// equal `Float`s, excluding `Exact`.
+pub fn big_exponent_float_signed_unsigned_rounding_mode_quadruple_gen_var_5_float() -> Generator<(
+    (Float, i64, u64, RoundingMode),
+    (BigExponentFloat, i64, u64, RoundingMode),
+)> {
+    Generator::new(
+        &|| {
+            big_exponent_float_value_unsigned_rounding_mode_quadruple_float(
+                exhaustive_big_exponent_float_signed_unsigned_rounding_mode_quadruple_gen_var_5(),
+            )
+        },
+        &|config| {
+            big_exponent_float_value_unsigned_rounding_mode_quadruple_float(
+                random_big_exponent_float_signed_unsigned_rounding_mode_quadruple_gen_var_5(config),
+            )
+        },
+        &|config| {
+            big_exponent_float_value_unsigned_rounding_mode_quadruple_float(
+                special_random_big_exponent_float_signed_unsigned_rounding_mode_quadruple_gen_var_5(
+                    config,
+                ),
+            )
+        },
+    )
+}
+
+// Like `big_exponent_float_signed_unsigned_rounding_mode_quadruple_gen_var_3`, paired with the
+// equal `Float`s, excluding `Exact`.
+pub fn big_exponent_float_signed_unsigned_rounding_mode_quadruple_gen_var_3_float() -> Generator<(
+    (Float, i64, u64, RoundingMode),
+    (BigExponentFloat, i64, u64, RoundingMode),
+)> {
+    Generator::new(
+        &|| {
+            big_exponent_float_value_unsigned_rounding_mode_quadruple_float(
+                exhaustive_big_exponent_float_signed_unsigned_rounding_mode_quadruple_gen_var_3(),
+            )
+        },
+        &|config| {
+            big_exponent_float_value_unsigned_rounding_mode_quadruple_float(
+                random_big_exponent_float_signed_unsigned_rounding_mode_quadruple_gen_var_3(config),
+            )
+        },
+        &|config| {
+            big_exponent_float_value_unsigned_rounding_mode_quadruple_float(
+                special_random_big_exponent_float_signed_unsigned_rounding_mode_quadruple_gen_var_3(
+                    config,
+                ),
+            )
+        },
+    )
+}
+
+// Like `big_exponent_float_signed_unsigned_rounding_mode_quadruple_gen_var_4`, paired with the
+// equal `Float`s, excluding `Exact`.
+pub fn big_exponent_float_signed_unsigned_rounding_mode_quadruple_gen_var_4_float() -> Generator<(
+    (Float, i64, u64, RoundingMode),
+    (BigExponentFloat, i64, u64, RoundingMode),
+)> {
+    Generator::new(
+        &|| {
+            big_exponent_float_value_unsigned_rounding_mode_quadruple_float(
+                exhaustive_big_exponent_float_signed_unsigned_rounding_mode_quadruple_gen_var_4(),
+            )
+        },
+        &|config| {
+            big_exponent_float_value_unsigned_rounding_mode_quadruple_float(
+                random_big_exponent_float_signed_unsigned_rounding_mode_quadruple_gen_var_4(config),
+            )
+        },
+        &|config| {
+            big_exponent_float_value_unsigned_rounding_mode_quadruple_float(
+                special_random_big_exponent_float_signed_unsigned_rounding_mode_quadruple_gen_var_4(
+                    config,
+                ),
+            )
+        },
     )
 }
 
@@ -7102,6 +8070,27 @@ pub fn rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_1()
     )
 }
 
+// Like `rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_1`, but with x > 0, so that the
+// logarithm is a real number.
+pub fn rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_12()
+-> Generator<(Rational, u64, u64, RoundingMode)> {
+    Generator::new(
+        &|| {
+            let xs = exhaustive_rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_1();
+            Box::new(xs.filter(|(x, _, _, _)| *x > 0u32))
+        },
+        &|config| {
+            let xs = random_rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_1(config);
+            Box::new(xs.filter(|(x, _, _, _)| *x > 0u32))
+        },
+        &|config| {
+            let xs =
+                special_random_rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_1(config);
+            Box::new(xs.filter(|(x, _, _, _)| *x > 0u32))
+        },
+    )
+}
+
 // All `(Rational, u64, u64, RoundingMode)` (exponent, base, prec, rm) valid for
 // `Float::unsigned_pow_rational_prec_round`.
 pub fn rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_2()
@@ -7134,6 +8123,27 @@ pub fn rational_rational_unsigned_rounding_mode_quadruple_gen_var_2()
         &exhaustive_rational_rational_unsigned_rounding_mode_quadruple_gen_var_2,
         &random_rational_rational_unsigned_rounding_mode_quadruple_gen_var_2,
         &special_random_rational_rational_unsigned_rounding_mode_quadruple_gen_var_2,
+    )
+}
+
+// Like `rational_rational_unsigned_rounding_mode_quadruple_gen_var_2`, but with x > 0, so that the
+// logarithm is a real number.
+pub fn rational_rational_unsigned_rounding_mode_quadruple_gen_var_5()
+-> Generator<(Rational, Rational, u64, RoundingMode)> {
+    Generator::new(
+        &|| {
+            let xs = exhaustive_rational_rational_unsigned_rounding_mode_quadruple_gen_var_2();
+            Box::new(xs.filter(|(x, _, _, _)| *x > 0u32))
+        },
+        &|config| {
+            let xs = random_rational_rational_unsigned_rounding_mode_quadruple_gen_var_2(config);
+            Box::new(xs.filter(|(x, _, _, _)| *x > 0u32))
+        },
+        &|config| {
+            let xs =
+                special_random_rational_rational_unsigned_rounding_mode_quadruple_gen_var_2(config);
+            Box::new(xs.filter(|(x, _, _, _)| *x > 0u32))
+        },
     )
 }
 
@@ -8018,6 +9028,66 @@ pub fn rational_unsigned_rounding_mode_triple_gen_var_18() -> GT3 {
         &exhaustive_rational_unsigned_rounding_mode_triple_gen_var_18,
         &random_rational_unsigned_rounding_mode_triple_gen_var_18,
         &special_random_rational_unsigned_rounding_mode_triple_gen_var_18,
+    )
+}
+
+// All `(Rational, u64, RoundingMode)` that are valid inputs to
+// `BigExponentFloat::exp_rational_prec_round`.
+pub fn rational_unsigned_rounding_mode_triple_gen_var_19() -> GT3 {
+    Generator::new(
+        &exhaustive_rational_unsigned_rounding_mode_triple_gen_var_19,
+        &random_rational_unsigned_rounding_mode_triple_gen_var_19,
+        &special_random_rational_unsigned_rounding_mode_triple_gen_var_19,
+    )
+}
+
+// All `(Rational, u64, RoundingMode)` that are valid inputs to
+// `BigExponentFloat::exp_x_minus_1_rational_prec_round`.
+pub fn rational_unsigned_rounding_mode_triple_gen_var_20() -> GT3 {
+    Generator::new(
+        &exhaustive_rational_unsigned_rounding_mode_triple_gen_var_20,
+        &random_rational_unsigned_rounding_mode_triple_gen_var_20,
+        &special_random_rational_unsigned_rounding_mode_triple_gen_var_20,
+    )
+}
+
+// All `(Rational, u64, RoundingMode)` that are valid inputs to
+// `BigExponentFloat::power_of_2_rational_prec_round`.
+pub fn rational_unsigned_rounding_mode_triple_gen_var_21() -> GT3 {
+    Generator::new(
+        &exhaustive_rational_unsigned_rounding_mode_triple_gen_var_21,
+        &random_rational_unsigned_rounding_mode_triple_gen_var_21,
+        &special_random_rational_unsigned_rounding_mode_triple_gen_var_21,
+    )
+}
+
+// All `(Rational, u64, RoundingMode)` that are valid inputs to
+// `BigExponentFloat::power_of_2_x_minus_1_rational_prec_round`.
+pub fn rational_unsigned_rounding_mode_triple_gen_var_22() -> GT3 {
+    Generator::new(
+        &exhaustive_rational_unsigned_rounding_mode_triple_gen_var_22,
+        &random_rational_unsigned_rounding_mode_triple_gen_var_22,
+        &special_random_rational_unsigned_rounding_mode_triple_gen_var_22,
+    )
+}
+
+// All `(Rational, u64, RoundingMode)` that are valid inputs to
+// `BigExponentFloat::power_of_10_rational_prec_round`.
+pub fn rational_unsigned_rounding_mode_triple_gen_var_23() -> GT3 {
+    Generator::new(
+        &exhaustive_rational_unsigned_rounding_mode_triple_gen_var_23,
+        &random_rational_unsigned_rounding_mode_triple_gen_var_23,
+        &special_random_rational_unsigned_rounding_mode_triple_gen_var_23,
+    )
+}
+
+// All `(Rational, u64, RoundingMode)` that are valid inputs to
+// `BigExponentFloat::power_of_10_x_minus_1_rational_prec_round`.
+pub fn rational_unsigned_rounding_mode_triple_gen_var_24() -> GT3 {
+    Generator::new(
+        &exhaustive_rational_unsigned_rounding_mode_triple_gen_var_24,
+        &random_rational_unsigned_rounding_mode_triple_gen_var_24,
+        &special_random_rational_unsigned_rounding_mode_triple_gen_var_24,
     )
 }
 

@@ -15,7 +15,9 @@
 use crate::InnerFloat::{Infinity, NaN, Zero};
 use crate::float::arithmetic::round_near_x::float_round_near_x;
 use crate::float::exponential::exp::{exp_overflow, one_neighbor};
-use crate::float::exponential::exp_x_minus_1::exp_x_minus_1_rational_near_zero;
+use crate::float::exponential::exp_x_minus_1::{
+    exp_x_minus_1_rational_near_zero, exp_x_minus_1_scaled_rational_near_zero,
+};
 use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn, floor_and_ceiling};
 use core::cmp::Ordering::{self, *};
 use core::cmp::max;
@@ -290,16 +292,36 @@ fn power_of_2_x_minus_1_deep_negative(x: &Float, prec: u64, rm: RoundingMode) ->
     }
 }
 
-// Computes 2^x - 1 for a nonzero `Rational` `x` with `|x| < 2^MIN_EXPONENT`, too small to bracket
-// between `Float`s. Since 2^x - 1 = expm1(x ln(2)), bracketing ln(2) between two `Rational`s (from
-// a single directed ln(2) computation) and applying `exp_x_minus_1_rational_near_zero` to each
-// product brackets the result; that helper's `from_rational_prec_round` calls perform the underflow
-// rounding, which matters here because |2^x - 1| ~ |x| ln(2) can fall below the smallest positive
-// `Float` (ln(2) < 1). expm1 is increasing, and x ln(2) is increasing in ln(2) for x > 0 and
-// decreasing for x < 0, so the bracket ends order accordingly. The bracket width is about |x| 2^-w
-// for a working ln(2) precision w, while the result's ulp is about 2^(EXP(x) - prec), so w ~ prec +
-// slack suffices regardless of how tiny x is; the Ziv loop widens w if not.
+// Bounds lo <= log 2 <= hi with `wp` bits, from a single directed computation.
+fn ln_2_bounds(wp: u64) -> (Float, Float) {
+    floor_and_ceiling(Float::ln_2_prec_round(wp, Floor))
+}
+
+// Computes 2^x - 1 = expm1(x log 2) for a nonzero `Rational` `x` with `|x| < 2^MIN_EXPONENT`, too
+// small to bracket between `Float`s. See `exp_x_minus_1_scaled_rational_near_zero`, which brackets
+// x log 2 with `BigExponentFloat`s; `power_of_2_x_minus_1_rational_near_zero_exact` is its
+// fallback.
 fn power_of_2_x_minus_1_rational_near_zero(
+    x: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    exp_x_minus_1_scaled_rational_near_zero(x, prec, rm, Some(ln_2_bounds), || {
+        power_of_2_x_minus_1_rational_near_zero_exact(x, prec, rm)
+    })
+}
+
+// Computes, with exact `Rational` arithmetic (slow when x has a huge denominator), 2^x - 1 for a
+// nonzero `Rational` `x` with `|x| < 2^MIN_EXPONENT`, too small to bracket between `Float`s. Since
+// 2^x - 1 = expm1(x ln(2)), bracketing ln(2) between two `Rational`s (from a single directed ln(2)
+// computation) and applying `exp_x_minus_1_rational_near_zero` to each product brackets the result;
+// that helper's `from_rational_prec_round` calls perform the underflow rounding, which matters here
+// because |2^x - 1| ~ |x| ln(2) can fall below the smallest positive `Float` (ln(2) < 1). expm1 is
+// increasing, and x ln(2) is increasing in ln(2) for x > 0 and decreasing for x < 0, so the bracket
+// ends order accordingly. The bracket width is about |x| 2^-w for a working ln(2) precision w,
+// while the result's ulp is about 2^(EXP(x) - prec), so w ~ prec + slack suffices regardless of how
+// tiny x is; the Ziv loop widens w if not.
+fn power_of_2_x_minus_1_rational_near_zero_exact(
     x: &Rational,
     prec: u64,
     rm: RoundingMode,

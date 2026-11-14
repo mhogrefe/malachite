@@ -7,6 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::cmp::Ordering::{self, *};
+use core::str::FromStr;
+use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, Two, Zero,
@@ -129,6 +131,35 @@ fn test_log_base_float_base_1_plus_x_prec_round() {
     // x = +-0: signed zero by x's sign times the base.
     test(0.0, 3.0, 10, Exact, "0.0", "0x0.0", Equal); // +0, base > 1 -> +0
     test(0.0, 0.5, 10, Exact, "-0.0", "-0x0.0", Equal); // +0, base < 1 -> -0
+}
+
+// For x = 2^(2^26) and a base 2^pow, log_b(1 + x) is within about 2^(-2^26) of the exactly
+// representable 2^26 / pow; this once took time and memory proportional to 2^26.
+#[test]
+fn test_log_base_float_base_1_plus_x_huge_power_of_2() {
+    let x = Float::power_of_2(1i64 << 26);
+    let test = |base: &str, rm: RoundingMode, out: &str, out_hex: &str, o_out| {
+        let base = Float::from_str(base).unwrap();
+        let (log, o) = check(&x, &base, 10, rm, true);
+        assert_eq!(log.to_string(), out);
+        assert_eq!(to_hex_string(&log), out_hex);
+        assert_eq!(o, o_out);
+    };
+    test("4", Floor, "3.3554e7", "0x2.00E+6#10", Less);
+    test("4", Ceiling, "3.3620e7", "0x2.01E+6#10", Greater);
+    test("4", Nearest, "3.3554e7", "0x2.00E+6#10", Less);
+    test("4", Down, "3.3554e7", "0x2.00E+6#10", Less);
+    test("4", Up, "3.3620e7", "0x2.01E+6#10", Greater);
+    test("0.25", Floor, "-3.3620e7", "-0x2.01E+6#10", Less);
+    test("0.25", Ceiling, "-3.3554e7", "-0x2.00E+6#10", Greater);
+    test("0.25", Nearest, "-3.3554e7", "-0x2.00E+6#10", Greater);
+    test("0.25", Down, "-3.3554e7", "-0x2.00E+6#10", Greater);
+    test("0.25", Up, "-3.3620e7", "-0x2.01E+6#10", Less);
+    test("0.5", Floor, "-6.7240e7", "-0x4.02E+6#10", Less);
+    test("0.5", Ceiling, "-6.7109e7", "-0x4.00E+6#10", Greater);
+    test("0.5", Nearest, "-6.7109e7", "-0x4.00E+6#10", Greater);
+    test("0.5", Down, "-6.7109e7", "-0x4.00E+6#10", Greater);
+    test("0.5", Up, "-6.7240e7", "-0x4.02E+6#10", Less);
 }
 
 #[test]
@@ -518,7 +549,7 @@ fn primitive_float_log_base_float_base_1_plus_x_properties() {
 // exactly-representable result would leave the Ziv loop unable to terminate.
 #[test]
 fn log_base_float_base_1_plus_x_exact_extreme() {
-    use malachite_base::num::arithmetic::traits::{Pow, PowerOf2};
+    use malachite_base::num::arithmetic::traits::Pow;
     use malachite_nz::natural::Natural;
     // 1 + 2^70 = root, base = root^2 (a 142-bit Float): log_base(1 + x) = 1/2, exact.
     let x = Float::power_of_2(70i64);

@@ -16,7 +16,9 @@ use crate::InnerFloat::{Infinity, NaN, Zero};
 use crate::TWICE_WIDTH;
 use crate::float::arithmetic::round_near_x::float_round_near_x;
 use crate::float::exponential::exp::{exp_overflow, one_neighbor};
-use crate::float::exponential::exp_x_minus_1::exp_x_minus_1_rational_near_zero;
+use crate::float::exponential::exp_x_minus_1::{
+    exp_x_minus_1_rational_near_zero, exp_x_minus_1_scaled_rational_near_zero,
+};
 use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn, floor_and_ceiling};
 use core::cmp::Ordering::{self, *};
 use core::cmp::max;
@@ -275,13 +277,32 @@ fn power_of_10_x_minus_1_deep_negative(
     }
 }
 
-// Computes 10^x - 1 for a nonzero `Rational` `x` with x * log2(10) < MIN_EXPONENT (so 10^x is too
-// small to bracket between `Float`s). Since 10^x - 1 = expm1(x ln(10)), bracketing ln(10) between
-// two `Rational`s (from a single directed ln(10) computation) and applying
-// `exp_x_minus_1_rational_near_zero` to each product brackets the result. expm1 is increasing, and
-// x ln(10) is increasing in ln(10) for x > 0 and decreasing for x < 0, so the bracket ends order
-// accordingly.
+// Bounds lo <= log 10 <= hi with `wp` bits, from a single directed computation.
+fn ln_10_bounds(wp: u64) -> (Float, Float) {
+    floor_and_ceiling(Float::ln_10_prec_round(wp, Floor))
+}
+
+// Computes 10^x - 1 = expm1(x log 10) for a nonzero `Rational` `x` with `|x| < 2^MIN_EXPONENT`, too
+// small to bracket between `Float`s. See `exp_x_minus_1_scaled_rational_near_zero`, which brackets
+// x log 10 with `BigExponentFloat`s; `power_of_10_x_minus_1_rational_near_zero_exact` is its
+// fallback.
 fn power_of_10_x_minus_1_rational_near_zero(
+    x: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    exp_x_minus_1_scaled_rational_near_zero(x, prec, rm, Some(ln_10_bounds), || {
+        power_of_10_x_minus_1_rational_near_zero_exact(x, prec, rm)
+    })
+}
+
+// Computes, with exact `Rational` arithmetic (slow when x has a huge denominator), 10^x - 1 for a
+// nonzero `Rational` `x` with x * log2(10) < MIN_EXPONENT (so 10^x is too small to bracket between
+// `Float`s). Since 10^x - 1 = expm1(x ln(10)), bracketing ln(10) between two `Rational`s (from a
+// single directed ln(10) computation) and applying `exp_x_minus_1_rational_near_zero` to each
+// product brackets the result. expm1 is increasing, and x ln(10) is increasing in ln(10) for x > 0
+// and decreasing for x < 0, so the bracket ends order accordingly.
+fn power_of_10_x_minus_1_rational_near_zero_exact(
     x: &Rational,
     prec: u64,
     rm: RoundingMode,
@@ -327,9 +348,13 @@ fn power_of_10_x_minus_1_rational_helper(
             if x_log_2_10_ge(x, Float::MAX_EXPONENT_I64) {
                 exp_overflow(prec, rm)
             } else {
-                // 10^n - 1 is an exact integer with at most MAX_EXPONENT bits; round it directly.
-                let value = TEN.pow(u64::exact_from(&n)) - Rational::ONE;
-                Float::from_rational_prec_round(value, prec, rm)
+                // n is small enough to be an exact `Float`, and the `Float` function handles
+                // integers: it computes 10^n at a working precision above `prec`, so whenever 10^n
+                // - 1 is exactly representable with `prec` bits or is a midpoint, 10^n (whose
+                // significant part 5^n has fewer bits) is computed exactly and the result is a
+                // single rounded subtraction. Materializing 10^n - 1 here instead would take n
+                // log2(10) bits, about 10^9 for the largest n.
+                Float::exact_from(n).power_of_10_x_minus_1_prec_round(prec, rm)
             }
         } else {
             // n < 0: 10^n - 1 = (1 - 10^|n|) / 10^|n| lies in (-1, 0) and is never exactly
