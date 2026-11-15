@@ -14,6 +14,7 @@ pub(crate) fn register(runner: &mut Runner) {
     comparison::register(runner);
     constants::register(runner);
     conversion::register(runner);
+    elliptic::register(runner);
     exponential::register(runner);
 }
 
@@ -22,4 +23,5 @@ mod basic;
 mod comparison;
 mod constants;
 mod conversion;
+mod elliptic;
 mod exponential;

@@ -229,6 +229,9 @@ pub mod big_exponent_float {
             pub mod typst;
         }
     }
+    pub mod elliptic {
+        pub mod agm;
+    }
     pub mod exhaustive {
         pub mod exhaustive_big_exponent_floats;
         pub mod exhaustive_big_exponent_floats_with_precision;

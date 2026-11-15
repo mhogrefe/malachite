@@ -1251,6 +1251,22 @@ pub fn exhaustive_big_exponent_float_big_exponent_float_unsigned_rounding_mode_q
     )
 }
 
+// The rounding mode is `Exact` only if the result of `BigExponentFloat::agm_prec_round` is exact.
+pub fn exhaustive_big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_15()
+-> It<(BigExponentFloat, BigExponentFloat, u64, RoundingMode)> {
+    Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(
+                exhaustive_pairs_from_single(exhaustive_big_exponent_floats()),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .map(|(((x, y), p), rm)| (x, y, p, rm))
+        .filter(|(x, y, p, rm)| big_exponent_float_agm_prec_round_valid(x, y, *p, *rm)),
+    )
+}
+
 // The unsigned is positive, and the rounding mode is `Exact` only if the hypotenuse is
 // representable with that many bits.
 pub fn exhaustive_big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_6()
@@ -1711,6 +1727,35 @@ pub fn big_exponent_float_log_base_big_exponent_float_base_prec_round_valid(
             == Equal
 }
 
+// Whether `BigExponentFloat::agm_prec_round` may be called with these arguments: `Exact` is allowed
+// only when the result is exact, which, for finite positive arguments, happens only when they are
+// equal and representable with `p` bits.
+pub fn big_exponent_float_agm_prec_round_valid(
+    x: &BigExponentFloat,
+    y: &BigExponentFloat,
+    p: u64,
+    rm: RoundingMode,
+) -> bool {
+    rm != Exact
+        || !(x.is_finite() && *x > 0u32 && y.is_finite() && *y > 0u32)
+        || x == y && x.round_to_prec_round_ref(p, Floor).1 == Equal
+}
+
+// Whether `BigExponentFloat::agm_big_exponent_float_rational_prec_round` may be called with these
+// arguments: `Exact` is allowed only when the result is exact, which, for a finite positive
+// `BigExponentFloat` and a positive `Rational`, happens only when they are equal and representable
+// with `p` bits.
+pub fn big_exponent_float_agm_big_exponent_float_rational_prec_round_valid(
+    x: &BigExponentFloat,
+    y: &Rational,
+    p: u64,
+    rm: RoundingMode,
+) -> bool {
+    rm != Exact
+        || !(x.is_finite() && *x > 0u32 && *y > 0u32)
+        || *x == *y && x.round_to_prec_round_ref(p, Floor).1 == Equal
+}
+
 // Like `add_prec_round_valid`, for log_b(1 + x) with a `BigExponentFloat` base.
 pub fn big_exponent_float_log_base_big_exponent_float_base_1_plus_x_prec_round_valid(
     x: &BigExponentFloat,
@@ -2039,6 +2084,25 @@ pub fn exhaustive_big_exponent_float_rational_unsigned_rounding_mode_quadruple_g
             big_exponent_float_log_base_rational_big_exponent_float_base_prec_round_valid(
                 y, x, *p, *rm,
             )
+        }),
+    )
+}
+
+// The rounding mode is `Exact` only if the result of
+// `BigExponentFloat::agm_big_exponent_float_rational_prec_round` is exact.
+pub fn exhaustive_big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_19()
+-> It<(BigExponentFloat, Rational, u64, RoundingMode)> {
+    Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(
+                exhaustive_pairs(exhaustive_big_exponent_floats(), exhaustive_rationals()),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .map(|(((x, y), p), rm)| (x, y, p, rm))
+        .filter(|(x, y, p, rm)| {
+            big_exponent_float_agm_big_exponent_float_rational_prec_round_valid(x, y, *p, *rm)
         }),
     )
 }

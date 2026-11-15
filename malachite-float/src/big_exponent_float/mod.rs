@@ -222,6 +222,8 @@ pub mod comparison;
 pub mod constants;
 /// Functions for converting [`BigExponentFloat`]s to and from other types, including strings.
 pub mod conversion;
+/// Elliptic functions of [`BigExponentFloat`]s; currently just the arithmetic-geometric mean (AGM).
+pub mod elliptic;
 /// Iterators that generate [`BigExponentFloat`]s without repetition.
 pub mod exhaustive;
 /// Exponential and logarithmic functions of [`BigExponentFloat`]s: `exp`, `ln`, logarithms to

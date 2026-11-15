@@ -7957,6 +7957,19 @@ fn test_against_flint() {
     ] {
         check_demo_against_flint(&oracle, "../malachite-float", demo_name, "arf_exponential");
     }
+    // `BigExponentFloat`'s AGM, checked with FLINT's arb ball arithmetic.
+    for demo_name in [
+        "demo_big_exponent_float_agm_prec_round",
+        "demo_big_exponent_float_agm_prec_round_in_domain",
+        "demo_big_exponent_float_agm_prec",
+        "demo_big_exponent_float_agm_rational_prec_round",
+        "demo_big_exponent_float_agm_rational_prec",
+        "demo_big_exponent_float_agm_big_exponent_float_rational_prec_round",
+        "demo_big_exponent_float_agm_big_exponent_float_rational_prec_round_in_domain",
+        "demo_big_exponent_float_agm_big_exponent_float_rational_prec",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-float", demo_name, "arf_agm");
+    }
     // `BigExponentFloat`'s logarithms, checked with FLINT's arb ball arithmetic.
     for demo_name in [
         "demo_big_exponent_float_ln_prec_round",
