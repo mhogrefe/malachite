@@ -271,6 +271,13 @@ pub mod big_exponent_float {
         pub mod power_of_2_x_minus_1;
     }
     pub mod trigonometric {
+        pub mod acos;
+        pub mod acot;
+        pub mod acsc;
+        pub mod asec;
+        pub mod asin;
+        pub mod atan;
+        pub mod atan2;
         pub mod cos;
         pub mod cot;
         pub mod csc;

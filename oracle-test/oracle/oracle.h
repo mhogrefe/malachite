@@ -146,6 +146,7 @@ int run_arf_arithmetic(const char * arg);
 int run_arf_misc(const char * arg);
 int run_arf_misc_rational(const char * arg);
 int run_arf_agm(const char * arg);
+int run_arf_atrig(const char * arg);
 int run_arf_exponential(const char * arg);
 int run_arf_trig(const char * arg);
 int run_arf_logarithm(const char * arg);

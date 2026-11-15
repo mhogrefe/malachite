@@ -1467,6 +1467,103 @@ pub fn rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_13()
     )
 }
 
+// Like `big_exponent_float_unsigned_rounding_mode_triple_gen_var_22`, but with `Exact` only for a
+// `NaN` argument, so that it is valid for every inverse trigonometric function.
+pub fn big_exponent_float_unsigned_rounding_mode_triple_gen_var_23()
+-> Generator<(BigExponentFloat, u64, RoundingMode)> {
+    Generator::new(
+        &|| {
+            Box::new(
+                exhaustive_big_exponent_float_unsigned_rounding_mode_triple_gen_var_22()
+                    .filter(|(x, _, rm)| *rm != RoundingMode::Exact || x.is_nan()),
+            )
+        },
+        &|config| {
+            Box::new(
+                random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_22(config)
+                    .filter(|(x, _, rm)| *rm != RoundingMode::Exact || x.is_nan()),
+            )
+        },
+        &|config| {
+            Box::new(
+                special_random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_22(config)
+                    .filter(|(x, _, rm)| *rm != RoundingMode::Exact || x.is_nan()),
+            )
+        },
+    )
+}
+
+// Like `big_exponent_float_unsigned_rounding_mode_triple_gen_var_23`, paired with the equal
+// `Float`s, excluding `Exact`.
+pub fn big_exponent_float_unsigned_rounding_mode_triple_gen_var_23_float() -> Generator<(
+    (Float, u64, RoundingMode),
+    (BigExponentFloat, u64, RoundingMode),
+)> {
+    Generator::new(
+        &|| {
+            big_exponent_float_unsigned_rounding_mode_triple_float_no_exact(Box::new(
+                exhaustive_big_exponent_float_unsigned_rounding_mode_triple_gen_var_22()
+                    .filter(|(_, _, rm)| *rm != RoundingMode::Exact),
+            ))
+        },
+        &|config| {
+            big_exponent_float_unsigned_rounding_mode_triple_float_no_exact(Box::new(
+                random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_22(config)
+                    .filter(|(_, _, rm)| *rm != RoundingMode::Exact),
+            ))
+        },
+        &|config| {
+            big_exponent_float_unsigned_rounding_mode_triple_float_no_exact(Box::new(
+                special_random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_22(config)
+                    .filter(|(_, _, rm)| *rm != RoundingMode::Exact),
+            ))
+        },
+    )
+}
+
+// Like `big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_8`, but with `Exact`
+// only for a `NaN` argument, so that it is valid for every inverse trigonometric function with a
+// period.
+pub fn big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_9()
+-> Generator<(BigExponentFloat, u64, u64, RoundingMode)> {
+    Generator::new(
+        &|| {
+            Box::new(
+                exhaustive_big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_8()
+                    .filter(|(x, _, _, rm)| *rm != RoundingMode::Exact || x.is_nan()),
+            )
+        },
+        &|config| {
+            Box::new(
+                random_big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_8(
+                    config,
+                )
+                .filter(|(x, _, _, rm)| *rm != RoundingMode::Exact || x.is_nan()),
+            )
+        },
+        &|config| {
+            Box::new(special_random_big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_8(config).filter(|(x, _, _, rm)| *rm != RoundingMode::Exact || x.is_nan()))
+        },
+    )
+}
+
+// Like `big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_15`, but
+// with `Exact` only when an argument is `NaN`, so that it is valid for `BigExponentFloat::atan2`.
+pub fn big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_17()
+-> Generator<(BigExponentFloat, BigExponentFloat, u64, RoundingMode)> {
+    Generator::new(
+        &|| {
+            Box::new(exhaustive_big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_15().filter(|(y, x, _, rm)| *rm != RoundingMode::Exact || y.is_nan() || x.is_nan()))
+        },
+        &|config| {
+            Box::new(random_big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_15(config).filter(|(y, x, _, rm)| *rm != RoundingMode::Exact || y.is_nan() || x.is_nan()))
+        },
+        &|config| {
+            Box::new(special_random_big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_15(config).filter(|(y, x, _, rm)| *rm != RoundingMode::Exact || y.is_nan() || x.is_nan()))
+        },
+    )
+}
+
 // All `(BigExponentFloat, u64, RoundingMode)` that are valid inputs to
 // `BigExponentFloat::exp_prec_round`, with exponents at most 2^10.
 pub fn big_exponent_float_unsigned_rounding_mode_triple_gen_var_9()
