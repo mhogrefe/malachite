@@ -270,6 +270,15 @@ pub mod big_exponent_float {
         pub mod power_of_2_of_big_exponent_float;
         pub mod power_of_2_x_minus_1;
     }
+    pub mod trigonometric {
+        pub mod cos;
+        pub mod cot;
+        pub mod csc;
+        pub mod sec;
+        pub mod sin;
+        pub mod sin_cos;
+        pub mod tan;
+    }
     pub mod random {
         pub mod random_big_exponent_floats;
         pub mod random_finite_big_exponent_floats;

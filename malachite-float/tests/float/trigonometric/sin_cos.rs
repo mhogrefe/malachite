@@ -132,6 +132,44 @@ fn test_sin_cos_prec_round() {
     test(
         "NaN", "NaN", 1, Floor, "NaN", "NaN", "NaN", "NaN", Equal, Equal,
     );
+    // - a tiny x with more bits than the target precision: the small-input shortcut decides the
+    //   rounding (it once declined here, and the general path then worked at about 2^25 bits)
+    test(
+        "4.364220784553589608489591e-4651186",
+        "0x1.998430e8f68565d451dE-3862726#77",
+        10,
+        Nearest,
+        "4.3640e-4651186",
+        "0x1.998E-3862726#10",
+        "1.0000",
+        "0x1.000#10",
+        Less,
+        Greater,
+    );
+    test(
+        "4.364220784553589608489591e-4651186",
+        "0x1.998430e8f68565d451dE-3862726#77",
+        10,
+        Floor,
+        "4.3640e-4651186",
+        "0x1.998E-3862726#10",
+        "0.99902",
+        "0x0.ffc#10",
+        Less,
+        Less,
+    );
+    test(
+        "4.364220784553589608489591e-4651186",
+        "0x1.998430e8f68565d451dE-3862726#77",
+        10,
+        Ceiling,
+        "4.3694e-4651186",
+        "0x1.9a0E-3862726#10",
+        "1.0000",
+        "0x1.000#10",
+        Greater,
+        Greater,
+    );
     test(
         "Infinity", "Infinity", 1, Floor, "NaN", "NaN", "NaN", "NaN", Equal, Equal,
     );

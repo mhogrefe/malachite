@@ -1199,10 +1199,23 @@ documented by git history.
   `log_base_power_of_2_1_plus_x_prec_round` when the base is a power of 2. Previously, for an $x$
   such as $2^k$ their Ziv loop needed a working precision of about $k$ bits, so $x = 2^{2^{26}}$
   took gigabytes. Results are unchanged.
+- `Float::sin_prec_round`, `Float::tan_prec_round`, and `Float::sin_cos_prec_round`, with their
+  other forms, are much faster for a tiny $x$ with more bits than the target precision. Their
+  small-input shortcut capped its error bound at the target precision plus 2, below the input's own
+  precision, so the shortcut could decline and leave the general algorithm to work at about
+  $-2\operatorname{EXP}(x)$ bits: for $x \approx 2^{-1.5 \cdot 10^7}$ with 77 bits, rounded to
+  10 bits, that was about 0.6 seconds and hundreds of MB per call, and it is now a few microseconds.
+  The bound is now capped as in the other functions' shortcuts, above the input's precision.
+  Results are unchanged.
 - Corrected formulas in the documentation of three `Float` constants: the golden ratio
   (`phi_prec_round` and `phi_prec`) is $(1+\sqrt{5})/2$, not $(1+\sqrt{2})/2$; `two_over_sqrt_pi`'s
   docs now render $2/\sqrt{\pi}$; and the series for the Prouhet–Thue–Morse constant now sums over
   the same index $n$ that its terms use.
+- The documentation of `Float::catalans_constant_prec_round` and `catalans_constant_prec` (and of
+  their `BigExponentFloat` counterparts) now states that Catalan's constant is irrational, linking
+  to a Lean formalization of the proof, instead of saying that its irrationality is unproven.
+- Corrected the rendering of $\pm$ and $\infty$ in the special cases documented for
+  `Float::cot_with_period_prec_round` and its other forms.
 
 ## 0.14.0 — 2026-10-13
 

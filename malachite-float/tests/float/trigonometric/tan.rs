@@ -101,6 +101,35 @@ fn test_tan_prec_round() {
         }
     };
     test("NaN", "NaN", 1, Floor, "NaN", "NaN", Equal);
+    // - a tiny x with more bits than the target precision: the small-input shortcut decides the
+    //   rounding (it once declined here, and the general path then worked at about 2^25 bits)
+    test(
+        "4.364220784553589608489591e-4651186",
+        "0x1.998430e8f68565d451dE-3862726#77",
+        10,
+        Nearest,
+        "4.3640e-4651186",
+        "0x1.998E-3862726#10",
+        Less,
+    );
+    test(
+        "4.364220784553589608489591e-4651186",
+        "0x1.998430e8f68565d451dE-3862726#77",
+        10,
+        Floor,
+        "4.3640e-4651186",
+        "0x1.998E-3862726#10",
+        Less,
+    );
+    test(
+        "4.364220784553589608489591e-4651186",
+        "0x1.998430e8f68565d451dE-3862726#77",
+        10,
+        Ceiling,
+        "4.3694e-4651186",
+        "0x1.9a0E-3862726#10",
+        Greater,
+    );
     test("Infinity", "Infinity", 1, Floor, "NaN", "NaN", Equal);
     test("-Infinity", "-Infinity", 1, Floor, "NaN", "NaN", Equal);
     test("0.0", "0x0.0", 1, Floor, "0.0", "0x0.0", Equal);

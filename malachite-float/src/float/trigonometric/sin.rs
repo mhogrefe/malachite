@@ -19,7 +19,7 @@
 // `mpfr_sin_fast`, built on `mpfr_sincos_fast`) is used instead.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::float::arithmetic::round_near_x::float_round_near_x;
+use crate::float::arithmetic::round_near_x::small_input_shortcut;
 use crate::float::trigonometric::cos::{
     NEAR_ZERO_MIN_CANCEL, TrigStep, half_constant, phi_minus_1_prec_round, reduce_huge,
     round_bracket, sin_bound, trig_near_zero, trig_rational_near_zero, trig_turns_near_zero,
@@ -27,7 +27,7 @@ use crate::float::trigonometric::cos::{
 use crate::float::trigonometric::sin_cos::{SINCOS_THRESHOLD, sin_cos_fast};
 use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn};
 use core::cmp::Ordering::{self, Equal, Greater, Less};
-use core::cmp::{max, min};
+use core::cmp::max;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{Abs, NegAssign, PowerOf2};
 use malachite_base::num::basic::floats::PrimitiveFloat;
@@ -594,18 +594,8 @@ fn sin_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float, 
     // sin(x) = x - x^3/6 + ... so the error is < 2^(3*EXP(x)-2)
     //
     // MPFR_FAST_COMPUTE_IF_SMALL_INPUT (y, x, err1, 2, 0, rnd_mode, {});
-    if err1 > 0 {
-        let err = u64::exact_from(err1) + 2;
-        if err > prec + 1 {
-            // The error bound only has to clear prec + 1; passing an enormous err (a tiny x has one
-            // around 2^31) would make float_round_near_x do work proportional to it. This can fail
-            // to round, for instance for a power of 2 stored at a precision above the error bound,
-            // whose bits within the error window are all zero; the general algorithm then takes
-            // over, as in MPFR.
-            if let Some(result) = float_round_near_x(x, min(err, prec + 2), false, prec, rm) {
-                return result;
-            }
-        }
+    if let Some(result) = small_input_shortcut(x, err1, 2, false, prec, rm) {
+        return result;
     }
     // Compute initial precision
     if prec >= SINCOS_THRESHOLD {

@@ -21,7 +21,7 @@
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::float::arithmetic::round_near_x::{
-    LEADING_TERM_MIN_EXPONENT, float_round_near_x, round_rational_leading_term,
+    LEADING_TERM_MIN_EXPONENT, round_rational_leading_term, small_input_shortcut,
 };
 use crate::float::conversion::string::set_str::overflow;
 use crate::float::trigonometric::cos::{
@@ -34,7 +34,7 @@ use crate::float::trigonometric::sin_cos::{
 };
 use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn};
 use core::cmp::Ordering::{self, Equal};
-use core::cmp::{max, min};
+use core::cmp::max;
 use malachite_base::num::arithmetic::traits::{
     Abs, AddMul, IsPowerOf2, Parity, Pow, PowerOf2, Reciprocal, Square,
 };
@@ -132,15 +132,8 @@ fn tan_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float, 
     //
     // MPFR_FAST_COMPUTE_IF_SMALL_INPUT (y, x, -2 * MPFR_GET_EXP (x), 1, 1, rnd_mode, {});
     let err1 = -(exp_x << 1);
-    if err1 > 0 {
-        let err = u64::exact_from(err1) + 1;
-        // The error bound only has to clear prec + 1; passing an enormous err (a tiny x has one
-        // around 2^31) would make float_round_near_x do work proportional to it.
-        if err > prec + 1
-            && let Some(result) = float_round_near_x(x, min(err, prec + 2), true, prec, rm)
-        {
-            return result;
-        }
+    if let Some(result) = small_input_shortcut(x, err1, 1, true, prec, rm) {
+        return result;
     }
     // Compute initial precision
     let mut m = prec + prec.ceiling_log_base_2() + 13;

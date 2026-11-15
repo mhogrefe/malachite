@@ -15,9 +15,9 @@ impl BigExponentFloat {
     /// \frac{(-1)^k}{(2k+1)^2}$, with the given precision and rounded using the given
     /// [`RoundingMode`]. An [`Ordering`] is also returned, indicating whether the rounded value is
     /// less than or greater than the exact value of the constant. (The rounded value is never equal
-    /// to the exact value of the constant. Catalan's constant has not been proven irrational, but
-    /// its binary expansion is known to be aperiodic far beyond any precision reachable by this
-    /// function.)
+    /// to the exact value of the constant. Catalan's constant is irrational; a proof, formalized in
+    /// Lean, is in [OpenAI's math
+    /// repository](https://github.com/openai/math/blob/main/lean/OAI/NumberTheory/Catalan/Results/Conclusions.lean).)
     ///
     /// $$
     /// x = G+\varepsilon.
@@ -52,6 +52,7 @@ impl BigExponentFloat {
     /// assert_eq!(x.to_string(), "0.9159655941772190150546035149325");
     /// assert_eq!(o, Greater);
     /// ```
+    #[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
     #[inline]
     pub fn catalans_constant_prec_round(prec: u64, rm: RoundingMode) -> (Self, Ordering) {
         let (x, o) = Float::catalans_constant_prec_round(prec, rm);
@@ -62,9 +63,9 @@ impl BigExponentFloat {
     /// \frac{(-1)^k}{(2k+1)^2}$, with the given precision and rounded to the nearest value of that
     /// precision. An [`Ordering`] is also returned, indicating whether the rounded value is less
     /// than or greater than the exact value of the constant. (The rounded value is never equal to
-    /// the exact value of the constant. Catalan's constant has not been proven irrational, but its
-    /// binary expansion is known to be aperiodic far beyond any precision reachable by this
-    /// function.)
+    /// the exact value of the constant. Catalan's constant is irrational; a proof, formalized in
+    /// Lean, is in [OpenAI's math
+    /// repository](https://github.com/openai/math/blob/main/lean/OAI/NumberTheory/Catalan/Results/Conclusions.lean).)
     ///
     /// $$
     /// x = G+\varepsilon.
@@ -101,6 +102,7 @@ impl BigExponentFloat {
     /// assert_eq!(x.to_string(), "0.9159655941772190150546035149325");
     /// assert_eq!(o, Greater);
     /// ```
+    #[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
     #[inline]
     pub fn catalans_constant_prec(prec: u64) -> (Self, Ordering) {
         let (x, o) = Float::catalans_constant_prec(prec);

@@ -708,8 +708,13 @@ fn sin_cos_prec_round_normal_ref(
         let neg_two_exp = u64::exact_from(-(exp_x << 1));
         let err_cos = neg_two_exp + 1;
         if err_cos > prec + 1
-            && let Some((s, o_s)) =
-                float_round_near_x(x, min(neg_two_exp + 2, prec + 2), false, prec, rm)
+            && let Some((s, o_s)) = float_round_near_x(
+                x,
+                min(neg_two_exp + 2, max(prec + 2, x.get_prec().unwrap() + 1)),
+                false,
+                prec,
+                rm,
+            )
         {
             let (c, o_c) = near_one(err_cos, false, prec, rm);
             return (s, c, o_s, o_c);

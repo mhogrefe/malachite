@@ -1571,14 +1571,14 @@ impl Float {
     /// - $f(\text{NaN},u,p,m)=\text{NaN}$
     /// - $f(\pm\infty,u,p,m)=\text{NaN}$
     /// - $f(x,0,p,m)=\text{NaN}$
-    /// - $f(\\pm0.0,u,p,m)=\\pm\\infty$
+    /// - $f(\pm0.0,u,p,m)=\pm\infty$
     /// - If $x/u$ is a multiple of $1/2$, the cotangent has a pole there, and the result is exactly
-    ///   $\\pm\\infty$: the sine is a zero carrying the sign of $x$ and the cosine is $\\pm1$, so
-    ///   the sign is that of $x$ at an even multiple and the opposite at an odd one. Keeping that
+    ///   $\pm\infty$: the sine is a zero carrying the sign of $x$ and the cosine is $\pm1$, so the
+    ///   sign is that of $x$ at an even multiple and the opposite at an odd one. Keeping that
     ///   identity is what makes the function odd.
-    /// - If $x/u$ is an odd multiple of $1/4$, the result is exactly $\\pm0.0$, with the sign of
-    ///   the sine there.
-    /// - If $x/u$ is an odd multiple of $1/8$, the result is exactly $\\pm1$.
+    /// - If $x/u$ is an odd multiple of $1/4$, the result is exactly $\pm0.0$, with the sign of the
+    ///   sine there.
+    /// - If $x/u$ is an odd multiple of $1/8$, the result is exactly $\pm1$.
     ///
     /// When $x/u$ in lowest terms has denominator 3 or 6, the result is $\pm\sqrt3/3$, and when it
     /// has denominator 12, $\pm\sqrt3$; each is computed from a single correctly rounded constant
@@ -2052,12 +2052,12 @@ impl Float {
     /// - $f(x,0,p,m)=\text{NaN}$
     /// - $f(0,u,p,m)=\infty$
     /// - If $x/u$ is a multiple of $1/2$, the cotangent has a pole there, and the result is exactly
-    ///   $\\pm\\infty$: the sine is a zero carrying the sign of $x$ and the cosine is $\\pm1$, so
-    ///   the sign is that of $x$ at an even multiple and the opposite at an odd one. Keeping that
+    ///   $\pm\infty$: the sine is a zero carrying the sign of $x$ and the cosine is $\pm1$, so the
+    ///   sign is that of $x$ at an even multiple and the opposite at an odd one. Keeping that
     ///   identity is what makes the function odd.
-    /// - If $x/u$ is an odd multiple of $1/4$, the result is exactly $\\pm0.0$, with the sign of
-    ///   the sine there.
-    /// - If $x/u$ is an odd multiple of $1/8$, the result is exactly $\\pm1$.
+    /// - If $x/u$ is an odd multiple of $1/4$, the result is exactly $\pm0.0$, with the sign of the
+    ///   sine there.
+    /// - If $x/u$ is an odd multiple of $1/8$, the result is exactly $\pm1$.
     ///
     /// When $x/u$ in lowest terms has denominator 3 or 6, the result is $\pm\sqrt3/3$, and when it
     /// has denominator 12, $\pm\sqrt3$; each is computed from a single correctly rounded constant
@@ -3178,12 +3178,12 @@ where
 /// - $f(x,0)=\text{NaN}$
 /// - $f(\pm0.0,u)=\pm\infty$
 /// - If $x/u$ is a multiple of $1/2$, the cotangent has a pole there, and the result is exactly
-///   $\\pm\\infty$: the sine is a zero carrying the sign of $x$ and the cosine is $\\pm1$, so the
-///   sign is that of $x$ at an even multiple and the opposite at an odd one.
-/// - If $x/u$ is an odd multiple of $1/4$, the result is exactly $\\pm0.0$, and if it is an odd
-///   multiple of $1/8$, exactly $\\pm1$.
-/// - If $x/u$ in lowest terms has denominator 3 or 6, the result is $\\pm\\sqrt3/3$, and if it has
-///   denominator 12, $\\pm\\sqrt3$.
+///   $\pm\infty$: the sine is a zero carrying the sign of $x$ and the cosine is $\pm1$, so the sign
+///   is that of $x$ at an even multiple and the opposite at an odd one.
+/// - If $x/u$ is an odd multiple of $1/4$, the result is exactly $\pm0.0$, and if it is an odd
+///   multiple of $1/8$, exactly $\pm1$.
+/// - If $x/u$ in lowest terms has denominator 3 or 6, the result is $\pm\sqrt3/3$, and if it has
+///   denominator 12, $\pm\sqrt3$.
 ///
 /// Overflow happens at a pole, where the result is exactly $\pm\infty$, and for a tiny $x/u$, whose
 /// cotangent is close to $u/(2\pi x)$: an [`f32`] or [`f64`] whose fraction of a turn is not a
@@ -3262,12 +3262,12 @@ where
 /// - $f(x,0)=\text{NaN}$
 /// - $f(0,u)=\infty$
 /// - If $x/u$ is a multiple of $1/2$, the cotangent has a pole there, and the result is exactly
-///   $\\pm\\infty$: the sine is a zero carrying the sign of $x$ and the cosine is $\\pm1$, so the
-///   sign is that of $x$ at an even multiple and the opposite at an odd one.
-/// - If $x/u$ is an odd multiple of $1/4$, the result is exactly $\\pm0.0$, and if it is an odd
-///   multiple of $1/8$, exactly $\\pm1$.
-/// - If $x/u$ in lowest terms has denominator 3 or 6, the result is $\\pm\\sqrt3/3$, and if it has
-///   denominator 12, $\\pm\\sqrt3$.
+///   $\pm\infty$: the sine is a zero carrying the sign of $x$ and the cosine is $\pm1$, so the sign
+///   is that of $x$ at an even multiple and the opposite at an odd one.
+/// - If $x/u$ is an odd multiple of $1/4$, the result is exactly $\pm0.0$, and if it is an odd
+///   multiple of $1/8$, exactly $\pm1$.
+/// - If $x/u$ in lowest terms has denominator 3 or 6, the result is $\pm\sqrt3/3$, and if it has
+///   denominator 12, $\pm\sqrt3$.
 ///
 /// Overflow is possible away from a pole too: a fraction of a turn within about $2^{-130}$ of a
 /// multiple of $1/2$ has a cotangent beyond the largest [`f32`], and one within about $2^{-1026}$

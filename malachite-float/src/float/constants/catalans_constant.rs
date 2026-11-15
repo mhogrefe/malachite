@@ -48,9 +48,9 @@ impl Float {
     /// \frac{(-1)^k}{(2k+1)^2}$, with the given precision and rounded using the given
     /// [`RoundingMode`]. An [`Ordering`] is also returned, indicating whether the rounded value is
     /// less than or greater than the exact value of the constant. (The rounded value is never equal
-    /// to the exact value of the constant. Catalan's constant has not been proven irrational, but
-    /// its binary expansion is known to be aperiodic far beyond any precision reachable by this
-    /// function.)
+    /// to the exact value of the constant. Catalan's constant is irrational; a proof, formalized in
+    /// Lean, is in [OpenAI's math
+    /// repository](https://github.com/openai/math/blob/main/lean/OAI/NumberTheory/Catalan/Results/Conclusions.lean).)
     ///
     /// $$
     /// x = G+\varepsilon.
@@ -91,6 +91,7 @@ impl Float {
     // G = Pi/8*log(2+sqrt(3)) + 3/8*sum(k!^2/(2k)!/(2k+1)^2, k=0..infinity)
     //
     // This is mpfr_const_catalan_internal from const_catalan.c, MPFR 4.2.2.
+    #[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
     pub fn catalans_constant_prec_round(prec: u64, rm: RoundingMode) -> (Self, Ordering) {
         const THREE: Natural = Natural::const_from(3);
         let mut working_prec = prec + prec.ceiling_log_base_2() + 7;
@@ -121,9 +122,9 @@ impl Float {
     /// \frac{(-1)^k}{(2k+1)^2}$, with the given precision and rounded to the nearest [`Float`] of
     /// that precision. An [`Ordering`] is also returned, indicating whether the rounded value is
     /// less than or greater than the exact value of the constant. (The rounded value is never equal
-    /// to the exact value of the constant. Catalan's constant has not been proven irrational, but
-    /// its binary expansion is known to be aperiodic far beyond any precision reachable by this
-    /// function.)
+    /// to the exact value of the constant. Catalan's constant is irrational; a proof, formalized in
+    /// Lean, is in [OpenAI's math
+    /// repository](https://github.com/openai/math/blob/main/lean/OAI/NumberTheory/Catalan/Results/Conclusions.lean).)
     ///
     /// $$
     /// x = G+\varepsilon.
@@ -159,6 +160,7 @@ impl Float {
     /// assert_eq!(g.to_string(), "0.91596559417721901505460351493252");
     /// assert_eq!(o, Greater);
     /// ```
+    #[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
     #[inline]
     pub fn catalans_constant_prec(prec: u64) -> (Self, Ordering) {
         Self::catalans_constant_prec_round(prec, Nearest)

@@ -232,3 +232,5 @@ pub mod exponential;
 #[cfg(feature = "random")]
 /// Iterators that generate [`BigExponentFloat`]s randomly.
 pub mod random;
+/// Trigonometric functions of [`BigExponentFloat`]s and [`Rational`](malachite_q::Rational)s.
+pub mod trigonometric;

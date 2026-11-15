@@ -260,6 +260,17 @@ pub fn exhaustive_big_exponent_float_unsigned_pair_gen_var_1() -> It<(BigExponen
     ))
 }
 
+// The unsigned is positive, and the exponent is at most 2^16.
+pub fn exhaustive_big_exponent_float_unsigned_pair_gen_var_3() -> It<(BigExponentFloat, u64)> {
+    Box::new(
+        exhaustive_pairs_big_tiny(
+            exhaustive_big_exponent_floats(),
+            exhaustive_positive_primitive_ints(),
+        )
+        .filter(|(x, _)| big_exponent_float_trig_argument_is_small(x)),
+    )
+}
+
 // The unsigned is small.
 pub fn exhaustive_big_exponent_float_unsigned_pair_gen_var_2() -> It<(BigExponentFloat, u64)> {
     Box::new(exhaustive_pairs_big_tiny(
@@ -381,6 +392,39 @@ pub fn exhaustive_big_exponent_float_unsigned_rounding_mode_triple_gen_var_9()
             exhaustive_rounding_modes(),
         )
         .filter(|&((ref x, p), rm)| big_exponent_float_exp_prec_round_valid(x, p, rm)),
+    ))
+}
+
+// The rounding mode is `Exact` only if the argument is zero or not finite.
+pub fn exhaustive_big_exponent_float_unsigned_rounding_mode_triple_gen_var_22()
+-> It<(BigExponentFloat, u64, RoundingMode)> {
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(
+                exhaustive_big_exponent_floats(),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, p), rm)| {
+            big_exponent_float_trig_with_period_prec_round_valid(x, 2, p, rm)
+        }),
+    ))
+}
+
+// The rounding mode is `Exact` only if the argument is zero or not finite, and the exponent is at
+// most 2^16.
+pub fn exhaustive_big_exponent_float_unsigned_rounding_mode_triple_gen_var_21()
+-> It<(BigExponentFloat, u64, RoundingMode)> {
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(
+                exhaustive_big_exponent_floats(),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, p), rm)| big_exponent_float_trig_prec_round_valid(x, p, rm)),
     ))
 }
 
@@ -687,6 +731,25 @@ pub fn exhaustive_big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_g
         )
         .map(|((x, k, p), rm)| (x, k, p, rm))
         .filter(|(x, k, p, rm)| big_exponent_float_log_base_prec_round_valid(x, *k, *p, *rm)),
+    )
+}
+
+// The rounding mode is `Exact` only if the argument is zero or not finite, or the unsigned u is 0.
+pub fn exhaustive_big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_8()
+-> It<(BigExponentFloat, u64, u64, RoundingMode)> {
+    Box::new(
+        lex_pairs(
+            exhaustive_triples(
+                exhaustive_big_exponent_floats(),
+                exhaustive_unsigneds(),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .map(|((x, k, p), rm)| (x, k, p, rm))
+        .filter(|(x, u, p, rm)| {
+            big_exponent_float_trig_with_period_prec_round_valid(x, *u, *p, *rm)
+        }),
     )
 }
 
@@ -1452,6 +1515,38 @@ pub fn big_exponent_float_rem_unsigned_prec_round_valid(
     rm: RoundingMode,
 ) -> bool {
     rm != Exact || x.rem_unsigned_prec_round_ref(n, p, Floor).1 == Equal
+}
+
+// Whether a `BigExponentFloat` is a cheap argument for the trigonometric functions: zero, not
+// finite, or with an exponent of at most 2^16 (reducing an argument with exponent e takes about e
+// bits of π).
+pub fn big_exponent_float_trig_argument_is_small(x: &BigExponentFloat) -> bool {
+    x.get_exponent().is_none_or(|e| *e <= 65536u32)
+}
+
+// Whether `BigExponentFloat::sin_prec_round` (and the other forward trigonometric functions) may be
+// called with these arguments, in a test: the argument must satisfy
+// `big_exponent_float_trig_argument_is_small`, and `Exact` is allowed only when it is zero or not
+// finite.
+pub fn big_exponent_float_trig_prec_round_valid(
+    x: &BigExponentFloat,
+    _p: u64,
+    rm: RoundingMode,
+) -> bool {
+    big_exponent_float_trig_argument_is_small(x) && (rm != Exact || !x.is_finite() || x.is_zero())
+}
+
+// Whether `BigExponentFloat::sin_with_period_prec_round` (and the other forward trigonometric
+// functions with a period) may be called with these arguments, in a test: `Exact` is allowed only
+// when the argument is zero or not finite, or u is 0. (The exact cases at multiples of 1/24 of a
+// turn differ from function to function, and are tested separately.)
+pub fn big_exponent_float_trig_with_period_prec_round_valid(
+    x: &BigExponentFloat,
+    u: u64,
+    _p: u64,
+    rm: RoundingMode,
+) -> bool {
+    rm != Exact || !x.is_finite() || x.is_zero() || u == 0
 }
 
 // Whether the exponent of `x`, if it has one, is at most 2^10. The exponential functions take time
