@@ -210,6 +210,11 @@ impl BigExponentFloat {
     /// Unlike [its `Float` counterpart](crate::Float::power_of_10_x_minus_1_prec_round), this
     /// function never overflows or underflows.
     ///
+    /// Warning: a positive argument with exponent $e > 0$ has an integer part of about $e$ bits,
+    /// and 5 is raised to that power, which takes about $e$ squarings. The time and memory needed
+    /// therefore grow with the exponent, without any limit: an argument near $2^{2^{40}}$ has an
+    /// integer part of about $2^{40}$ bits, or 128 GiB.
+    ///
     /// If you know you'll be using `Nearest`, consider using
     /// [`BigExponentFloat::power_of_10_x_minus_1_prec`] instead.
     ///
@@ -287,6 +292,11 @@ impl BigExponentFloat {
     /// Unlike [its `Float` counterpart](crate::Float::power_of_10_x_minus_1_prec_round), this
     /// function never overflows or underflows.
     ///
+    /// Warning: a positive argument with exponent $e > 0$ has an integer part of about $e$ bits,
+    /// and 5 is raised to that power, which takes about $e$ squarings. The time and memory needed
+    /// therefore grow with the exponent, without any limit: an argument near $2^{2^{40}}$ has an
+    /// integer part of about $2^{40}$ bits, or 128 GiB.
+    ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n^{3/2} \log n \log\log n + mn \log n \log\log n)$
     ///
@@ -360,6 +370,11 @@ impl BigExponentFloat {
     ///
     /// Unlike [its `Float` counterpart](crate::Float::power_of_10_x_minus_1_prec_round), this
     /// function never overflows or underflows.
+    ///
+    /// Warning: a positive argument with exponent $e > 0$ has an integer part of about $e$ bits,
+    /// and 5 is raised to that power, which takes about $e$ squarings. The time and memory needed
+    /// therefore grow with the exponent, without any limit: an argument near $2^{2^{40}}$ has an
+    /// integer part of about $2^{40}$ bits, or 128 GiB.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n^{3/2} \log n \log\log n + mn \log n \log\log n)$
@@ -447,6 +462,11 @@ impl BigExponentFloat {
     /// Unlike [its `Float` counterpart](crate::Float::power_of_10_x_minus_1_prec_round), this
     /// function never overflows or underflows.
     ///
+    /// Warning: a positive argument with exponent $e > 0$ has an integer part of about $e$ bits,
+    /// and 5 is raised to that power, which takes about $e$ squarings. The time and memory needed
+    /// therefore grow with the exponent, without any limit: an argument near $2^{2^{40}}$ has an
+    /// integer part of about $2^{40}$ bits, or 128 GiB.
+    ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`BigExponentFloat::power_of_10_x_minus_1_prec_round`] instead.
     ///
@@ -506,6 +526,11 @@ impl BigExponentFloat {
     /// Unlike [its `Float` counterpart](crate::Float::power_of_10_x_minus_1_prec_round), this
     /// function never overflows or underflows.
     ///
+    /// Warning: a positive argument with exponent $e > 0$ has an integer part of about $e$ bits,
+    /// and 5 is raised to that power, which takes about $e$ squarings. The time and memory needed
+    /// therefore grow with the exponent, without any limit: an argument near $2^{2^{40}}$ has an
+    /// integer part of about $2^{40}$ bits, or 128 GiB.
+    ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n^{3/2} \log n \log\log n + mn \log n \log\log n)$
     ///
@@ -551,6 +576,11 @@ impl BigExponentFloat {
     ///
     /// Unlike [its `Float` counterpart](crate::Float::power_of_10_x_minus_1_prec_round), this
     /// function never overflows or underflows.
+    ///
+    /// Warning: a positive argument with exponent $e > 0$ has an integer part of about $e$ bits,
+    /// and 5 is raised to that power, which takes about $e$ squarings. The time and memory needed
+    /// therefore grow with the exponent, without any limit: an argument near $2^{2^{40}}$ has an
+    /// integer part of about $2^{40}$ bits, or 128 GiB.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n^{3/2} \log n \log\log n + mn \log n \log\log n)$

@@ -147,6 +147,11 @@ impl BigExponentFloat {
     /// Unlike [its `Float` counterpart](crate::Float::exp_x_minus_1_prec_round), this function
     /// never overflows or underflows.
     ///
+    /// Warning: a positive argument with exponent $e > 0$ is reduced modulo $\log 2$, which takes
+    /// about $e$ bits of $\log 2$. The time and memory needed therefore grow with the exponent,
+    /// without any limit: an argument near $2^{2^{40}}$ needs about $2^{40}$ bits, or 128 GiB, of
+    /// $\log 2$.
+    ///
     /// If you know you'll be using `Nearest`, consider using
     /// [`BigExponentFloat::exp_x_minus_1_prec`] instead.
     ///
@@ -224,6 +229,11 @@ impl BigExponentFloat {
     /// Unlike [its `Float` counterpart](crate::Float::exp_x_minus_1_prec_round), this function
     /// never overflows or underflows.
     ///
+    /// Warning: a positive argument with exponent $e > 0$ is reduced modulo $\log 2$, which takes
+    /// about $e$ bits of $\log 2$. The time and memory needed therefore grow with the exponent,
+    /// without any limit: an argument near $2^{2^{40}}$ needs about $2^{40}$ bits, or 128 GiB, of
+    /// $\log 2$.
+    ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n^{3/2} \log n \log\log n + m (\log m)^2 \log\log m)$
     ///
@@ -291,6 +301,11 @@ impl BigExponentFloat {
     ///
     /// Unlike [its `Float` counterpart](crate::Float::exp_x_minus_1_prec_round), this function
     /// never overflows or underflows.
+    ///
+    /// Warning: a positive argument with exponent $e > 0$ is reduced modulo $\log 2$, which takes
+    /// about $e$ bits of $\log 2$. The time and memory needed therefore grow with the exponent,
+    /// without any limit: an argument near $2^{2^{40}}$ needs about $2^{40}$ bits, or 128 GiB, of
+    /// $\log 2$.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n^{3/2} \log n \log\log n + m (\log m)^2 \log\log m)$
@@ -365,6 +380,11 @@ impl BigExponentFloat {
     /// Unlike [its `Float` counterpart](crate::Float::exp_x_minus_1_prec_round), this function
     /// never overflows or underflows.
     ///
+    /// Warning: a positive argument with exponent $e > 0$ is reduced modulo $\log 2$, which takes
+    /// about $e$ bits of $\log 2$. The time and memory needed therefore grow with the exponent,
+    /// without any limit: an argument near $2^{2^{40}}$ needs about $2^{40}$ bits, or 128 GiB, of
+    /// $\log 2$.
+    ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`BigExponentFloat::exp_x_minus_1_prec_round`] instead.
     ///
@@ -424,6 +444,11 @@ impl BigExponentFloat {
     /// Unlike [its `Float` counterpart](crate::Float::exp_x_minus_1_prec_round), this function
     /// never overflows or underflows.
     ///
+    /// Warning: a positive argument with exponent $e > 0$ is reduced modulo $\log 2$, which takes
+    /// about $e$ bits of $\log 2$. The time and memory needed therefore grow with the exponent,
+    /// without any limit: an argument near $2^{2^{40}}$ needs about $2^{40}$ bits, or 128 GiB, of
+    /// $\log 2$.
+    ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n^{3/2} \log n \log\log n + m (\log m)^2 \log\log m)$
     ///
@@ -469,6 +494,11 @@ impl BigExponentFloat {
     ///
     /// Unlike [its `Float` counterpart](crate::Float::exp_x_minus_1_prec_round), this function
     /// never overflows or underflows.
+    ///
+    /// Warning: a positive argument with exponent $e > 0$ is reduced modulo $\log 2$, which takes
+    /// about $e$ bits of $\log 2$. The time and memory needed therefore grow with the exponent,
+    /// without any limit: an argument near $2^{2^{40}}$ needs about $2^{40}$ bits, or 128 GiB, of
+    /// $\log 2$.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n^{3/2} \log n \log\log n + m (\log m)^2 \log\log m)$

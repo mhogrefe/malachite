@@ -8135,6 +8135,68 @@ fn test_against_flint() {
     ] {
         check_demo_against_flint(&oracle, "../malachite-float", demo_name, "arf_atrig");
     }
+    // `BigExponentFloat`'s forward hyperbolic functions, checked with FLINT's arb ball arithmetic.
+    for demo_name in [
+        "demo_big_exponent_float_cosh_prec",
+        "demo_big_exponent_float_cosh_prec_round",
+        "demo_big_exponent_float_cosh_rational_prec",
+        "demo_big_exponent_float_cosh_rational_prec_round",
+        "demo_big_exponent_float_coth_prec",
+        "demo_big_exponent_float_coth_prec_round",
+        "demo_big_exponent_float_coth_rational_prec",
+        "demo_big_exponent_float_coth_rational_prec_round",
+        "demo_big_exponent_float_csch_prec",
+        "demo_big_exponent_float_csch_prec_round",
+        "demo_big_exponent_float_csch_rational_prec",
+        "demo_big_exponent_float_csch_rational_prec_round",
+        "demo_big_exponent_float_sech_prec",
+        "demo_big_exponent_float_sech_prec_round",
+        "demo_big_exponent_float_sech_rational_prec",
+        "demo_big_exponent_float_sech_rational_prec_round",
+        "demo_big_exponent_float_sinh_cosh_prec",
+        "demo_big_exponent_float_sinh_cosh_prec_round",
+        "demo_big_exponent_float_sinh_cosh_rational_prec",
+        "demo_big_exponent_float_sinh_cosh_rational_prec_round",
+        "demo_big_exponent_float_sinh_prec",
+        "demo_big_exponent_float_sinh_prec_round",
+        "demo_big_exponent_float_sinh_rational_prec",
+        "demo_big_exponent_float_sinh_rational_prec_round",
+        "demo_big_exponent_float_tanh_prec",
+        "demo_big_exponent_float_tanh_prec_round",
+        "demo_big_exponent_float_tanh_rational_prec",
+        "demo_big_exponent_float_tanh_rational_prec_round",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-float", demo_name, "arf_hyp");
+    }
+    // `BigExponentFloat`'s inverse hyperbolic functions, checked with FLINT's arb ball arithmetic.
+    for demo_name in [
+        "demo_big_exponent_float_acosh_prec",
+        "demo_big_exponent_float_acosh_prec_round",
+        "demo_big_exponent_float_acosh_rational_prec",
+        "demo_big_exponent_float_acosh_rational_prec_round",
+        "demo_big_exponent_float_acoth_prec",
+        "demo_big_exponent_float_acoth_prec_round",
+        "demo_big_exponent_float_acoth_rational_prec",
+        "demo_big_exponent_float_acoth_rational_prec_round",
+        "demo_big_exponent_float_acsch_prec",
+        "demo_big_exponent_float_acsch_prec_round",
+        "demo_big_exponent_float_acsch_rational_prec",
+        "demo_big_exponent_float_acsch_rational_prec_round",
+        "demo_big_exponent_float_asech_prec",
+        "demo_big_exponent_float_asech_prec_round",
+        "demo_big_exponent_float_asech_rational_prec",
+        "demo_big_exponent_float_asech_rational_prec_round",
+        "demo_big_exponent_float_asinh_prec",
+        "demo_big_exponent_float_asinh_prec_round",
+        "demo_big_exponent_float_asinh_rational_prec",
+        "demo_big_exponent_float_asinh_rational_prec_round",
+        "demo_big_exponent_float_atanh_prec",
+        "demo_big_exponent_float_atanh_prec_round",
+        "demo_big_exponent_float_atanh_rational_prec",
+        "demo_big_exponent_float_atanh_rational_prec_round",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-float", demo_name, "arf_ihyp");
+    }
     // `BigExponentFloat`'s AGM, checked with FLINT's arb ball arithmetic.
     for demo_name in [
         "demo_big_exponent_float_agm_prec_round",

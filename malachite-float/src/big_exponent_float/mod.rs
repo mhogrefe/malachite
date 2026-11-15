@@ -229,6 +229,8 @@ pub mod exhaustive;
 /// Exponential and logarithmic functions of [`BigExponentFloat`]s: `exp`, `ln`, logarithms to
 /// various bases, powers of 2 and 10, and compound interest.
 pub mod exponential;
+/// Hyperbolic functions of [`BigExponentFloat`]s and [`Rational`](malachite_q::Rational)s.
+pub mod hyperbolic;
 #[cfg(feature = "random")]
 /// Iterators that generate [`BigExponentFloat`]s randomly.
 pub mod random;

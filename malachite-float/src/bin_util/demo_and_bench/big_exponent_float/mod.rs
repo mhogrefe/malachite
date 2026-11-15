@@ -16,6 +16,7 @@ pub(crate) fn register(runner: &mut Runner) {
     conversion::register(runner);
     elliptic::register(runner);
     exponential::register(runner);
+    hyperbolic::register(runner);
     trigonometric::register(runner);
 }
 
@@ -26,4 +27,5 @@ mod constants;
 mod conversion;
 mod elliptic;
 mod exponential;
+mod hyperbolic;
 mod trigonometric;

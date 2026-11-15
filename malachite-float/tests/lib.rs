@@ -232,6 +232,21 @@ pub mod big_exponent_float {
     pub mod elliptic {
         pub mod agm;
     }
+    pub mod hyperbolic {
+        pub mod acosh;
+        pub mod acoth;
+        pub mod acsch;
+        pub mod asech;
+        pub mod asinh;
+        pub mod atanh;
+        pub mod cosh;
+        pub mod coth;
+        pub mod csch;
+        pub mod sech;
+        pub mod sinh;
+        pub mod sinh_cosh;
+        pub mod tanh;
+    }
     pub mod exhaustive {
         pub mod exhaustive_big_exponent_floats;
         pub mod exhaustive_big_exponent_floats_with_precision;

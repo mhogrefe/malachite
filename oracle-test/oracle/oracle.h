@@ -148,6 +148,8 @@ int run_arf_misc_rational(const char * arg);
 int run_arf_agm(const char * arg);
 int run_arf_atrig(const char * arg);
 int run_arf_exponential(const char * arg);
+int run_arf_hyp(const char * arg);
+int run_arf_ihyp(const char * arg);
 int run_arf_trig(const char * arg);
 int run_arf_logarithm(const char * arg);
 int run_arf_logarithm_general(const char * arg);

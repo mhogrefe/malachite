@@ -62,6 +62,8 @@ static const oracle_mode modes[] = {
     {"arf_agm", run_arf_agm},
     {"arf_atrig", run_arf_atrig},
     {"arf_exponential", run_arf_exponential},
+    {"arf_hyp", run_arf_hyp},
+    {"arf_ihyp", run_arf_ihyp},
     {"arf_logarithm", run_arf_logarithm},
     {"arf_logarithm_general", run_arf_logarithm_general},
     {"arf_string_general", run_arf_string_general},

@@ -33,7 +33,8 @@ fn same_pair(x: &(BigExponentFloat, Ordering), y: &(BigExponentFloat, Ordering))
 
 fn float_result_comparable(x: &Float, o: Ordering) -> bool {
     x.get_exponent().map_or_else(
-        || !x.is_zero() || o == Equal,
+        // an inexact zero or infinity is an underflow or overflow
+        || o == Equal,
         |e| e > Float::MIN_EXPONENT + 1 && e < Float::MAX_EXPONENT - 1,
     )
 }

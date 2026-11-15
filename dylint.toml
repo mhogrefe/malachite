@@ -7,6 +7,7 @@ max_line_length = 100
 # inside `macro_rules!` bodies (each expansion would need to fulfill the expectation separately).
 # An entry whose line is no longer too long is itself flagged, so this list cannot go stale.
 long_lines_exceptions = [
+    { file = "malachite-float/src/bin_util/demo_and_bench/big_exponent_float/hyperbolic/sinh_cosh.rs", line = 130 },
     { file = "malachite-float/src/bin_util/demo_and_bench/big_exponent_float/trigonometric/acos.rs", line = 539 },
     { file = "malachite-float/src/bin_util/demo_and_bench/big_exponent_float/trigonometric/acos.rs", line = 547 },
     { file = "malachite-float/src/bin_util/demo_and_bench/big_exponent_float/trigonometric/acot.rs", line = 539 },
