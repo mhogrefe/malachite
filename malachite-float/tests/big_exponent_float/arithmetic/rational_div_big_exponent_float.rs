@@ -6,22 +6,19 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use core::str::FromStr;
-use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, One, Zero};
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_float::big_exponent_float::ComparableBigExponentFloatRef;
 use malachite_float::big_exponent_float::arithmetic::rational_div_big_exponent_float::*;
 use malachite_float::test_util::big_exponent_float::{
-    big_exponent_float_exponent_is_small, big_exponent_float_power_of_2,
-    float_to_big_exponent_float,
+    big_exponent_float_exponent_is_small, float_to_big_exponent_float, parse_big_exponent_float_hex,
 };
 use malachite_float::test_util::generators::{
     big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_6,
     big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_6_float,
 };
 use malachite_float::{BigExponentFloat, Float};
-use malachite_nz::integer::Integer;
 use malachite_q::Rational;
 use std::cmp::Ordering::{self, *};
 
@@ -99,11 +96,17 @@ fn rational_div_big_exponent_float_prec_round_all(
 #[test]
 fn test_rational_div_big_exponent_float_prec_round() {
     let check = |x: &Rational,
-                 y: &BigExponentFloat,
+                 y: &str,
+                 y_hex: &str,
                  prec: u64,
                  rm: RoundingMode,
-                 out: &BigExponentFloat,
+                 out: &str,
+                 out_hex: &str,
                  o| {
+        assert_eq!(parse_big_exponent_float_hex(y_hex).to_string(), y);
+        let y = &parse_big_exponent_float_hex(y_hex);
+        assert_eq!(parse_big_exponent_float_hex(out_hex).to_string(), out);
+        let out = &parse_big_exponent_float_hex(out_hex);
         let r = rational_div_big_exponent_float_prec_round_all(x, y, prec, rm);
         assert!(
             same(&r.0, out),
@@ -112,41 +115,55 @@ fn test_rational_div_big_exponent_float_prec_round() {
         );
         assert_eq!(r.1, o);
     };
-    let big = Integer::from_str("100000000000000000000").unwrap();
-    let huge = big_exponent_float_power_of_2(big.clone());
-    let tiny = big_exponent_float_power_of_2(-big.clone());
-    let nan = BigExponentFloat::NAN;
-    let inf = BigExponentFloat::INFINITY;
-    let neg_inf = BigExponentFloat::NEGATIVE_INFINITY;
-    let zero = BigExponentFloat::ZERO;
-    let one = BigExponentFloat::ONE;
     let third = Rational::from_unsigneds(1u8, 3);
     let q_zero = Rational::ZERO;
     // 1/3 rounded to 10 bits.
-    let third_floor = BigExponentFloat::from_rational_prec_round_ref(&third, 10, Floor).0;
-    let third_ceiling = BigExponentFloat::from_rational_prec_round_ref(&third, 10, Ceiling).0;
-    check(&third, &nan, 10, Floor, &nan, Equal);
-    check(&third, &zero, 10, Floor, &nan, Equal);
-    check(&q_zero, &zero, 10, Floor, &nan, Equal);
-    check(&third, &inf, 10, Floor, &zero, Equal);
-    check(&third, &neg_inf, 10, Floor, &zero, Equal);
-    check(&q_zero, &one, 10, Floor, &zero, Equal);
-    check(&third, &one, 10, Floor, &third_floor, Less);
+    check(&third, "NaN", "NaN", 10, Floor, "NaN", "NaN", Equal);
+    check(&third, "0.0", "0x0.0", 10, Floor, "NaN", "NaN", Equal);
+    check(&q_zero, "0.0", "0x0.0", 10, Floor, "NaN", "NaN", Equal);
     check(
-        &Rational::from(3u32),
-        &BigExponentFloat::from(3u32),
-        1,
-        Exact,
-        &one,
-        Equal,
+        &third, "Infinity", "Infinity", 10, Floor, "0.0", "0x0.0", Equal,
     );
-    check(&third, &huge, 10, Floor, &(&third_floor * &tiny), Less);
     check(
         &third,
-        &tiny,
+        "-Infinity",
+        "-Infinity",
+        10,
+        Floor,
+        "0.0",
+        "0x0.0",
+        Equal,
+    );
+    check(&q_zero, "1.0", "0x1.0", 10, Floor, "0.0", "0x0.0", Equal);
+    check(&third, "1.0", "0x1.0", 10, Floor, "0.3330", "0x0.554", Less);
+    check(
+        &Rational::from(3u32),
+        "3.0",
+        "0x3.0",
+        1,
+        Exact,
+        "1.0",
+        "0x1.0",
+        Equal,
+    );
+    check(
+        &third,
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        10,
+        Floor,
+        "1.408e-30102999566398119522",
+        "0x5.54E-25000000000000000001",
+        Less,
+    );
+    check(
+        &third,
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
         10,
         Ceiling,
-        &(&third_ceiling * &huge),
+        "7.8882e30102999566398119520",
+        "0x5.56E+24999999999999999999",
         Greater,
     );
 }

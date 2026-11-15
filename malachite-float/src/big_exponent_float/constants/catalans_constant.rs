@@ -45,11 +45,11 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::catalans_constant_prec_round(100, Floor);
-    /// assert_eq!(format!("{x:?}"), "0x0.ea7cb89f409ae845215822e37");
+    /// assert_eq!(x.to_string(), "0.91596559417721901505460351493173");
     /// assert_eq!(o, Less);
     ///
     /// let (x, o) = BigExponentFloat::catalans_constant_prec_round(100, Ceiling);
-    /// assert_eq!(format!("{x:?}"), "0x0.ea7cb89f409ae845215822e38");
+    /// assert_eq!(x.to_string(), "0.9159655941772190150546035149325");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -90,15 +90,15 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::catalans_constant_prec(1);
-    /// assert_eq!(format!("{x:?}"), "0x1.0");
+    /// assert_eq!(x.to_string(), "1.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (x, o) = BigExponentFloat::catalans_constant_prec(10);
-    /// assert_eq!(format!("{x:?}"), "0x0.ea8");
+    /// assert_eq!(x.to_string(), "0.9160");
     /// assert_eq!(o, Greater);
     ///
     /// let (x, o) = BigExponentFloat::catalans_constant_prec(100);
-    /// assert_eq!(format!("{x:?}"), "0x0.ea7cb89f409ae845215822e38");
+    /// assert_eq!(x.to_string(), "0.9159655941772190150546035149325");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]

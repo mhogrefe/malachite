@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
-use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, One, Two, Zero};
+use malachite_base::num::basic::traits::{Infinity, NaN, One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_float::big_exponent_float::ComparableBigExponentFloatRef;
@@ -108,14 +108,22 @@ fn test_mul() {
     let e = parse_big_exponent_float_hex("0x2.b7e151628aed2#53");
     let nan = BigExponentFloat::NAN;
     let inf = BigExponentFloat::INFINITY;
-    let ninf = BigExponentFloat::NEGATIVE_INFINITY;
     let zero = BigExponentFloat::ZERO;
-    let check = |x: &BigExponentFloat,
-                 y: &BigExponentFloat,
+    let check = |x: &str,
+                 x_hex: &str,
+                 y: &str,
+                 y_hex: &str,
                  prec: u64,
                  rm: RoundingMode,
-                 out: &BigExponentFloat,
+                 out: &str,
+                 out_hex: &str,
                  o: Ordering| {
+        assert_eq!(parse_big_exponent_float_hex(x_hex).to_string(), x);
+        let x = &parse_big_exponent_float_hex(x_hex);
+        assert_eq!(parse_big_exponent_float_hex(y_hex).to_string(), y);
+        let y = &parse_big_exponent_float_hex(y_hex);
+        assert_eq!(parse_big_exponent_float_hex(out_hex).to_string(), out);
+        let out = &parse_big_exponent_float_hex(out_hex);
         let r = mul_prec_round_all(x, y, prec, rm);
         assert!(
             same(&r.0, out),
@@ -125,51 +133,108 @@ fn test_mul() {
         assert_eq!(r.1, o);
     };
 
-    check(&nan, &one, 10, Floor, &nan, Equal);
-    check(&inf, &zero, 10, Floor, &nan, Equal);
-    check(&zero, &ninf, 10, Floor, &nan, Equal);
+    check("NaN", "NaN", "1.0", "0x1.0", 10, Floor, "NaN", "NaN", Equal);
     check(
-        &inf,
-        &big_exponent_float_negate(one.clone()),
+        "Infinity", "Infinity", "0.0", "0x0.0", 10, Floor, "NaN", "NaN", Equal,
+    );
+    check(
+        "0.0",
+        "0x0.0",
+        "-Infinity",
+        "-Infinity",
         10,
         Floor,
-        &ninf,
+        "NaN",
+        "NaN",
         Equal,
     );
-    check(&ninf, &ninf, 10, Floor, &inf, Equal);
-    check(&zero, &pi, 10, Floor, &zero, Equal);
-    // Exponents add without overflow or underflow.
-    check(&huge, &tiny, 1, Exact, &one, Equal);
     check(
-        &huge,
-        &huge,
+        "Infinity",
+        "Infinity",
+        "-1.0",
+        "-0x1.0",
+        10,
+        Floor,
+        "-Infinity",
+        "-Infinity",
+        Equal,
+    );
+    check(
+        "-Infinity",
+        "-Infinity",
+        "-Infinity",
+        "-Infinity",
+        10,
+        Floor,
+        "Infinity",
+        "Infinity",
+        Equal,
+    );
+    check(
+        "0.0",
+        "0x0.0",
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        10,
+        Floor,
+        "0.0",
+        "0x0.0",
+        Equal,
+    );
+    // Exponents add without overflow or underflow.
+    check(
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
         1,
         Exact,
-        &big_exponent_float_power_of_2(big.clone() * Integer::TWO),
+        "1.0",
+        "0x1.0",
         Equal,
     );
     check(
-        &pi,
-        &e,
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        1,
+        Exact,
+        "5.6e60205999132796239042",
+        "0x1.0E+50000000000000000000",
+        Equal,
+    );
+    check(
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        "2.7182818284590451",
+        "0x2.b7e151628aed2",
         5,
         Floor,
-        &parse_big_exponent_float_hex("0x8.8#5"),
+        "8.50",
+        "0x8.8",
         Less,
     );
     check(
-        &pi,
-        &e,
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        "2.7182818284590451",
+        "0x2.b7e151628aed2",
         5,
         Ceiling,
-        &parse_big_exponent_float_hex("0x9.0#5"),
+        "9.00",
+        "0x9.0",
         Greater,
     );
     check(
-        &pi,
-        &e,
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        "2.7182818284590451",
+        "0x2.b7e151628aed2",
         20,
         Nearest,
-        &parse_big_exponent_float_hex("0x8.8a2c#20"),
+        "8.539734",
+        "0x8.8a2c",
         Less,
     );
     let p = mul_all(&pi, &e);

@@ -6,20 +6,17 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{SubMul, SubMulAssign};
-use malachite_base::num::basic::traits::{Infinity, NaN, One, Zero};
+use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_float::big_exponent_float::ComparableBigExponentFloatRef;
 use malachite_float::big_exponent_float::arithmetic::add_mul::add_mul_prec_round_generic;
 use malachite_float::test_util::big_exponent_float::{
-    big_exponent_float_exponent_is_small, big_exponent_float_power_of_2,
-    float_to_big_exponent_float,
+    big_exponent_float_exponent_is_small, float_to_big_exponent_float, parse_big_exponent_float_hex,
 };
 use malachite_float::test_util::generators::*;
 use malachite_float::{BigExponentFloat, Float};
-use malachite_nz::integer::Integer;
 use malachite_q::Rational;
 use std::cmp::Ordering::{self, *};
 
@@ -170,70 +167,83 @@ fn sub_mul_all(
 
 #[test]
 fn test_sub_mul_prec_round() {
-    let check = |x: &BigExponentFloat,
-                 y: &BigExponentFloat,
-                 z: &BigExponentFloat,
+    let check = |x: &str,
+                 x_hex: &str,
+                 y: &str,
+                 y_hex: &str,
+                 z: &str,
+                 z_hex: &str,
                  prec: u64,
                  rm: RoundingMode,
-                 out: &BigExponentFloat,
+                 out: &str,
+                 out_hex: &str,
                  o| {
+        assert_eq!(parse_big_exponent_float_hex(x_hex).to_string(), x);
+        let x = &parse_big_exponent_float_hex(x_hex);
+        assert_eq!(parse_big_exponent_float_hex(y_hex).to_string(), y);
+        let y = &parse_big_exponent_float_hex(y_hex);
+        assert_eq!(parse_big_exponent_float_hex(z_hex).to_string(), z);
+        let z = &parse_big_exponent_float_hex(z_hex);
+        assert_eq!(parse_big_exponent_float_hex(out_hex).to_string(), out);
+        let out = &parse_big_exponent_float_hex(out_hex);
         let r = sub_mul_prec_round_all(x, y, z, prec, rm);
         assert!(same(&r.0, out), "{:?} != {out:?}", r.0);
         assert_eq!(r.1, o);
     };
-    let big = Integer::from_str("100000000000000000000").unwrap();
-    let huge = big_exponent_float_power_of_2(big.clone());
-    let tiny = big_exponent_float_power_of_2(-big);
-    let one = BigExponentFloat::ONE;
 
     // The huge terms cancel exactly.
     check(
-        &huge,
-        &one,
-        &huge,
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        "1.0",
+        "0x1.0",
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
         10,
         Exact,
-        &BigExponentFloat::ZERO,
+        "0.0",
+        "0x0.0",
         Equal,
     );
-    check(&one, &huge, &tiny, 1, Exact, &BigExponentFloat::ZERO, Equal);
+    check(
+        "1.0",
+        "0x1.0",
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
+        1,
+        Exact,
+        "0.0",
+        "0x0.0",
+        Equal,
+    );
     // A tiny x is far below yz.
-    check(&tiny, &huge, &huge, 10, Floor, &-(&huge * &huge), Less);
     check(
-        &BigExponentFloat::NAN,
-        &one,
-        &one,
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
         10,
         Floor,
-        &BigExponentFloat::NAN,
+        "-5.6e60205999132796239042",
+        "-0x1.0E+50000000000000000000",
+        Less,
+    );
+    check(
+        "NaN", "NaN", "1.0", "0x1.0", "1.0", "0x1.0", 10, Floor, "NaN", "NaN", Equal,
+    );
+    check(
+        "1.0", "0x1.0", "Infinity", "Infinity", "0.0", "0x0.0", 10, Floor, "NaN", "NaN", Equal,
+    );
+    check(
+        "Infinity", "Infinity", "Infinity", "Infinity", "1.0", "0x1.0", 10, Floor, "NaN", "NaN",
         Equal,
     );
     check(
-        &one,
-        &BigExponentFloat::INFINITY,
-        &BigExponentFloat::ZERO,
-        10,
-        Floor,
-        &BigExponentFloat::NAN,
-        Equal,
-    );
-    check(
-        &BigExponentFloat::INFINITY,
-        &BigExponentFloat::INFINITY,
-        &one,
-        10,
-        Floor,
-        &BigExponentFloat::NAN,
-        Equal,
-    );
-    check(
-        &BigExponentFloat::from(1.5),
-        &BigExponentFloat::from(0.5),
-        &BigExponentFloat::from(3.0),
-        2,
-        Exact,
-        &BigExponentFloat::from(0.0),
-        Equal,
+        "1.5", "0x1.8", "0.50", "0x0.8", "3.0", "0x3.0", 2, Exact, "0.0", "0x0.0", Equal,
     );
 }
 

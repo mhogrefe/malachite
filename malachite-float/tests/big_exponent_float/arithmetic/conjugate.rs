@@ -7,9 +7,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{Conjugate, ConjugateAssign};
-use malachite_base::num::basic::traits::{NaN, NegativeInfinity};
 use malachite_float::BigExponentFloat;
 use malachite_float::big_exponent_float::ComparableBigExponentFloatRef;
+use malachite_float::test_util::big_exponent_float::parse_big_exponent_float_hex;
 use malachite_float::test_util::generators::big_exponent_float_gen;
 
 fn same(x: &BigExponentFloat, y: &BigExponentFloat) -> bool {
@@ -18,12 +18,15 @@ fn same(x: &BigExponentFloat, y: &BigExponentFloat) -> bool {
 
 #[test]
 fn test_conjugate() {
-    let nan = BigExponentFloat::NAN;
-    assert!(same(&nan.clone().conjugate(), &nan));
-    assert!(same(
-        &BigExponentFloat::NEGATIVE_INFINITY.conjugate(),
-        &BigExponentFloat::NEGATIVE_INFINITY
-    ));
+    let test = |x: &str, x_hex: &str, out: &str, out_hex: &str| {
+        assert_eq!(parse_big_exponent_float_hex(x_hex).to_string(), x);
+        let x = &parse_big_exponent_float_hex(x_hex);
+        assert_eq!(parse_big_exponent_float_hex(out_hex).to_string(), out);
+        let out = &parse_big_exponent_float_hex(out_hex);
+        assert!(same(&x.clone().conjugate(), out));
+    };
+    test("NaN", "NaN", "NaN", "NaN");
+    test("-Infinity", "-Infinity", "-Infinity", "-Infinity");
 }
 
 #[test]

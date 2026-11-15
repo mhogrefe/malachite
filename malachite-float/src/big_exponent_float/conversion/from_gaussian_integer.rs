@@ -35,11 +35,9 @@ impl TryFrom<&GaussianInteger> for BigExponentFloat {
     /// use std::str::FromStr;
     ///
     /// assert_eq!(
-    ///     format!(
-    ///         "{:?}",
-    ///         BigExponentFloat::try_from(&GaussianInteger::from(Integer::from(-3))).unwrap()
-    ///     ),
-    ///     "-0x3.0"
+    ///     (BigExponentFloat::try_from(&GaussianInteger::from(Integer::from(-3))).unwrap())
+    ///         .to_string(),
+    ///     "-3.0"
     /// );
     /// assert!(BigExponentFloat::try_from(&GaussianInteger::from_str("1+i").unwrap()).is_err());
     /// ```
@@ -73,11 +71,9 @@ impl TryFrom<GaussianInteger> for BigExponentFloat {
     /// use std::str::FromStr;
     ///
     /// assert_eq!(
-    ///     format!(
-    ///         "{:?}",
-    ///         BigExponentFloat::try_from(GaussianInteger::from(Integer::from(-3))).unwrap()
-    ///     ),
-    ///     "-0x3.0"
+    ///     (BigExponentFloat::try_from(GaussianInteger::from(Integer::from(-3))).unwrap())
+    ///         .to_string(),
+    ///     "-3.0"
     /// );
     /// assert!(BigExponentFloat::try_from(GaussianInteger::from_str("1+i").unwrap()).is_err());
     /// ```

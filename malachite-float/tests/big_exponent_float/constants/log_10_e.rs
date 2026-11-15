@@ -20,34 +20,63 @@ fn same(x: &BigExponentFloat, y: &BigExponentFloat) -> bool {
 
 #[test]
 fn test_log_10_e_prec_round() {
-    let cases: &[(u64, RoundingMode, &str, Ordering)] = &[
-        (1, Floor, "0x0.4", Less),
-        (1, Ceiling, "0x0.8", Greater),
-        (1, Down, "0x0.4", Less),
-        (1, Up, "0x0.8", Greater),
-        (1, Nearest, "0x0.8", Greater),
-        (2, Floor, "0x0.6", Less),
-        (2, Ceiling, "0x0.8", Greater),
-        (2, Down, "0x0.6", Less),
-        (2, Up, "0x0.8", Greater),
-        (2, Nearest, "0x0.6", Less),
-        (10, Floor, "0x0.6f2", Less),
-        (10, Ceiling, "0x0.6f4", Greater),
-        (10, Down, "0x0.6f2", Less),
-        (10, Up, "0x0.6f4", Greater),
-        (10, Nearest, "0x0.6f2", Less),
-        (100, Floor, "0x0.6f2dec549b9438ca9aadd557d", Less),
-        (100, Ceiling, "0x0.6f2dec549b9438ca9aadd557d8", Greater),
-        (100, Down, "0x0.6f2dec549b9438ca9aadd557d", Less),
-        (100, Up, "0x0.6f2dec549b9438ca9aadd557d8", Greater),
-        (100, Nearest, "0x0.6f2dec549b9438ca9aadd557d8", Greater),
-    ];
-    for &(p, rm, out, o) in cases {
+    let test = |p: u64, rm: RoundingMode, out: &str, out_hex: &str, o: Ordering| {
         let (x, o_alt) = BigExponentFloat::log_10_e_prec_round(p, rm);
         assert!(x.is_valid());
-        assert_eq!(format!("{x:?}"), out, "{:?}", (p, rm));
+        assert_eq!(format!("{x:?}"), out_hex, "{:?}", (p, rm));
+        assert_eq!(x.to_string(), out);
         assert_eq!(o_alt, o);
-    }
+    };
+    test(1, Floor, "0.25", "0x0.4", Less);
+    test(1, Ceiling, "0.50", "0x0.8", Greater);
+    test(1, Down, "0.25", "0x0.4", Less);
+    test(1, Up, "0.50", "0x0.8", Greater);
+    test(1, Nearest, "0.50", "0x0.8", Greater);
+    test(2, Floor, "0.38", "0x0.6", Less);
+    test(2, Ceiling, "0.50", "0x0.8", Greater);
+    test(2, Down, "0.38", "0x0.6", Less);
+    test(2, Up, "0.50", "0x0.8", Greater);
+    test(2, Nearest, "0.38", "0x0.6", Less);
+    test(10, Floor, "0.43408", "0x0.6f2", Less);
+    test(10, Ceiling, "0.4346", "0x0.6f4", Greater);
+    test(10, Down, "0.43408", "0x0.6f2", Less);
+    test(10, Up, "0.4346", "0x0.6f4", Greater);
+    test(10, Nearest, "0.43408", "0x0.6f2", Less);
+    test(
+        100,
+        Floor,
+        "0.4342944819032518276511289189163",
+        "0x0.6f2dec549b9438ca9aadd557d",
+        Less,
+    );
+    test(
+        100,
+        Ceiling,
+        "0.43429448190325182765112891891667",
+        "0x0.6f2dec549b9438ca9aadd557d8",
+        Greater,
+    );
+    test(
+        100,
+        Down,
+        "0.4342944819032518276511289189163",
+        "0x0.6f2dec549b9438ca9aadd557d",
+        Less,
+    );
+    test(
+        100,
+        Up,
+        "0.43429448190325182765112891891667",
+        "0x0.6f2dec549b9438ca9aadd557d8",
+        Greater,
+    );
+    test(
+        100,
+        Nearest,
+        "0.43429448190325182765112891891667",
+        "0x0.6f2dec549b9438ca9aadd557d8",
+        Greater,
+    );
 }
 
 #[test]
@@ -87,18 +116,22 @@ fn log_10_e_prec_round_properties() {
 
 #[test]
 fn test_log_10_e_prec() {
-    let cases: &[(u64, &str, Ordering)] = &[
-        (1, "0x0.8", Greater),
-        (2, "0x0.6", Less),
-        (10, "0x0.6f2", Less),
-        (100, "0x0.6f2dec549b9438ca9aadd557d8", Greater),
-    ];
-    for &(p, out, o) in cases {
+    let test = |p: u64, out: &str, out_hex: &str, o: Ordering| {
         let (x, o_alt) = BigExponentFloat::log_10_e_prec(p);
         assert!(x.is_valid());
-        assert_eq!(format!("{x:?}"), out, "{:?}", (p));
+        assert_eq!(format!("{x:?}"), out_hex, "{:?}", (p));
+        assert_eq!(x.to_string(), out);
         assert_eq!(o_alt, o);
-    }
+    };
+    test(1, "0.50", "0x0.8", Greater);
+    test(2, "0.38", "0x0.6", Less);
+    test(10, "0.43408", "0x0.6f2", Less);
+    test(
+        100,
+        "0.43429448190325182765112891891667",
+        "0x0.6f2dec549b9438ca9aadd557d8",
+        Greater,
+    );
 }
 
 #[test]

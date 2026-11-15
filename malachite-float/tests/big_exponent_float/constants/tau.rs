@@ -20,34 +20,63 @@ fn same(x: &BigExponentFloat, y: &BigExponentFloat) -> bool {
 
 #[test]
 fn test_tau_prec_round() {
-    let cases: &[(u64, RoundingMode, &str, Ordering)] = &[
-        (1, Floor, "0x4.0", Less),
-        (1, Ceiling, "0x8.0", Greater),
-        (1, Down, "0x4.0", Less),
-        (1, Up, "0x8.0", Greater),
-        (1, Nearest, "0x8.0", Greater),
-        (2, Floor, "0x6.0", Less),
-        (2, Ceiling, "0x8.0", Greater),
-        (2, Down, "0x6.0", Less),
-        (2, Up, "0x8.0", Greater),
-        (2, Nearest, "0x6.0", Less),
-        (10, Floor, "0x6.48", Less),
-        (10, Ceiling, "0x6.4a", Greater),
-        (10, Down, "0x6.48", Less),
-        (10, Up, "0x6.4a", Greater),
-        (10, Nearest, "0x6.48", Less),
-        (100, Floor, "0x6.487ed5110b4611a62633145c", Less),
-        (100, Ceiling, "0x6.487ed5110b4611a62633145c8", Greater),
-        (100, Down, "0x6.487ed5110b4611a62633145c", Less),
-        (100, Up, "0x6.487ed5110b4611a62633145c8", Greater),
-        (100, Nearest, "0x6.487ed5110b4611a62633145c", Less),
-    ];
-    for &(p, rm, out, o) in cases {
+    let test = |p: u64, rm: RoundingMode, out: &str, out_hex: &str, o: Ordering| {
         let (x, o_alt) = BigExponentFloat::tau_prec_round(p, rm);
         assert!(x.is_valid());
-        assert_eq!(format!("{x:?}"), out, "{:?}", (p, rm));
+        assert_eq!(format!("{x:?}"), out_hex, "{:?}", (p, rm));
+        assert_eq!(x.to_string(), out);
         assert_eq!(o_alt, o);
-    }
+    };
+    test(1, Floor, "4.0", "0x4.0", Less);
+    test(1, Ceiling, "8.0", "0x8.0", Greater);
+    test(1, Down, "4.0", "0x4.0", Less);
+    test(1, Up, "8.0", "0x8.0", Greater);
+    test(1, Nearest, "8.0", "0x8.0", Greater);
+    test(2, Floor, "6.0", "0x6.0", Less);
+    test(2, Ceiling, "8.0", "0x8.0", Greater);
+    test(2, Down, "6.0", "0x6.0", Less);
+    test(2, Up, "8.0", "0x8.0", Greater);
+    test(2, Nearest, "6.0", "0x6.0", Less);
+    test(10, Floor, "6.281", "0x6.48", Less);
+    test(10, Ceiling, "6.2891", "0x6.4a", Greater);
+    test(10, Down, "6.281", "0x6.48", Less);
+    test(10, Up, "6.2891", "0x6.4a", Greater);
+    test(10, Nearest, "6.281", "0x6.48", Less);
+    test(
+        100,
+        Floor,
+        "6.283185307179586476925286766559",
+        "0x6.487ed5110b4611a62633145c",
+        Less,
+    );
+    test(
+        100,
+        Ceiling,
+        "6.2831853071795864769252867665650",
+        "0x6.487ed5110b4611a62633145c8",
+        Greater,
+    );
+    test(
+        100,
+        Down,
+        "6.283185307179586476925286766559",
+        "0x6.487ed5110b4611a62633145c",
+        Less,
+    );
+    test(
+        100,
+        Up,
+        "6.2831853071795864769252867665650",
+        "0x6.487ed5110b4611a62633145c8",
+        Greater,
+    );
+    test(
+        100,
+        Nearest,
+        "6.283185307179586476925286766559",
+        "0x6.487ed5110b4611a62633145c",
+        Less,
+    );
 }
 
 #[test]
@@ -87,18 +116,22 @@ fn tau_prec_round_properties() {
 
 #[test]
 fn test_tau_prec() {
-    let cases: &[(u64, &str, Ordering)] = &[
-        (1, "0x8.0", Greater),
-        (2, "0x6.0", Less),
-        (10, "0x6.48", Less),
-        (100, "0x6.487ed5110b4611a62633145c", Less),
-    ];
-    for &(p, out, o) in cases {
+    let test = |p: u64, out: &str, out_hex: &str, o: Ordering| {
         let (x, o_alt) = BigExponentFloat::tau_prec(p);
         assert!(x.is_valid());
-        assert_eq!(format!("{x:?}"), out, "{:?}", (p));
+        assert_eq!(format!("{x:?}"), out_hex, "{:?}", (p));
+        assert_eq!(x.to_string(), out);
         assert_eq!(o_alt, o);
-    }
+    };
+    test(1, "8.0", "0x8.0", Greater);
+    test(2, "6.0", "0x6.0", Less);
+    test(10, "6.281", "0x6.48", Less);
+    test(
+        100,
+        "6.283185307179586476925286766559",
+        "0x6.487ed5110b4611a62633145c",
+        Less,
+    );
 }
 
 #[test]

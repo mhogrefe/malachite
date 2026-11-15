@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
-use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, One, Zero};
+use malachite_base::num::basic::traits::{Infinity, NaN, One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_float::big_exponent_float::ComparableBigExponentFloatRef;
@@ -102,20 +102,25 @@ fn sub_all(x: &BigExponentFloat, y: &BigExponentFloat) -> BigExponentFloat {
 fn test_sub() {
     let big = Integer::from_str("100000000000000000000").unwrap();
     let huge = big_exponent_float_power_of_2(big.clone());
-    let tiny = big_exponent_float_power_of_2(-big.clone());
     let one = BigExponentFloat::ONE;
-    let pi = parse_big_exponent_float_hex("0x3.243f6a8885a30#53");
-    let e = parse_big_exponent_float_hex("0x2.b7e151628aed2#53");
     let nan = BigExponentFloat::NAN;
     let inf = BigExponentFloat::INFINITY;
-    let ninf = BigExponentFloat::NEGATIVE_INFINITY;
     let zero = BigExponentFloat::ZERO;
-    let check = |x: &BigExponentFloat,
-                 y: &BigExponentFloat,
+    let check = |x: &str,
+                 x_hex: &str,
+                 y: &str,
+                 y_hex: &str,
                  prec: u64,
                  rm: RoundingMode,
-                 out: &BigExponentFloat,
+                 out: &str,
+                 out_hex: &str,
                  o: Ordering| {
+        assert_eq!(parse_big_exponent_float_hex(x_hex).to_string(), x);
+        let x = &parse_big_exponent_float_hex(x_hex);
+        assert_eq!(parse_big_exponent_float_hex(y_hex).to_string(), y);
+        let y = &parse_big_exponent_float_hex(y_hex);
+        assert_eq!(parse_big_exponent_float_hex(out_hex).to_string(), out);
+        let out = &parse_big_exponent_float_hex(out_hex);
         let r = sub_prec_round_all(x, y, prec, rm);
         assert!(
             same(&r.0, out),
@@ -125,51 +130,145 @@ fn test_sub() {
         assert_eq!(r.1, o);
     };
 
-    check(&nan, &one, 10, Floor, &nan, Equal);
-    check(&inf, &inf, 10, Floor, &nan, Equal);
-    check(&inf, &ninf, 10, Floor, &inf, Equal);
-    check(&one, &inf, 10, Floor, &ninf, Equal);
-    check(&zero, &zero, 10, Floor, &zero, Equal);
+    check("NaN", "NaN", "1.0", "0x1.0", 10, Floor, "NaN", "NaN", Equal);
     check(
-        &zero,
-        &pi,
-        53,
-        Exact,
-        &big_exponent_float_negate(pi.clone()),
+        "Infinity", "Infinity", "Infinity", "Infinity", 10, Floor, "NaN", "NaN", Equal,
+    );
+    check(
+        "Infinity",
+        "Infinity",
+        "-Infinity",
+        "-Infinity",
+        10,
+        Floor,
+        "Infinity",
+        "Infinity",
         Equal,
     );
-    check(&pi, &pi, 10, Floor, &zero, Equal);
-    check(&huge, &huge, 10, Ceiling, &zero, Equal);
-    // Cancellation at a huge exponent.
-    let hp = &huge + &(&huge >> 200u32);
-    check(&hp, &huge, 1, Exact, &(&huge >> 200u32), Equal);
-    let one_ulp = big_exponent_float_power_of_2(Integer::from(-9));
-    check(&one, &tiny, 10, Floor, &(&one - &(&one_ulp >> 1u32)), Less);
-    check(&one, &tiny, 10, Ceiling, &one, Greater);
-    check(&one, &tiny, 10, Nearest, &one, Greater);
-    // Rounding toward zero lands just below huge in absolute value.
     check(
-        &tiny,
-        &huge,
+        "1.0",
+        "0x1.0",
+        "Infinity",
+        "Infinity",
         10,
-        Down,
-        &big_exponent_float_negate(&huge - &(&huge >> 10u32)),
-        Greater,
+        Floor,
+        "-Infinity",
+        "-Infinity",
+        Equal,
     );
     check(
-        &pi,
-        &e,
-        5,
+        "0.0", "0x0.0", "0.0", "0x0.0", 10, Floor, "0.0", "0x0.0", Equal,
+    );
+    check(
+        "0.0",
+        "0x0.0",
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        53,
+        Exact,
+        "-3.1415926535897931",
+        "-0x3.243f6a8885a3",
+        Equal,
+    );
+    check(
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        10,
         Floor,
-        &parse_big_exponent_float_hex("0x0.6c#5"),
+        "0.0",
+        "0x0.0",
+        Equal,
+    );
+    check(
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        10,
+        Ceiling,
+        "0.0",
+        "0x0.0",
+        Equal,
+    );
+    // Cancellation at a huge exponent.
+    check(
+        "2.3653176496878716463137939216895230994454804444359351664030925e30102999566398119521",
+        "0x1.00000000000000000000000000000000000000000000000001E+25000000000000000000",
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        1,
+        Exact,
+        "1.5e30102999566398119461",
+        "0x1.0E+24999999999999999950",
+        Equal,
+    );
+    check(
+        "1.0",
+        "0x1.0",
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
+        10,
+        Floor,
+        "0.99902",
+        "0x0.ffc",
         Less,
     );
     check(
-        &pi,
-        &e,
+        "1.0",
+        "0x1.0",
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
+        10,
+        Ceiling,
+        "1.0",
+        "0x1.0",
+        Greater,
+    );
+    check(
+        "1.0",
+        "0x1.0",
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
+        10,
+        Nearest,
+        "1.0",
+        "0x1.0",
+        Greater,
+    );
+    // Rounding toward zero lands just below huge in absolute value.
+    check(
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        10,
+        Down,
+        "-2.3630e30102999566398119521",
+        "-0xf.fcE+24999999999999999999",
+        Greater,
+    );
+    check(
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        "2.7182818284590451",
+        "0x2.b7e151628aed2",
+        5,
+        Floor,
+        "0.422",
+        "0x0.6c",
+        Less,
+    );
+    check(
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        "2.7182818284590451",
+        "0x2.b7e151628aed2",
         5,
         Ceiling,
-        &parse_big_exponent_float_hex("0x0.70#5"),
+        "0.44",
+        "0x0.7",
         Greater,
     );
     let d = sub_all(&one, &(&one >> 100u32));

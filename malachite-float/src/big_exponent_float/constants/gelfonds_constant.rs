@@ -44,11 +44,11 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::gelfonds_constant_prec_round(100, Floor);
-    /// assert_eq!(format!("{x:?}"), "0x17.24046eb093399ecda7489f9a");
+    /// assert_eq!(x.to_string(), "23.140692632779269005729086367940");
     /// assert_eq!(o, Less);
     ///
     /// let (x, o) = BigExponentFloat::gelfonds_constant_prec_round(100, Ceiling);
-    /// assert_eq!(format!("{x:?}"), "0x17.24046eb093399ecda7489f9c");
+    /// assert_eq!(x.to_string(), "23.14069263277926900572908636796");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -88,15 +88,15 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::gelfonds_constant_prec(1);
-    /// assert_eq!(format!("{x:?}"), "0x1.0E+1");
+    /// assert_eq!(x.to_string(), "16.0");
     /// assert_eq!(o, Less);
     ///
     /// let (x, o) = BigExponentFloat::gelfonds_constant_prec(10);
-    /// assert_eq!(format!("{x:?}"), "0x17.28");
+    /// assert_eq!(x.to_string(), "23.156");
     /// assert_eq!(o, Greater);
     ///
     /// let (x, o) = BigExponentFloat::gelfonds_constant_prec(100);
-    /// assert_eq!(format!("{x:?}"), "0x17.24046eb093399ecda7489f9a");
+    /// assert_eq!(x.to_string(), "23.140692632779269005729086367940");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]

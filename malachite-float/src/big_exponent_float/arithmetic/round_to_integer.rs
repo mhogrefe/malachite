@@ -237,37 +237,37 @@ impl BigExponentFloat {
     ///
     /// let (z, o, integer) =
     ///     BigExponentFloat::from(3141.592653589793).round_to_integer_prec_round(5, Floor);
-    /// assert_eq!(format!("{z:?}"), "0xc.0E+2");
+    /// assert_eq!(z.to_string(), "3.1e3");
     /// assert_eq!(o, Less);
     /// assert_eq!(integer, false);
     ///
     /// let (z, o, integer) =
     ///     BigExponentFloat::from(3141.592653589793).round_to_integer_prec_round(5, Ceiling);
-    /// assert_eq!(format!("{z:?}"), "0xc.8E+2");
+    /// assert_eq!(z.to_string(), "3.20e3");
     /// assert_eq!(o, Greater);
     /// assert_eq!(integer, false);
     ///
     /// let (z, o, integer) =
     ///     BigExponentFloat::from(3141.592653589793).round_to_integer_prec_round(5, Nearest);
-    /// assert_eq!(format!("{z:?}"), "0xc.8E+2");
+    /// assert_eq!(z.to_string(), "3.20e3");
     /// assert_eq!(o, Greater);
     /// assert_eq!(integer, false);
     ///
     /// let (z, o, integer) =
     ///     BigExponentFloat::from(3141.592653589793).round_to_integer_prec_round(20, Floor);
-    /// assert_eq!(format!("{z:?}"), "0xc45.0");
+    /// assert_eq!(z.to_string(), "3141.0");
     /// assert_eq!(o, Less);
     /// assert_eq!(integer, false);
     ///
     /// let (z, o, integer) =
     ///     BigExponentFloat::from(3141.592653589793).round_to_integer_prec_round(20, Ceiling);
-    /// assert_eq!(format!("{z:?}"), "0xc46.0");
+    /// assert_eq!(z.to_string(), "3142.0");
     /// assert_eq!(o, Greater);
     /// assert_eq!(integer, false);
     ///
     /// let (z, o, integer) =
     ///     BigExponentFloat::from(3141.592653589793).round_to_integer_prec_round(20, Nearest);
-    /// assert_eq!(format!("{z:?}"), "0xc46.0");
+    /// assert_eq!(z.to_string(), "3142.0");
     /// assert_eq!(o, Greater);
     /// assert_eq!(integer, false);
     /// ```
@@ -321,37 +321,37 @@ impl BigExponentFloat {
     ///
     /// let (z, o, integer) =
     ///     (&BigExponentFloat::from(3141.592653589793)).round_to_integer_prec_round_ref(5, Floor);
-    /// assert_eq!(format!("{z:?}"), "0xc.0E+2");
+    /// assert_eq!(z.to_string(), "3.1e3");
     /// assert_eq!(o, Less);
     /// assert_eq!(integer, false);
     ///
     /// let (z, o, integer) = (&BigExponentFloat::from(3141.592653589793))
     ///     .round_to_integer_prec_round_ref(5, Ceiling);
-    /// assert_eq!(format!("{z:?}"), "0xc.8E+2");
+    /// assert_eq!(z.to_string(), "3.20e3");
     /// assert_eq!(o, Greater);
     /// assert_eq!(integer, false);
     ///
     /// let (z, o, integer) = (&BigExponentFloat::from(3141.592653589793))
     ///     .round_to_integer_prec_round_ref(5, Nearest);
-    /// assert_eq!(format!("{z:?}"), "0xc.8E+2");
+    /// assert_eq!(z.to_string(), "3.20e3");
     /// assert_eq!(o, Greater);
     /// assert_eq!(integer, false);
     ///
     /// let (z, o, integer) =
     ///     (&BigExponentFloat::from(3141.592653589793)).round_to_integer_prec_round_ref(20, Floor);
-    /// assert_eq!(format!("{z:?}"), "0xc45.0");
+    /// assert_eq!(z.to_string(), "3141.0");
     /// assert_eq!(o, Less);
     /// assert_eq!(integer, false);
     ///
     /// let (z, o, integer) = (&BigExponentFloat::from(3141.592653589793))
     ///     .round_to_integer_prec_round_ref(20, Ceiling);
-    /// assert_eq!(format!("{z:?}"), "0xc46.0");
+    /// assert_eq!(z.to_string(), "3142.0");
     /// assert_eq!(o, Greater);
     /// assert_eq!(integer, false);
     ///
     /// let (z, o, integer) = (&BigExponentFloat::from(3141.592653589793))
     ///     .round_to_integer_prec_round_ref(20, Nearest);
-    /// assert_eq!(format!("{z:?}"), "0xc46.0");
+    /// assert_eq!(z.to_string(), "3142.0");
     /// assert_eq!(o, Greater);
     /// assert_eq!(integer, false);
     /// ```
@@ -398,12 +398,12 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (z, o, integer) = BigExponentFloat::from(3141.592653589793).round_to_integer_prec(5);
-    /// assert_eq!(format!("{z:?}"), "0xc.8E+2");
+    /// assert_eq!(z.to_string(), "3.20e3");
     /// assert_eq!(o, Greater);
     /// assert_eq!(integer, false);
     ///
     /// let (z, o, integer) = BigExponentFloat::from(3141.592653589793).round_to_integer_prec(20);
-    /// assert_eq!(format!("{z:?}"), "0xc46.0");
+    /// assert_eq!(z.to_string(), "3142.0");
     /// assert_eq!(o, Greater);
     /// assert_eq!(integer, false);
     /// ```
@@ -447,13 +447,13 @@ impl BigExponentFloat {
     ///
     /// let (z, o, integer) =
     ///     (&BigExponentFloat::from(3141.592653589793)).round_to_integer_prec_ref(5);
-    /// assert_eq!(format!("{z:?}"), "0xc.8E+2");
+    /// assert_eq!(z.to_string(), "3.20e3");
     /// assert_eq!(o, Greater);
     /// assert_eq!(integer, false);
     ///
     /// let (z, o, integer) =
     ///     (&BigExponentFloat::from(3141.592653589793)).round_to_integer_prec_ref(20);
-    /// assert_eq!(format!("{z:?}"), "0xc46.0");
+    /// assert_eq!(z.to_string(), "3142.0");
     /// assert_eq!(o, Greater);
     /// assert_eq!(integer, false);
     /// ```
@@ -495,27 +495,27 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (z, o, integer) = BigExponentFloat::from(-2.5).round_to_integer_round(Floor);
-    /// assert_eq!(format!("{z:?}"), "-0x3.0");
+    /// assert_eq!(z.to_string(), "-3.0");
     /// assert_eq!(o, Less);
     /// assert_eq!(integer, false);
     ///
     /// let (z, o, integer) = BigExponentFloat::from(-2.5).round_to_integer_round(Ceiling);
-    /// assert_eq!(format!("{z:?}"), "-0x2.0");
+    /// assert_eq!(z.to_string(), "-2.0");
     /// assert_eq!(o, Greater);
     /// assert_eq!(integer, false);
     ///
     /// let (z, o, integer) = BigExponentFloat::from(-2.5).round_to_integer_round(Down);
-    /// assert_eq!(format!("{z:?}"), "-0x2.0");
+    /// assert_eq!(z.to_string(), "-2.0");
     /// assert_eq!(o, Greater);
     /// assert_eq!(integer, false);
     ///
     /// let (z, o, integer) = BigExponentFloat::from(-2.5).round_to_integer_round(Up);
-    /// assert_eq!(format!("{z:?}"), "-0x3.0");
+    /// assert_eq!(z.to_string(), "-3.0");
     /// assert_eq!(o, Less);
     /// assert_eq!(integer, false);
     ///
     /// let (z, o, integer) = BigExponentFloat::from(-2.5).round_to_integer_round(Nearest);
-    /// assert_eq!(format!("{z:?}"), "-0x2.0");
+    /// assert_eq!(z.to_string(), "-2.0");
     /// assert_eq!(o, Greater);
     /// assert_eq!(integer, false);
     /// ```
@@ -557,27 +557,27 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (z, o, integer) = (&BigExponentFloat::from(-2.5)).round_to_integer_round_ref(Floor);
-    /// assert_eq!(format!("{z:?}"), "-0x3.0");
+    /// assert_eq!(z.to_string(), "-3.0");
     /// assert_eq!(o, Less);
     /// assert_eq!(integer, false);
     ///
     /// let (z, o, integer) = (&BigExponentFloat::from(-2.5)).round_to_integer_round_ref(Ceiling);
-    /// assert_eq!(format!("{z:?}"), "-0x2.0");
+    /// assert_eq!(z.to_string(), "-2.0");
     /// assert_eq!(o, Greater);
     /// assert_eq!(integer, false);
     ///
     /// let (z, o, integer) = (&BigExponentFloat::from(-2.5)).round_to_integer_round_ref(Down);
-    /// assert_eq!(format!("{z:?}"), "-0x2.0");
+    /// assert_eq!(z.to_string(), "-2.0");
     /// assert_eq!(o, Greater);
     /// assert_eq!(integer, false);
     ///
     /// let (z, o, integer) = (&BigExponentFloat::from(-2.5)).round_to_integer_round_ref(Up);
-    /// assert_eq!(format!("{z:?}"), "-0x3.0");
+    /// assert_eq!(z.to_string(), "-3.0");
     /// assert_eq!(o, Less);
     /// assert_eq!(integer, false);
     ///
     /// let (z, o, integer) = (&BigExponentFloat::from(-2.5)).round_to_integer_round_ref(Nearest);
-    /// assert_eq!(format!("{z:?}"), "-0x2.0");
+    /// assert_eq!(z.to_string(), "-2.0");
     /// assert_eq!(o, Greater);
     /// assert_eq!(integer, false);
     /// ```
@@ -610,7 +610,7 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (z, o, integer) = BigExponentFloat::from(2.5).round_to_integer();
-    /// assert_eq!(format!("{z:?}"), "0x2.0");
+    /// assert_eq!(z.to_string(), "2.0");
     /// assert_eq!(o, Less);
     /// assert_eq!(integer, false);
     /// ```
@@ -643,7 +643,7 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (z, o, integer) = (&BigExponentFloat::from(2.5)).round_to_integer_ref();
-    /// assert_eq!(format!("{z:?}"), "0x2.0");
+    /// assert_eq!(z.to_string(), "2.0");
     /// assert_eq!(o, Less);
     /// assert_eq!(integer, false);
     /// ```
@@ -688,12 +688,12 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (z, o, integer) = BigExponentFloat::from(3141.5).round_to_integer_ties_away_prec(5);
-    /// assert_eq!(format!("{z:?}"), "0xc.8E+2");
+    /// assert_eq!(z.to_string(), "3.20e3");
     /// assert_eq!(o, Greater);
     /// assert_eq!(integer, false);
     ///
     /// let (z, o, integer) = BigExponentFloat::from(3141.5).round_to_integer_ties_away_prec(20);
-    /// assert_eq!(format!("{z:?}"), "0xc46.0");
+    /// assert_eq!(z.to_string(), "3142.0");
     /// assert_eq!(o, Greater);
     /// assert_eq!(integer, false);
     /// ```
@@ -737,13 +737,13 @@ impl BigExponentFloat {
     ///
     /// let (z, o, integer) =
     ///     (&BigExponentFloat::from(3141.5)).round_to_integer_ties_away_prec_ref(5);
-    /// assert_eq!(format!("{z:?}"), "0xc.8E+2");
+    /// assert_eq!(z.to_string(), "3.20e3");
     /// assert_eq!(o, Greater);
     /// assert_eq!(integer, false);
     ///
     /// let (z, o, integer) =
     ///     (&BigExponentFloat::from(3141.5)).round_to_integer_ties_away_prec_ref(20);
-    /// assert_eq!(format!("{z:?}"), "0xc46.0");
+    /// assert_eq!(z.to_string(), "3142.0");
     /// assert_eq!(o, Greater);
     /// assert_eq!(integer, false);
     /// ```
@@ -776,7 +776,7 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (z, o, integer) = BigExponentFloat::from(2.5).round_to_integer_ties_away();
-    /// assert_eq!(format!("{z:?}"), "0x3.0");
+    /// assert_eq!(z.to_string(), "3.0");
     /// assert_eq!(o, Greater);
     /// assert_eq!(integer, false);
     /// ```
@@ -809,7 +809,7 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (z, o, integer) = (&BigExponentFloat::from(2.5)).round_to_integer_ties_away_ref();
-    /// assert_eq!(format!("{z:?}"), "0x3.0");
+    /// assert_eq!(z.to_string(), "3.0");
     /// assert_eq!(o, Greater);
     /// assert_eq!(integer, false);
     /// ```
@@ -851,32 +851,32 @@ impl BigExponentFloat {
     ///
     /// let (z, o) = BigExponentFloat::from(3141.592653589793)
     ///     .round_to_integer_then_prec_round(Nearest, 5, Floor);
-    /// assert_eq!(format!("{z:?}"), "0xc.0E+2");
+    /// assert_eq!(z.to_string(), "3.1e3");
     /// assert_eq!(o, Less);
     ///
     /// let (z, o) = BigExponentFloat::from(3141.592653589793)
     ///     .round_to_integer_then_prec_round(Nearest, 5, Ceiling);
-    /// assert_eq!(format!("{z:?}"), "0xc.8E+2");
+    /// assert_eq!(z.to_string(), "3.20e3");
     /// assert_eq!(o, Greater);
     ///
     /// let (z, o) = BigExponentFloat::from(3141.592653589793)
     ///     .round_to_integer_then_prec_round(Nearest, 5, Nearest);
-    /// assert_eq!(format!("{z:?}"), "0xc.8E+2");
+    /// assert_eq!(z.to_string(), "3.20e3");
     /// assert_eq!(o, Greater);
     ///
     /// let (z, o) = BigExponentFloat::from(3141.592653589793)
     ///     .round_to_integer_then_prec_round(Nearest, 20, Floor);
-    /// assert_eq!(format!("{z:?}"), "0xc46.0");
+    /// assert_eq!(z.to_string(), "3142.0");
     /// assert_eq!(o, Equal);
     ///
     /// let (z, o) = BigExponentFloat::from(3141.592653589793)
     ///     .round_to_integer_then_prec_round(Nearest, 20, Ceiling);
-    /// assert_eq!(format!("{z:?}"), "0xc46.0");
+    /// assert_eq!(z.to_string(), "3142.0");
     /// assert_eq!(o, Equal);
     ///
     /// let (z, o) = BigExponentFloat::from(3141.592653589793)
     ///     .round_to_integer_then_prec_round(Nearest, 20, Nearest);
-    /// assert_eq!(format!("{z:?}"), "0xc46.0");
+    /// assert_eq!(z.to_string(), "3142.0");
     /// assert_eq!(o, Equal);
     /// ```
     #[inline]
@@ -922,32 +922,32 @@ impl BigExponentFloat {
     ///
     /// let (z, o) = (&BigExponentFloat::from(3141.592653589793))
     ///     .round_to_integer_then_prec_round_ref(Nearest, 5, Floor);
-    /// assert_eq!(format!("{z:?}"), "0xc.0E+2");
+    /// assert_eq!(z.to_string(), "3.1e3");
     /// assert_eq!(o, Less);
     ///
     /// let (z, o) = (&BigExponentFloat::from(3141.592653589793))
     ///     .round_to_integer_then_prec_round_ref(Nearest, 5, Ceiling);
-    /// assert_eq!(format!("{z:?}"), "0xc.8E+2");
+    /// assert_eq!(z.to_string(), "3.20e3");
     /// assert_eq!(o, Greater);
     ///
     /// let (z, o) = (&BigExponentFloat::from(3141.592653589793))
     ///     .round_to_integer_then_prec_round_ref(Nearest, 5, Nearest);
-    /// assert_eq!(format!("{z:?}"), "0xc.8E+2");
+    /// assert_eq!(z.to_string(), "3.20e3");
     /// assert_eq!(o, Greater);
     ///
     /// let (z, o) = (&BigExponentFloat::from(3141.592653589793))
     ///     .round_to_integer_then_prec_round_ref(Nearest, 20, Floor);
-    /// assert_eq!(format!("{z:?}"), "0xc46.0");
+    /// assert_eq!(z.to_string(), "3142.0");
     /// assert_eq!(o, Equal);
     ///
     /// let (z, o) = (&BigExponentFloat::from(3141.592653589793))
     ///     .round_to_integer_then_prec_round_ref(Nearest, 20, Ceiling);
-    /// assert_eq!(format!("{z:?}"), "0xc46.0");
+    /// assert_eq!(z.to_string(), "3142.0");
     /// assert_eq!(o, Equal);
     ///
     /// let (z, o) = (&BigExponentFloat::from(3141.592653589793))
     ///     .round_to_integer_then_prec_round_ref(Nearest, 20, Nearest);
-    /// assert_eq!(format!("{z:?}"), "0xc46.0");
+    /// assert_eq!(z.to_string(), "3142.0");
     /// assert_eq!(o, Equal);
     /// ```
     #[inline]
@@ -990,32 +990,32 @@ impl BigExponentFloat {
     ///
     /// let (z, o) =
     ///     BigExponentFloat::from(3141.5).round_to_integer_ties_away_then_prec_round(5, Floor);
-    /// assert_eq!(format!("{z:?}"), "0xc.0E+2");
+    /// assert_eq!(z.to_string(), "3.1e3");
     /// assert_eq!(o, Less);
     ///
     /// let (z, o) =
     ///     BigExponentFloat::from(3141.5).round_to_integer_ties_away_then_prec_round(5, Ceiling);
-    /// assert_eq!(format!("{z:?}"), "0xc.8E+2");
+    /// assert_eq!(z.to_string(), "3.20e3");
     /// assert_eq!(o, Greater);
     ///
     /// let (z, o) =
     ///     BigExponentFloat::from(3141.5).round_to_integer_ties_away_then_prec_round(5, Nearest);
-    /// assert_eq!(format!("{z:?}"), "0xc.8E+2");
+    /// assert_eq!(z.to_string(), "3.20e3");
     /// assert_eq!(o, Greater);
     ///
     /// let (z, o) =
     ///     BigExponentFloat::from(3141.5).round_to_integer_ties_away_then_prec_round(20, Floor);
-    /// assert_eq!(format!("{z:?}"), "0xc46.0");
+    /// assert_eq!(z.to_string(), "3142.0");
     /// assert_eq!(o, Equal);
     ///
     /// let (z, o) =
     ///     BigExponentFloat::from(3141.5).round_to_integer_ties_away_then_prec_round(20, Ceiling);
-    /// assert_eq!(format!("{z:?}"), "0xc46.0");
+    /// assert_eq!(z.to_string(), "3142.0");
     /// assert_eq!(o, Equal);
     ///
     /// let (z, o) =
     ///     BigExponentFloat::from(3141.5).round_to_integer_ties_away_then_prec_round(20, Nearest);
-    /// assert_eq!(format!("{z:?}"), "0xc46.0");
+    /// assert_eq!(z.to_string(), "3142.0");
     /// assert_eq!(o, Equal);
     /// ```
     #[inline]
@@ -1057,32 +1057,32 @@ impl BigExponentFloat {
     ///
     /// let (z, o) = (&BigExponentFloat::from(3141.5))
     ///     .round_to_integer_ties_away_then_prec_round_ref(5, Floor);
-    /// assert_eq!(format!("{z:?}"), "0xc.0E+2");
+    /// assert_eq!(z.to_string(), "3.1e3");
     /// assert_eq!(o, Less);
     ///
     /// let (z, o) = (&BigExponentFloat::from(3141.5))
     ///     .round_to_integer_ties_away_then_prec_round_ref(5, Ceiling);
-    /// assert_eq!(format!("{z:?}"), "0xc.8E+2");
+    /// assert_eq!(z.to_string(), "3.20e3");
     /// assert_eq!(o, Greater);
     ///
     /// let (z, o) = (&BigExponentFloat::from(3141.5))
     ///     .round_to_integer_ties_away_then_prec_round_ref(5, Nearest);
-    /// assert_eq!(format!("{z:?}"), "0xc.8E+2");
+    /// assert_eq!(z.to_string(), "3.20e3");
     /// assert_eq!(o, Greater);
     ///
     /// let (z, o) = (&BigExponentFloat::from(3141.5))
     ///     .round_to_integer_ties_away_then_prec_round_ref(20, Floor);
-    /// assert_eq!(format!("{z:?}"), "0xc46.0");
+    /// assert_eq!(z.to_string(), "3142.0");
     /// assert_eq!(o, Equal);
     ///
     /// let (z, o) = (&BigExponentFloat::from(3141.5))
     ///     .round_to_integer_ties_away_then_prec_round_ref(20, Ceiling);
-    /// assert_eq!(format!("{z:?}"), "0xc46.0");
+    /// assert_eq!(z.to_string(), "3142.0");
     /// assert_eq!(o, Equal);
     ///
     /// let (z, o) = (&BigExponentFloat::from(3141.5))
     ///     .round_to_integer_ties_away_then_prec_round_ref(20, Nearest);
-    /// assert_eq!(format!("{z:?}"), "0xc46.0");
+    /// assert_eq!(z.to_string(), "3142.0");
     /// assert_eq!(o, Equal);
     /// ```
     #[inline]

@@ -8,18 +8,15 @@
 
 use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::AbsSquared;
-use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, OneHalf, Zero};
 use malachite_base::num::comparison::traits::EqAbs;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_float::BigExponentFloat;
 use malachite_float::test_util::big_exponent_float::{
-    big_exponent_float_exponent_is_small, big_exponent_float_negate, big_exponent_float_power_of_2,
-    float_to_big_exponent_float, parse_big_exponent_float_hex,
+    big_exponent_float_exponent_is_small, float_to_big_exponent_float, parse_big_exponent_float_hex,
 };
 use malachite_float::test_util::generators::{
     big_exponent_float_gen, float_gaussian_rational_pair_gen,
 };
-use malachite_nz::integer::Integer;
 use malachite_q::Rational;
 use malachite_q::gaussian_rational::GaussianRational;
 use std::cmp::Ordering::{self, *};
@@ -42,48 +39,68 @@ fn gaussian_partial_cmp_abs_oracle(x: &BigExponentFloat, y: &GaussianRational) -
 
 #[test]
 fn test_eq_abs_gaussian_rational() {
-    let big = Integer::from_str("100000000000000000000").unwrap();
-    let huge = big_exponent_float_power_of_2(big.clone());
-    let tiny = big_exponent_float_power_of_2(-big);
-    let neg_huge = big_exponent_float_negate(huge.clone());
-    let neg_tiny = big_exponent_float_negate(tiny.clone());
-    let test = |x: BigExponentFloat, y: &str| {
+    let test = |s: &str, s_hex: &str, y: &str| {
+        let x = parse_big_exponent_float_hex(s_hex);
+        assert_eq!(x.to_string(), s);
         let y = GaussianRational::from_str(y).unwrap();
         let out = gaussian_partial_cmp_abs_oracle(&x, &y) == Some(Equal);
         assert_eq!(x.eq_abs(&y), out);
         assert_eq!(y.eq_abs(&x), out);
     };
-    test(BigExponentFloat::NAN, "3+4i");
-    test(BigExponentFloat::INFINITY, "3+4i");
-    test(BigExponentFloat::NEGATIVE_INFINITY, "0");
-    test(BigExponentFloat::ZERO, "0");
-    test(BigExponentFloat::ZERO, "i");
-    test(BigExponentFloat::from(5), "3+4i");
-    test(BigExponentFloat::from(-5), "-3-4i");
-    test(BigExponentFloat::from(5), "-4i");
-    test(BigExponentFloat::from(-4), "-4i");
-    test(BigExponentFloat::from(3), "3");
-    test(BigExponentFloat::from(-3), "3");
-    test(BigExponentFloat::from(4.5), "3+4i");
-    test(BigExponentFloat::from(5.5), "3+4i");
+    test("NaN", "NaN", "3+4i");
+    test("Infinity", "Infinity", "3+4i");
+    test("-Infinity", "-Infinity", "0");
+    test("0.0", "0x0.0", "0");
+    test("0.0", "0x0.0", "i");
+    test("5.0", "0x5.0", "3+4i");
+    test("-5.0", "-0x5.0", "-3-4i");
+    test("5.0", "0x5.0", "-4i");
+    test("-4.0", "-0x4.0", "-4i");
+    test("3.0", "0x3.0", "3");
+    test("-3.0", "-0x3.0", "3");
+    test("4.50", "0x4.8", "3+4i");
+    test("5.50", "0x5.8", "3+4i");
     test(
-        parse_big_exponent_float_hex("0x5.0000000000000000000010#90"),
+        "5.000000000000000000000000052",
+        "0x5.000000000000000000001",
         "3+4i",
     );
     test(
-        parse_big_exponent_float_hex("0x4.fffffffffffffffffffff0#90"),
+        "4.999999999999999999999999948",
+        "0x4.fffffffffffffffffffff",
         "3+4i",
     );
-    test(huge.clone(), "3+4i");
-    test(neg_huge.clone(), "-3+4i");
-    test(tiny.clone(), "3+4i");
-    test(tiny.clone(), "0");
-    test(neg_tiny.clone(), "i");
-    test(BigExponentFloat::from(2.5), "3/2+2i");
-    test(BigExponentFloat::from(-2.5), "-3/2-2i");
-    test(BigExponentFloat::ONE_HALF, "1/3+i/3");
     test(
-        tiny.clone(),
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        "3+4i",
+    );
+    test(
+        "-2.4e30102999566398119521",
+        "-0x1.0E+25000000000000000000",
+        "-3+4i",
+    );
+    test(
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
+        "3+4i",
+    );
+    test(
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
+        "0",
+    );
+    test(
+        "-4.2e-30102999566398119522",
+        "-0x1.0E-25000000000000000000",
+        "i",
+    );
+    test("2.5", "0x2.8", "3/2+2i");
+    test("-2.5", "-0x2.8", "-3/2-2i");
+    test("0.50", "0x0.8", "1/3+i/3");
+    test(
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
         "1/1000000000000000000000000000000+i/1000000000000000000000000000000",
     );
 }

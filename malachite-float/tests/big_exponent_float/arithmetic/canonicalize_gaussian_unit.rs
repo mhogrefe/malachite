@@ -9,9 +9,9 @@
 use malachite_base::num::arithmetic::traits::{
     Abs, CanonicalizeGaussianUnit, CanonicalizeGaussianUnitAssign,
 };
-use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity};
 use malachite_float::BigExponentFloat;
 use malachite_float::big_exponent_float::ComparableBigExponentFloatRef;
+use malachite_float::test_util::big_exponent_float::parse_big_exponent_float_hex;
 use malachite_float::test_util::generators::big_exponent_float_gen;
 
 fn same(x: &BigExponentFloat, y: &BigExponentFloat) -> bool {
@@ -20,16 +20,16 @@ fn same(x: &BigExponentFloat, y: &BigExponentFloat) -> bool {
 
 #[test]
 fn test_canonicalize_gaussian_unit() {
-    let nan = BigExponentFloat::NAN;
-    assert!(same(&(&nan).canonicalize_gaussian_unit(), &nan));
-    assert!(same(
-        &BigExponentFloat::NEGATIVE_INFINITY.canonicalize_gaussian_unit(),
-        &BigExponentFloat::INFINITY
-    ));
-    assert!(same(
-        &BigExponentFloat::from(-1.5).canonicalize_gaussian_unit(),
-        &BigExponentFloat::from(1.5)
-    ));
+    let test = |x: &str, x_hex: &str, out: &str, out_hex: &str| {
+        assert_eq!(parse_big_exponent_float_hex(x_hex).to_string(), x);
+        let x = &parse_big_exponent_float_hex(x_hex);
+        assert_eq!(parse_big_exponent_float_hex(out_hex).to_string(), out);
+        let out = &parse_big_exponent_float_hex(out_hex);
+        assert!(same(&x.canonicalize_gaussian_unit(), out));
+    };
+    test("NaN", "NaN", "NaN", "NaN");
+    test("-Infinity", "-Infinity", "Infinity", "Infinity");
+    test("-1.5", "-0x1.8", "1.5", "0x1.8");
 }
 
 #[test]

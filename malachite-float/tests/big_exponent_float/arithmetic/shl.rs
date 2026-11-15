@@ -6,12 +6,11 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 use core::str::FromStr;
-use malachite_base::num::basic::traits::{Infinity, NaN, One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_float::big_exponent_float::ComparableBigExponentFloatRef;
 use malachite_float::test_util::big_exponent_float::{
     big_exponent_float_exponent_is_small, big_exponent_float_power_of_2,
-    float_to_big_exponent_float,
+    float_to_big_exponent_float, parse_big_exponent_float_hex,
 };
 use malachite_float::test_util::generators::{
     big_exponent_float_signed_pair_gen, float_signed_pair_gen,
@@ -28,8 +27,11 @@ fn same(x: &BigExponentFloat, y: &BigExponentFloat) -> bool {
 fn test_shl() {
     let big = Integer::from_str("100000000000000000000").unwrap();
     let huge = big_exponent_float_power_of_2(big.clone());
-    let one = BigExponentFloat::ONE;
-    let test = |x: &BigExponentFloat, k: i64, out: &BigExponentFloat| {
+    let test = |s: &str, s_hex: &str, k: i64, t: &str, t_hex: &str| {
+        let x = &parse_big_exponent_float_hex(s_hex);
+        assert_eq!(x.to_string(), s);
+        let out = &parse_big_exponent_float_hex(t_hex);
+        assert_eq!(out.to_string(), t);
         let l = x.clone() << k;
         assert!(l.is_valid());
         assert!(same(&l, out));
@@ -44,31 +46,27 @@ fn test_shl() {
         m >>= neg_k;
         assert!(same(&m, out));
     };
-    test(&BigExponentFloat::NAN, 10, &BigExponentFloat::NAN);
-    test(
-        &BigExponentFloat::INFINITY,
-        -10,
-        &BigExponentFloat::INFINITY,
-    );
-    test(&BigExponentFloat::ZERO, 10, &BigExponentFloat::ZERO);
-    test(&one, 0, &one);
-    test(&one, 10, &BigExponentFloat::from(1024u32));
-    test(&one, -10, &BigExponentFloat::from(1.0 / 1024.0));
-    test(
-        &BigExponentFloat::from(-1.5),
-        3,
-        &BigExponentFloat::from(-12i32),
-    );
+    test("NaN", "NaN", 10, "NaN", "NaN");
+    test("Infinity", "Infinity", -10, "Infinity", "Infinity");
+    test("0.0", "0x0.0", 10, "0.0", "0x0.0");
+    test("1.0", "0x1.0", 0, "1.0", "0x1.0");
+    test("1.0", "0x1.0", 10, "1.0e3", "0x4.0E+2");
+    test("1.0", "0x1.0", -10, "0.00098", "0x0.004");
+    test("-1.5", "-0x1.8", 3, "-12.0", "-0xc.0");
     // Far beyond Float's exponent range, exactly.
     test(
-        &one,
+        "1.0",
+        "0x1.0",
         i64::MAX,
-        &big_exponent_float_power_of_2(Integer::from(i64::MAX)),
+        "6.9e2776511644261678565",
+        "0x8.0E+2305843009213693951",
     );
     test(
-        &one,
+        "1.0",
+        "0x1.0",
         i64::MIN,
-        &big_exponent_float_power_of_2(Integer::from(i64::MIN)),
+        "7.2e-2776511644261678567",
+        "0x1.0E-2305843009213693952",
     );
     assert!(same(
         &(&huge << u128::MAX),

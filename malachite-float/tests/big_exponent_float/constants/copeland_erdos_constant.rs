@@ -23,74 +23,178 @@ fn same(x: &BigExponentFloat, y: &BigExponentFloat) -> bool {
 
 #[test]
 fn test_copeland_erdos_constant_base_prec_round() {
-    let cases: &[(u64, u64, RoundingMode, &str, Ordering)] = &[
-        (2, 1, Floor, "0x0.8", Less),
-        (2, 1, Ceiling, "0x1.0", Greater),
-        (2, 1, Down, "0x0.8", Less),
-        (2, 1, Up, "0x1.0", Greater),
-        (2, 1, Nearest, "0x0.8", Less),
-        (2, 2, Floor, "0x0.8", Less),
-        (2, 2, Ceiling, "0x0.c", Greater),
-        (2, 2, Down, "0x0.8", Less),
-        (2, 2, Up, "0x0.c", Greater),
-        (2, 2, Nearest, "0x0.c", Greater),
-        (2, 10, Floor, "0x0.bbc", Less),
-        (2, 10, Ceiling, "0x0.bc", Greater),
-        (2, 10, Down, "0x0.bbc", Less),
-        (2, 10, Up, "0x0.bc", Greater),
-        (2, 10, Nearest, "0x0.bc", Greater),
-        (2, 100, Floor, "0x0.bbef633bf7f2d35dfaf7ec38f", Less),
-        (2, 100, Ceiling, "0x0.bbef633bf7f2d35dfaf7ec39", Greater),
-        (2, 100, Down, "0x0.bbef633bf7f2d35dfaf7ec38f", Less),
-        (2, 100, Up, "0x0.bbef633bf7f2d35dfaf7ec39", Greater),
-        (2, 100, Nearest, "0x0.bbef633bf7f2d35dfaf7ec38f", Less),
-        (3, 1, Floor, "0x0.8", Less),
-        (3, 1, Ceiling, "0x1.0", Greater),
-        (3, 1, Down, "0x0.8", Less),
-        (3, 1, Up, "0x1.0", Greater),
-        (3, 1, Nearest, "0x1.0", Greater),
-        (3, 2, Floor, "0x0.c", Less),
-        (3, 2, Ceiling, "0x1.0", Greater),
-        (3, 2, Down, "0x0.c", Less),
-        (3, 2, Up, "0x1.0", Greater),
-        (3, 2, Nearest, "0x0.c", Less),
-        (3, 10, Floor, "0x0.cd", Less),
-        (3, 10, Ceiling, "0x0.cd4", Greater),
-        (3, 10, Down, "0x0.cd", Less),
-        (3, 10, Up, "0x0.cd4", Greater),
-        (3, 10, Nearest, "0x0.cd4", Greater),
-        (3, 100, Floor, "0x0.cd3f746be386f441c9c14f7e5", Less),
-        (3, 100, Ceiling, "0x0.cd3f746be386f441c9c14f7e6", Greater),
-        (3, 100, Down, "0x0.cd3f746be386f441c9c14f7e5", Less),
-        (3, 100, Up, "0x0.cd3f746be386f441c9c14f7e6", Greater),
-        (3, 100, Nearest, "0x0.cd3f746be386f441c9c14f7e6", Greater),
-        (10, 1, Floor, "0x0.2", Less),
-        (10, 1, Ceiling, "0x0.4", Greater),
-        (10, 1, Down, "0x0.2", Less),
-        (10, 1, Up, "0x0.4", Greater),
-        (10, 1, Nearest, "0x0.4", Greater),
-        (10, 2, Floor, "0x0.3", Less),
-        (10, 2, Ceiling, "0x0.4", Greater),
-        (10, 2, Down, "0x0.3", Less),
-        (10, 2, Up, "0x0.4", Greater),
-        (10, 2, Nearest, "0x0.4", Greater),
-        (10, 10, Floor, "0x0.3c5", Less),
-        (10, 10, Ceiling, "0x0.3c6", Greater),
-        (10, 10, Down, "0x0.3c5", Less),
-        (10, 10, Up, "0x0.3c6", Greater),
-        (10, 10, Nearest, "0x0.3c5", Less),
-        (10, 100, Floor, "0x0.3c579092098975475a5c13b984", Less),
-        (10, 100, Ceiling, "0x0.3c579092098975475a5c13b988", Greater),
-        (10, 100, Down, "0x0.3c579092098975475a5c13b984", Less),
-        (10, 100, Up, "0x0.3c579092098975475a5c13b988", Greater),
-        (10, 100, Nearest, "0x0.3c579092098975475a5c13b988", Greater),
-    ];
-    for &(b, p, rm, out, o) in cases {
+    let test = |b: u64, p: u64, rm: RoundingMode, out: &str, out_hex: &str, o: Ordering| {
         let (x, o_alt) = BigExponentFloat::copeland_erdos_constant_base_prec_round(b, p, rm);
         assert!(x.is_valid());
-        assert_eq!(format!("{x:?}"), out, "{:?}", (b, p, rm));
+        assert_eq!(format!("{x:?}"), out_hex, "{:?}", (b, p, rm));
+        assert_eq!(x.to_string(), out);
         assert_eq!(o_alt, o);
-    }
+    };
+    test(2, 1, Floor, "0.50", "0x0.8", Less);
+    test(2, 1, Ceiling, "1.0", "0x1.0", Greater);
+    test(2, 1, Down, "0.50", "0x0.8", Less);
+    test(2, 1, Up, "1.0", "0x1.0", Greater);
+    test(2, 1, Nearest, "0.50", "0x0.8", Less);
+    test(2, 2, Floor, "0.50", "0x0.8", Less);
+    test(2, 2, Ceiling, "0.75", "0x0.c", Greater);
+    test(2, 2, Down, "0.50", "0x0.8", Less);
+    test(2, 2, Up, "0.75", "0x0.c", Greater);
+    test(2, 2, Nearest, "0.75", "0x0.c", Greater);
+    test(2, 10, Floor, "0.73340", "0x0.bbc", Less);
+    test(2, 10, Ceiling, "0.734", "0x0.bc", Greater);
+    test(2, 10, Down, "0.73340", "0x0.bbc", Less);
+    test(2, 10, Up, "0.734", "0x0.bc", Greater);
+    test(2, 10, Nearest, "0.734", "0x0.bc", Greater);
+    test(
+        2,
+        100,
+        Floor,
+        "0.73412151540828612060627828845711",
+        "0x0.bbef633bf7f2d35dfaf7ec38f",
+        Less,
+    );
+    test(
+        2,
+        100,
+        Ceiling,
+        "0.734121515408286120606278288458",
+        "0x0.bbef633bf7f2d35dfaf7ec39",
+        Greater,
+    );
+    test(
+        2,
+        100,
+        Down,
+        "0.73412151540828612060627828845711",
+        "0x0.bbef633bf7f2d35dfaf7ec38f",
+        Less,
+    );
+    test(
+        2,
+        100,
+        Up,
+        "0.734121515408286120606278288458",
+        "0x0.bbef633bf7f2d35dfaf7ec39",
+        Greater,
+    );
+    test(
+        2,
+        100,
+        Nearest,
+        "0.73412151540828612060627828845711",
+        "0x0.bbef633bf7f2d35dfaf7ec38f",
+        Less,
+    );
+    test(3, 1, Floor, "0.50", "0x0.8", Less);
+    test(3, 1, Ceiling, "1.0", "0x1.0", Greater);
+    test(3, 1, Down, "0.50", "0x0.8", Less);
+    test(3, 1, Up, "1.0", "0x1.0", Greater);
+    test(3, 1, Nearest, "1.0", "0x1.0", Greater);
+    test(3, 2, Floor, "0.75", "0x0.c", Less);
+    test(3, 2, Ceiling, "1.0", "0x1.0", Greater);
+    test(3, 2, Down, "0.75", "0x0.c", Less);
+    test(3, 2, Up, "1.0", "0x1.0", Greater);
+    test(3, 2, Nearest, "0.75", "0x0.c", Less);
+    test(3, 10, Floor, "0.8008", "0x0.cd", Less);
+    test(3, 10, Ceiling, "0.80176", "0x0.cd4", Greater);
+    test(3, 10, Down, "0.8008", "0x0.cd", Less);
+    test(3, 10, Up, "0.80176", "0x0.cd4", Greater);
+    test(3, 10, Nearest, "0.80176", "0x0.cd4", Greater);
+    test(
+        3,
+        100,
+        Floor,
+        "0.80174949296954506695856974572014",
+        "0x0.cd3f746be386f441c9c14f7e5",
+        Less,
+    );
+    test(
+        3,
+        100,
+        Ceiling,
+        "0.8017494929695450669585697457209",
+        "0x0.cd3f746be386f441c9c14f7e6",
+        Greater,
+    );
+    test(
+        3,
+        100,
+        Down,
+        "0.80174949296954506695856974572014",
+        "0x0.cd3f746be386f441c9c14f7e5",
+        Less,
+    );
+    test(
+        3,
+        100,
+        Up,
+        "0.8017494929695450669585697457209",
+        "0x0.cd3f746be386f441c9c14f7e6",
+        Greater,
+    );
+    test(
+        3,
+        100,
+        Nearest,
+        "0.8017494929695450669585697457209",
+        "0x0.cd3f746be386f441c9c14f7e6",
+        Greater,
+    );
+    test(10, 1, Floor, "0.12", "0x0.2", Less);
+    test(10, 1, Ceiling, "0.25", "0x0.4", Greater);
+    test(10, 1, Down, "0.12", "0x0.2", Less);
+    test(10, 1, Up, "0.25", "0x0.4", Greater);
+    test(10, 1, Nearest, "0.25", "0x0.4", Greater);
+    test(10, 2, Floor, "0.19", "0x0.3", Less);
+    test(10, 2, Ceiling, "0.25", "0x0.4", Greater);
+    test(10, 2, Down, "0.19", "0x0.3", Less);
+    test(10, 2, Up, "0.25", "0x0.4", Greater);
+    test(10, 2, Nearest, "0.25", "0x0.4", Greater);
+    test(10, 10, Floor, "0.23560", "0x0.3c5", Less);
+    test(10, 10, Ceiling, "0.2358", "0x0.3c6", Greater);
+    test(10, 10, Down, "0.23560", "0x0.3c5", Less);
+    test(10, 10, Up, "0.2358", "0x0.3c6", Greater);
+    test(10, 10, Nearest, "0.23560", "0x0.3c5", Less);
+    test(
+        10,
+        100,
+        Floor,
+        "0.23571113171923293137414347535946",
+        "0x0.3c579092098975475a5c13b984",
+        Less,
+    );
+    test(
+        10,
+        100,
+        Ceiling,
+        "0.2357111317192329313741434753597",
+        "0x0.3c579092098975475a5c13b988",
+        Greater,
+    );
+    test(
+        10,
+        100,
+        Down,
+        "0.23571113171923293137414347535946",
+        "0x0.3c579092098975475a5c13b984",
+        Less,
+    );
+    test(
+        10,
+        100,
+        Up,
+        "0.2357111317192329313741434753597",
+        "0x0.3c579092098975475a5c13b988",
+        Greater,
+    );
+    test(
+        10,
+        100,
+        Nearest,
+        "0.2357111317192329313741434753597",
+        "0x0.3c579092098975475a5c13b988",
+        Greater,
+    );
 }
 
 #[test]
@@ -136,26 +240,43 @@ fn copeland_erdos_constant_base_prec_round_properties() {
 
 #[test]
 fn test_copeland_erdos_constant_base_prec() {
-    let cases: &[(u64, u64, &str, Ordering)] = &[
-        (2, 1, "0x0.8", Less),
-        (2, 2, "0x0.c", Greater),
-        (2, 10, "0x0.bc", Greater),
-        (2, 100, "0x0.bbef633bf7f2d35dfaf7ec38f", Less),
-        (3, 1, "0x1.0", Greater),
-        (3, 2, "0x0.c", Less),
-        (3, 10, "0x0.cd4", Greater),
-        (3, 100, "0x0.cd3f746be386f441c9c14f7e6", Greater),
-        (10, 1, "0x0.4", Greater),
-        (10, 2, "0x0.4", Greater),
-        (10, 10, "0x0.3c5", Less),
-        (10, 100, "0x0.3c579092098975475a5c13b988", Greater),
-    ];
-    for &(b, p, out, o) in cases {
+    let test = |b: u64, p: u64, out: &str, out_hex: &str, o: Ordering| {
         let (x, o_alt) = BigExponentFloat::copeland_erdos_constant_base_prec(b, p);
         assert!(x.is_valid());
-        assert_eq!(format!("{x:?}"), out, "{:?}", (b, p));
+        assert_eq!(format!("{x:?}"), out_hex, "{:?}", (b, p));
+        assert_eq!(x.to_string(), out);
         assert_eq!(o_alt, o);
-    }
+    };
+    test(2, 1, "0.50", "0x0.8", Less);
+    test(2, 2, "0.75", "0x0.c", Greater);
+    test(2, 10, "0.734", "0x0.bc", Greater);
+    test(
+        2,
+        100,
+        "0.73412151540828612060627828845711",
+        "0x0.bbef633bf7f2d35dfaf7ec38f",
+        Less,
+    );
+    test(3, 1, "1.0", "0x1.0", Greater);
+    test(3, 2, "0.75", "0x0.c", Less);
+    test(3, 10, "0.80176", "0x0.cd4", Greater);
+    test(
+        3,
+        100,
+        "0.8017494929695450669585697457209",
+        "0x0.cd3f746be386f441c9c14f7e6",
+        Greater,
+    );
+    test(10, 1, "0.25", "0x0.4", Greater);
+    test(10, 2, "0.25", "0x0.4", Greater);
+    test(10, 10, "0.23560", "0x0.3c5", Less);
+    test(
+        10,
+        100,
+        "0.2357111317192329313741434753597",
+        "0x0.3c579092098975475a5c13b988",
+        Greater,
+    );
 }
 
 #[test]
@@ -185,34 +306,63 @@ fn copeland_erdos_constant_base_prec_properties() {
 
 #[test]
 fn test_copeland_erdos_constant_prec_round() {
-    let cases: &[(u64, RoundingMode, &str, Ordering)] = &[
-        (1, Floor, "0x0.2", Less),
-        (1, Ceiling, "0x0.4", Greater),
-        (1, Down, "0x0.2", Less),
-        (1, Up, "0x0.4", Greater),
-        (1, Nearest, "0x0.4", Greater),
-        (2, Floor, "0x0.3", Less),
-        (2, Ceiling, "0x0.4", Greater),
-        (2, Down, "0x0.3", Less),
-        (2, Up, "0x0.4", Greater),
-        (2, Nearest, "0x0.4", Greater),
-        (10, Floor, "0x0.3c5", Less),
-        (10, Ceiling, "0x0.3c6", Greater),
-        (10, Down, "0x0.3c5", Less),
-        (10, Up, "0x0.3c6", Greater),
-        (10, Nearest, "0x0.3c5", Less),
-        (100, Floor, "0x0.3c579092098975475a5c13b984", Less),
-        (100, Ceiling, "0x0.3c579092098975475a5c13b988", Greater),
-        (100, Down, "0x0.3c579092098975475a5c13b984", Less),
-        (100, Up, "0x0.3c579092098975475a5c13b988", Greater),
-        (100, Nearest, "0x0.3c579092098975475a5c13b988", Greater),
-    ];
-    for &(p, rm, out, o) in cases {
+    let test = |p: u64, rm: RoundingMode, out: &str, out_hex: &str, o: Ordering| {
         let (x, o_alt) = BigExponentFloat::copeland_erdos_constant_prec_round(p, rm);
         assert!(x.is_valid());
-        assert_eq!(format!("{x:?}"), out, "{:?}", (p, rm));
+        assert_eq!(format!("{x:?}"), out_hex, "{:?}", (p, rm));
+        assert_eq!(x.to_string(), out);
         assert_eq!(o_alt, o);
-    }
+    };
+    test(1, Floor, "0.12", "0x0.2", Less);
+    test(1, Ceiling, "0.25", "0x0.4", Greater);
+    test(1, Down, "0.12", "0x0.2", Less);
+    test(1, Up, "0.25", "0x0.4", Greater);
+    test(1, Nearest, "0.25", "0x0.4", Greater);
+    test(2, Floor, "0.19", "0x0.3", Less);
+    test(2, Ceiling, "0.25", "0x0.4", Greater);
+    test(2, Down, "0.19", "0x0.3", Less);
+    test(2, Up, "0.25", "0x0.4", Greater);
+    test(2, Nearest, "0.25", "0x0.4", Greater);
+    test(10, Floor, "0.23560", "0x0.3c5", Less);
+    test(10, Ceiling, "0.2358", "0x0.3c6", Greater);
+    test(10, Down, "0.23560", "0x0.3c5", Less);
+    test(10, Up, "0.2358", "0x0.3c6", Greater);
+    test(10, Nearest, "0.23560", "0x0.3c5", Less);
+    test(
+        100,
+        Floor,
+        "0.23571113171923293137414347535946",
+        "0x0.3c579092098975475a5c13b984",
+        Less,
+    );
+    test(
+        100,
+        Ceiling,
+        "0.2357111317192329313741434753597",
+        "0x0.3c579092098975475a5c13b988",
+        Greater,
+    );
+    test(
+        100,
+        Down,
+        "0.23571113171923293137414347535946",
+        "0x0.3c579092098975475a5c13b984",
+        Less,
+    );
+    test(
+        100,
+        Up,
+        "0.2357111317192329313741434753597",
+        "0x0.3c579092098975475a5c13b988",
+        Greater,
+    );
+    test(
+        100,
+        Nearest,
+        "0.2357111317192329313741434753597",
+        "0x0.3c579092098975475a5c13b988",
+        Greater,
+    );
 }
 
 #[test]
@@ -252,18 +402,22 @@ fn copeland_erdos_constant_prec_round_properties() {
 
 #[test]
 fn test_copeland_erdos_constant_prec() {
-    let cases: &[(u64, &str, Ordering)] = &[
-        (1, "0x0.4", Greater),
-        (2, "0x0.4", Greater),
-        (10, "0x0.3c5", Less),
-        (100, "0x0.3c579092098975475a5c13b988", Greater),
-    ];
-    for &(p, out, o) in cases {
+    let test = |p: u64, out: &str, out_hex: &str, o: Ordering| {
         let (x, o_alt) = BigExponentFloat::copeland_erdos_constant_prec(p);
         assert!(x.is_valid());
-        assert_eq!(format!("{x:?}"), out, "{:?}", (p));
+        assert_eq!(format!("{x:?}"), out_hex, "{:?}", (p));
+        assert_eq!(x.to_string(), out);
         assert_eq!(o_alt, o);
-    }
+    };
+    test(1, "0.25", "0x0.4", Greater);
+    test(2, "0.25", "0x0.4", Greater);
+    test(10, "0.23560", "0x0.3c5", Less);
+    test(
+        100,
+        "0.2357111317192329313741434753597",
+        "0x0.3c579092098975475a5c13b988",
+        Greater,
+    );
 }
 
 #[test]

@@ -162,27 +162,27 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (square, o) = BigExponentFloat::from(PI).square_prec_round(5, Floor);
-    /// assert_eq!(format!("{square:?}"), "0x9.8");
+    /// assert_eq!(square.to_string(), "9.50");
     /// assert_eq!(o, Less);
     ///
     /// let (square, o) = BigExponentFloat::from(PI).square_prec_round(5, Ceiling);
-    /// assert_eq!(format!("{square:?}"), "0xa.0");
+    /// assert_eq!(square.to_string(), "10.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (square, o) = BigExponentFloat::from(PI).square_prec_round(5, Nearest);
-    /// assert_eq!(format!("{square:?}"), "0xa.0");
+    /// assert_eq!(square.to_string(), "10.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (square, o) = BigExponentFloat::from(PI).square_prec_round(20, Floor);
-    /// assert_eq!(format!("{square:?}"), "0x9.de9e");
+    /// assert_eq!(square.to_string(), "9.869598");
     /// assert_eq!(o, Less);
     ///
     /// let (square, o) = BigExponentFloat::from(PI).square_prec_round(20, Ceiling);
-    /// assert_eq!(format!("{square:?}"), "0x9.de9f");
+    /// assert_eq!(square.to_string(), "9.8696136");
     /// assert_eq!(o, Greater);
     ///
     /// let (square, o) = BigExponentFloat::from(PI).square_prec_round(20, Nearest);
-    /// assert_eq!(format!("{square:?}"), "0x9.de9e");
+    /// assert_eq!(square.to_string(), "9.869598");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -232,27 +232,27 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (square, o) = (&BigExponentFloat::from(PI)).square_prec_round_ref(5, Floor);
-    /// assert_eq!(format!("{square:?}"), "0x9.8");
+    /// assert_eq!(square.to_string(), "9.50");
     /// assert_eq!(o, Less);
     ///
     /// let (square, o) = (&BigExponentFloat::from(PI)).square_prec_round_ref(5, Ceiling);
-    /// assert_eq!(format!("{square:?}"), "0xa.0");
+    /// assert_eq!(square.to_string(), "10.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (square, o) = (&BigExponentFloat::from(PI)).square_prec_round_ref(5, Nearest);
-    /// assert_eq!(format!("{square:?}"), "0xa.0");
+    /// assert_eq!(square.to_string(), "10.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (square, o) = (&BigExponentFloat::from(PI)).square_prec_round_ref(20, Floor);
-    /// assert_eq!(format!("{square:?}"), "0x9.de9e");
+    /// assert_eq!(square.to_string(), "9.869598");
     /// assert_eq!(o, Less);
     ///
     /// let (square, o) = (&BigExponentFloat::from(PI)).square_prec_round_ref(20, Ceiling);
-    /// assert_eq!(format!("{square:?}"), "0x9.de9f");
+    /// assert_eq!(square.to_string(), "9.8696136");
     /// assert_eq!(o, Greater);
     ///
     /// let (square, o) = (&BigExponentFloat::from(PI)).square_prec_round_ref(20, Nearest);
-    /// assert_eq!(format!("{square:?}"), "0x9.de9e");
+    /// assert_eq!(square.to_string(), "9.869598");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -298,27 +298,27 @@ impl BigExponentFloat {
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(x.square_prec_round_assign(5, Floor), Less);
-    /// assert_eq!(format!("{x:?}"), "0x9.8");
+    /// assert_eq!(x.to_string(), "9.50");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(x.square_prec_round_assign(5, Ceiling), Greater);
-    /// assert_eq!(format!("{x:?}"), "0xa.0");
+    /// assert_eq!(x.to_string(), "10.0");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(x.square_prec_round_assign(5, Nearest), Greater);
-    /// assert_eq!(format!("{x:?}"), "0xa.0");
+    /// assert_eq!(x.to_string(), "10.0");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(x.square_prec_round_assign(20, Floor), Less);
-    /// assert_eq!(format!("{x:?}"), "0x9.de9e");
+    /// assert_eq!(x.to_string(), "9.869598");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(x.square_prec_round_assign(20, Ceiling), Greater);
-    /// assert_eq!(format!("{x:?}"), "0x9.de9f");
+    /// assert_eq!(x.to_string(), "9.8696136");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(x.square_prec_round_assign(20, Nearest), Less);
-    /// assert_eq!(format!("{x:?}"), "0x9.de9e");
+    /// assert_eq!(x.to_string(), "9.869598");
     /// ```
     #[inline]
     pub fn square_prec_round_assign(&mut self, prec: u64, rm: RoundingMode) -> Ordering {
@@ -367,11 +367,11 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (square, o) = BigExponentFloat::from(PI).square_prec(5);
-    /// assert_eq!(format!("{square:?}"), "0xa.0");
+    /// assert_eq!(square.to_string(), "10.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (square, o) = BigExponentFloat::from(PI).square_prec(20);
-    /// assert_eq!(format!("{square:?}"), "0x9.de9e");
+    /// assert_eq!(square.to_string(), "9.869598");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -414,11 +414,11 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (square, o) = (&BigExponentFloat::from(PI)).square_prec_ref(5);
-    /// assert_eq!(format!("{square:?}"), "0xa.0");
+    /// assert_eq!(square.to_string(), "10.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (square, o) = (&BigExponentFloat::from(PI)).square_prec_ref(20);
-    /// assert_eq!(format!("{square:?}"), "0x9.de9e");
+    /// assert_eq!(square.to_string(), "9.869598");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -457,11 +457,11 @@ impl BigExponentFloat {
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(x.square_prec_assign(5), Greater);
-    /// assert_eq!(format!("{x:?}"), "0xa.0");
+    /// assert_eq!(x.to_string(), "10.0");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(x.square_prec_assign(20), Less);
-    /// assert_eq!(format!("{x:?}"), "0x9.de9e");
+    /// assert_eq!(x.to_string(), "9.869598");
     /// ```
     #[inline]
     pub fn square_prec_assign(&mut self, prec: u64) -> Ordering {
@@ -501,10 +501,7 @@ impl Square for BigExponentFloat {
     /// use malachite_base::num::basic::traits::{Infinity, NegativeInfinity};
     /// use malachite_float::BigExponentFloat;
     ///
-    /// assert_eq!(
-    ///     format!("{:?}", BigExponentFloat::from(-1.5).square()),
-    ///     "0x2.4"
-    /// );
+    /// assert_eq!(BigExponentFloat::from(-1.5).square().to_string(), "2.25");
     /// assert_eq!(
     ///     BigExponentFloat::NEGATIVE_INFINITY.square(),
     ///     BigExponentFloat::INFINITY
@@ -544,8 +541,8 @@ impl Square for &BigExponentFloat {
     /// use malachite_float::BigExponentFloat;
     ///
     /// assert_eq!(
-    ///     format!("{:?}", (&BigExponentFloat::from(-1.5)).square()),
-    ///     "0x2.4"
+    ///     ((&BigExponentFloat::from(-1.5)).square()).to_string(),
+    ///     "2.25"
     /// );
     /// assert_eq!(
     ///     (&BigExponentFloat::NEGATIVE_INFINITY).square(),
@@ -579,7 +576,7 @@ impl SquareAssign for BigExponentFloat {
     ///
     /// let mut x = BigExponentFloat::from(-1.5);
     /// x.square_assign();
-    /// assert_eq!(format!("{x:?}"), "0x2.4");
+    /// assert_eq!(x.to_string(), "2.25");
     /// ```
     #[inline]
     fn square_assign(&mut self) {

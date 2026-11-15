@@ -98,11 +98,12 @@ use crate::test_util::generators::exhaustive::{
     big_exponent_float_round_to_integer_prec_round_valid, big_exponent_float_sqrt_prec_round_valid,
     big_exponent_float_square_prec_round_valid, big_exponent_float_sub_mul_prec_round_valid,
     big_exponent_float_sub_prec_round_valid, big_exponent_float_sub_rational_prec_round_valid,
-    big_exponent_float_sum_prec_round_valid, cbrt_prec_round_valid, cbrt_round_valid,
-    compound_prec_round_valid, cos_with_period_prec_round_valid,
-    cos_with_period_rational_prec_round_valid, cos_with_period_round_valid, div_prec_round_valid,
-    div_rational_prec_round_valid, div_rational_round_valid, div_round_valid, dot_prec_round_valid,
-    dot_round_valid, exp_prec_round_valid, exp_rational_prec_round_valid, exp_round_valid,
+    big_exponent_float_sum_prec_round_valid, big_exponent_float_to_sci_options_valid,
+    cbrt_prec_round_valid, cbrt_round_valid, compound_prec_round_valid,
+    cos_with_period_prec_round_valid, cos_with_period_rational_prec_round_valid,
+    cos_with_period_round_valid, div_prec_round_valid, div_rational_prec_round_valid,
+    div_rational_round_valid, div_round_valid, dot_prec_round_valid, dot_round_valid,
+    exp_prec_round_valid, exp_rational_prec_round_valid, exp_round_valid,
     float_to_sci_options_valid, from_primitive_float_prec_round_valid, hypot_prec_round_valid,
     hypot_round_valid, integer_rounding_from_float_valid, ln_1_plus_x_prec_round_valid,
     ln_1_plus_x_round_valid, ln_prec_round_valid, ln_rational_prec_round_valid, ln_round_valid,
@@ -17257,5 +17258,60 @@ pub fn random_big_exponent_float_vec_pair_gen_var_1(
                 .chain(ys)
                 .all(big_exponent_float_exponent_is_small)
         }),
+    )
+}
+
+pub fn random_big_exponent_float_to_sci_options_pair_gen(
+    config: &GenConfig,
+) -> It<(BigExponentFloat, ToSciOptions)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_big_exponent_floats(
+                seed,
+                config.get_or("mean_exponent_bits_n", 8),
+                config.get_or("mean_exponent_bits_d", 1),
+                config.get_or("mean_precision_n", 64),
+                config.get_or("mean_precision_d", 1),
+                config.get_or("mean_special_p_n", 1),
+                config.get_or("mean_special_p_d", 64),
+            )
+        },
+        &|seed| {
+            random_to_sci_options(
+                seed,
+                config.get_or("small_mean_n", 4),
+                config.get_or("small_mean_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn random_big_exponent_float_to_sci_options_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(BigExponentFloat, ToSciOptions)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_big_exponent_floats(
+                    seed,
+                    config.get_or("mean_exponent_bits_n", 8),
+                    config.get_or("mean_exponent_bits_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_special_p_n", 1),
+                    config.get_or("mean_special_p_d", 64),
+                )
+            },
+            &|seed| {
+                random_to_sci_options(
+                    seed,
+                    config.get_or("small_mean_n", 4),
+                    config.get_or("small_mean_d", 1),
+                )
+            },
+        )
+        .filter(|(x, options)| big_exponent_float_to_sci_options_valid(x, *options)),
     )
 }

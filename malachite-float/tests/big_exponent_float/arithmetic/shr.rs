@@ -5,18 +5,15 @@
 // Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
-use malachite_base::num::basic::traits::{Infinity, NaN, One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_float::big_exponent_float::ComparableBigExponentFloatRef;
 use malachite_float::test_util::big_exponent_float::{
-    big_exponent_float_exponent_is_small, big_exponent_float_power_of_2,
-    float_to_big_exponent_float,
+    big_exponent_float_exponent_is_small, float_to_big_exponent_float, parse_big_exponent_float_hex,
 };
 use malachite_float::test_util::generators::{
     big_exponent_float_unsigned_pair_gen, float_signed_pair_gen,
 };
 use malachite_float::{BigExponentFloat, Float};
-use malachite_nz::integer::Integer;
 use malachite_q::Rational;
 
 fn same(x: &BigExponentFloat, y: &BigExponentFloat) -> bool {
@@ -25,8 +22,11 @@ fn same(x: &BigExponentFloat, y: &BigExponentFloat) -> bool {
 
 #[test]
 fn test_shr() {
-    let one = BigExponentFloat::ONE;
-    let test = |x: &BigExponentFloat, k: i64, out: &BigExponentFloat| {
+    let test = |s: &str, s_hex: &str, k: i64, t: &str, t_hex: &str| {
+        let x = &parse_big_exponent_float_hex(s_hex);
+        assert_eq!(x.to_string(), s);
+        let out = &parse_big_exponent_float_hex(t_hex);
+        assert_eq!(out.to_string(), t);
         let r = x.clone() >> k;
         assert!(r.is_valid());
         assert!(same(&r, out));
@@ -35,29 +35,25 @@ fn test_shr() {
         m >>= k;
         assert!(same(&m, out));
     };
-    test(&BigExponentFloat::NAN, 10, &BigExponentFloat::NAN);
+    test("NaN", "NaN", 10, "NaN", "NaN");
+    test("Infinity", "Infinity", -10, "Infinity", "Infinity");
+    test("0.0", "0x0.0", 10, "0.0", "0x0.0");
+    test("1.0", "0x1.0", 10, "0.00098", "0x0.004");
+    test("1.0", "0x1.0", -10, "1.0e3", "0x4.0E+2");
+    test("-12.0", "-0xc.0", 3, "-1.5", "-0x1.8");
     test(
-        &BigExponentFloat::INFINITY,
-        -10,
-        &BigExponentFloat::INFINITY,
-    );
-    test(&BigExponentFloat::ZERO, 10, &BigExponentFloat::ZERO);
-    test(&one, 10, &BigExponentFloat::from(1.0 / 1024.0));
-    test(&one, -10, &BigExponentFloat::from(1024u32));
-    test(
-        &BigExponentFloat::from(-12i32),
-        3,
-        &BigExponentFloat::from(-1.5),
-    );
-    test(
-        &one,
+        "1.0",
+        "0x1.0",
         i64::MAX,
-        &big_exponent_float_power_of_2(-Integer::from(i64::MAX)),
+        "1.4e-2776511644261678566",
+        "0x2.0E-2305843009213693952",
     );
     test(
-        &one,
+        "1.0",
+        "0x1.0",
         i64::MIN,
-        &big_exponent_float_power_of_2(-Integer::from(i64::MIN)),
+        "1.4e2776511644261678566",
+        "0x1.0E+2305843009213693952",
     );
 }
 

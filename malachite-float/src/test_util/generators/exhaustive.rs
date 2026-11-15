@@ -24,6 +24,7 @@ use crate::big_exponent_float::arithmetic::root::root_prec_round_generic;
 use crate::big_exponent_float::arithmetic::sqrt::sqrt_prec_round_generic;
 use crate::big_exponent_float::arithmetic::square::square_prec_round_generic;
 use crate::big_exponent_float::arithmetic::sub_rational::sub_rational_prec_round_generic;
+use crate::big_exponent_float::conversion::string::to_sci::to_sci_valid as big_exponent_float_to_sci_valid;
 use crate::big_exponent_float::exhaustive::exhaustive_big_exponent_floats;
 use crate::float::conversion::string::to_sci::to_sci_valid;
 use crate::float::exhaustive::{
@@ -10913,5 +10914,48 @@ pub fn exhaustive_big_exponent_float_vec_pair_gen_var_1()
                 .chain(ys)
                 .all(big_exponent_float_exponent_is_small)
         }),
+    )
+}
+
+// -- (BigExponentFloat, ToSciOptions) --
+
+// Whether `x` can be formatted using `options` with a string of manageable length: at most 10000
+// digits, and, for `Scale` or `Complete` sizing, which write every digit down to the point or to
+// the end of the expansion, an exponent of at most 10000 in absolute value.
+pub(crate) fn big_exponent_float_to_sci_options_valid(
+    x: &BigExponentFloat,
+    options: ToSciOptions,
+) -> bool {
+    const MAX_DIGITS: u64 = 10_000;
+    if !big_exponent_float_to_sci_valid(x, options) {
+        return false;
+    }
+    let exponent_small = match x.get_exponent() {
+        Some(exponent) => *exponent.unsigned_abs_ref() <= MAX_DIGITS,
+        None => true,
+    };
+    match options.get_size_options() {
+        SciSizeOptions::Precision(precision) => precision <= MAX_DIGITS,
+        SciSizeOptions::Scale(scale) => scale <= MAX_DIGITS && exponent_small,
+        SciSizeOptions::Complete => exponent_small,
+    }
+}
+
+pub fn exhaustive_big_exponent_float_to_sci_options_pair_gen()
+-> It<(BigExponentFloat, ToSciOptions)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_big_exponent_floats(),
+        exhaustive_to_sci_options(),
+    ))
+}
+
+pub fn exhaustive_big_exponent_float_to_sci_options_pair_gen_var_1()
+-> It<(BigExponentFloat, ToSciOptions)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_big_exponent_floats(),
+            exhaustive_to_sci_options(),
+        )
+        .filter(|(x, options)| big_exponent_float_to_sci_options_valid(x, *options)),
     )
 }

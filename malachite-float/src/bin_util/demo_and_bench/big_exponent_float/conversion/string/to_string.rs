@@ -27,6 +27,15 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_to_octal_string);
     register_demo!(runner, demo_big_exponent_float_to_string_base);
     register_demo!(runner, demo_big_exponent_float_to_string_base_upper);
+    register_demo!(runner, demo_big_exponent_float_to_string);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_to_string_base_non_power_of_2
+    );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_to_string_base_upper_non_power_of_2
+    );
 
     register_bench!(
         runner,
@@ -39,6 +48,11 @@ pub(crate) fn register(runner: &mut Runner) {
         runner,
         benchmark_big_exponent_float_to_string_base_float_comparison
     );
+    register_bench!(
+        runner,
+        benchmark_big_exponent_float_to_string_float_comparison
+    );
+    register_bench!(runner, benchmark_big_exponent_float_to_string);
 }
 
 fn demo_big_exponent_float_to_lower_hex_string(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -215,5 +229,91 @@ fn benchmark_big_exponent_float_to_string_base_float_comparison(
                 no_out!(f.to_string_base(32));
             }),
         ],
+    );
+}
+
+fn demo_big_exponent_float_to_string(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in big_exponent_float_gen().get(gm, config).take(limit) {
+        println!(
+            "({}).to_string() = {x}",
+            big_exponent_float_exact_string(&x)
+        );
+    }
+}
+
+fn demo_big_exponent_float_to_string_base_non_power_of_2(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for x in big_exponent_float_gen().get(gm, config).take(limit) {
+        for base in [3, 10, 36] {
+            println!(
+                "({}).to_string_base({base}) = {}",
+                big_exponent_float_exact_string(&x),
+                x.to_string_base(base)
+            );
+        }
+    }
+}
+
+fn demo_big_exponent_float_to_string_base_upper_non_power_of_2(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for x in big_exponent_float_gen().get(gm, config).take(limit) {
+        for base in [7, 20] {
+            println!(
+                "({}).to_string_base_upper({base}) = {}",
+                big_exponent_float_exact_string(&x),
+                x.to_string_base_upper(base)
+            );
+        }
+    }
+}
+
+fn benchmark_big_exponent_float_to_string_float_comparison(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "BigExponentFloat.to_string()",
+        BenchmarkType::LibraryComparison,
+        big_exponent_float_gen_var_1_float().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_2_big_exponent_float_complexity_bucketer("x"),
+        &mut [
+            ("BigExponentFloat", &mut |(_, x)| {
+                no_out!(x.to_string());
+            }),
+            ("Float", &mut |(f, _)| {
+                no_out!(f.to_string());
+            }),
+        ],
+    );
+}
+
+fn benchmark_big_exponent_float_to_string(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "BigExponentFloat.to_string()",
+        BenchmarkType::Single,
+        big_exponent_float_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &big_exponent_float_complexity_bucketer("x"),
+        &mut [("Malachite", &mut |x| {
+            no_out!(x.to_string());
+        })],
     );
 }

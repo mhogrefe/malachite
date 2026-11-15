@@ -38,8 +38,8 @@ impl Abs for BigExponentFloat {
     ///     BigExponentFloat::INFINITY
     /// );
     /// assert_eq!(BigExponentFloat::ZERO.abs(), BigExponentFloat::ZERO);
-    /// assert_eq!(format!("{:?}", BigExponentFloat::from(-1.5).abs()), "0x1.8");
-    /// assert_eq!(format!("{:?}", BigExponentFloat::from(1.5).abs()), "0x1.8");
+    /// assert_eq!(BigExponentFloat::from(-1.5).abs().to_string(), "1.5");
+    /// assert_eq!(BigExponentFloat::from(1.5).abs().to_string(), "1.5");
     /// ```
     #[inline]
     fn abs(mut self) -> Self {
@@ -78,14 +78,8 @@ impl Abs for &BigExponentFloat {
     ///     BigExponentFloat::INFINITY
     /// );
     /// assert_eq!((&BigExponentFloat::ZERO).abs(), BigExponentFloat::ZERO);
-    /// assert_eq!(
-    ///     format!("{:?}", (&BigExponentFloat::from(-1.5)).abs()),
-    ///     "0x1.8"
-    /// );
-    /// assert_eq!(
-    ///     format!("{:?}", (&BigExponentFloat::from(1.5)).abs()),
-    ///     "0x1.8"
-    /// );
+    /// assert_eq!(((&BigExponentFloat::from(-1.5)).abs()).to_string(), "1.5");
+    /// assert_eq!(((&BigExponentFloat::from(1.5)).abs()).to_string(), "1.5");
     /// ```
     #[inline]
     fn abs(self) -> BigExponentFloat {
@@ -121,7 +115,7 @@ impl AbsAssign for BigExponentFloat {
     ///
     /// let mut x = BigExponentFloat::from(-1.5);
     /// x.abs_assign();
-    /// assert_eq!(format!("{x:?}"), "0x1.8");
+    /// assert_eq!(x.to_string(), "1.5");
     /// ```
     fn abs_assign(&mut self) {
         if let Self(Finite { sign, .. } | Infinity { sign }) = self {

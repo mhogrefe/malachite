@@ -28,8 +28,9 @@ use std::str::FromStr;
 fn test_significand_exponent_and_prec() {
     // `odd` is the significand with its trailing zeros removed, which does not depend on the limb
     // width
-    let test = |s, odd: &str, exponent: Option<&str>, prec: Option<u64>| {
-        let x = parse_big_exponent_float_hex(s);
+    let test = |s, s_hex, odd: &str, exponent: Option<&str>, prec: Option<u64>| {
+        let x = parse_big_exponent_float_hex(s_hex);
+        assert_eq!(x.to_string(), s);
         let odd_part = |n: &Natural| (n >> n.trailing_zeros().unwrap()).to_string();
         let significand = x.to_significand();
         assert_eq!(x.significand_ref(), significand.as_ref());
@@ -41,14 +42,21 @@ fn test_significand_exponent_and_prec() {
         );
         assert_eq!(x.get_prec(), prec);
     };
-    test("NaN", "", None, None);
-    test("Infinity", "", None, None);
-    test("0x0.0", "", None, None);
-    test("0x1.0#1", "1", Some("1"), Some(1));
-    test("0x1.0000000000000000000000000#100", "1", Some("1"), Some(1));
-    test("-0x1.8#2", "3", Some("1"), Some(2));
-    test("0x0.8#1", "1", Some("0"), Some(1));
+    test("NaN", "NaN", "", None, None);
+    test("Infinity", "Infinity", "", None, None);
+    test("0.0", "0x0.0", "", None, None);
+    test("1.0", "0x1.0#1", "1", Some("1"), Some(1));
     test(
+        "1.0",
+        "0x1.0000000000000000000000000#100",
+        "1",
+        Some("1"),
+        Some(1),
+    );
+    test("-1.5", "-0x1.8#2", "3", Some("1"), Some(2));
+    test("0.50", "0x0.8#1", "1", Some("0"), Some(1));
+    test(
+        "3.1415926535897931",
         "0x3.243f6a8885a30#53",
         "884279719003555",
         Some("2"),
@@ -56,6 +64,7 @@ fn test_significand_exponent_and_prec() {
     );
     // - a trailing zero limb of the `Float` is dropped
     test(
+        "1.0000000000000000000000000000016",
         "0x1.0000000000000000000000002#100",
         "633825300114114700748351602689",
         Some("1"),
@@ -104,40 +113,76 @@ fn significand_exponent_and_prec_properties() {
 
 #[test]
 fn test_round_to_prec_round() {
-    let test = |s, prec, rm, out: &str, o: &str| {
-        let x = parse_big_exponent_float_hex(s);
+    let test = |s, s_hex, prec, rm, out: &str, out_hex: &str, o: &str| {
+        let x = parse_big_exponent_float_hex(s_hex);
+        assert_eq!(x.to_string(), s);
         let (y, o_out) = x.round_to_prec_round_ref(prec, rm);
         assert!(y.is_valid());
-        assert_eq!(format!("{y:#x}"), out);
+        assert_eq!(format!("{y:#x}"), out_hex);
+        assert_eq!(y.to_string(), out);
         assert_eq!(format!("{o_out:?}"), o);
         let (y_alt, o_alt) = x.clone().round_to_prec_round(prec, rm);
-        assert_eq!(format!("{y_alt:#x}"), out);
+        assert_eq!(format!("{y_alt:#x}"), out_hex);
         assert_eq!(o_alt, o_out);
         let mut x_alt = x;
         assert_eq!(x_alt.round_to_prec_round_assign(prec, rm), o_out);
-        assert_eq!(format!("{x_alt:#x}"), out);
+        assert_eq!(format!("{x_alt:#x}"), out_hex);
     };
-    test("NaN", 1, Floor, "NaN", "Equal");
-    test("-Infinity", 1, Floor, "-Infinity", "Equal");
-    test("0x0.0", 1, Exact, "0x0.0", "Equal");
-    test("0x1.8#2", 2, Exact, "0x1.8", "Equal");
-    test("0x1.8#2", 1, Floor, "0x1.0", "Less");
-    test("0x1.8#2", 1, Ceiling, "0x2.0", "Greater");
-    test("0x1.8#2", 1, Nearest, "0x2.0", "Greater");
-    test("-0x1.8#2", 1, Floor, "-0x2.0", "Less");
-    test("-0x1.8#2", 1, Down, "-0x1.0", "Greater");
-    test("0x3.243f6a8885a30#53", 10, Nearest, "0x3.24", "Less");
-    test("0x3.243f6a8885a30#53", 10, Ceiling, "0x3.25", "Greater");
+    test("NaN", "NaN", 1, Floor, "NaN", "NaN", "Equal");
+    test(
+        "-Infinity",
+        "-Infinity",
+        1,
+        Floor,
+        "-Infinity",
+        "-Infinity",
+        "Equal",
+    );
+    test("0.0", "0x0.0", 1, Exact, "0.0", "0x0.0", "Equal");
+    test("1.5", "0x1.8#2", 2, Exact, "1.5", "0x1.8", "Equal");
+    test("1.5", "0x1.8#2", 1, Floor, "1.0", "0x1.0", "Less");
+    test("1.5", "0x1.8#2", 1, Ceiling, "2.0", "0x2.0", "Greater");
+    test("1.5", "0x1.8#2", 1, Nearest, "2.0", "0x2.0", "Greater");
+    test("-1.5", "-0x1.8#2", 1, Floor, "-2.0", "-0x2.0", "Less");
+    test("-1.5", "-0x1.8#2", 1, Down, "-1.0", "-0x1.0", "Greater");
+    test(
+        "3.1415926535897931",
+        "0x3.243f6a8885a30#53",
+        10,
+        Nearest,
+        "3.141",
+        "0x3.24",
+        "Less",
+    );
+    test(
+        "3.1415926535897931",
+        "0x3.243f6a8885a30#53",
+        10,
+        Ceiling,
+        "3.1445",
+        "0x3.25",
+        "Greater",
+    );
     // - rounding up carries into the next power of 2
     test(
+        "1.9999999999999999999999999999984",
         "0x1.ffffffffffffffffffffffffe#100",
         10,
         Up,
+        "2.0",
         "0x2.0",
         "Greater",
     );
     // - a carry that would overflow a `Float` just increments the exponent
-    test("0x7.f0E+268435455#10", 2, Up, "0x8.0E+268435455", "Greater");
+    test(
+        "2.082e323228496",
+        "0x7.f0E+268435455#10",
+        2,
+        Up,
+        "2.1e323228496",
+        "0x8.0E+268435455",
+        "Greater",
+    );
 }
 
 #[test]

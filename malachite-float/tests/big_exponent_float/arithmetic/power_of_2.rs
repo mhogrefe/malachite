@@ -9,13 +9,17 @@
 use malachite_base::num::arithmetic::traits::{IsPowerOf2, PowerOf2};
 use malachite_base::num::basic::traits::One;
 use malachite_base::test_util::generators::{signed_gen, unsigned_gen};
-use malachite_float::test_util::big_exponent_float::float_to_big_exponent_float;
+use malachite_float::test_util::big_exponent_float::{
+    float_to_big_exponent_float, parse_big_exponent_float_hex,
+};
 use malachite_float::{BigExponentFloat, Float};
 use malachite_nz::integer::Integer;
 
 #[test]
 fn test_power_of_2() {
-    let test = |n: i64, expected: BigExponentFloat| {
+    let test = |n: i64, s: &str, s_hex: &str| {
+        let expected = parse_big_exponent_float_hex(s_hex);
+        assert_eq!(expected.to_string(), s);
         let x = BigExponentFloat::power_of_2(n);
         assert!(x.is_valid());
         assert_eq!(x, expected);
@@ -23,11 +27,11 @@ fn test_power_of_2() {
             assert_eq!(BigExponentFloat::power_of_2(u), expected);
         }
     };
-    test(0, BigExponentFloat::ONE);
-    test(1, BigExponentFloat::from(2));
-    test(10, BigExponentFloat::from(1024));
-    test(-1, BigExponentFloat::from(0.5));
-    test(-10, BigExponentFloat::from(1.0 / 1024.0));
+    test(0, "1.0", "0x1.0");
+    test(1, "2.0", "0x2.0");
+    test(10, "1.0e3", "0x4.0E+2");
+    test(-1, "0.50", "0x0.8");
+    test(-10, "0.00098", "0x0.004");
     // The extremes of the exponent types are exact: 2^n has exponent n + 1.
     assert_eq!(
         *BigExponentFloat::power_of_2(u64::MAX)

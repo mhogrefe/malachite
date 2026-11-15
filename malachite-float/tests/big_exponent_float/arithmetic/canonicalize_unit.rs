@@ -9,9 +9,10 @@
 use malachite_base::num::arithmetic::traits::{
     Abs, CanonicalizeUnit, CanonicalizeUnitAssign, IsUnit,
 };
-use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, One, Zero};
+use malachite_base::num::basic::traits::One;
 use malachite_float::BigExponentFloat;
 use malachite_float::big_exponent_float::ComparableBigExponentFloatRef;
+use malachite_float::test_util::big_exponent_float::parse_big_exponent_float_hex;
 use malachite_float::test_util::generators::big_exponent_float_gen;
 
 fn same(x: &BigExponentFloat, y: &BigExponentFloat) -> bool {
@@ -20,20 +21,17 @@ fn same(x: &BigExponentFloat, y: &BigExponentFloat) -> bool {
 
 #[test]
 fn test_canonicalize_unit() {
-    let nan = BigExponentFloat::NAN;
-    assert!(same(&(&nan).canonicalize_unit(), &nan));
-    assert!(same(
-        &BigExponentFloat::NEGATIVE_INFINITY.canonicalize_unit(),
-        &BigExponentFloat::INFINITY
-    ));
-    assert!(same(
-        &BigExponentFloat::ZERO.canonicalize_unit(),
-        &BigExponentFloat::ZERO
-    ));
-    assert!(same(
-        &BigExponentFloat::from(-1.5).canonicalize_unit(),
-        &BigExponentFloat::ONE
-    ));
+    let test = |x: &str, x_hex: &str, out: &str, out_hex: &str| {
+        assert_eq!(parse_big_exponent_float_hex(x_hex).to_string(), x);
+        let x = &parse_big_exponent_float_hex(x_hex);
+        assert_eq!(parse_big_exponent_float_hex(out_hex).to_string(), out);
+        let out = &parse_big_exponent_float_hex(out_hex);
+        assert!(same(&x.canonicalize_unit(), out));
+    };
+    test("NaN", "NaN", "NaN", "NaN");
+    test("-Infinity", "-Infinity", "Infinity", "Infinity");
+    test("0.0", "0x0.0", "0.0", "0x0.0");
+    test("-1.5", "-0x1.8", "1.0", "0x1.0");
 }
 
 #[test]

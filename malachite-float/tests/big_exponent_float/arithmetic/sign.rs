@@ -6,27 +6,37 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::Sign;
-use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, One, Zero};
+use malachite_base::num::basic::traits::{NaN, Zero};
 use malachite_float::BigExponentFloat;
 use malachite_float::test_util::big_exponent_float::{
-    big_exponent_float_power_of_2, float_to_big_exponent_float,
+    float_to_big_exponent_float, parse_big_exponent_float_hex,
 };
 use malachite_float::test_util::generators::{big_exponent_float_gen, float_gen};
-use malachite_nz::integer::Integer;
 use std::cmp::Ordering::*;
 
 #[test]
 fn test_sign() {
-    assert_eq!(BigExponentFloat::INFINITY.sign(), Greater);
-    assert_eq!(BigExponentFloat::NEGATIVE_INFINITY.sign(), Less);
-    assert_eq!(BigExponentFloat::ZERO.sign(), Equal);
-    assert_eq!(BigExponentFloat::ONE.sign(), Greater);
-    assert_eq!(BigExponentFloat::from(-1.5).sign(), Less);
-    let huge = big_exponent_float_power_of_2(Integer::from_str("100000000000000000000").unwrap());
-    assert_eq!(huge.sign(), Greater);
-    assert_eq!((-huge).sign(), Less);
+    let test = |x: &str, x_hex: &str, out| {
+        assert_eq!(parse_big_exponent_float_hex(x_hex).to_string(), x);
+        let x = &parse_big_exponent_float_hex(x_hex);
+        assert_eq!(x.sign(), out);
+    };
+    test("Infinity", "Infinity", Greater);
+    test("-Infinity", "-Infinity", Less);
+    test("0.0", "0x0.0", Equal);
+    test("1.0", "0x1.0", Greater);
+    test("-1.5", "-0x1.8", Less);
+    test(
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        Greater,
+    );
+    test(
+        "-2.4e30102999566398119521",
+        "-0x1.0E+25000000000000000000",
+        Less,
+    );
 }
 
 #[test]

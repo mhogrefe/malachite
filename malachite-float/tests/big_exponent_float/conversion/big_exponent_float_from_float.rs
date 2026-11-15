@@ -12,25 +12,42 @@ use malachite_float::{BigExponentFloat, Float};
 
 #[test]
 fn test_from_float() {
-    let test = |s, out| {
-        let f = parse_hex_string(s);
+    let test = |s, s_hex, out, out_hex| {
+        let f = parse_hex_string(s_hex);
+        assert_eq!(f.to_string(), s);
         let x = BigExponentFloat::from(f.clone());
         assert!(x.is_valid());
-        assert_eq!(format!("{x:#x}"), out);
-        assert_eq!(format!("{:#x}", BigExponentFloat::from(&f)), out);
+        assert_eq!(format!("{x:#x}"), out_hex);
+        assert_eq!(x.to_string(), out);
+        assert_eq!(format!("{:#x}", BigExponentFloat::from(&f)), out_hex);
     };
-    test("NaN", "NaN");
-    test("Infinity", "Infinity");
-    test("-Infinity", "-Infinity");
-    test("0x0.0", "0x0.0");
+    test("NaN", "NaN", "NaN", "NaN");
+    test("Infinity", "Infinity", "Infinity", "Infinity");
+    test("-Infinity", "-Infinity", "-Infinity", "-Infinity");
+    test("0.0", "0x0.0", "0.0", "0x0.0");
     // - negative zero loses its sign
-    test("-0x0.0", "0x0.0");
-    test("0x1.8#2", "0x1.8");
-    test("-0x1.8#2", "-0x1.8");
+    test("-0.0", "-0x0.0", "0.0", "0x0.0");
+    test("1.5", "0x1.8#2", "1.5", "0x1.8");
+    test("-1.5", "-0x1.8#2", "-1.5", "-0x1.8");
     // - trailing zero limbs are dropped
-    test("0x1.0000000000000000000000000#100", "0x1.0");
-    test("0x4.0E+268435455#1", "0x4.0E+268435455");
-    test("0x1.0E-268435456#1", "0x1.0E-268435456");
+    test(
+        "1.0000000000000000000000000000000",
+        "0x1.0000000000000000000000000#100",
+        "1.0",
+        "0x1.0",
+    );
+    test(
+        "1.0e323228496",
+        "0x4.0E+268435455#1",
+        "1.0e323228496",
+        "0x4.0E+268435455",
+    );
+    test(
+        "2.4e-323228497",
+        "0x1.0E-268435456#1",
+        "2.4e-323228497",
+        "0x1.0E-268435456",
+    );
 }
 
 #[test]

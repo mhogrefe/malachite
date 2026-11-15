@@ -7,15 +7,18 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::big_exponent_float::InnerBigExponentFloat::Finite;
+use crate::big_exponent_float::conversion::string::to_sci::to_sci_string;
 use crate::big_exponent_float::{
     BigExponentFloat, ComparableBigExponentFloat, ComparableBigExponentFloatRef,
 };
+use crate::float::conversion::string::get_str::get_str_digit_count;
 use crate::{Float, InnerFloat};
 use alloc::format;
 use alloc::string::String;
-use core::fmt::{Binary, Debug, Formatter, LowerHex, Octal, Result, UpperHex};
+use core::fmt::{Binary, Debug, Display, Formatter, LowerHex, Octal, Result, UpperHex};
 use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{DivExact, Mod};
+use malachite_base::num::conversion::string::options::ToSciOptions;
 use malachite_base::num::conversion::traits::{ExactFrom, ToStringBase};
 use malachite_base::strings::{ToBinaryString, ToLowerHexString, ToOctalString, ToUpperHexString};
 use malachite_nz::integer::Integer;
@@ -250,62 +253,102 @@ impl Octal for BigExponentFloat {
 pub(crate) fn power_of_2_base_log(base: u8) -> u64 {
     assert!(
         base.is_power_of_two() && (2..=32).contains(&base),
-        "BigExponentFloat supports only power-of-2 bases from 2 to 32 for now, not {base}"
+        "{base} is not a power of 2 from 2 to 32"
     );
     u64::from(base.trailing_zeros())
 }
 
+// The options for writing a finite nonzero `x` in a base that is not a power of 2 with the digit
+// count that round-trips a `Float` of `x`'s precision, as `Float`'s `Display` and `ToStringBase`
+// do.
+fn round_trip_options(x: &BigExponentFloat, base: u8, uppercase: bool) -> ToSciOptions {
+    let mut options = ToSciOptions::default();
+    options.set_base(base);
+    if uppercase {
+        options.set_uppercase();
+        // so that the whole string, exponent marker included, is the uppercase of the lowercase
+        // form; from base 15 up the mandatory sign on the exponent keeps `E` the digit distinct
+        // from `E` the marker
+        options.set_e_uppercase();
+    }
+    if let Some(prec) = x.get_prec() {
+        options.set_precision(u64::exact_from(get_str_digit_count(u64::from(base), prec)));
+        options.set_include_trailing_zeros(true);
+    }
+    options
+}
+
 impl ToStringBase for BigExponentFloat {
-    /// Converts a [`BigExponentFloat`] to a [`String`] using a specified base, which must for now
-    /// be a power of 2: 2, 4, 8, 16, or 32. Digits from 10 to 31 become the lowercase [`char`]s
-    /// `'a'` to `'v'`.
+    /// Converts a [`BigExponentFloat`] to a [`String`] using a specified base.
+    ///
+    /// Digits from 0 to 9 become [`char`]s from `'0'` to `'9'`, and digits from 10 to 35 become the
+    /// lowercase [`char`]s `'a'` to `'z'`.
     ///
     /// In a power-of-2 base every [`BigExponentFloat`] is exactly representable, so the output has
-    /// exactly as many digits as are needed to write the value. The output is that of [`Float`]'s
-    /// [`ToStringBase`] for a [`Float`] with the same value and precision, continued to exponents
-    /// outside [`Float`]'s range. Other bases need arithmetic to scale huge exponents, and will be
-    /// supported once [`BigExponentFloat`] has it.
+    /// exactly as many digits as are needed to write the value; base 10 writes what [`Display`]
+    /// writes. In any other base the value is rounded to nearest, to the number of digits that
+    /// round-trips a [`Float`] whose precision is the number of significant bits of `self`, with
+    /// trailing zeros kept to reach it. For a value within [`Float`]'s exponent range, the output
+    /// is that of [`Float`]'s [`ToStringBase`] for the [`Float`] with the same value and that
+    /// precision; the exponent may be arbitrarily large.
+    ///
+    /// Values whose exponent is far from zero use scientific notation. From base 15 upward the
+    /// exponent always carries an explicit sign, since `'e'` is a digit in those bases and the sign
+    /// is what distinguishes the exponent from the digits.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n)$
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
     ///
-    /// $M(n) = O(n)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.complexity()`.
     ///
     /// # Panics
-    /// Panics if `base` is not 2, 4, 8, 16, or 32.
+    /// Panics if `base` is less than 2 or greater than 36.
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::conversion::traits::ToStringBase;
+    /// use malachite_base::num::conversion::traits::{FromStringBase, ToStringBase};
     /// use malachite_float::{BigExponentFloat, Float};
     ///
     /// let x = BigExponentFloat::from(Float::from(1.5));
     /// assert_eq!(x.to_string_base(2), "1.1");
-    /// assert_eq!(x.to_string_base(4), "1.2");
+    /// assert_eq!(x.to_string_base(3), "1.11");
     /// assert_eq!(x.to_string_base(32), "1.g");
+    ///
+    /// // 2^(10^20), whose decimal exponent is far beyond `Float`'s range.
+    /// let x = BigExponentFloat::from_string_base(2, "1.0E+100000000000000000000").unwrap();
+    /// assert_eq!(x.to_string_base(10), "2.4e30102999566398119521");
     /// ```
     fn to_string_base(&self, base: u8) -> String {
-        let log_base = power_of_2_base_log(base);
-        power_of_2_base_string(self, log_base, &|x| x.to_string_base(base))
+        assert!((2..=36).contains(&base), "base out of range");
+        if base.is_power_of_two() {
+            let log_base = power_of_2_base_log(base);
+            power_of_2_base_string(self, log_base, &|x| x.to_string_base(base))
+        } else {
+            to_sci_string(self, round_trip_options(self, base, false))
+        }
     }
 
-    /// Converts a [`BigExponentFloat`] to a [`String`] using a specified base, which must for now
-    /// be a power of 2: 2, 4, 8, 16, or 32. Digits from 10 to 31 become the uppercase [`char`]s
-    /// `'A'` to `'V'`.
+    /// Converts a [`BigExponentFloat`] to a [`String`] using a specified base, with digits being
+    /// uppercase.
     ///
-    /// See [`ToStringBase::to_string_base`] for details.
+    /// Digits from 0 to 9 become [`char`]s from `'0'` to `'9'`, and digits from 10 to 35 become the
+    /// uppercase [`char`]s `'A'` to `'Z'`.
+    ///
+    /// This is [`to_string_base`](ToStringBase::to_string_base) with the whole string uppercased,
+    /// the exponent marker included. The special values `NaN`, `Infinity`, and `-Infinity` keep
+    /// their spelling, as they do in every base.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n)$
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
     ///
-    /// $M(n) = O(n)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.complexity()`.
     ///
     /// # Panics
-    /// Panics if `base` is not 2, 4, 8, 16, or 32.
+    /// Panics if `base` is less than 2 or greater than 36.
     ///
     /// # Examples
     /// ```
@@ -314,10 +357,66 @@ impl ToStringBase for BigExponentFloat {
     ///
     /// let x = BigExponentFloat::from(Float::from(1.5));
     /// assert_eq!(x.to_string_base_upper(32), "1.G");
+    /// assert_eq!(x.to_string_base_upper(20), "1.A");
     /// ```
     fn to_string_base_upper(&self, base: u8) -> String {
-        let log_base = power_of_2_base_log(base);
-        power_of_2_base_string(self, log_base, &|x| x.to_string_base_upper(base))
+        assert!((2..=36).contains(&base), "base out of range");
+        if base.is_power_of_two() {
+            let log_base = power_of_2_base_log(base);
+            power_of_2_base_string(self, log_base, &|x| x.to_string_base_upper(base))
+        } else {
+            to_sci_string(self, round_trip_options(self, base, true))
+        }
+    }
+}
+
+impl Display for BigExponentFloat {
+    /// Converts a [`BigExponentFloat`] to a [`String`], in base 10.
+    ///
+    /// The value is rounded to nearest, to the number of significant digits that round-trips a
+    /// [`Float`] whose precision is the number of significant bits of `self`, with trailing zeros
+    /// kept to reach it. For a value within [`Float`]'s exponent range, the output is what
+    /// [`Float`]'s [`Display`] writes for the [`Float`] with the same value and that precision; the
+    /// exponent may be arbitrarily large. Values whose exponent is far from zero use scientific
+    /// notation, and a finite value always shows a point. `NaN` and the infinities are written as
+    /// `NaN`, `Infinity`, and `-Infinity`.
+    ///
+    /// Since the output is rounded, it does not in general determine the value; [`Debug`], which
+    /// writes the value in hexadecimal, is exact.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.complexity()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{Infinity, NaN, One, Zero};
+    /// use malachite_base::num::conversion::traits::FromStringBase;
+    /// use malachite_float::BigExponentFloat;
+    ///
+    /// assert_eq!(BigExponentFloat::NAN.to_string(), "NaN");
+    /// assert_eq!(BigExponentFloat::INFINITY.to_string(), "Infinity");
+    /// assert_eq!(BigExponentFloat::ZERO.to_string(), "0.0");
+    /// assert_eq!(BigExponentFloat::ONE.to_string(), "1.0");
+    /// assert_eq!(
+    ///     BigExponentFloat::from(0.1).to_string(),
+    ///     "0.10000000000000001"
+    /// );
+    /// assert_eq!(
+    ///     BigExponentFloat::from(core::f64::consts::PI).to_string(),
+    ///     "3.1415926535897931"
+    /// );
+    ///
+    /// // 2^(-10^20)
+    /// let x = BigExponentFloat::from_string_base(2, "1.0E-100000000000000000000").unwrap();
+    /// assert_eq!(x.to_string(), "4.2e-30102999566398119522");
+    /// ```
+    #[inline]
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        f.write_str(&to_sci_string(self, round_trip_options(self, 10, false)))
     }
 }
 

@@ -49,11 +49,11 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::champernowne_constant_base_prec_round(16, 100, Floor);
-    /// assert_eq!(format!("{x:?}"), "0x0.123456789abcdef1011121314");
+    /// assert_eq!(x.to_string(), "0.0711111111111111102365063523810");
     /// assert_eq!(o, Less);
     ///
     /// let (x, o) = BigExponentFloat::champernowne_constant_base_prec_round(16, 100, Ceiling);
-    /// assert_eq!(format!("{x:?}"), "0x0.123456789abcdef10111213142");
+    /// assert_eq!(x.to_string(), "0.071111111111111110236506352381062");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -94,11 +94,11 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::champernowne_constant_base_prec(16, 100);
-    /// assert_eq!(format!("{x:?}"), "0x0.123456789abcdef10111213142");
+    /// assert_eq!(x.to_string(), "0.071111111111111110236506352381062");
     /// assert_eq!(o, Greater);
     ///
     /// let (x, o) = BigExponentFloat::champernowne_constant_base_prec(3, 50);
-    /// assert_eq!(format!("{x:?}"), "0x0.9955528d3fea");
+    /// assert_eq!(x.to_string(), "0.5989581675384343");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -147,11 +147,11 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::champernowne_constant_prec_round(100, Floor);
-    /// assert_eq!(format!("{x:?}"), "0x0.1f9add37a88fe81c1a98fb84dc");
+    /// assert_eq!(x.to_string(), "0.1234567891011121314151617181920");
     /// assert_eq!(o, Less);
     ///
     /// let (x, o) = BigExponentFloat::champernowne_constant_prec_round(100, Ceiling);
-    /// assert_eq!(format!("{x:?}"), "0x0.1f9add37a88fe81c1a98fb84de");
+    /// assert_eq!(x.to_string(), "0.12345678910111213141516171819207");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -198,7 +198,7 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::champernowne_constant_prec(100);
-    /// assert_eq!(format!("{x:?}"), "0x0.1f9add37a88fe81c1a98fb84de");
+    /// assert_eq!(x.to_string(), "0.12345678910111213141516171819207");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]

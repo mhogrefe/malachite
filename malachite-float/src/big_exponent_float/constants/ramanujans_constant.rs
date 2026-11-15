@@ -47,11 +47,11 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::ramanujans_constant_prec_round(100, Floor);
-    /// assert_eq!(format!("{x:?}"), "0x3a4b862c4b402e7.ffffffffff");
+    /// assert_eq!(x.to_string(), "262537412640768743.9999999999991");
     /// assert_eq!(o, Less);
     ///
     /// let (x, o) = BigExponentFloat::ramanujans_constant_prec_round(100, Ceiling);
-    /// assert_eq!(format!("{x:?}"), "0x3a4b862c4b402e7.ffffffffff4");
+    /// assert_eq!(x.to_string(), "262537412640768743.99999999999932");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -93,19 +93,19 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::ramanujans_constant_prec(1);
-    /// assert_eq!(format!("{x:?}"), "0x4.0E+14");
+    /// assert_eq!(x.to_string(), "2.9e17");
     /// assert_eq!(o, Greater);
     ///
     /// let (x, o) = BigExponentFloat::ramanujans_constant_prec(10);
-    /// assert_eq!(format!("{x:?}"), "0x3.a5E+14");
+    /// assert_eq!(x.to_string(), "2.6262e17");
     /// assert_eq!(o, Greater);
     ///
     /// let (x, o) = BigExponentFloat::ramanujans_constant_prec(97);
-    /// assert_eq!(format!("{x:?}"), "0x3a4b862c4b402e8.0");
+    /// assert_eq!(x.to_string(), "262537412640768744.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (x, o) = BigExponentFloat::ramanujans_constant_prec(100);
-    /// assert_eq!(format!("{x:?}"), "0x3a4b862c4b402e7.ffffffffff4");
+    /// assert_eq!(x.to_string(), "262537412640768743.99999999999932");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]

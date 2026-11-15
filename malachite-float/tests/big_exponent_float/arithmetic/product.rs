@@ -6,14 +6,12 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use core::str::FromStr;
-use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, One, Two, Zero};
+use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_float::big_exponent_float::ComparableBigExponentFloatRef;
 use malachite_float::test_util::big_exponent_float::{
-    big_exponent_float_exponent_is_small, big_exponent_float_power_of_2,
-    float_to_big_exponent_float,
+    big_exponent_float_exponent_is_small, float_to_big_exponent_float, parse_big_exponent_float_hex,
 };
 use malachite_float::test_util::generators::{
     big_exponent_float_vec_gen_var_1,
@@ -21,7 +19,6 @@ use malachite_float::test_util::generators::{
     float_vec_unsigned_rounding_mode_triple_gen_var_3,
 };
 use malachite_float::{BigExponentFloat, Float};
-use malachite_nz::integer::Integer;
 use malachite_q::Rational;
 use std::cmp::Ordering::{self, *};
 
@@ -66,64 +63,58 @@ fn product_all(xs: &[BigExponentFloat]) -> BigExponentFloat {
 
 #[test]
 fn test_product_prec_round() {
-    let check =
-        |xs: &[BigExponentFloat], prec: u64, rm: RoundingMode, out: &BigExponentFloat, o| {
-            let r = product_prec_round_all(xs, prec, rm);
-            assert!(same(&r.0, out), "{:?} != {out:?}", r.0);
-            assert_eq!(r.1, o);
-        };
-    let big = Integer::from_str("100000000000000000000").unwrap();
-    let huge = big_exponent_float_power_of_2(big.clone());
-    let tiny = big_exponent_float_power_of_2(-big.clone());
-    let one = BigExponentFloat::ONE;
-    check(&[], 10, Floor, &one, Equal);
+    let check = |xs_hex: &[&str], prec: u64, rm: RoundingMode, out: &str, out_hex: &str, o| {
+        let xs = &xs_hex
+            .iter()
+            .map(|s| parse_big_exponent_float_hex(s))
+            .collect::<Vec<_>>();
+        assert_eq!(parse_big_exponent_float_hex(out_hex).to_string(), out);
+        let out = &parse_big_exponent_float_hex(out_hex);
+        let r = product_prec_round_all(xs, prec, rm);
+        assert!(same(&r.0, out), "{:?} != {out:?}", r.0);
+        assert_eq!(r.1, o);
+    };
+    check(&[], 10, Floor, "1.0", "0x1.0", Equal);
+    check(&["NaN", "0x1.0"], 10, Floor, "NaN", "NaN", Equal);
+    check(&["Infinity", "0x0.0"], 10, Floor, "NaN", "NaN", Equal);
     check(
-        &[BigExponentFloat::NAN, one.clone()],
+        &["Infinity", "-0x2.0"],
         10,
         Floor,
-        &BigExponentFloat::NAN,
+        "-Infinity",
+        "-Infinity",
         Equal,
     );
     check(
-        &[BigExponentFloat::INFINITY, BigExponentFloat::ZERO],
+        &["0x0.0", "0x1.0E+25000000000000000000"],
         10,
         Floor,
-        &BigExponentFloat::NAN,
+        "0.0",
+        "0x0.0",
         Equal,
     );
     check(
-        &[BigExponentFloat::INFINITY, BigExponentFloat::from(-2.0)],
-        10,
-        Floor,
-        &BigExponentFloat::NEGATIVE_INFINITY,
-        Equal,
-    );
-    check(
-        &[BigExponentFloat::ZERO, huge.clone()],
-        10,
-        Floor,
-        &BigExponentFloat::ZERO,
-        Equal,
-    );
-    check(
-        &[huge.clone(), tiny.clone(), BigExponentFloat::from(3.0)],
+        &["0x1.0E+25000000000000000000", "0x1.0E-25000000000000000000", "0x3.0"],
         2,
         Exact,
-        &BigExponentFloat::from(3.0),
+        "3.0",
+        "0x3.0",
         Equal,
     );
     check(
-        &[huge.clone(), huge.clone()],
+        &["0x1.0E+25000000000000000000", "0x1.0E+25000000000000000000"],
         1,
         Exact,
-        &big_exponent_float_power_of_2(big * Integer::TWO),
+        "5.6e60205999132796239042",
+        "0x1.0E+50000000000000000000",
         Equal,
     );
     check(
-        &[BigExponentFloat::from(3.0), BigExponentFloat::from(3.0), BigExponentFloat::from(3.0)],
+        &["0x3.0", "0x3.0", "0x3.0"],
         3,
         Floor,
-        &BigExponentFloat::from(24.0),
+        "24.0",
+        "0x18.0",
         Less,
     );
 }

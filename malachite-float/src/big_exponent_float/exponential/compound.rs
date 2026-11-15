@@ -224,27 +224,27 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (y, o) = BigExponentFloat::from(PI).compound_prec_round(3, 5, Floor);
-    /// assert_eq!(format!("{y:?}"), "0x44.0");
+    /// assert_eq!(y.to_string(), "68.0");
     /// assert_eq!(o, Less);
     ///
     /// let (y, o) = BigExponentFloat::from(PI).compound_prec_round(3, 5, Ceiling);
-    /// assert_eq!(format!("{y:?}"), "0x48.0");
+    /// assert_eq!(y.to_string(), "72.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (y, o) = BigExponentFloat::from(PI).compound_prec_round(3, 5, Nearest);
-    /// assert_eq!(format!("{y:?}"), "0x48.0");
+    /// assert_eq!(y.to_string(), "72.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (y, o) = BigExponentFloat::from(PI).compound_prec_round(3, 20, Floor);
-    /// assert_eq!(format!("{y:?}"), "0x47.0a3");
+    /// assert_eq!(y.to_string(), "71.03979");
     /// assert_eq!(o, Less);
     ///
     /// let (y, o) = BigExponentFloat::from(PI).compound_prec_round(3, 20, Ceiling);
-    /// assert_eq!(format!("{y:?}"), "0x47.0a38");
+    /// assert_eq!(y.to_string(), "71.039917");
     /// assert_eq!(o, Greater);
     ///
     /// let (y, o) = BigExponentFloat::from(PI).compound_prec_round(3, 20, Nearest);
-    /// assert_eq!(format!("{y:?}"), "0x47.0a38");
+    /// assert_eq!(y.to_string(), "71.039917");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -303,27 +303,27 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (y, o) = (&BigExponentFloat::from(PI)).compound_prec_round_ref(3, 5, Floor);
-    /// assert_eq!(format!("{y:?}"), "0x44.0");
+    /// assert_eq!(y.to_string(), "68.0");
     /// assert_eq!(o, Less);
     ///
     /// let (y, o) = (&BigExponentFloat::from(PI)).compound_prec_round_ref(3, 5, Ceiling);
-    /// assert_eq!(format!("{y:?}"), "0x48.0");
+    /// assert_eq!(y.to_string(), "72.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (y, o) = (&BigExponentFloat::from(PI)).compound_prec_round_ref(3, 5, Nearest);
-    /// assert_eq!(format!("{y:?}"), "0x48.0");
+    /// assert_eq!(y.to_string(), "72.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (y, o) = (&BigExponentFloat::from(PI)).compound_prec_round_ref(3, 20, Floor);
-    /// assert_eq!(format!("{y:?}"), "0x47.0a3");
+    /// assert_eq!(y.to_string(), "71.03979");
     /// assert_eq!(o, Less);
     ///
     /// let (y, o) = (&BigExponentFloat::from(PI)).compound_prec_round_ref(3, 20, Ceiling);
-    /// assert_eq!(format!("{y:?}"), "0x47.0a38");
+    /// assert_eq!(y.to_string(), "71.039917");
     /// assert_eq!(o, Greater);
     ///
     /// let (y, o) = (&BigExponentFloat::from(PI)).compound_prec_round_ref(3, 20, Nearest);
-    /// assert_eq!(format!("{y:?}"), "0x47.0a38");
+    /// assert_eq!(y.to_string(), "71.039917");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -373,27 +373,27 @@ impl BigExponentFloat {
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(x.compound_prec_round_assign(3, 5, Floor), Less);
-    /// assert_eq!(format!("{x:?}"), "0x44.0");
+    /// assert_eq!(x.to_string(), "68.0");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(x.compound_prec_round_assign(3, 5, Ceiling), Greater);
-    /// assert_eq!(format!("{x:?}"), "0x48.0");
+    /// assert_eq!(x.to_string(), "72.0");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(x.compound_prec_round_assign(3, 5, Nearest), Greater);
-    /// assert_eq!(format!("{x:?}"), "0x48.0");
+    /// assert_eq!(x.to_string(), "72.0");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(x.compound_prec_round_assign(3, 20, Floor), Less);
-    /// assert_eq!(format!("{x:?}"), "0x47.0a3");
+    /// assert_eq!(x.to_string(), "71.03979");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(x.compound_prec_round_assign(3, 20, Ceiling), Greater);
-    /// assert_eq!(format!("{x:?}"), "0x47.0a38");
+    /// assert_eq!(x.to_string(), "71.039917");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(x.compound_prec_round_assign(3, 20, Nearest), Greater);
-    /// assert_eq!(format!("{x:?}"), "0x47.0a38");
+    /// assert_eq!(x.to_string(), "71.039917");
     /// ```
     #[inline]
     pub fn compound_prec_round_assign(&mut self, n: i64, prec: u64, rm: RoundingMode) -> Ordering {
@@ -450,15 +450,15 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (y, o) = BigExponentFloat::from(PI).compound_prec(3, 5);
-    /// assert_eq!(format!("{y:?}"), "0x48.0");
+    /// assert_eq!(y.to_string(), "72.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (y, o) = BigExponentFloat::from(PI).compound_prec(3, 20);
-    /// assert_eq!(format!("{y:?}"), "0x47.0a38");
+    /// assert_eq!(y.to_string(), "71.039917");
     /// assert_eq!(o, Greater);
     ///
     /// let (y, o) = BigExponentFloat::power_of_2(1000000000000i64).compound_prec(3, 10);
-    /// assert_eq!(format!("{y:?}"), "0x1.0E+750000000000");
+    /// assert_eq!(y.to_string(), "8.8e903089986991");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -510,11 +510,11 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (y, o) = (&BigExponentFloat::from(PI)).compound_prec_ref(3, 5);
-    /// assert_eq!(format!("{y:?}"), "0x48.0");
+    /// assert_eq!(y.to_string(), "72.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (y, o) = (&BigExponentFloat::from(PI)).compound_prec_ref(3, 20);
-    /// assert_eq!(format!("{y:?}"), "0x47.0a38");
+    /// assert_eq!(y.to_string(), "71.039917");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -557,11 +557,11 @@ impl BigExponentFloat {
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(x.compound_prec_assign(3, 5), Greater);
-    /// assert_eq!(format!("{x:?}"), "0x48.0");
+    /// assert_eq!(x.to_string(), "72.0");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(x.compound_prec_assign(3, 20), Greater);
-    /// assert_eq!(format!("{x:?}"), "0x47.0a38");
+    /// assert_eq!(x.to_string(), "71.039917");
     /// ```
     #[inline]
     pub fn compound_prec_assign(&mut self, n: i64, prec: u64) -> Ordering {

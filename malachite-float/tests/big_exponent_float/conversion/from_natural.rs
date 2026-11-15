@@ -16,17 +16,22 @@ use std::str::FromStr;
 
 #[test]
 fn test_from_natural() {
-    let test = |s, out| {
+    let test = |s, out, out_hex| {
         let n = Natural::from_str(s).unwrap();
         let x = BigExponentFloat::from(n.clone());
         assert!(x.is_valid());
-        assert_eq!(format!("{x:#x}"), out);
-        assert_eq!(format!("{:#x}", BigExponentFloat::from(&n)), out);
+        assert_eq!(format!("{x:#x}"), out_hex);
+        assert_eq!(x.to_string(), out);
+        assert_eq!(format!("{:#x}", BigExponentFloat::from(&n)), out_hex);
     };
-    test("0", "0x0.0");
-    test("1", "0x1.0");
-    test("123", "0x7b.0");
-    test("1000000000000000000000000", "0xd.3c21bcecceda1E+19");
+    test("0", "0.0", "0x0.0");
+    test("1", "1.0", "0x1.0");
+    test("123", "123.0", "0x7b.0");
+    test(
+        "1000000000000000000000000",
+        "1.00000000000000000e24",
+        "0xd.3c21bcecceda1E+19",
+    );
 }
 
 #[test]

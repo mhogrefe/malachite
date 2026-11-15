@@ -22,20 +22,21 @@ fn bef(f: &Float) -> BigExponentFloat {
 
 #[test]
 fn test_from_primitive_float() {
-    let test = |x: f64, out| {
+    let test = |x: f64, out, out_hex| {
         let y = BigExponentFloat::from(x);
         assert!(y.is_valid());
-        assert_eq!(format!("{y:#x}"), out);
+        assert_eq!(format!("{y:#x}"), out_hex);
+        assert_eq!(y.to_string(), out);
     };
-    test(f64::NAN, "NaN");
-    test(f64::INFINITY, "Infinity");
-    test(f64::NEGATIVE_INFINITY, "-Infinity");
-    test(0.0, "0x0.0");
-    test(-0.0, "0x0.0");
-    test(1.5, "0x1.8");
-    test(-0.1, "-0x0.1999999999999a");
-    test(f64::MIN_POSITIVE_SUBNORMAL, "0x4.0E-269");
-    test(f64::MAX, "0xf.ffffffffffff8E+255");
+    test(f64::NAN, "NaN", "NaN");
+    test(f64::INFINITY, "Infinity", "Infinity");
+    test(f64::NEGATIVE_INFINITY, "-Infinity", "-Infinity");
+    test(0.0, "0.0", "0x0.0");
+    test(-0.0, "0.0", "0x0.0");
+    test(1.5, "1.5", "0x1.8");
+    test(-0.1, "-0.10000000000000001", "-0x0.1999999999999a");
+    test(f64::MIN_POSITIVE_SUBNORMAL, "4.9e-324", "0x4.0E-269");
+    test(f64::MAX, "1.7976931348623157e308", "0xf.ffffffffffff8E+255");
 }
 
 fn from_primitive_float_properties_helper<T>()

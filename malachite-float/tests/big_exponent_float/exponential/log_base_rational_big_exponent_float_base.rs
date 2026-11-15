@@ -75,252 +75,534 @@ fn log_base_rational_big_exponent_float_base_prec_round_all(
 #[test]
 fn test_log_base_rational_big_exponent_float_base_prec_round() {
     // The expected values agree with FLINT's arb (see the `arf_logarithm_general` oracle mode).
-    let cases: &[(&str, &str, u64, RoundingMode, &str, Ordering)] = &[
-        ("3/5", "0x3", 1, Nearest, "-0x0.8", Less),
-        ("3/5", "0x3", 10, Floor, "-0x0.772", Less),
-        ("3/5", "0x3", 10, Ceiling, "-0x0.77", Greater),
-        ("3/5", "0x3", 10, Down, "-0x0.77", Greater),
-        ("3/5", "0x3", 10, Up, "-0x0.772", Less),
-        ("3/5", "0x3", 10, Nearest, "-0x0.77", Greater),
-        (
-            "3/5",
-            "0x3",
-            100,
-            Nearest,
-            "-0x0.77088130fd4e46455c3c9ca988",
-            Greater,
-        ),
-        ("3/5", "0x0.8", 1, Nearest, "0x0.8", Less),
-        ("3/5", "0x0.8", 10, Floor, "0x0.bc8", Less),
-        ("3/5", "0x0.8", 10, Ceiling, "0x0.bcc", Greater),
-        ("3/5", "0x0.8", 10, Down, "0x0.bc8", Less),
-        ("3/5", "0x0.8", 10, Up, "0x0.bcc", Greater),
-        ("3/5", "0x0.8", 10, Nearest, "0x0.bcc", Greater),
-        (
-            "3/5",
-            "0x0.8",
-            100,
-            Nearest,
-            "0x0.bca9c6f53897a45984a4c9f33",
-            Less,
-        ),
-        ("3/5", "0x1.0", 1, Nearest, "NaN", Equal),
-        ("3/5", "0x1.0", 10, Floor, "NaN", Equal),
-        ("3/5", "0x1.0", 10, Ceiling, "NaN", Equal),
-        ("3/5", "0x1.0", 10, Down, "NaN", Equal),
-        ("3/5", "0x1.0", 10, Up, "NaN", Equal),
-        ("3/5", "0x1.0", 10, Nearest, "NaN", Equal),
-        ("3/5", "0x1.0", 100, Nearest, "NaN", Equal),
-        ("3/5", "0x1.0", 300, Exact, "NaN", Equal),
-        ("9", "0x3", 1, Nearest, "0x2.0", Equal),
-        ("9", "0x3", 10, Floor, "0x2.0", Equal),
-        ("9", "0x3", 10, Ceiling, "0x2.0", Equal),
-        ("9", "0x3", 10, Down, "0x2.0", Equal),
-        ("9", "0x3", 10, Up, "0x2.0", Equal),
-        ("9", "0x3", 10, Nearest, "0x2.0", Equal),
-        ("9", "0x3", 100, Nearest, "0x2.0", Equal),
-        ("9", "0x3", 300, Exact, "0x2.0", Equal),
-        ("9", "0x0.8", 1, Nearest, "-0x4.0", Less),
-        ("9", "0x0.8", 10, Floor, "-0x3.2c", Less),
-        ("9", "0x0.8", 10, Ceiling, "-0x3.2b", Greater),
-        ("9", "0x0.8", 10, Down, "-0x3.2b", Greater),
-        ("9", "0x0.8", 10, Up, "-0x3.2c", Less),
-        ("9", "0x0.8", 10, Nearest, "-0x3.2c", Less),
-        (
-            "9",
-            "0x0.8",
-            100,
-            Nearest,
-            "-0x3.2b803473f7ad0f3f40162414",
-            Greater,
-        ),
-        ("9", "0x1.0", 1, Nearest, "NaN", Equal),
-        ("9", "0x1.0", 10, Floor, "NaN", Equal),
-        ("9", "0x1.0", 10, Ceiling, "NaN", Equal),
-        ("9", "0x1.0", 10, Down, "NaN", Equal),
-        ("9", "0x1.0", 10, Up, "NaN", Equal),
-        ("9", "0x1.0", 10, Nearest, "NaN", Equal),
-        ("9", "0x1.0", 100, Nearest, "NaN", Equal),
-        ("9", "0x1.0", 300, Exact, "NaN", Equal),
-        ("1/9", "0x3", 1, Nearest, "-0x2.0", Equal),
-        ("1/9", "0x3", 10, Floor, "-0x2.0", Equal),
-        ("1/9", "0x3", 10, Ceiling, "-0x2.0", Equal),
-        ("1/9", "0x3", 10, Down, "-0x2.0", Equal),
-        ("1/9", "0x3", 10, Up, "-0x2.0", Equal),
-        ("1/9", "0x3", 10, Nearest, "-0x2.0", Equal),
-        ("1/9", "0x3", 100, Nearest, "-0x2.0", Equal),
-        ("1/9", "0x3", 300, Exact, "-0x2.0", Equal),
-        ("1/9", "0x0.8", 1, Nearest, "0x4.0", Greater),
-        ("1/9", "0x0.8", 10, Floor, "0x3.2b", Less),
-        ("1/9", "0x0.8", 10, Ceiling, "0x3.2c", Greater),
-        ("1/9", "0x0.8", 10, Down, "0x3.2b", Less),
-        ("1/9", "0x0.8", 10, Up, "0x3.2c", Greater),
-        ("1/9", "0x0.8", 10, Nearest, "0x3.2c", Greater),
-        (
-            "1/9",
-            "0x0.8",
-            100,
-            Nearest,
-            "0x3.2b803473f7ad0f3f40162414",
-            Less,
-        ),
-        ("1/9", "0x1.0", 1, Nearest, "NaN", Equal),
-        ("1/9", "0x1.0", 10, Floor, "NaN", Equal),
-        ("1/9", "0x1.0", 10, Ceiling, "NaN", Equal),
-        ("1/9", "0x1.0", 10, Down, "NaN", Equal),
-        ("1/9", "0x1.0", 10, Up, "NaN", Equal),
-        ("1/9", "0x1.0", 10, Nearest, "NaN", Equal),
-        ("1/9", "0x1.0", 100, Nearest, "NaN", Equal),
-        ("1/9", "0x1.0", 300, Exact, "NaN", Equal),
-        ("1/3", "0x3", 1, Nearest, "-0x1.0", Equal),
-        ("1/3", "0x3", 10, Floor, "-0x1.0", Equal),
-        ("1/3", "0x3", 10, Ceiling, "-0x1.0", Equal),
-        ("1/3", "0x3", 10, Down, "-0x1.0", Equal),
-        ("1/3", "0x3", 10, Up, "-0x1.0", Equal),
-        ("1/3", "0x3", 10, Nearest, "-0x1.0", Equal),
-        ("1/3", "0x3", 100, Nearest, "-0x1.0", Equal),
-        ("1/3", "0x3", 300, Exact, "-0x1.0", Equal),
-        ("1/3", "0x0.8", 1, Nearest, "0x2.0", Greater),
-        ("1/3", "0x0.8", 10, Floor, "0x1.958", Less),
-        ("1/3", "0x0.8", 10, Ceiling, "0x1.96", Greater),
-        ("1/3", "0x0.8", 10, Down, "0x1.958", Less),
-        ("1/3", "0x0.8", 10, Up, "0x1.96", Greater),
-        ("1/3", "0x0.8", 10, Nearest, "0x1.96", Greater),
-        (
-            "1/3",
-            "0x0.8",
-            100,
-            Nearest,
-            "0x1.95c01a39fbd6879fa00b120a",
-            Less,
-        ),
-        ("1/3", "0x1.0", 1, Nearest, "NaN", Equal),
-        ("1/3", "0x1.0", 10, Floor, "NaN", Equal),
-        ("1/3", "0x1.0", 10, Ceiling, "NaN", Equal),
-        ("1/3", "0x1.0", 10, Down, "NaN", Equal),
-        ("1/3", "0x1.0", 10, Up, "NaN", Equal),
-        ("1/3", "0x1.0", 10, Nearest, "NaN", Equal),
-        ("1/3", "0x1.0", 100, Nearest, "NaN", Equal),
-        ("1/3", "0x1.0", 300, Exact, "NaN", Equal),
-        ("10000000000/3", "0x3", 1, Nearest, "0x1.0E+1", Less),
-        ("10000000000/3", "0x3", 10, Floor, "0x13.f", Less),
-        ("10000000000/3", "0x3", 10, Ceiling, "0x13.f8", Greater),
-        ("10000000000/3", "0x3", 10, Down, "0x13.f", Less),
-        ("10000000000/3", "0x3", 10, Up, "0x13.f8", Greater),
-        ("10000000000/3", "0x3", 10, Nearest, "0x13.f8", Greater),
-        (
-            "10000000000/3",
-            "0x3",
-            100,
-            Nearest,
-            "0x13.f5832b7a85b1dbc1c4d0f94c",
-            Greater,
-        ),
-        ("10000000000/3", "0x0.8", 1, Nearest, "-0x2.0E+1", Less),
-        ("10000000000/3", "0x0.8", 10, Floor, "-0x1f.a8", Less),
-        ("10000000000/3", "0x0.8", 10, Ceiling, "-0x1f.a", Greater),
-        ("10000000000/3", "0x0.8", 10, Down, "-0x1f.a", Greater),
-        ("10000000000/3", "0x0.8", 10, Up, "-0x1f.a8", Less),
-        ("10000000000/3", "0x0.8", 10, Nearest, "-0x1f.a", Greater),
-        (
-            "10000000000/3",
-            "0x0.8",
-            100,
-            Nearest,
-            "-0x1f.a262b19e1077301bced385da",
-            Greater,
-        ),
-        ("10000000000/3", "0x1.0", 1, Nearest, "NaN", Equal),
-        ("10000000000/3", "0x1.0", 10, Floor, "NaN", Equal),
-        ("10000000000/3", "0x1.0", 10, Ceiling, "NaN", Equal),
-        ("10000000000/3", "0x1.0", 10, Down, "NaN", Equal),
-        ("10000000000/3", "0x1.0", 10, Up, "NaN", Equal),
-        ("10000000000/3", "0x1.0", 10, Nearest, "NaN", Equal),
-        ("10000000000/3", "0x1.0", 100, Nearest, "NaN", Equal),
-        ("10000000000/3", "0x1.0", 300, Exact, "NaN", Equal),
-        ("1", "0x3", 1, Nearest, "0x0.0", Equal),
-        ("1", "0x3", 10, Floor, "0x0.0", Equal),
-        ("1", "0x3", 10, Ceiling, "0x0.0", Equal),
-        ("1", "0x3", 10, Down, "0x0.0", Equal),
-        ("1", "0x3", 10, Up, "0x0.0", Equal),
-        ("1", "0x3", 10, Nearest, "0x0.0", Equal),
-        ("1", "0x3", 100, Nearest, "0x0.0", Equal),
-        ("1", "0x3", 300, Exact, "0x0.0", Equal),
-        ("1", "0x0.8", 1, Nearest, "0x0.0", Equal),
-        ("1", "0x0.8", 10, Floor, "0x0.0", Equal),
-        ("1", "0x0.8", 10, Ceiling, "0x0.0", Equal),
-        ("1", "0x0.8", 10, Down, "0x0.0", Equal),
-        ("1", "0x0.8", 10, Up, "0x0.0", Equal),
-        ("1", "0x0.8", 10, Nearest, "0x0.0", Equal),
-        ("1", "0x0.8", 100, Nearest, "0x0.0", Equal),
-        ("1", "0x0.8", 300, Exact, "0x0.0", Equal),
-        ("1", "0x1.0", 1, Nearest, "NaN", Equal),
-        ("1", "0x1.0", 10, Floor, "NaN", Equal),
-        ("1", "0x1.0", 10, Ceiling, "NaN", Equal),
-        ("1", "0x1.0", 10, Down, "NaN", Equal),
-        ("1", "0x1.0", 10, Up, "NaN", Equal),
-        ("1", "0x1.0", 10, Nearest, "NaN", Equal),
-        ("1", "0x1.0", 100, Nearest, "NaN", Equal),
-        ("1", "0x1.0", 300, Exact, "NaN", Equal),
-        ("0", "0x3", 1, Nearest, "-Infinity", Equal),
-        ("0", "0x3", 10, Floor, "-Infinity", Equal),
-        ("0", "0x3", 10, Ceiling, "-Infinity", Equal),
-        ("0", "0x3", 10, Down, "-Infinity", Equal),
-        ("0", "0x3", 10, Up, "-Infinity", Equal),
-        ("0", "0x3", 10, Nearest, "-Infinity", Equal),
-        ("0", "0x3", 100, Nearest, "-Infinity", Equal),
-        ("0", "0x3", 300, Exact, "-Infinity", Equal),
-        ("0", "0x0.8", 1, Nearest, "Infinity", Equal),
-        ("0", "0x0.8", 10, Floor, "Infinity", Equal),
-        ("0", "0x0.8", 10, Ceiling, "Infinity", Equal),
-        ("0", "0x0.8", 10, Down, "Infinity", Equal),
-        ("0", "0x0.8", 10, Up, "Infinity", Equal),
-        ("0", "0x0.8", 10, Nearest, "Infinity", Equal),
-        ("0", "0x0.8", 100, Nearest, "Infinity", Equal),
-        ("0", "0x0.8", 300, Exact, "Infinity", Equal),
-        ("0", "0x1.0", 1, Nearest, "NaN", Equal),
-        ("0", "0x1.0", 10, Floor, "NaN", Equal),
-        ("0", "0x1.0", 10, Ceiling, "NaN", Equal),
-        ("0", "0x1.0", 10, Down, "NaN", Equal),
-        ("0", "0x1.0", 10, Up, "NaN", Equal),
-        ("0", "0x1.0", 10, Nearest, "NaN", Equal),
-        ("0", "0x1.0", 100, Nearest, "NaN", Equal),
-        ("0", "0x1.0", 300, Exact, "NaN", Equal),
-        ("-1", "0x3", 1, Nearest, "NaN", Equal),
-        ("-1", "0x3", 10, Floor, "NaN", Equal),
-        ("-1", "0x3", 10, Ceiling, "NaN", Equal),
-        ("-1", "0x3", 10, Down, "NaN", Equal),
-        ("-1", "0x3", 10, Up, "NaN", Equal),
-        ("-1", "0x3", 10, Nearest, "NaN", Equal),
-        ("-1", "0x3", 100, Nearest, "NaN", Equal),
-        ("-1", "0x3", 300, Exact, "NaN", Equal),
-        ("-1", "0x0.8", 1, Nearest, "NaN", Equal),
-        ("-1", "0x0.8", 10, Floor, "NaN", Equal),
-        ("-1", "0x0.8", 10, Ceiling, "NaN", Equal),
-        ("-1", "0x0.8", 10, Down, "NaN", Equal),
-        ("-1", "0x0.8", 10, Up, "NaN", Equal),
-        ("-1", "0x0.8", 10, Nearest, "NaN", Equal),
-        ("-1", "0x0.8", 100, Nearest, "NaN", Equal),
-        ("-1", "0x0.8", 300, Exact, "NaN", Equal),
-        ("-1", "0x1.0", 1, Nearest, "NaN", Equal),
-        ("-1", "0x1.0", 10, Floor, "NaN", Equal),
-        ("-1", "0x1.0", 10, Ceiling, "NaN", Equal),
-        ("-1", "0x1.0", 10, Down, "NaN", Equal),
-        ("-1", "0x1.0", 10, Up, "NaN", Equal),
-        ("-1", "0x1.0", 10, Nearest, "NaN", Equal),
-        ("-1", "0x1.0", 100, Nearest, "NaN", Equal),
-        ("-1", "0x1.0", 300, Exact, "NaN", Equal),
-    ];
-    for &(x, b, prec, rm, out, o) in cases {
+    let test = |x: &str,
+                b: &str,
+                b_hex: &str,
+                prec: u64,
+                rm: RoundingMode,
+                out: &str,
+                out_hex: &str,
+                o: Ordering| {
+        assert_eq!(hex(b_hex).to_string(), b);
         let r = log_base_rational_big_exponent_float_base_prec_round_all(
             &Rational::from_str(x).unwrap(),
-            &hex(b),
+            &hex(b_hex),
             prec,
             rm,
         );
-        assert_eq!(format!("{:?}", r.0), out, "{x} {b} {prec} {rm}");
+        assert_eq!(format!("{:?}", r.0), out_hex, "{x} {b} {prec} {rm}");
+        assert_eq!(r.0.to_string(), out);
         assert_eq!(r.1, o, "{x} {b} {prec} {rm}");
-    }
+    };
+    test("3/5", "3.0", "0x3", 1, Nearest, "-0.50", "-0x0.8", Less);
+    test("3/5", "3.0", "0x3", 10, Floor, "-0.46533", "-0x0.772", Less);
+    test(
+        "3/5", "3.0", "0x3", 10, Ceiling, "-0.4648", "-0x0.77", Greater,
+    );
+    test("3/5", "3.0", "0x3", 10, Down, "-0.4648", "-0x0.77", Greater);
+    test("3/5", "3.0", "0x3", 10, Up, "-0.46533", "-0x0.772", Less);
+    test(
+        "3/5", "3.0", "0x3", 10, Nearest, "-0.4648", "-0x0.77", Greater,
+    );
+    test(
+        "3/5",
+        "3.0",
+        "0x3",
+        100,
+        Nearest,
+        "-0.46497352071792716719704040767853",
+        "-0x0.77088130fd4e46455c3c9ca988",
+        Greater,
+    );
+    test("3/5", "0.50", "0x0.8", 1, Nearest, "0.50", "0x0.8", Less);
+    test("3/5", "0.50", "0x0.8", 10, Floor, "0.7363", "0x0.bc8", Less);
+    test(
+        "3/5", "0.50", "0x0.8", 10, Ceiling, "0.73730", "0x0.bcc", Greater,
+    );
+    test("3/5", "0.50", "0x0.8", 10, Down, "0.7363", "0x0.bc8", Less);
+    test(
+        "3/5", "0.50", "0x0.8", 10, Up, "0.73730", "0x0.bcc", Greater,
+    );
+    test(
+        "3/5", "0.50", "0x0.8", 10, Nearest, "0.73730", "0x0.bcc", Greater,
+    );
+    test(
+        "3/5",
+        "0.50",
+        "0x0.8",
+        100,
+        Nearest,
+        "0.73696559416620616641658048554156",
+        "0x0.bca9c6f53897a45984a4c9f33",
+        Less,
+    );
+    test("3/5", "1.0", "0x1.0", 1, Nearest, "NaN", "NaN", Equal);
+    test("3/5", "1.0", "0x1.0", 10, Floor, "NaN", "NaN", Equal);
+    test("3/5", "1.0", "0x1.0", 10, Ceiling, "NaN", "NaN", Equal);
+    test("3/5", "1.0", "0x1.0", 10, Down, "NaN", "NaN", Equal);
+    test("3/5", "1.0", "0x1.0", 10, Up, "NaN", "NaN", Equal);
+    test("3/5", "1.0", "0x1.0", 10, Nearest, "NaN", "NaN", Equal);
+    test("3/5", "1.0", "0x1.0", 100, Nearest, "NaN", "NaN", Equal);
+    test("3/5", "1.0", "0x1.0", 300, Exact, "NaN", "NaN", Equal);
+    test("9", "3.0", "0x3", 1, Nearest, "2.0", "0x2.0", Equal);
+    test("9", "3.0", "0x3", 10, Floor, "2.0", "0x2.0", Equal);
+    test("9", "3.0", "0x3", 10, Ceiling, "2.0", "0x2.0", Equal);
+    test("9", "3.0", "0x3", 10, Down, "2.0", "0x2.0", Equal);
+    test("9", "3.0", "0x3", 10, Up, "2.0", "0x2.0", Equal);
+    test("9", "3.0", "0x3", 10, Nearest, "2.0", "0x2.0", Equal);
+    test("9", "3.0", "0x3", 100, Nearest, "2.0", "0x2.0", Equal);
+    test("9", "3.0", "0x3", 300, Exact, "2.0", "0x2.0", Equal);
+    test("9", "0.50", "0x0.8", 1, Nearest, "-4.0", "-0x4.0", Less);
+    test("9", "0.50", "0x0.8", 10, Floor, "-3.172", "-0x3.2c", Less);
+    test(
+        "9", "0.50", "0x0.8", 10, Ceiling, "-3.1680", "-0x3.2b", Greater,
+    );
+    test(
+        "9", "0.50", "0x0.8", 10, Down, "-3.1680", "-0x3.2b", Greater,
+    );
+    test("9", "0.50", "0x0.8", 10, Up, "-3.172", "-0x3.2c", Less);
+    test("9", "0.50", "0x0.8", 10, Nearest, "-3.172", "-0x3.2c", Less);
+    test(
+        "9",
+        "0.50",
+        "0x0.8",
+        100,
+        Nearest,
+        "-3.16992500144231236290747788789",
+        "-0x3.2b803473f7ad0f3f40162414",
+        Greater,
+    );
+    test("9", "1.0", "0x1.0", 1, Nearest, "NaN", "NaN", Equal);
+    test("9", "1.0", "0x1.0", 10, Floor, "NaN", "NaN", Equal);
+    test("9", "1.0", "0x1.0", 10, Ceiling, "NaN", "NaN", Equal);
+    test("9", "1.0", "0x1.0", 10, Down, "NaN", "NaN", Equal);
+    test("9", "1.0", "0x1.0", 10, Up, "NaN", "NaN", Equal);
+    test("9", "1.0", "0x1.0", 10, Nearest, "NaN", "NaN", Equal);
+    test("9", "1.0", "0x1.0", 100, Nearest, "NaN", "NaN", Equal);
+    test("9", "1.0", "0x1.0", 300, Exact, "NaN", "NaN", Equal);
+    test("1/9", "3.0", "0x3", 1, Nearest, "-2.0", "-0x2.0", Equal);
+    test("1/9", "3.0", "0x3", 10, Floor, "-2.0", "-0x2.0", Equal);
+    test("1/9", "3.0", "0x3", 10, Ceiling, "-2.0", "-0x2.0", Equal);
+    test("1/9", "3.0", "0x3", 10, Down, "-2.0", "-0x2.0", Equal);
+    test("1/9", "3.0", "0x3", 10, Up, "-2.0", "-0x2.0", Equal);
+    test("1/9", "3.0", "0x3", 10, Nearest, "-2.0", "-0x2.0", Equal);
+    test("1/9", "3.0", "0x3", 100, Nearest, "-2.0", "-0x2.0", Equal);
+    test("1/9", "3.0", "0x3", 300, Exact, "-2.0", "-0x2.0", Equal);
+    test("1/9", "0.50", "0x0.8", 1, Nearest, "4.0", "0x4.0", Greater);
+    test("1/9", "0.50", "0x0.8", 10, Floor, "3.1680", "0x3.2b", Less);
+    test(
+        "1/9", "0.50", "0x0.8", 10, Ceiling, "3.172", "0x3.2c", Greater,
+    );
+    test("1/9", "0.50", "0x0.8", 10, Down, "3.1680", "0x3.2b", Less);
+    test("1/9", "0.50", "0x0.8", 10, Up, "3.172", "0x3.2c", Greater);
+    test(
+        "1/9", "0.50", "0x0.8", 10, Nearest, "3.172", "0x3.2c", Greater,
+    );
+    test(
+        "1/9",
+        "0.50",
+        "0x0.8",
+        100,
+        Nearest,
+        "3.16992500144231236290747788789",
+        "0x3.2b803473f7ad0f3f40162414",
+        Less,
+    );
+    test("1/9", "1.0", "0x1.0", 1, Nearest, "NaN", "NaN", Equal);
+    test("1/9", "1.0", "0x1.0", 10, Floor, "NaN", "NaN", Equal);
+    test("1/9", "1.0", "0x1.0", 10, Ceiling, "NaN", "NaN", Equal);
+    test("1/9", "1.0", "0x1.0", 10, Down, "NaN", "NaN", Equal);
+    test("1/9", "1.0", "0x1.0", 10, Up, "NaN", "NaN", Equal);
+    test("1/9", "1.0", "0x1.0", 10, Nearest, "NaN", "NaN", Equal);
+    test("1/9", "1.0", "0x1.0", 100, Nearest, "NaN", "NaN", Equal);
+    test("1/9", "1.0", "0x1.0", 300, Exact, "NaN", "NaN", Equal);
+    test("1/3", "3.0", "0x3", 1, Nearest, "-1.0", "-0x1.0", Equal);
+    test("1/3", "3.0", "0x3", 10, Floor, "-1.0", "-0x1.0", Equal);
+    test("1/3", "3.0", "0x3", 10, Ceiling, "-1.0", "-0x1.0", Equal);
+    test("1/3", "3.0", "0x3", 10, Down, "-1.0", "-0x1.0", Equal);
+    test("1/3", "3.0", "0x3", 10, Up, "-1.0", "-0x1.0", Equal);
+    test("1/3", "3.0", "0x3", 10, Nearest, "-1.0", "-0x1.0", Equal);
+    test("1/3", "3.0", "0x3", 100, Nearest, "-1.0", "-0x1.0", Equal);
+    test("1/3", "3.0", "0x3", 300, Exact, "-1.0", "-0x1.0", Equal);
+    test("1/3", "0.50", "0x0.8", 1, Nearest, "2.0", "0x2.0", Greater);
+    test("1/3", "0.50", "0x0.8", 10, Floor, "1.5840", "0x1.958", Less);
+    test(
+        "1/3", "0.50", "0x0.8", 10, Ceiling, "1.586", "0x1.96", Greater,
+    );
+    test("1/3", "0.50", "0x0.8", 10, Down, "1.5840", "0x1.958", Less);
+    test("1/3", "0.50", "0x0.8", 10, Up, "1.586", "0x1.96", Greater);
+    test(
+        "1/3", "0.50", "0x0.8", 10, Nearest, "1.586", "0x1.96", Greater,
+    );
+    test(
+        "1/3",
+        "0.50",
+        "0x0.8",
+        100,
+        Nearest,
+        "1.58496250072115618145373894395",
+        "0x1.95c01a39fbd6879fa00b120a",
+        Less,
+    );
+    test("1/3", "1.0", "0x1.0", 1, Nearest, "NaN", "NaN", Equal);
+    test("1/3", "1.0", "0x1.0", 10, Floor, "NaN", "NaN", Equal);
+    test("1/3", "1.0", "0x1.0", 10, Ceiling, "NaN", "NaN", Equal);
+    test("1/3", "1.0", "0x1.0", 10, Down, "NaN", "NaN", Equal);
+    test("1/3", "1.0", "0x1.0", 10, Up, "NaN", "NaN", Equal);
+    test("1/3", "1.0", "0x1.0", 10, Nearest, "NaN", "NaN", Equal);
+    test("1/3", "1.0", "0x1.0", 100, Nearest, "NaN", "NaN", Equal);
+    test("1/3", "1.0", "0x1.0", 300, Exact, "NaN", "NaN", Equal);
+    test(
+        "10000000000/3",
+        "3.0",
+        "0x3",
+        1,
+        Nearest,
+        "16.0",
+        "0x1.0E+1",
+        Less,
+    );
+    test(
+        "10000000000/3",
+        "3.0",
+        "0x3",
+        10,
+        Floor,
+        "19.94",
+        "0x13.f",
+        Less,
+    );
+    test(
+        "10000000000/3",
+        "3.0",
+        "0x3",
+        10,
+        Ceiling,
+        "19.969",
+        "0x13.f8",
+        Greater,
+    );
+    test(
+        "10000000000/3",
+        "3.0",
+        "0x3",
+        10,
+        Down,
+        "19.94",
+        "0x13.f",
+        Less,
+    );
+    test(
+        "10000000000/3",
+        "3.0",
+        "0x3",
+        10,
+        Up,
+        "19.969",
+        "0x13.f8",
+        Greater,
+    );
+    test(
+        "10000000000/3",
+        "3.0",
+        "0x3",
+        10,
+        Nearest,
+        "19.969",
+        "0x13.f8",
+        Greater,
+    );
+    test(
+        "10000000000/3",
+        "3.0",
+        "0x3",
+        100,
+        Nearest,
+        "19.95903274289384604296567522023",
+        "0x13.f5832b7a85b1dbc1c4d0f94c",
+        Greater,
+    );
+    test(
+        "10000000000/3",
+        "0.50",
+        "0x0.8",
+        1,
+        Nearest,
+        "-32.0",
+        "-0x2.0E+1",
+        Less,
+    );
+    test(
+        "10000000000/3",
+        "0.50",
+        "0x0.8",
+        10,
+        Floor,
+        "-31.656",
+        "-0x1f.a8",
+        Less,
+    );
+    test(
+        "10000000000/3",
+        "0.50",
+        "0x0.8",
+        10,
+        Ceiling,
+        "-31.62",
+        "-0x1f.a",
+        Greater,
+    );
+    test(
+        "10000000000/3",
+        "0.50",
+        "0x0.8",
+        10,
+        Down,
+        "-31.62",
+        "-0x1f.a",
+        Greater,
+    );
+    test(
+        "10000000000/3",
+        "0.50",
+        "0x0.8",
+        10,
+        Up,
+        "-31.656",
+        "-0x1f.a8",
+        Less,
+    );
+    test(
+        "10000000000/3",
+        "0.50",
+        "0x0.8",
+        10,
+        Nearest,
+        "-31.62",
+        "-0x1f.a",
+        Greater,
+    );
+    test(
+        "10000000000/3",
+        "0.50",
+        "0x0.8",
+        100,
+        Nearest,
+        "-31.634318448152467297249455350945",
+        "-0x1f.a262b19e1077301bced385da",
+        Greater,
+    );
+    test(
+        "10000000000/3",
+        "1.0",
+        "0x1.0",
+        1,
+        Nearest,
+        "NaN",
+        "NaN",
+        Equal,
+    );
+    test(
+        "10000000000/3",
+        "1.0",
+        "0x1.0",
+        10,
+        Floor,
+        "NaN",
+        "NaN",
+        Equal,
+    );
+    test(
+        "10000000000/3",
+        "1.0",
+        "0x1.0",
+        10,
+        Ceiling,
+        "NaN",
+        "NaN",
+        Equal,
+    );
+    test(
+        "10000000000/3",
+        "1.0",
+        "0x1.0",
+        10,
+        Down,
+        "NaN",
+        "NaN",
+        Equal,
+    );
+    test("10000000000/3", "1.0", "0x1.0", 10, Up, "NaN", "NaN", Equal);
+    test(
+        "10000000000/3",
+        "1.0",
+        "0x1.0",
+        10,
+        Nearest,
+        "NaN",
+        "NaN",
+        Equal,
+    );
+    test(
+        "10000000000/3",
+        "1.0",
+        "0x1.0",
+        100,
+        Nearest,
+        "NaN",
+        "NaN",
+        Equal,
+    );
+    test(
+        "10000000000/3",
+        "1.0",
+        "0x1.0",
+        300,
+        Exact,
+        "NaN",
+        "NaN",
+        Equal,
+    );
+    test("1", "3.0", "0x3", 1, Nearest, "0.0", "0x0.0", Equal);
+    test("1", "3.0", "0x3", 10, Floor, "0.0", "0x0.0", Equal);
+    test("1", "3.0", "0x3", 10, Ceiling, "0.0", "0x0.0", Equal);
+    test("1", "3.0", "0x3", 10, Down, "0.0", "0x0.0", Equal);
+    test("1", "3.0", "0x3", 10, Up, "0.0", "0x0.0", Equal);
+    test("1", "3.0", "0x3", 10, Nearest, "0.0", "0x0.0", Equal);
+    test("1", "3.0", "0x3", 100, Nearest, "0.0", "0x0.0", Equal);
+    test("1", "3.0", "0x3", 300, Exact, "0.0", "0x0.0", Equal);
+    test("1", "0.50", "0x0.8", 1, Nearest, "0.0", "0x0.0", Equal);
+    test("1", "0.50", "0x0.8", 10, Floor, "0.0", "0x0.0", Equal);
+    test("1", "0.50", "0x0.8", 10, Ceiling, "0.0", "0x0.0", Equal);
+    test("1", "0.50", "0x0.8", 10, Down, "0.0", "0x0.0", Equal);
+    test("1", "0.50", "0x0.8", 10, Up, "0.0", "0x0.0", Equal);
+    test("1", "0.50", "0x0.8", 10, Nearest, "0.0", "0x0.0", Equal);
+    test("1", "0.50", "0x0.8", 100, Nearest, "0.0", "0x0.0", Equal);
+    test("1", "0.50", "0x0.8", 300, Exact, "0.0", "0x0.0", Equal);
+    test("1", "1.0", "0x1.0", 1, Nearest, "NaN", "NaN", Equal);
+    test("1", "1.0", "0x1.0", 10, Floor, "NaN", "NaN", Equal);
+    test("1", "1.0", "0x1.0", 10, Ceiling, "NaN", "NaN", Equal);
+    test("1", "1.0", "0x1.0", 10, Down, "NaN", "NaN", Equal);
+    test("1", "1.0", "0x1.0", 10, Up, "NaN", "NaN", Equal);
+    test("1", "1.0", "0x1.0", 10, Nearest, "NaN", "NaN", Equal);
+    test("1", "1.0", "0x1.0", 100, Nearest, "NaN", "NaN", Equal);
+    test("1", "1.0", "0x1.0", 300, Exact, "NaN", "NaN", Equal);
+    test(
+        "0",
+        "3.0",
+        "0x3",
+        1,
+        Nearest,
+        "-Infinity",
+        "-Infinity",
+        Equal,
+    );
+    test(
+        "0",
+        "3.0",
+        "0x3",
+        10,
+        Floor,
+        "-Infinity",
+        "-Infinity",
+        Equal,
+    );
+    test(
+        "0",
+        "3.0",
+        "0x3",
+        10,
+        Ceiling,
+        "-Infinity",
+        "-Infinity",
+        Equal,
+    );
+    test("0", "3.0", "0x3", 10, Down, "-Infinity", "-Infinity", Equal);
+    test("0", "3.0", "0x3", 10, Up, "-Infinity", "-Infinity", Equal);
+    test(
+        "0",
+        "3.0",
+        "0x3",
+        10,
+        Nearest,
+        "-Infinity",
+        "-Infinity",
+        Equal,
+    );
+    test(
+        "0",
+        "3.0",
+        "0x3",
+        100,
+        Nearest,
+        "-Infinity",
+        "-Infinity",
+        Equal,
+    );
+    test(
+        "0",
+        "3.0",
+        "0x3",
+        300,
+        Exact,
+        "-Infinity",
+        "-Infinity",
+        Equal,
+    );
+    test(
+        "0", "0.50", "0x0.8", 1, Nearest, "Infinity", "Infinity", Equal,
+    );
+    test(
+        "0", "0.50", "0x0.8", 10, Floor, "Infinity", "Infinity", Equal,
+    );
+    test(
+        "0", "0.50", "0x0.8", 10, Ceiling, "Infinity", "Infinity", Equal,
+    );
+    test(
+        "0", "0.50", "0x0.8", 10, Down, "Infinity", "Infinity", Equal,
+    );
+    test("0", "0.50", "0x0.8", 10, Up, "Infinity", "Infinity", Equal);
+    test(
+        "0", "0.50", "0x0.8", 10, Nearest, "Infinity", "Infinity", Equal,
+    );
+    test(
+        "0", "0.50", "0x0.8", 100, Nearest, "Infinity", "Infinity", Equal,
+    );
+    test(
+        "0", "0.50", "0x0.8", 300, Exact, "Infinity", "Infinity", Equal,
+    );
+    test("0", "1.0", "0x1.0", 1, Nearest, "NaN", "NaN", Equal);
+    test("0", "1.0", "0x1.0", 10, Floor, "NaN", "NaN", Equal);
+    test("0", "1.0", "0x1.0", 10, Ceiling, "NaN", "NaN", Equal);
+    test("0", "1.0", "0x1.0", 10, Down, "NaN", "NaN", Equal);
+    test("0", "1.0", "0x1.0", 10, Up, "NaN", "NaN", Equal);
+    test("0", "1.0", "0x1.0", 10, Nearest, "NaN", "NaN", Equal);
+    test("0", "1.0", "0x1.0", 100, Nearest, "NaN", "NaN", Equal);
+    test("0", "1.0", "0x1.0", 300, Exact, "NaN", "NaN", Equal);
+    test("-1", "3.0", "0x3", 1, Nearest, "NaN", "NaN", Equal);
+    test("-1", "3.0", "0x3", 10, Floor, "NaN", "NaN", Equal);
+    test("-1", "3.0", "0x3", 10, Ceiling, "NaN", "NaN", Equal);
+    test("-1", "3.0", "0x3", 10, Down, "NaN", "NaN", Equal);
+    test("-1", "3.0", "0x3", 10, Up, "NaN", "NaN", Equal);
+    test("-1", "3.0", "0x3", 10, Nearest, "NaN", "NaN", Equal);
+    test("-1", "3.0", "0x3", 100, Nearest, "NaN", "NaN", Equal);
+    test("-1", "3.0", "0x3", 300, Exact, "NaN", "NaN", Equal);
+    test("-1", "0.50", "0x0.8", 1, Nearest, "NaN", "NaN", Equal);
+    test("-1", "0.50", "0x0.8", 10, Floor, "NaN", "NaN", Equal);
+    test("-1", "0.50", "0x0.8", 10, Ceiling, "NaN", "NaN", Equal);
+    test("-1", "0.50", "0x0.8", 10, Down, "NaN", "NaN", Equal);
+    test("-1", "0.50", "0x0.8", 10, Up, "NaN", "NaN", Equal);
+    test("-1", "0.50", "0x0.8", 10, Nearest, "NaN", "NaN", Equal);
+    test("-1", "0.50", "0x0.8", 100, Nearest, "NaN", "NaN", Equal);
+    test("-1", "0.50", "0x0.8", 300, Exact, "NaN", "NaN", Equal);
+    test("-1", "1.0", "0x1.0", 1, Nearest, "NaN", "NaN", Equal);
+    test("-1", "1.0", "0x1.0", 10, Floor, "NaN", "NaN", Equal);
+    test("-1", "1.0", "0x1.0", 10, Ceiling, "NaN", "NaN", Equal);
+    test("-1", "1.0", "0x1.0", 10, Down, "NaN", "NaN", Equal);
+    test("-1", "1.0", "0x1.0", 10, Up, "NaN", "NaN", Equal);
+    test("-1", "1.0", "0x1.0", 10, Nearest, "NaN", "NaN", Equal);
+    test("-1", "1.0", "0x1.0", 100, Nearest, "NaN", "NaN", Equal);
+    test("-1", "1.0", "0x1.0", 300, Exact, "NaN", "NaN", Equal);
 }
 
 #[test]

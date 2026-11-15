@@ -113,32 +113,32 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (f, o) = BigExponentFloat::from(3141.592653589793).fractional_part_prec_round(5, Floor);
-    /// assert_eq!(format!("{f:?}"), "0x0.9");
+    /// assert_eq!(f.to_string(), "0.562");
     /// assert_eq!(o, Less);
     ///
     /// let (f, o) =
     ///     BigExponentFloat::from(3141.592653589793).fractional_part_prec_round(5, Ceiling);
-    /// assert_eq!(format!("{f:?}"), "0x0.98");
+    /// assert_eq!(f.to_string(), "0.594");
     /// assert_eq!(o, Greater);
     ///
     /// let (f, o) =
     ///     BigExponentFloat::from(3141.592653589793).fractional_part_prec_round(5, Nearest);
-    /// assert_eq!(format!("{f:?}"), "0x0.98");
+    /// assert_eq!(f.to_string(), "0.594");
     /// assert_eq!(o, Greater);
     ///
     /// let (f, o) =
     ///     BigExponentFloat::from(3141.592653589793).fractional_part_prec_round(20, Floor);
-    /// assert_eq!(format!("{f:?}"), "0x0.97b82");
+    /// assert_eq!(f.to_string(), "0.5926533");
     /// assert_eq!(o, Less);
     ///
     /// let (f, o) =
     ///     BigExponentFloat::from(3141.592653589793).fractional_part_prec_round(20, Ceiling);
-    /// assert_eq!(format!("{f:?}"), "0x0.97b83");
+    /// assert_eq!(f.to_string(), "0.59265423");
     /// assert_eq!(o, Greater);
     ///
     /// let (f, o) =
     ///     BigExponentFloat::from(3141.592653589793).fractional_part_prec_round(20, Nearest);
-    /// assert_eq!(format!("{f:?}"), "0x0.97b82");
+    /// assert_eq!(f.to_string(), "0.5926533");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -170,11 +170,11 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (f, o) = BigExponentFloat::from(3141.592653589793).fractional_part_prec(5);
-    /// assert_eq!(format!("{f:?}"), "0x0.98");
+    /// assert_eq!(f.to_string(), "0.594");
     /// assert_eq!(o, Greater);
     ///
     /// let (f, o) = BigExponentFloat::from(3141.592653589793).fractional_part_prec(20);
-    /// assert_eq!(format!("{f:?}"), "0x0.97b82");
+    /// assert_eq!(f.to_string(), "0.5926533");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -200,8 +200,8 @@ impl BigExponentFloat {
     /// use malachite_float::BigExponentFloat;
     ///
     /// assert_eq!(
-    ///     format!("{:?}", BigExponentFloat::from(-3.25).fractional_part()),
-    ///     "-0x0.4"
+    ///     BigExponentFloat::from(-3.25).fractional_part().to_string(),
+    ///     "-0.25"
     /// );
     /// ```
     #[inline]
@@ -239,32 +239,32 @@ impl BigExponentFloat {
     ///
     /// let (f, o) =
     ///     (&BigExponentFloat::from(3141.592653589793)).fractional_part_prec_round_ref(5, Floor);
-    /// assert_eq!(format!("{f:?}"), "0x0.9");
+    /// assert_eq!(f.to_string(), "0.562");
     /// assert_eq!(o, Less);
     ///
     /// let (f, o) =
     ///     (&BigExponentFloat::from(3141.592653589793)).fractional_part_prec_round_ref(5, Ceiling);
-    /// assert_eq!(format!("{f:?}"), "0x0.98");
+    /// assert_eq!(f.to_string(), "0.594");
     /// assert_eq!(o, Greater);
     ///
     /// let (f, o) =
     ///     (&BigExponentFloat::from(3141.592653589793)).fractional_part_prec_round_ref(5, Nearest);
-    /// assert_eq!(format!("{f:?}"), "0x0.98");
+    /// assert_eq!(f.to_string(), "0.594");
     /// assert_eq!(o, Greater);
     ///
     /// let (f, o) =
     ///     (&BigExponentFloat::from(3141.592653589793)).fractional_part_prec_round_ref(20, Floor);
-    /// assert_eq!(format!("{f:?}"), "0x0.97b82");
+    /// assert_eq!(f.to_string(), "0.5926533");
     /// assert_eq!(o, Less);
     ///
     /// let (f, o) = (&BigExponentFloat::from(3141.592653589793))
     ///     .fractional_part_prec_round_ref(20, Ceiling);
-    /// assert_eq!(format!("{f:?}"), "0x0.97b83");
+    /// assert_eq!(f.to_string(), "0.59265423");
     /// assert_eq!(o, Greater);
     ///
     /// let (f, o) = (&BigExponentFloat::from(3141.592653589793))
     ///     .fractional_part_prec_round_ref(20, Nearest);
-    /// assert_eq!(format!("{f:?}"), "0x0.97b82");
+    /// assert_eq!(f.to_string(), "0.5926533");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -296,11 +296,11 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (f, o) = (&BigExponentFloat::from(3141.592653589793)).fractional_part_prec_ref(5);
-    /// assert_eq!(format!("{f:?}"), "0x0.98");
+    /// assert_eq!(f.to_string(), "0.594");
     /// assert_eq!(o, Greater);
     ///
     /// let (f, o) = (&BigExponentFloat::from(3141.592653589793)).fractional_part_prec_ref(20);
-    /// assert_eq!(format!("{f:?}"), "0x0.97b82");
+    /// assert_eq!(f.to_string(), "0.5926533");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -326,11 +326,8 @@ impl BigExponentFloat {
     /// use malachite_float::BigExponentFloat;
     ///
     /// assert_eq!(
-    ///     format!(
-    ///         "{:?}",
-    ///         (&BigExponentFloat::from(-3.25)).fractional_part_ref()
-    ///     ),
-    ///     "-0x0.4"
+    ///     ((&BigExponentFloat::from(-3.25)).fractional_part_ref()).to_string(),
+    ///     "-0.25"
     /// );
     /// ```
     #[inline]
@@ -372,44 +369,44 @@ impl BigExponentFloat {
     ///
     /// let ((i, io), (f, fo)) = BigExponentFloat::from(-3141.592653589793)
     ///     .integer_and_fractional_parts_prec_round(5, 5, Floor);
-    /// assert_eq!(format!("{i:?}"), "-0xc.8E+2");
+    /// assert_eq!(i.to_string(), "-3.20e3");
     /// assert_eq!(io, Less);
-    /// assert_eq!(format!("{f:?}"), "-0x0.98");
+    /// assert_eq!(f.to_string(), "-0.594");
     /// assert_eq!(fo, Less);
     ///
     /// let ((i, io), (f, fo)) = BigExponentFloat::from(-3141.592653589793)
     ///     .integer_and_fractional_parts_prec_round(5, 5, Ceiling);
-    /// assert_eq!(format!("{i:?}"), "-0xc.0E+2");
+    /// assert_eq!(i.to_string(), "-3.1e3");
     /// assert_eq!(io, Greater);
-    /// assert_eq!(format!("{f:?}"), "-0x0.9");
+    /// assert_eq!(f.to_string(), "-0.562");
     /// assert_eq!(fo, Greater);
     ///
     /// let ((i, io), (f, fo)) = BigExponentFloat::from(-3141.592653589793)
     ///     .integer_and_fractional_parts_prec_round(5, 5, Nearest);
-    /// assert_eq!(format!("{i:?}"), "-0xc.8E+2");
+    /// assert_eq!(i.to_string(), "-3.20e3");
     /// assert_eq!(io, Less);
-    /// assert_eq!(format!("{f:?}"), "-0x0.98");
+    /// assert_eq!(f.to_string(), "-0.594");
     /// assert_eq!(fo, Less);
     ///
     /// let ((i, io), (f, fo)) = BigExponentFloat::from(-3141.592653589793)
     ///     .integer_and_fractional_parts_prec_round(20, 20, Floor);
-    /// assert_eq!(format!("{i:?}"), "-0xc45.0");
+    /// assert_eq!(i.to_string(), "-3141.0");
     /// assert_eq!(io, Equal);
-    /// assert_eq!(format!("{f:?}"), "-0x0.97b83");
+    /// assert_eq!(f.to_string(), "-0.59265423");
     /// assert_eq!(fo, Less);
     ///
     /// let ((i, io), (f, fo)) = BigExponentFloat::from(-3141.592653589793)
     ///     .integer_and_fractional_parts_prec_round(20, 20, Ceiling);
-    /// assert_eq!(format!("{i:?}"), "-0xc45.0");
+    /// assert_eq!(i.to_string(), "-3141.0");
     /// assert_eq!(io, Equal);
-    /// assert_eq!(format!("{f:?}"), "-0x0.97b82");
+    /// assert_eq!(f.to_string(), "-0.5926533");
     /// assert_eq!(fo, Greater);
     ///
     /// let ((i, io), (f, fo)) = BigExponentFloat::from(-3141.592653589793)
     ///     .integer_and_fractional_parts_prec_round(20, 20, Nearest);
-    /// assert_eq!(format!("{i:?}"), "-0xc45.0");
+    /// assert_eq!(i.to_string(), "-3141.0");
     /// assert_eq!(io, Equal);
-    /// assert_eq!(format!("{f:?}"), "-0x0.97b82");
+    /// assert_eq!(f.to_string(), "-0.5926533");
     /// assert_eq!(fo, Greater);
     /// ```
     #[inline]
@@ -448,16 +445,16 @@ impl BigExponentFloat {
     ///
     /// let ((i, io), (f, fo)) =
     ///     BigExponentFloat::from(-3141.592653589793).integer_and_fractional_parts_prec(5, 5);
-    /// assert_eq!(format!("{i:?}"), "-0xc.8E+2");
+    /// assert_eq!(i.to_string(), "-3.20e3");
     /// assert_eq!(io, Less);
-    /// assert_eq!(format!("{f:?}"), "-0x0.98");
+    /// assert_eq!(f.to_string(), "-0.594");
     /// assert_eq!(fo, Less);
     ///
     /// let ((i, io), (f, fo)) =
     ///     BigExponentFloat::from(-3141.592653589793).integer_and_fractional_parts_prec(20, 20);
-    /// assert_eq!(format!("{i:?}"), "-0xc45.0");
+    /// assert_eq!(i.to_string(), "-3141.0");
     /// assert_eq!(io, Equal);
-    /// assert_eq!(format!("{f:?}"), "-0x0.97b82");
+    /// assert_eq!(f.to_string(), "-0.5926533");
     /// assert_eq!(fo, Greater);
     /// ```
     #[inline]
@@ -488,8 +485,8 @@ impl BigExponentFloat {
     /// use malachite_float::BigExponentFloat;
     ///
     /// let (i, f) = BigExponentFloat::from(-3.25).integer_and_fractional_parts();
-    /// assert_eq!(format!("{i:?}"), "-0x3.0");
-    /// assert_eq!(format!("{f:?}"), "-0x0.4");
+    /// assert_eq!(i.to_string(), "-3.0");
+    /// assert_eq!(f.to_string(), "-0.25");
     /// ```
     #[inline]
     pub fn integer_and_fractional_parts(self) -> (Self, Self) {
@@ -528,44 +525,44 @@ impl BigExponentFloat {
     ///
     /// let ((i, io), (f, fo)) = (&BigExponentFloat::from(-3141.592653589793))
     ///     .integer_and_fractional_parts_prec_round_ref(5, 5, Floor);
-    /// assert_eq!(format!("{i:?}"), "-0xc.8E+2");
+    /// assert_eq!(i.to_string(), "-3.20e3");
     /// assert_eq!(io, Less);
-    /// assert_eq!(format!("{f:?}"), "-0x0.98");
+    /// assert_eq!(f.to_string(), "-0.594");
     /// assert_eq!(fo, Less);
     ///
     /// let ((i, io), (f, fo)) = (&BigExponentFloat::from(-3141.592653589793))
     ///     .integer_and_fractional_parts_prec_round_ref(5, 5, Ceiling);
-    /// assert_eq!(format!("{i:?}"), "-0xc.0E+2");
+    /// assert_eq!(i.to_string(), "-3.1e3");
     /// assert_eq!(io, Greater);
-    /// assert_eq!(format!("{f:?}"), "-0x0.9");
+    /// assert_eq!(f.to_string(), "-0.562");
     /// assert_eq!(fo, Greater);
     ///
     /// let ((i, io), (f, fo)) = (&BigExponentFloat::from(-3141.592653589793))
     ///     .integer_and_fractional_parts_prec_round_ref(5, 5, Nearest);
-    /// assert_eq!(format!("{i:?}"), "-0xc.8E+2");
+    /// assert_eq!(i.to_string(), "-3.20e3");
     /// assert_eq!(io, Less);
-    /// assert_eq!(format!("{f:?}"), "-0x0.98");
+    /// assert_eq!(f.to_string(), "-0.594");
     /// assert_eq!(fo, Less);
     ///
     /// let ((i, io), (f, fo)) = (&BigExponentFloat::from(-3141.592653589793))
     ///     .integer_and_fractional_parts_prec_round_ref(20, 20, Floor);
-    /// assert_eq!(format!("{i:?}"), "-0xc45.0");
+    /// assert_eq!(i.to_string(), "-3141.0");
     /// assert_eq!(io, Equal);
-    /// assert_eq!(format!("{f:?}"), "-0x0.97b83");
+    /// assert_eq!(f.to_string(), "-0.59265423");
     /// assert_eq!(fo, Less);
     ///
     /// let ((i, io), (f, fo)) = (&BigExponentFloat::from(-3141.592653589793))
     ///     .integer_and_fractional_parts_prec_round_ref(20, 20, Ceiling);
-    /// assert_eq!(format!("{i:?}"), "-0xc45.0");
+    /// assert_eq!(i.to_string(), "-3141.0");
     /// assert_eq!(io, Equal);
-    /// assert_eq!(format!("{f:?}"), "-0x0.97b82");
+    /// assert_eq!(f.to_string(), "-0.5926533");
     /// assert_eq!(fo, Greater);
     ///
     /// let ((i, io), (f, fo)) = (&BigExponentFloat::from(-3141.592653589793))
     ///     .integer_and_fractional_parts_prec_round_ref(20, 20, Nearest);
-    /// assert_eq!(format!("{i:?}"), "-0xc45.0");
+    /// assert_eq!(i.to_string(), "-3141.0");
     /// assert_eq!(io, Equal);
-    /// assert_eq!(format!("{f:?}"), "-0x0.97b82");
+    /// assert_eq!(f.to_string(), "-0.5926533");
     /// assert_eq!(fo, Greater);
     /// ```
     #[inline]
@@ -604,16 +601,16 @@ impl BigExponentFloat {
     ///
     /// let ((i, io), (f, fo)) = (&BigExponentFloat::from(-3141.592653589793))
     ///     .integer_and_fractional_parts_prec_ref(5, 5);
-    /// assert_eq!(format!("{i:?}"), "-0xc.8E+2");
+    /// assert_eq!(i.to_string(), "-3.20e3");
     /// assert_eq!(io, Less);
-    /// assert_eq!(format!("{f:?}"), "-0x0.98");
+    /// assert_eq!(f.to_string(), "-0.594");
     /// assert_eq!(fo, Less);
     ///
     /// let ((i, io), (f, fo)) = (&BigExponentFloat::from(-3141.592653589793))
     ///     .integer_and_fractional_parts_prec_ref(20, 20);
-    /// assert_eq!(format!("{i:?}"), "-0xc45.0");
+    /// assert_eq!(i.to_string(), "-3141.0");
     /// assert_eq!(io, Equal);
-    /// assert_eq!(format!("{f:?}"), "-0x0.97b82");
+    /// assert_eq!(f.to_string(), "-0.5926533");
     /// assert_eq!(fo, Greater);
     /// ```
     #[inline]
@@ -644,8 +641,8 @@ impl BigExponentFloat {
     /// use malachite_float::BigExponentFloat;
     ///
     /// let (i, f) = (&BigExponentFloat::from(-3.25)).integer_and_fractional_parts_ref();
-    /// assert_eq!(format!("{i:?}"), "-0x3.0");
-    /// assert_eq!(format!("{f:?}"), "-0x0.4");
+    /// assert_eq!(i.to_string(), "-3.0");
+    /// assert_eq!(f.to_string(), "-0.25");
     /// ```
     #[inline]
     pub fn integer_and_fractional_parts_ref(&self) -> (Self, Self) {

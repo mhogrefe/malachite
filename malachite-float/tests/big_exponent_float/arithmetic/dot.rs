@@ -6,12 +6,12 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::basic::traits::{Infinity, NaN, One, Zero};
+use malachite_base::num::basic::traits::{Infinity, One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_float::big_exponent_float::ComparableBigExponentFloatRef;
 use malachite_float::test_util::big_exponent_float::{
-    big_exponent_float_exponent_is_small, float_to_big_exponent_float,
+    big_exponent_float_exponent_is_small, float_to_big_exponent_float, parse_big_exponent_float_hex,
 };
 use malachite_float::test_util::generators::{
     big_exponent_float_vec_pair_gen_var_1,
@@ -61,20 +61,24 @@ fn test_dot_prec_round() {
                  ys: &[BigExponentFloat],
                  prec: u64,
                  rm: RoundingMode,
-                 out: &BigExponentFloat,
+                 out: &str,
+                 out_hex: &str,
                  o| {
+        assert_eq!(parse_big_exponent_float_hex(out_hex).to_string(), out);
+        let out = &parse_big_exponent_float_hex(out_hex);
         let r = dot_prec_round_all(xs, ys, prec, rm);
         assert!(same(&r.0, out), "{:?} != {out:?}", r.0);
         assert_eq!(r.1, o);
     };
     let one = BigExponentFloat::ONE;
-    check(&[], &[], 10, Floor, &BigExponentFloat::ZERO, Equal);
+    check(&[], &[], 10, Floor, "0.0", "0x0.0", Equal);
     check(
         &[BigExponentFloat::INFINITY],
         &[BigExponentFloat::ZERO],
         10,
         Floor,
-        &BigExponentFloat::NAN,
+        "NaN",
+        "NaN",
         Equal,
     );
     check(
@@ -82,7 +86,8 @@ fn test_dot_prec_round() {
         &[one.clone(), BigExponentFloat::from(-1.0)],
         10,
         Floor,
-        &BigExponentFloat::NAN,
+        "NaN",
+        "NaN",
         Equal,
     );
     check(
@@ -90,7 +95,8 @@ fn test_dot_prec_round() {
         &[BigExponentFloat::from(3.0), BigExponentFloat::from(-0.5)],
         6,
         Exact,
-        &BigExponentFloat::from(4.375),
+        "4.38",
+        "0x4.6",
         Equal,
     );
 }

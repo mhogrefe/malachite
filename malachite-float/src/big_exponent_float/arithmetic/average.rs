@@ -79,32 +79,32 @@ impl BigExponentFloat {
     ///
     /// let (z, o) =
     ///     BigExponentFloat::from(PI).average_prec_round(BigExponentFloat::from(E), 5, Floor);
-    /// assert_eq!(format!("{z:?}"), "0x2.e");
+    /// assert_eq!(z.to_string(), "2.88");
     /// assert_eq!(o, Less);
     ///
     /// let (z, o) =
     ///     BigExponentFloat::from(PI).average_prec_round(BigExponentFloat::from(E), 5, Ceiling);
-    /// assert_eq!(format!("{z:?}"), "0x3.0");
+    /// assert_eq!(z.to_string(), "3.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (z, o) =
     ///     BigExponentFloat::from(PI).average_prec_round(BigExponentFloat::from(E), 5, Nearest);
-    /// assert_eq!(format!("{z:?}"), "0x2.e");
+    /// assert_eq!(z.to_string(), "2.88");
     /// assert_eq!(o, Less);
     ///
     /// let (z, o) =
     ///     BigExponentFloat::from(PI).average_prec_round(BigExponentFloat::from(E), 20, Floor);
-    /// assert_eq!(format!("{z:?}"), "0x2.ee104");
+    /// assert_eq!(z.to_string(), "2.9299355");
     /// assert_eq!(o, Less);
     ///
     /// let (z, o) =
     ///     BigExponentFloat::from(PI).average_prec_round(BigExponentFloat::from(E), 20, Ceiling);
-    /// assert_eq!(format!("{z:?}"), "0x2.ee108");
+    /// assert_eq!(z.to_string(), "2.929939");
     /// assert_eq!(o, Greater);
     ///
     /// let (z, o) =
     ///     BigExponentFloat::from(PI).average_prec_round(BigExponentFloat::from(E), 20, Nearest);
-    /// assert_eq!(format!("{z:?}"), "0x2.ee104");
+    /// assert_eq!(z.to_string(), "2.9299355");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -165,7 +165,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{z:?}"), "0x2.e");
+    /// assert_eq!(z.to_string(), "2.88");
     /// assert_eq!(o, Less);
     ///
     /// let (z, o) = BigExponentFloat::from(PI).average_prec_round_val_ref(
@@ -173,7 +173,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{z:?}"), "0x3.0");
+    /// assert_eq!(z.to_string(), "3.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (z, o) = BigExponentFloat::from(PI).average_prec_round_val_ref(
@@ -181,7 +181,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Nearest,
     /// );
-    /// assert_eq!(format!("{z:?}"), "0x2.e");
+    /// assert_eq!(z.to_string(), "2.88");
     /// assert_eq!(o, Less);
     ///
     /// let (z, o) = BigExponentFloat::from(PI).average_prec_round_val_ref(
@@ -189,7 +189,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{z:?}"), "0x2.ee104");
+    /// assert_eq!(z.to_string(), "2.9299355");
     /// assert_eq!(o, Less);
     ///
     /// let (z, o) = BigExponentFloat::from(PI).average_prec_round_val_ref(
@@ -197,7 +197,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{z:?}"), "0x2.ee108");
+    /// assert_eq!(z.to_string(), "2.929939");
     /// assert_eq!(o, Greater);
     ///
     /// let (z, o) = BigExponentFloat::from(PI).average_prec_round_val_ref(
@@ -205,7 +205,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Nearest,
     /// );
-    /// assert_eq!(format!("{z:?}"), "0x2.ee104");
+    /// assert_eq!(z.to_string(), "2.9299355");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -271,7 +271,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{z:?}"), "0x2.e");
+    /// assert_eq!(z.to_string(), "2.88");
     /// assert_eq!(o, Less);
     ///
     /// let (z, o) = (&BigExponentFloat::from(PI)).average_prec_round_ref_val(
@@ -279,7 +279,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{z:?}"), "0x3.0");
+    /// assert_eq!(z.to_string(), "3.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (z, o) = (&BigExponentFloat::from(PI)).average_prec_round_ref_val(
@@ -287,7 +287,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Nearest,
     /// );
-    /// assert_eq!(format!("{z:?}"), "0x2.e");
+    /// assert_eq!(z.to_string(), "2.88");
     /// assert_eq!(o, Less);
     ///
     /// let (z, o) = (&BigExponentFloat::from(PI)).average_prec_round_ref_val(
@@ -295,7 +295,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{z:?}"), "0x2.ee104");
+    /// assert_eq!(z.to_string(), "2.9299355");
     /// assert_eq!(o, Less);
     ///
     /// let (z, o) = (&BigExponentFloat::from(PI)).average_prec_round_ref_val(
@@ -303,7 +303,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{z:?}"), "0x2.ee108");
+    /// assert_eq!(z.to_string(), "2.929939");
     /// assert_eq!(o, Greater);
     ///
     /// let (z, o) = (&BigExponentFloat::from(PI)).average_prec_round_ref_val(
@@ -311,7 +311,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Nearest,
     /// );
-    /// assert_eq!(format!("{z:?}"), "0x2.ee104");
+    /// assert_eq!(z.to_string(), "2.9299355");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -377,7 +377,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{z:?}"), "0x2.e");
+    /// assert_eq!(z.to_string(), "2.88");
     /// assert_eq!(o, Less);
     ///
     /// let (z, o) = (&BigExponentFloat::from(PI)).average_prec_round_ref_ref(
@@ -385,7 +385,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{z:?}"), "0x3.0");
+    /// assert_eq!(z.to_string(), "3.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (z, o) = (&BigExponentFloat::from(PI)).average_prec_round_ref_ref(
@@ -393,7 +393,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Nearest,
     /// );
-    /// assert_eq!(format!("{z:?}"), "0x2.e");
+    /// assert_eq!(z.to_string(), "2.88");
     /// assert_eq!(o, Less);
     ///
     /// let (z, o) = (&BigExponentFloat::from(PI)).average_prec_round_ref_ref(
@@ -401,7 +401,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{z:?}"), "0x2.ee104");
+    /// assert_eq!(z.to_string(), "2.9299355");
     /// assert_eq!(o, Less);
     ///
     /// let (z, o) = (&BigExponentFloat::from(PI)).average_prec_round_ref_ref(
@@ -409,7 +409,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{z:?}"), "0x2.ee108");
+    /// assert_eq!(z.to_string(), "2.929939");
     /// assert_eq!(o, Greater);
     ///
     /// let (z, o) = (&BigExponentFloat::from(PI)).average_prec_round_ref_ref(
@@ -417,7 +417,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Nearest,
     /// );
-    /// assert_eq!(format!("{z:?}"), "0x2.ee104");
+    /// assert_eq!(z.to_string(), "2.9299355");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -474,42 +474,42 @@ impl BigExponentFloat {
     ///     x.average_prec_round_assign(BigExponentFloat::from(E), 5, Floor),
     ///     Less
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x2.e");
+    /// assert_eq!(x.to_string(), "2.88");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
     ///     x.average_prec_round_assign(BigExponentFloat::from(E), 5, Ceiling),
     ///     Greater
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x3.0");
+    /// assert_eq!(x.to_string(), "3.0");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
     ///     x.average_prec_round_assign(BigExponentFloat::from(E), 5, Nearest),
     ///     Less
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x2.e");
+    /// assert_eq!(x.to_string(), "2.88");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
     ///     x.average_prec_round_assign(BigExponentFloat::from(E), 20, Floor),
     ///     Less
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x2.ee104");
+    /// assert_eq!(x.to_string(), "2.9299355");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
     ///     x.average_prec_round_assign(BigExponentFloat::from(E), 20, Ceiling),
     ///     Greater
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x2.ee108");
+    /// assert_eq!(x.to_string(), "2.929939");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
     ///     x.average_prec_round_assign(BigExponentFloat::from(E), 20, Nearest),
     ///     Less
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x2.ee104");
+    /// assert_eq!(x.to_string(), "2.9299355");
     /// ```
     #[inline]
     pub fn average_prec_round_assign(
@@ -568,42 +568,42 @@ impl BigExponentFloat {
     ///     x.average_prec_round_assign_ref(&BigExponentFloat::from(E), 5, Floor),
     ///     Less
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x2.e");
+    /// assert_eq!(x.to_string(), "2.88");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
     ///     x.average_prec_round_assign_ref(&BigExponentFloat::from(E), 5, Ceiling),
     ///     Greater
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x3.0");
+    /// assert_eq!(x.to_string(), "3.0");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
     ///     x.average_prec_round_assign_ref(&BigExponentFloat::from(E), 5, Nearest),
     ///     Less
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x2.e");
+    /// assert_eq!(x.to_string(), "2.88");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
     ///     x.average_prec_round_assign_ref(&BigExponentFloat::from(E), 20, Floor),
     ///     Less
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x2.ee104");
+    /// assert_eq!(x.to_string(), "2.9299355");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
     ///     x.average_prec_round_assign_ref(&BigExponentFloat::from(E), 20, Ceiling),
     ///     Greater
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x2.ee108");
+    /// assert_eq!(x.to_string(), "2.929939");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
     ///     x.average_prec_round_assign_ref(&BigExponentFloat::from(E), 20, Nearest),
     ///     Less
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x2.ee104");
+    /// assert_eq!(x.to_string(), "2.9299355");
     /// ```
     #[inline]
     pub fn average_prec_round_assign_ref(
@@ -662,11 +662,11 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (z, o) = BigExponentFloat::from(PI).average_prec(BigExponentFloat::from(E), 5);
-    /// assert_eq!(format!("{z:?}"), "0x2.e");
+    /// assert_eq!(z.to_string(), "2.88");
     /// assert_eq!(o, Less);
     ///
     /// let (z, o) = BigExponentFloat::from(PI).average_prec(BigExponentFloat::from(E), 20);
-    /// assert_eq!(format!("{z:?}"), "0x2.ee104");
+    /// assert_eq!(z.to_string(), "2.9299355");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -716,12 +716,12 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (z, o) = BigExponentFloat::from(PI).average_prec_val_ref(&BigExponentFloat::from(E), 5);
-    /// assert_eq!(format!("{z:?}"), "0x2.e");
+    /// assert_eq!(z.to_string(), "2.88");
     /// assert_eq!(o, Less);
     ///
     /// let (z, o) =
     ///     BigExponentFloat::from(PI).average_prec_val_ref(&BigExponentFloat::from(E), 20);
-    /// assert_eq!(format!("{z:?}"), "0x2.ee104");
+    /// assert_eq!(z.to_string(), "2.9299355");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -776,12 +776,12 @@ impl BigExponentFloat {
     ///
     /// let (z, o) =
     ///     (&BigExponentFloat::from(PI)).average_prec_ref_val(BigExponentFloat::from(E), 5);
-    /// assert_eq!(format!("{z:?}"), "0x2.e");
+    /// assert_eq!(z.to_string(), "2.88");
     /// assert_eq!(o, Less);
     ///
     /// let (z, o) =
     ///     (&BigExponentFloat::from(PI)).average_prec_ref_val(BigExponentFloat::from(E), 20);
-    /// assert_eq!(format!("{z:?}"), "0x2.ee104");
+    /// assert_eq!(z.to_string(), "2.9299355");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -835,12 +835,12 @@ impl BigExponentFloat {
     ///
     /// let (z, o) =
     ///     (&BigExponentFloat::from(PI)).average_prec_ref_ref(&BigExponentFloat::from(E), 5);
-    /// assert_eq!(format!("{z:?}"), "0x2.e");
+    /// assert_eq!(z.to_string(), "2.88");
     /// assert_eq!(o, Less);
     ///
     /// let (z, o) =
     ///     (&BigExponentFloat::from(PI)).average_prec_ref_ref(&BigExponentFloat::from(E), 20);
-    /// assert_eq!(format!("{z:?}"), "0x2.ee104");
+    /// assert_eq!(z.to_string(), "2.9299355");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -887,11 +887,11 @@ impl BigExponentFloat {
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(x.average_prec_assign(BigExponentFloat::from(E), 5), Less);
-    /// assert_eq!(format!("{x:?}"), "0x2.e");
+    /// assert_eq!(x.to_string(), "2.88");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(x.average_prec_assign(BigExponentFloat::from(E), 20), Less);
-    /// assert_eq!(format!("{x:?}"), "0x2.ee104");
+    /// assert_eq!(x.to_string(), "2.9299355");
     /// ```
     #[inline]
     pub fn average_prec_assign(&mut self, other: Self, prec: u64) -> Ordering {
@@ -939,14 +939,14 @@ impl BigExponentFloat {
     ///     x.average_prec_assign_ref(&BigExponentFloat::from(E), 5),
     ///     Less
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x2.e");
+    /// assert_eq!(x.to_string(), "2.88");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
     ///     x.average_prec_assign_ref(&BigExponentFloat::from(E), 20),
     ///     Less
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x2.ee104");
+    /// assert_eq!(x.to_string(), "2.9299355");
     /// ```
     #[inline]
     pub fn average_prec_assign_ref(&mut self, other: &Self, prec: u64) -> Ordering {
@@ -988,11 +988,8 @@ impl Average<Self> for BigExponentFloat {
     /// use malachite_float::BigExponentFloat;
     ///
     /// assert_eq!(
-    ///     format!(
-    ///         "{:?}",
-    ///         BigExponentFloat::from(1.5).average(BigExponentFloat::from(2.25))
-    ///     ),
-    ///     "0x1.e"
+    ///     (BigExponentFloat::from(1.5).average(BigExponentFloat::from(2.25))).to_string(),
+    ///     "1.88"
     /// );
     /// ```
     #[inline]
@@ -1031,11 +1028,8 @@ impl Average<&Self> for BigExponentFloat {
     /// use malachite_float::BigExponentFloat;
     ///
     /// assert_eq!(
-    ///     format!(
-    ///         "{:?}",
-    ///         BigExponentFloat::from(1.5).average(&BigExponentFloat::from(2.25))
-    ///     ),
-    ///     "0x1.e"
+    ///     (BigExponentFloat::from(1.5).average(&BigExponentFloat::from(2.25))).to_string(),
+    ///     "1.88"
     /// );
     /// ```
     #[inline]
@@ -1074,11 +1068,8 @@ impl Average<BigExponentFloat> for &BigExponentFloat {
     /// use malachite_float::BigExponentFloat;
     ///
     /// assert_eq!(
-    ///     format!(
-    ///         "{:?}",
-    ///         (&BigExponentFloat::from(1.5)).average(BigExponentFloat::from(2.25))
-    ///     ),
-    ///     "0x1.e"
+    ///     ((&BigExponentFloat::from(1.5)).average(BigExponentFloat::from(2.25))).to_string(),
+    ///     "1.88"
     /// );
     /// ```
     #[inline]
@@ -1117,11 +1108,8 @@ impl Average<&BigExponentFloat> for &BigExponentFloat {
     /// use malachite_float::BigExponentFloat;
     ///
     /// assert_eq!(
-    ///     format!(
-    ///         "{:?}",
-    ///         (&BigExponentFloat::from(1.5)).average(&BigExponentFloat::from(2.25))
-    ///     ),
-    ///     "0x1.e"
+    ///     ((&BigExponentFloat::from(1.5)).average(&BigExponentFloat::from(2.25))).to_string(),
+    ///     "1.88"
     /// );
     /// ```
     #[inline]
@@ -1154,7 +1142,7 @@ impl AverageAssign<Self> for BigExponentFloat {
     ///
     /// let mut x = BigExponentFloat::from(1.5);
     /// x.average_assign(BigExponentFloat::from(2.25));
-    /// assert_eq!(format!("{x:?}"), "0x1.e");
+    /// assert_eq!(x.to_string(), "1.88");
     /// ```
     #[inline]
     fn average_assign(&mut self, other: Self) {
@@ -1187,7 +1175,7 @@ impl AverageAssign<&Self> for BigExponentFloat {
     ///
     /// let mut x = BigExponentFloat::from(1.5);
     /// x.average_assign(&BigExponentFloat::from(2.25));
-    /// assert_eq!(format!("{x:?}"), "0x1.e");
+    /// assert_eq!(x.to_string(), "1.88");
     /// ```
     #[inline]
     fn average_assign(&mut self, other: &Self) {

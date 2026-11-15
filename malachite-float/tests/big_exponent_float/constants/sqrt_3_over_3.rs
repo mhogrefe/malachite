@@ -20,34 +20,63 @@ fn same(x: &BigExponentFloat, y: &BigExponentFloat) -> bool {
 
 #[test]
 fn test_sqrt_3_over_3_prec_round() {
-    let cases: &[(u64, RoundingMode, &str, Ordering)] = &[
-        (1, Floor, "0x0.8", Less),
-        (1, Ceiling, "0x1.0", Greater),
-        (1, Down, "0x0.8", Less),
-        (1, Up, "0x1.0", Greater),
-        (1, Nearest, "0x0.8", Less),
-        (2, Floor, "0x0.8", Less),
-        (2, Ceiling, "0x0.c", Greater),
-        (2, Down, "0x0.8", Less),
-        (2, Up, "0x0.c", Greater),
-        (2, Nearest, "0x0.8", Less),
-        (10, Floor, "0x0.93c", Less),
-        (10, Ceiling, "0x0.94", Greater),
-        (10, Down, "0x0.93c", Less),
-        (10, Up, "0x0.94", Greater),
-        (10, Nearest, "0x0.93c", Less),
-        (100, Floor, "0x0.93cd3a2c8198e2690c7c0f257", Less),
-        (100, Ceiling, "0x0.93cd3a2c8198e2690c7c0f258", Greater),
-        (100, Down, "0x0.93cd3a2c8198e2690c7c0f257", Less),
-        (100, Up, "0x0.93cd3a2c8198e2690c7c0f258", Greater),
-        (100, Nearest, "0x0.93cd3a2c8198e2690c7c0f258", Greater),
-    ];
-    for &(p, rm, out, o) in cases {
+    let test = |p: u64, rm: RoundingMode, out: &str, out_hex: &str, o: Ordering| {
         let (x, o_alt) = BigExponentFloat::sqrt_3_over_3_prec_round(p, rm);
         assert!(x.is_valid());
-        assert_eq!(format!("{x:?}"), out, "{:?}", (p, rm));
+        assert_eq!(format!("{x:?}"), out_hex, "{:?}", (p, rm));
+        assert_eq!(x.to_string(), out);
         assert_eq!(o_alt, o);
-    }
+    };
+    test(1, Floor, "0.50", "0x0.8", Less);
+    test(1, Ceiling, "1.0", "0x1.0", Greater);
+    test(1, Down, "0.50", "0x0.8", Less);
+    test(1, Up, "1.0", "0x1.0", Greater);
+    test(1, Nearest, "0.50", "0x0.8", Less);
+    test(2, Floor, "0.50", "0x0.8", Less);
+    test(2, Ceiling, "0.75", "0x0.c", Greater);
+    test(2, Down, "0.50", "0x0.8", Less);
+    test(2, Up, "0.75", "0x0.c", Greater);
+    test(2, Nearest, "0.50", "0x0.8", Less);
+    test(10, Floor, "0.57715", "0x0.93c", Less);
+    test(10, Ceiling, "0.578", "0x0.94", Greater);
+    test(10, Down, "0.57715", "0x0.93c", Less);
+    test(10, Up, "0.578", "0x0.94", Greater);
+    test(10, Nearest, "0.57715", "0x0.93c", Less);
+    test(
+        100,
+        Floor,
+        "0.57735026918962576450914878050129",
+        "0x0.93cd3a2c8198e2690c7c0f257",
+        Less,
+    );
+    test(
+        100,
+        Ceiling,
+        "0.5773502691896257645091487805021",
+        "0x0.93cd3a2c8198e2690c7c0f258",
+        Greater,
+    );
+    test(
+        100,
+        Down,
+        "0.57735026918962576450914878050129",
+        "0x0.93cd3a2c8198e2690c7c0f257",
+        Less,
+    );
+    test(
+        100,
+        Up,
+        "0.5773502691896257645091487805021",
+        "0x0.93cd3a2c8198e2690c7c0f258",
+        Greater,
+    );
+    test(
+        100,
+        Nearest,
+        "0.5773502691896257645091487805021",
+        "0x0.93cd3a2c8198e2690c7c0f258",
+        Greater,
+    );
 }
 
 #[test]
@@ -87,18 +116,22 @@ fn sqrt_3_over_3_prec_round_properties() {
 
 #[test]
 fn test_sqrt_3_over_3_prec() {
-    let cases: &[(u64, &str, Ordering)] = &[
-        (1, "0x0.8", Less),
-        (2, "0x0.8", Less),
-        (10, "0x0.93c", Less),
-        (100, "0x0.93cd3a2c8198e2690c7c0f258", Greater),
-    ];
-    for &(p, out, o) in cases {
+    let test = |p: u64, out: &str, out_hex: &str, o: Ordering| {
         let (x, o_alt) = BigExponentFloat::sqrt_3_over_3_prec(p);
         assert!(x.is_valid());
-        assert_eq!(format!("{x:?}"), out, "{:?}", (p));
+        assert_eq!(format!("{x:?}"), out_hex, "{:?}", (p));
+        assert_eq!(x.to_string(), out);
         assert_eq!(o_alt, o);
-    }
+    };
+    test(1, "0.50", "0x0.8", Less);
+    test(2, "0.50", "0x0.8", Less);
+    test(10, "0.57715", "0x0.93c", Less);
+    test(
+        100,
+        "0.5773502691896257645091487805021",
+        "0x0.93cd3a2c8198e2690c7c0f258",
+        Greater,
+    );
 }
 
 #[test]

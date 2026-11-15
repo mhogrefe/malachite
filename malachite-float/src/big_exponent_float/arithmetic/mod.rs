@@ -19,27 +19,18 @@
 ///
 /// assert_eq!(BigExponentFloat::ZERO << 10, BigExponentFloat::ZERO);
 /// assert_eq!(BigExponentFloat::INFINITY << 10, BigExponentFloat::INFINITY);
-/// assert_eq!(
-///     format!("{:?}", BigExponentFloat::from(1.5) << 10u8),
-///     "0x6.0E+2"
-/// );
-/// assert_eq!(
-///     format!("{:?}", BigExponentFloat::from(1.5) << -10i8),
-///     "0x0.006"
-/// );
+/// assert_eq!((BigExponentFloat::from(1.5) << 10u8).to_string(), "1.5e3");
+/// assert_eq!((BigExponentFloat::from(1.5) << -10i8).to_string(), "0.0015");
 ///
 /// assert_eq!(&BigExponentFloat::ZERO << 10, BigExponentFloat::ZERO);
 /// assert_eq!(
 ///     &BigExponentFloat::INFINITY << 10,
 ///     BigExponentFloat::INFINITY
 /// );
+/// assert_eq!((&BigExponentFloat::from(1.5) << 10u8).to_string(), "1.5e3");
 /// assert_eq!(
-///     format!("{:?}", &BigExponentFloat::from(1.5) << 10u8),
-///     "0x6.0E+2"
-/// );
-/// assert_eq!(
-///     format!("{:?}", &BigExponentFloat::from(1.5) << -10i8),
-///     "0x0.006"
+///     (&BigExponentFloat::from(1.5) << -10i8).to_string(),
+///     "0.0015"
 /// );
 /// ```
 ///
@@ -58,11 +49,11 @@
 ///
 /// let mut x = BigExponentFloat::from(1.5);
 /// x <<= 10;
-/// assert_eq!(format!("{x:?}"), "0x6.0E+2");
+/// assert_eq!(x.to_string(), "1.5e3");
 ///
 /// let mut x = BigExponentFloat::from(1.5);
 /// x <<= -10;
-/// assert_eq!(format!("{x:?}"), "0x0.006");
+/// assert_eq!(x.to_string(), "0.0015");
 /// ```
 /// Right-shifting a [`BigExponentFloat`](super::BigExponentFloat) (dividing it by a power of 2).
 ///
@@ -73,28 +64,16 @@
 ///
 /// assert_eq!(BigExponentFloat::ZERO >> 10, BigExponentFloat::ZERO);
 /// assert_eq!(BigExponentFloat::INFINITY >> 10, BigExponentFloat::INFINITY);
-/// assert_eq!(
-///     format!("{:?}", BigExponentFloat::from(1.5) >> 10u8),
-///     "0x0.006"
-/// );
-/// assert_eq!(
-///     format!("{:?}", BigExponentFloat::from(1.5) >> -10i8),
-///     "0x6.0E+2"
-/// );
+/// assert_eq!((BigExponentFloat::from(1.5) >> 10u8).to_string(), "0.0015");
+/// assert_eq!((BigExponentFloat::from(1.5) >> -10i8).to_string(), "1.5e3");
 ///
 /// assert_eq!(&BigExponentFloat::ZERO >> 10, BigExponentFloat::ZERO);
 /// assert_eq!(
 ///     &BigExponentFloat::INFINITY >> 10,
 ///     BigExponentFloat::INFINITY
 /// );
-/// assert_eq!(
-///     format!("{:?}", &BigExponentFloat::from(1.5) >> 10u8),
-///     "0x0.006"
-/// );
-/// assert_eq!(
-///     format!("{:?}", &BigExponentFloat::from(1.5) >> -10i8),
-///     "0x6.0E+2"
-/// );
+/// assert_eq!((&BigExponentFloat::from(1.5) >> 10u8).to_string(), "0.0015");
+/// assert_eq!((&BigExponentFloat::from(1.5) >> -10i8).to_string(), "1.5e3");
 /// ```
 ///
 /// # shr_assign
@@ -112,11 +91,11 @@
 ///
 /// let mut x = BigExponentFloat::from(1.5);
 /// x >>= 10;
-/// assert_eq!(format!("{x:?}"), "0x0.006");
+/// assert_eq!(x.to_string(), "0.0015");
 ///
 /// let mut x = BigExponentFloat::from(1.5);
 /// x >>= -10;
-/// assert_eq!(format!("{x:?}"), "0x6.0E+2");
+/// assert_eq!(x.to_string(), "1.5e3");
 /// ```
 /// An implementation of [`Sign`](malachite_base::num::arithmetic::traits::Sign), a trait for
 /// determining the sign of a number. Squaring of [`BigExponentFloat`](super::BigExponentFloat)s,

@@ -51,11 +51,11 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::dottie_number_prec_round(100, Floor);
-    /// assert_eq!(format!("{x:?}"), "0x0.bd34aeec1e716dcad51803874");
+    /// assert_eq!(x.to_string(), "0.7390851332151606416553120876735");
     /// assert_eq!(o, Less);
     ///
     /// let (x, o) = BigExponentFloat::dottie_number_prec_round(100, Ceiling);
-    /// assert_eq!(format!("{x:?}"), "0x0.bd34aeec1e716dcad51803875");
+    /// assert_eq!(x.to_string(), "0.73908513321516064165531208767425");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -96,15 +96,15 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::dottie_number_prec(1);
-    /// assert_eq!(format!("{x:?}"), "0x0.8");
+    /// assert_eq!(x.to_string(), "0.50");
     /// assert_eq!(o, Less);
     ///
     /// let (x, o) = BigExponentFloat::dottie_number_prec(10);
-    /// assert_eq!(format!("{x:?}"), "0x0.bd4");
+    /// assert_eq!(x.to_string(), "0.73926");
     /// assert_eq!(o, Greater);
     ///
     /// let (x, o) = BigExponentFloat::dottie_number_prec(100);
-    /// assert_eq!(format!("{x:?}"), "0x0.bd34aeec1e716dcad51803875");
+    /// assert_eq!(x.to_string(), "0.73908513321516064165531208767425");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]

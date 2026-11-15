@@ -17,11 +17,13 @@ fn test_exhaustive_positive_big_exponent_floats_with_sci_exponent_and_precision(
     exhaustive_big_exponent_floats_helper_helper(
         exhaustive_positive_big_exponent_floats_with_sci_exponent_and_precision(Integer::ZERO, 1),
         50,
+        &["1.0"],
         &["0x1.0"],
     );
     exhaustive_big_exponent_floats_helper_helper(
         exhaustive_positive_big_exponent_floats_with_sci_exponent_and_precision(Integer::ZERO, 4),
         50,
+        &["1.12", "1.38", "1.62", "1.88"],
         &["0x1.2", "0x1.6", "0x1.a", "0x1.e"],
     );
     exhaustive_big_exponent_floats_helper_helper(
@@ -30,6 +32,10 @@ fn test_exhaustive_positive_big_exponent_floats_with_sci_exponent_and_precision(
             6,
         ),
         50,
+        &[
+            "0.129", "0.137", "0.145", "0.152", "0.160", "0.168", "0.176", "0.184", "0.191",
+            "0.199", "0.207", "0.215", "0.223", "0.230", "0.238", "0.246",
+        ],
         &[
             "0x0.21", "0x0.23", "0x0.25", "0x0.27", "0x0.29", "0x0.2b", "0x0.2d", "0x0.2f",
             "0x0.31", "0x0.33", "0x0.35", "0x0.37", "0x0.39", "0x0.3b", "0x0.3d", "0x0.3f",
@@ -41,6 +47,7 @@ fn test_exhaustive_positive_big_exponent_floats_with_sci_exponent_and_precision(
             3,
         ),
         50,
+        &["6.9e301029995663981195213", "9.6e301029995663981195213"],
         &["0x1.4E+250000000000000000000", "0x1.cE+250000000000000000000"],
     );
 }

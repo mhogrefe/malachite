@@ -7,39 +7,15 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, NegativeOne, One, Zero};
+use malachite_base::strings::ToDebugString;
 use malachite_float::BigExponentFloat;
 use malachite_float::test_util::big_exponent_float::{
-    big_exponent_float_power_of_2, big_exponent_float_to_float, float_to_big_exponent_float,
-    parse_big_exponent_float_hex,
+    big_exponent_float_to_float, float_to_big_exponent_float, parse_big_exponent_float_hex,
 };
 use malachite_float::test_util::generators::{
     big_exponent_float_gen, big_exponent_float_gen_var_1, float_gen,
 };
-use malachite_nz::integer::Integer;
 use std::num::FpCategory;
-use std::str::FromStr;
-
-// (hex, is_nan, is_finite, is_infinite, is_zero, is_normal, is_sign_positive, is_sign_negative)
-const CASES: [(&str, [bool; 7]); 9] = [
-    ("NaN", [true, false, false, false, false, false, false]),
-    ("Infinity", [false, false, true, false, false, true, false]),
-    ("-Infinity", [false, false, true, false, false, false, true]),
-    ("0x0.0", [false, true, false, true, false, true, false]),
-    ("0x1.0#1", [false, true, false, false, true, true, false]),
-    ("-0x1.0#1", [false, true, false, false, true, false, true]),
-    (
-        "0x0.55555555555554#53",
-        [false, true, false, false, true, true, false],
-    ),
-    (
-        "-0x3.243f6a8885a30#53",
-        [false, true, false, false, true, false, true],
-    ),
-    (
-        "0x4.0E+268435455#1",
-        [false, true, false, false, true, true, false],
-    ),
-];
 
 const fn predicates(x: &BigExponentFloat) -> [bool; 7] {
     [
@@ -55,19 +31,67 @@ const fn predicates(x: &BigExponentFloat) -> [bool; 7] {
 
 #[test]
 fn test_classification() {
-    for (s, out) in CASES {
-        let x = parse_big_exponent_float_hex(s);
-        assert_eq!(predicates(&x), out, "{s}");
-    }
-    // - an exponent far outside `Float`'s range
-    for e in ["1000000000000000000000", "-1000000000000000000000"] {
-        let x = big_exponent_float_power_of_2(Integer::from_str(e).unwrap());
-        assert_eq!(
-            predicates(&x),
-            [false, true, false, false, true, true, false]
-        );
-        assert_eq!(x.classify(), FpCategory::Normal);
-    }
+    // - out: is_nan, is_finite, is_infinite, is_zero, is_normal, is_sign_positive, is_sign_negative
+    let test = |s, s_hex, out| {
+        let x = parse_big_exponent_float_hex(s_hex);
+        assert_eq!(x.to_string(), s);
+        assert_eq!(predicates(&x), out, "{s_hex}");
+    };
+    test(
+        "NaN",
+        "NaN",
+        [true, false, false, false, false, false, false],
+    );
+    test(
+        "Infinity",
+        "Infinity",
+        [false, false, true, false, false, true, false],
+    );
+    test(
+        "-Infinity",
+        "-Infinity",
+        [false, false, true, false, false, false, true],
+    );
+    test(
+        "0.0",
+        "0x0.0",
+        [false, true, false, true, false, true, false],
+    );
+    test(
+        "1.0",
+        "0x1.0#1",
+        [false, true, false, false, true, true, false],
+    );
+    test(
+        "-1.0",
+        "-0x1.0#1",
+        [false, true, false, false, true, false, true],
+    );
+    test(
+        "0.33333333333333331",
+        "0x0.55555555555554#53",
+        [false, true, false, false, true, true, false],
+    );
+    test(
+        "-3.1415926535897931",
+        "-0x3.243f6a8885a30#53",
+        [false, true, false, false, true, false, true],
+    );
+    test(
+        "1.0e323228496",
+        "0x4.0E+268435455#1",
+        [false, true, false, false, true, true, false],
+    );
+    test(
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        [false, true, false, false, true, true, false],
+    );
+    test(
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
+        [false, true, false, false, true, true, false],
+    );
     assert_eq!(BigExponentFloat::NAN.classify(), FpCategory::Nan);
     assert_eq!(BigExponentFloat::INFINITY.classify(), FpCategory::Infinite);
     assert_eq!(
@@ -80,22 +104,68 @@ fn test_classification() {
         BigExponentFloat::NEGATIVE_ONE.classify(),
         FpCategory::Normal
     );
+    assert_eq!(
+        parse_big_exponent_float_hex("0x1.0E+25000000000000000000").classify(),
+        FpCategory::Normal
+    );
 }
 
 #[test]
 fn test_into_and_to_finite_and_non_nan() {
-    let test = |s, non_nan: &str, finite: &str| {
-        let x = parse_big_exponent_float_hex(s);
-        assert_eq!(format!("{:?}", x.to_non_nan()), non_nan);
-        assert_eq!(format!("{:?}", x.clone().into_non_nan()), non_nan);
-        assert_eq!(format!("{:?}", x.to_finite()), finite);
-        assert_eq!(format!("{:?}", x.into_finite()), finite);
+    let test = |s,
+                s_hex,
+                non_nan: Option<&str>,
+                non_nan_hex: Option<&str>,
+                finite: Option<&str>,
+                finite_hex: Option<&str>| {
+        let x = parse_big_exponent_float_hex(s_hex);
+        assert_eq!(x.to_string(), s);
+        let check = |y: Option<BigExponentFloat>, out: Option<&str>, out_hex: Option<&str>| {
+            assert!(y.as_ref().is_none_or(BigExponentFloat::is_valid));
+            assert_eq!(y.as_ref().map(ToString::to_string).as_deref(), out);
+            assert_eq!(
+                y.as_ref().map(ToDebugString::to_debug_string).as_deref(),
+                out_hex
+            );
+        };
+        check(x.to_non_nan(), non_nan, non_nan_hex);
+        check(x.clone().into_non_nan(), non_nan, non_nan_hex);
+        check(x.to_finite(), finite, finite_hex);
+        check(x.into_finite(), finite, finite_hex);
     };
-    test("NaN", "None", "None");
-    test("Infinity", "Some(Infinity)", "None");
-    test("-Infinity", "Some(-Infinity)", "None");
-    test("0x0.0", "Some(0x0.0)", "Some(0x0.0)");
-    test("-0x1.8#2", "Some(-0x1.8)", "Some(-0x1.8)");
+    test("NaN", "NaN", None, None, None, None);
+    test(
+        "Infinity",
+        "Infinity",
+        Some("Infinity"),
+        Some("Infinity"),
+        None,
+        None,
+    );
+    test(
+        "-Infinity",
+        "-Infinity",
+        Some("-Infinity"),
+        Some("-Infinity"),
+        None,
+        None,
+    );
+    test(
+        "0.0",
+        "0x0.0",
+        Some("0.0"),
+        Some("0x0.0"),
+        Some("0.0"),
+        Some("0x0.0"),
+    );
+    test(
+        "-1.5",
+        "-0x1.8#2",
+        Some("-1.5"),
+        Some("-0x1.8"),
+        Some("-1.5"),
+        Some("-0x1.8"),
+    );
 }
 
 #[test]

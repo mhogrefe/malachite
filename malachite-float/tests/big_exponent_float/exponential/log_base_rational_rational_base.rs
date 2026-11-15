@@ -64,188 +64,235 @@ fn log_base_rational_rational_base_prec_round_all(
 #[test]
 fn test_log_base_rational_rational_base_prec_round() {
     // The expected values agree with FLINT's arb (see the `arf_logarithm_general` oracle mode).
-    let cases: &[(&str, &str, u64, RoundingMode, &str, Ordering)] = &[
-        ("3/5", "3/2", 1, Nearest, "-0x1.0", Greater),
-        ("3/5", "3/2", 10, Floor, "-0x1.43", Less),
-        ("3/5", "3/2", 10, Ceiling, "-0x1.428", Greater),
-        ("3/5", "3/2", 10, Down, "-0x1.428", Greater),
-        ("3/5", "3/2", 10, Up, "-0x1.43", Less),
-        ("3/5", "3/2", 10, Nearest, "-0x1.428", Greater),
-        (
-            "3/5",
-            "3/2",
-            100,
-            Nearest,
-            "-0x1.4285986e701f27888ea9387de",
-            Greater,
-        ),
-        ("3/5", "9", 1, Nearest, "-0x0.4", Less),
-        ("3/5", "9", 10, Floor, "-0x0.3b9", Less),
-        ("3/5", "9", 10, Ceiling, "-0x0.3b8", Greater),
-        ("3/5", "9", 10, Down, "-0x0.3b8", Greater),
-        ("3/5", "9", 10, Up, "-0x0.3b9", Less),
-        ("3/5", "9", 10, Nearest, "-0x0.3b8", Greater),
-        (
-            "3/5",
-            "9",
-            100,
-            Nearest,
-            "-0x0.3b8440987ea72322ae1e4e54c4",
-            Greater,
-        ),
-        ("9", "3/2", 1, Nearest, "0x4.0", Less),
-        ("9", "3/2", 10, Floor, "0x5.6a", Less),
-        ("9", "3/2", 10, Ceiling, "0x5.6c", Greater),
-        ("9", "3/2", 10, Down, "0x5.6a", Less),
-        ("9", "3/2", 10, Up, "0x5.6c", Greater),
-        ("9", "3/2", 10, Nearest, "0x5.6c", Greater),
-        (
-            "9",
-            "3/2",
-            100,
-            Nearest,
-            "0x5.6b451060fe9464f4ec69fd848",
-            Greater,
-        ),
-        ("9", "9", 1, Nearest, "0x1.0", Equal),
-        ("9", "9", 10, Floor, "0x1.0", Equal),
-        ("9", "9", 10, Ceiling, "0x1.0", Equal),
-        ("9", "9", 10, Down, "0x1.0", Equal),
-        ("9", "9", 10, Up, "0x1.0", Equal),
-        ("9", "9", 10, Nearest, "0x1.0", Equal),
-        ("9", "9", 100, Nearest, "0x1.0", Equal),
-        ("9", "9", 300, Exact, "0x1.0", Equal),
-        ("1/9", "3/2", 1, Nearest, "-0x4.0", Greater),
-        ("1/9", "3/2", 10, Floor, "-0x5.6c", Less),
-        ("1/9", "3/2", 10, Ceiling, "-0x5.6a", Greater),
-        ("1/9", "3/2", 10, Down, "-0x5.6a", Greater),
-        ("1/9", "3/2", 10, Up, "-0x5.6c", Less),
-        ("1/9", "3/2", 10, Nearest, "-0x5.6c", Less),
-        (
-            "1/9",
-            "3/2",
-            100,
-            Nearest,
-            "-0x5.6b451060fe9464f4ec69fd848",
-            Less,
-        ),
-        ("1/9", "9", 1, Nearest, "-0x1.0", Equal),
-        ("1/9", "9", 10, Floor, "-0x1.0", Equal),
-        ("1/9", "9", 10, Ceiling, "-0x1.0", Equal),
-        ("1/9", "9", 10, Down, "-0x1.0", Equal),
-        ("1/9", "9", 10, Up, "-0x1.0", Equal),
-        ("1/9", "9", 10, Nearest, "-0x1.0", Equal),
-        ("1/9", "9", 100, Nearest, "-0x1.0", Equal),
-        ("1/9", "9", 300, Exact, "-0x1.0", Equal),
-        ("1/3", "3/2", 1, Nearest, "-0x2.0", Greater),
-        ("1/3", "3/2", 10, Floor, "-0x2.b6", Less),
-        ("1/3", "3/2", 10, Ceiling, "-0x2.b5", Greater),
-        ("1/3", "3/2", 10, Down, "-0x2.b5", Greater),
-        ("1/3", "3/2", 10, Up, "-0x2.b6", Less),
-        ("1/3", "3/2", 10, Nearest, "-0x2.b6", Less),
-        (
-            "1/3",
-            "3/2",
-            100,
-            Nearest,
-            "-0x2.b5a288307f4a327a7634fec24",
-            Less,
-        ),
-        ("1/3", "9", 1, Nearest, "-0x0.8", Equal),
-        ("1/3", "9", 10, Floor, "-0x0.8", Equal),
-        ("1/3", "9", 10, Ceiling, "-0x0.8", Equal),
-        ("1/3", "9", 10, Down, "-0x0.8", Equal),
-        ("1/3", "9", 10, Up, "-0x0.8", Equal),
-        ("1/3", "9", 10, Nearest, "-0x0.8", Equal),
-        ("1/3", "9", 100, Nearest, "-0x0.8", Equal),
-        ("1/3", "9", 300, Exact, "-0x0.8", Equal),
-        ("10000000000/3", "3/2", 1, Nearest, "0x4.0E+1", Greater),
-        ("10000000000/3", "3/2", 10, Floor, "0x36.1", Less),
-        ("10000000000/3", "3/2", 10, Ceiling, "0x36.2", Greater),
-        ("10000000000/3", "3/2", 10, Down, "0x36.1", Less),
-        ("10000000000/3", "3/2", 10, Up, "0x36.2", Greater),
-        ("10000000000/3", "3/2", 10, Nearest, "0x36.1", Less),
-        (
-            "10000000000/3",
-            "3/2",
-            100,
-            Nearest,
-            "0x36.14480fe9d3b94a6c588b1d54",
-            Less,
-        ),
-        ("10000000000/3", "9", 1, Nearest, "0x8.0", Less),
-        ("10000000000/3", "9", 10, Floor, "0x9.f8", Less),
-        ("10000000000/3", "9", 10, Ceiling, "0x9.fc", Greater),
-        ("10000000000/3", "9", 10, Down, "0x9.f8", Less),
-        ("10000000000/3", "9", 10, Up, "0x9.fc", Greater),
-        ("10000000000/3", "9", 10, Nearest, "0x9.fc", Greater),
-        (
-            "10000000000/3",
-            "9",
-            100,
-            Nearest,
-            "0x9.fac195bd42d8ede0e2687ca6",
-            Greater,
-        ),
-        ("1", "3/2", 1, Nearest, "0x0.0", Equal),
-        ("1", "3/2", 10, Floor, "0x0.0", Equal),
-        ("1", "3/2", 10, Ceiling, "0x0.0", Equal),
-        ("1", "3/2", 10, Down, "0x0.0", Equal),
-        ("1", "3/2", 10, Up, "0x0.0", Equal),
-        ("1", "3/2", 10, Nearest, "0x0.0", Equal),
-        ("1", "3/2", 100, Nearest, "0x0.0", Equal),
-        ("1", "3/2", 300, Exact, "0x0.0", Equal),
-        ("1", "9", 1, Nearest, "0x0.0", Equal),
-        ("1", "9", 10, Floor, "0x0.0", Equal),
-        ("1", "9", 10, Ceiling, "0x0.0", Equal),
-        ("1", "9", 10, Down, "0x0.0", Equal),
-        ("1", "9", 10, Up, "0x0.0", Equal),
-        ("1", "9", 10, Nearest, "0x0.0", Equal),
-        ("1", "9", 100, Nearest, "0x0.0", Equal),
-        ("1", "9", 300, Exact, "0x0.0", Equal),
-        ("0", "3/2", 1, Nearest, "-Infinity", Equal),
-        ("0", "3/2", 10, Floor, "-Infinity", Equal),
-        ("0", "3/2", 10, Ceiling, "-Infinity", Equal),
-        ("0", "3/2", 10, Down, "-Infinity", Equal),
-        ("0", "3/2", 10, Up, "-Infinity", Equal),
-        ("0", "3/2", 10, Nearest, "-Infinity", Equal),
-        ("0", "3/2", 100, Nearest, "-Infinity", Equal),
-        ("0", "3/2", 300, Exact, "-Infinity", Equal),
-        ("0", "9", 1, Nearest, "-Infinity", Equal),
-        ("0", "9", 10, Floor, "-Infinity", Equal),
-        ("0", "9", 10, Ceiling, "-Infinity", Equal),
-        ("0", "9", 10, Down, "-Infinity", Equal),
-        ("0", "9", 10, Up, "-Infinity", Equal),
-        ("0", "9", 10, Nearest, "-Infinity", Equal),
-        ("0", "9", 100, Nearest, "-Infinity", Equal),
-        ("0", "9", 300, Exact, "-Infinity", Equal),
-        ("-1", "3/2", 1, Nearest, "NaN", Equal),
-        ("-1", "3/2", 10, Floor, "NaN", Equal),
-        ("-1", "3/2", 10, Ceiling, "NaN", Equal),
-        ("-1", "3/2", 10, Down, "NaN", Equal),
-        ("-1", "3/2", 10, Up, "NaN", Equal),
-        ("-1", "3/2", 10, Nearest, "NaN", Equal),
-        ("-1", "3/2", 100, Nearest, "NaN", Equal),
-        ("-1", "3/2", 300, Exact, "NaN", Equal),
-        ("-1", "9", 1, Nearest, "NaN", Equal),
-        ("-1", "9", 10, Floor, "NaN", Equal),
-        ("-1", "9", 10, Ceiling, "NaN", Equal),
-        ("-1", "9", 10, Down, "NaN", Equal),
-        ("-1", "9", 10, Up, "NaN", Equal),
-        ("-1", "9", 10, Nearest, "NaN", Equal),
-        ("-1", "9", 100, Nearest, "NaN", Equal),
-        ("-1", "9", 300, Exact, "NaN", Equal),
-    ];
-    for &(x, b, prec, rm, out, o) in cases {
-        let r = log_base_rational_rational_base_prec_round_all(
-            &Rational::from_str(x).unwrap(),
-            &Rational::from_str(b).unwrap(),
-            prec,
-            rm,
-        );
-        assert_eq!(format!("{:?}", r.0), out, "{x} {b} {prec} {rm}");
-        assert_eq!(r.1, o, "{x} {b} {prec} {rm}");
-    }
+    let test =
+        |x: &str, b: &str, prec: u64, rm: RoundingMode, out: &str, out_hex: &str, o: Ordering| {
+            let r = log_base_rational_rational_base_prec_round_all(
+                &Rational::from_str(x).unwrap(),
+                &Rational::from_str(b).unwrap(),
+                prec,
+                rm,
+            );
+            assert_eq!(format!("{:?}", r.0), out_hex, "{x} {b} {prec} {rm}");
+            assert_eq!(r.0.to_string(), out);
+            assert_eq!(r.1, o, "{x} {b} {prec} {rm}");
+        };
+    test("3/5", "3/2", 1, Nearest, "-1.0", "-0x1.0", Greater);
+    test("3/5", "3/2", 10, Floor, "-1.262", "-0x1.43", Less);
+    test("3/5", "3/2", 10, Ceiling, "-1.2598", "-0x1.428", Greater);
+    test("3/5", "3/2", 10, Down, "-1.2598", "-0x1.428", Greater);
+    test("3/5", "3/2", 10, Up, "-1.262", "-0x1.43", Less);
+    test("3/5", "3/2", 10, Nearest, "-1.2598", "-0x1.428", Greater);
+    test(
+        "3/5",
+        "3/2",
+        100,
+        Nearest,
+        "-1.2598510045646632506597788812136",
+        "-0x1.4285986e701f27888ea9387de",
+        Greater,
+    );
+    test("3/5", "9", 1, Nearest, "-0.25", "-0x0.4", Less);
+    test("3/5", "9", 10, Floor, "-0.23267", "-0x0.3b9", Less);
+    test("3/5", "9", 10, Ceiling, "-0.2324", "-0x0.3b8", Greater);
+    test("3/5", "9", 10, Down, "-0.2324", "-0x0.3b8", Greater);
+    test("3/5", "9", 10, Up, "-0.23267", "-0x0.3b9", Less);
+    test("3/5", "9", 10, Nearest, "-0.2324", "-0x0.3b8", Greater);
+    test(
+        "3/5",
+        "9",
+        100,
+        Nearest,
+        "-0.23248676035896358359852020383927",
+        "-0x0.3b8440987ea72322ae1e4e54c4",
+        Greater,
+    );
+    test("9", "3/2", 1, Nearest, "4.0", "0x4.0", Less);
+    test("9", "3/2", 10, Floor, "5.4141", "0x5.6a", Less);
+    test("9", "3/2", 10, Ceiling, "5.422", "0x5.6c", Greater);
+    test("9", "3/2", 10, Down, "5.4141", "0x5.6a", Less);
+    test("9", "3/2", 10, Up, "5.422", "0x5.6c", Greater);
+    test("9", "3/2", 10, Nearest, "5.422", "0x5.6c", Greater);
+    test(
+        "9",
+        "3/2",
+        100,
+        Nearest,
+        "5.4190225827029095539523805243486",
+        "0x5.6b451060fe9464f4ec69fd848",
+        Greater,
+    );
+    test("9", "9", 1, Nearest, "1.0", "0x1.0", Equal);
+    test("9", "9", 10, Floor, "1.0", "0x1.0", Equal);
+    test("9", "9", 10, Ceiling, "1.0", "0x1.0", Equal);
+    test("9", "9", 10, Down, "1.0", "0x1.0", Equal);
+    test("9", "9", 10, Up, "1.0", "0x1.0", Equal);
+    test("9", "9", 10, Nearest, "1.0", "0x1.0", Equal);
+    test("9", "9", 100, Nearest, "1.0", "0x1.0", Equal);
+    test("9", "9", 300, Exact, "1.0", "0x1.0", Equal);
+    test("1/9", "3/2", 1, Nearest, "-4.0", "-0x4.0", Greater);
+    test("1/9", "3/2", 10, Floor, "-5.422", "-0x5.6c", Less);
+    test("1/9", "3/2", 10, Ceiling, "-5.4141", "-0x5.6a", Greater);
+    test("1/9", "3/2", 10, Down, "-5.4141", "-0x5.6a", Greater);
+    test("1/9", "3/2", 10, Up, "-5.422", "-0x5.6c", Less);
+    test("1/9", "3/2", 10, Nearest, "-5.422", "-0x5.6c", Less);
+    test(
+        "1/9",
+        "3/2",
+        100,
+        Nearest,
+        "-5.4190225827029095539523805243486",
+        "-0x5.6b451060fe9464f4ec69fd848",
+        Less,
+    );
+    test("1/9", "9", 1, Nearest, "-1.0", "-0x1.0", Equal);
+    test("1/9", "9", 10, Floor, "-1.0", "-0x1.0", Equal);
+    test("1/9", "9", 10, Ceiling, "-1.0", "-0x1.0", Equal);
+    test("1/9", "9", 10, Down, "-1.0", "-0x1.0", Equal);
+    test("1/9", "9", 10, Up, "-1.0", "-0x1.0", Equal);
+    test("1/9", "9", 10, Nearest, "-1.0", "-0x1.0", Equal);
+    test("1/9", "9", 100, Nearest, "-1.0", "-0x1.0", Equal);
+    test("1/9", "9", 300, Exact, "-1.0", "-0x1.0", Equal);
+    test("1/3", "3/2", 1, Nearest, "-2.0", "-0x2.0", Greater);
+    test("1/3", "3/2", 10, Floor, "-2.711", "-0x2.b6", Less);
+    test("1/3", "3/2", 10, Ceiling, "-2.7070", "-0x2.b5", Greater);
+    test("1/3", "3/2", 10, Down, "-2.7070", "-0x2.b5", Greater);
+    test("1/3", "3/2", 10, Up, "-2.711", "-0x2.b6", Less);
+    test("1/3", "3/2", 10, Nearest, "-2.711", "-0x2.b6", Less);
+    test(
+        "1/3",
+        "3/2",
+        100,
+        Nearest,
+        "-2.7095112913514547769761902621743",
+        "-0x2.b5a288307f4a327a7634fec24",
+        Less,
+    );
+    test("1/3", "9", 1, Nearest, "-0.50", "-0x0.8", Equal);
+    test("1/3", "9", 10, Floor, "-0.50", "-0x0.8", Equal);
+    test("1/3", "9", 10, Ceiling, "-0.50", "-0x0.8", Equal);
+    test("1/3", "9", 10, Down, "-0.50", "-0x0.8", Equal);
+    test("1/3", "9", 10, Up, "-0.50", "-0x0.8", Equal);
+    test("1/3", "9", 10, Nearest, "-0.50", "-0x0.8", Equal);
+    test("1/3", "9", 100, Nearest, "-0.50", "-0x0.8", Equal);
+    test("1/3", "9", 300, Exact, "-0.50", "-0x0.8", Equal);
+    test(
+        "10000000000/3",
+        "3/2",
+        1,
+        Nearest,
+        "64.0",
+        "0x4.0E+1",
+        Greater,
+    );
+    test("10000000000/3", "3/2", 10, Floor, "54.062", "0x36.1", Less);
+    test(
+        "10000000000/3",
+        "3/2",
+        10,
+        Ceiling,
+        "54.12",
+        "0x36.2",
+        Greater,
+    );
+    test("10000000000/3", "3/2", 10, Down, "54.062", "0x36.1", Less);
+    test("10000000000/3", "3/2", 10, Up, "54.12", "0x36.2", Greater);
+    test(
+        "10000000000/3",
+        "3/2",
+        10,
+        Nearest,
+        "54.062",
+        "0x36.1",
+        Less,
+    );
+    test(
+        "10000000000/3",
+        "3/2",
+        100,
+        Nearest,
+        "54.079224581324273269145403793429",
+        "0x36.14480fe9d3b94a6c588b1d54",
+        Less,
+    );
+    test("10000000000/3", "9", 1, Nearest, "8.0", "0x8.0", Less);
+    test("10000000000/3", "9", 10, Floor, "9.969", "0x9.f8", Less);
+    test(
+        "10000000000/3",
+        "9",
+        10,
+        Ceiling,
+        "9.9844",
+        "0x9.fc",
+        Greater,
+    );
+    test("10000000000/3", "9", 10, Down, "9.969", "0x9.f8", Less);
+    test("10000000000/3", "9", 10, Up, "9.9844", "0x9.fc", Greater);
+    test(
+        "10000000000/3",
+        "9",
+        10,
+        Nearest,
+        "9.9844",
+        "0x9.fc",
+        Greater,
+    );
+    test(
+        "10000000000/3",
+        "9",
+        100,
+        Nearest,
+        "9.979516371446923021482837610113",
+        "0x9.fac195bd42d8ede0e2687ca6",
+        Greater,
+    );
+    test("1", "3/2", 1, Nearest, "0.0", "0x0.0", Equal);
+    test("1", "3/2", 10, Floor, "0.0", "0x0.0", Equal);
+    test("1", "3/2", 10, Ceiling, "0.0", "0x0.0", Equal);
+    test("1", "3/2", 10, Down, "0.0", "0x0.0", Equal);
+    test("1", "3/2", 10, Up, "0.0", "0x0.0", Equal);
+    test("1", "3/2", 10, Nearest, "0.0", "0x0.0", Equal);
+    test("1", "3/2", 100, Nearest, "0.0", "0x0.0", Equal);
+    test("1", "3/2", 300, Exact, "0.0", "0x0.0", Equal);
+    test("1", "9", 1, Nearest, "0.0", "0x0.0", Equal);
+    test("1", "9", 10, Floor, "0.0", "0x0.0", Equal);
+    test("1", "9", 10, Ceiling, "0.0", "0x0.0", Equal);
+    test("1", "9", 10, Down, "0.0", "0x0.0", Equal);
+    test("1", "9", 10, Up, "0.0", "0x0.0", Equal);
+    test("1", "9", 10, Nearest, "0.0", "0x0.0", Equal);
+    test("1", "9", 100, Nearest, "0.0", "0x0.0", Equal);
+    test("1", "9", 300, Exact, "0.0", "0x0.0", Equal);
+    test("0", "3/2", 1, Nearest, "-Infinity", "-Infinity", Equal);
+    test("0", "3/2", 10, Floor, "-Infinity", "-Infinity", Equal);
+    test("0", "3/2", 10, Ceiling, "-Infinity", "-Infinity", Equal);
+    test("0", "3/2", 10, Down, "-Infinity", "-Infinity", Equal);
+    test("0", "3/2", 10, Up, "-Infinity", "-Infinity", Equal);
+    test("0", "3/2", 10, Nearest, "-Infinity", "-Infinity", Equal);
+    test("0", "3/2", 100, Nearest, "-Infinity", "-Infinity", Equal);
+    test("0", "3/2", 300, Exact, "-Infinity", "-Infinity", Equal);
+    test("0", "9", 1, Nearest, "-Infinity", "-Infinity", Equal);
+    test("0", "9", 10, Floor, "-Infinity", "-Infinity", Equal);
+    test("0", "9", 10, Ceiling, "-Infinity", "-Infinity", Equal);
+    test("0", "9", 10, Down, "-Infinity", "-Infinity", Equal);
+    test("0", "9", 10, Up, "-Infinity", "-Infinity", Equal);
+    test("0", "9", 10, Nearest, "-Infinity", "-Infinity", Equal);
+    test("0", "9", 100, Nearest, "-Infinity", "-Infinity", Equal);
+    test("0", "9", 300, Exact, "-Infinity", "-Infinity", Equal);
+    test("-1", "3/2", 1, Nearest, "NaN", "NaN", Equal);
+    test("-1", "3/2", 10, Floor, "NaN", "NaN", Equal);
+    test("-1", "3/2", 10, Ceiling, "NaN", "NaN", Equal);
+    test("-1", "3/2", 10, Down, "NaN", "NaN", Equal);
+    test("-1", "3/2", 10, Up, "NaN", "NaN", Equal);
+    test("-1", "3/2", 10, Nearest, "NaN", "NaN", Equal);
+    test("-1", "3/2", 100, Nearest, "NaN", "NaN", Equal);
+    test("-1", "3/2", 300, Exact, "NaN", "NaN", Equal);
+    test("-1", "9", 1, Nearest, "NaN", "NaN", Equal);
+    test("-1", "9", 10, Floor, "NaN", "NaN", Equal);
+    test("-1", "9", 10, Ceiling, "NaN", "NaN", Equal);
+    test("-1", "9", 10, Down, "NaN", "NaN", Equal);
+    test("-1", "9", 10, Up, "NaN", "NaN", Equal);
+    test("-1", "9", 10, Nearest, "NaN", "NaN", Equal);
+    test("-1", "9", 100, Nearest, "NaN", "NaN", Equal);
+    test("-1", "9", 300, Exact, "NaN", "NaN", Equal);
 }
 
 #[test]

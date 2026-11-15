@@ -12,6 +12,7 @@ use crate::big_exponent_float::exhaustive::*;
 use crate::{Float, InnerFloat};
 use itertools::Itertools;
 use malachite_base::num::basic::traits::{Infinity as _, NaN as _, NegativeInfinity, Zero as _};
+use malachite_base::num::conversion::traits::FromStringBase;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::test_util::stats::common_values_map::common_values_map;
 use malachite_nz::integer::Integer;
@@ -67,16 +68,16 @@ pub fn exhaustive_big_exponent_floats_helper_helper<I: Iterator<Item = BigExpone
     xs: I,
     limit: usize,
     out: &[&str],
+    out_hex: &[&str],
 ) {
-    let hexes = xs
+    let xs = xs
         .take(limit)
-        .map(|x| {
-            assert!(x.is_valid());
-            format!("{x:#x}")
-        })
+        .inspect(|x| assert!(x.is_valid()))
         .collect_vec();
+    let hexes = xs.iter().map(|x| format!("{x:#x}")).collect_vec();
     assert!(hexes.iter().all_unique());
-    assert_eq!(hexes, out);
+    assert_eq!(hexes, out_hex);
+    assert_eq!(xs.iter().map(ToString::to_string).collect_vec(), out);
 }
 
 // Checks that the first million values of `xs` are valid, that the first 20 are written in
@@ -85,28 +86,52 @@ pub fn exhaustive_big_exponent_floats_helper_helper<I: Iterator<Item = BigExpone
 pub fn random_big_exponent_floats_helper_helper<I: Clone + Iterator<Item = BigExponentFloat>>(
     xs: I,
     expected_values: &[&str],
+    expected_values_hex: &[&str],
     expected_common_values: &[(&str, usize)],
+    expected_common_values_hex: &[(&str, usize)],
 ) {
-    let values = xs.clone().take(20).map(|x| format!("{x:#x}")).collect_vec();
+    let first = xs.clone().take(20).collect_vec();
     for x in xs.clone().take(1000000) {
         assert!(x.is_valid());
     }
+    // The common values are counted by their exact (hexadecimal) strings; the decimal list writes
+    // the same values, in the same order.
     let common_values = common_values_map(1000000, 10, xs.map(|x| format!("{x:#x}")));
-    let common_values = common_values
+    let common_values_dec = common_values
+        .iter()
+        .map(|(x, freq)| (parse_big_exponent_float_hex(x).to_string(), *freq))
+        .collect_vec();
+    let values_hex = first.iter().map(|x| format!("{x:#x}")).collect_vec();
+    let values = first.iter().map(ToString::to_string).collect_vec();
+    let common_values_hex = common_values
         .iter()
         .map(|(x, freq)| (x.as_str(), *freq))
         .collect_vec();
+    let common_values_dec = common_values_dec
+        .iter()
+        .map(|(x, freq)| (x.as_str(), *freq))
+        .collect_vec();
+    let values_hex = values_hex.iter().map(String::as_str).collect_vec();
     let values = values.iter().map(String::as_str).collect_vec();
     assert_eq!(
-        (values.as_slice(), common_values.as_slice()),
+        (values_hex.as_slice(), common_values_hex.as_slice()),
+        (expected_values_hex, expected_common_values_hex)
+    );
+    assert_eq!(
+        (values.as_slice(), common_values_dec.as_slice()),
         (expected_values, expected_common_values)
     );
 }
 
-// Parses `Float`'s hexadecimal format, as `parse_hex_string` does, into the `BigExponentFloat` with
-// the same value.
+// Parses a hexadecimal string into a `BigExponentFloat`: `Float`'s format, with its `#` precision
+// suffix, as `parse_hex_string` does, into the `BigExponentFloat` with the same value; and, without
+// a suffix, `BigExponentFloat`'s own (what `Debug` writes), which reaches any exponent.
 pub fn parse_big_exponent_float_hex(s: &str) -> BigExponentFloat {
-    float_to_big_exponent_float(&crate::test_util::common::parse_hex_string(s))
+    if s.contains('#') {
+        float_to_big_exponent_float(&crate::test_util::common::parse_hex_string(s))
+    } else {
+        BigExponentFloat::from_string_base(16, s).unwrap()
+    }
 }
 
 // The positive power of 2 with sci-exponent `sci_exponent`: 2^`sci_exponent`.

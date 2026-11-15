@@ -9511,3 +9511,24 @@ pub fn big_exponent_float_vec_pair_unsigned_rounding_mode_quadruple_gen_var_1_fl
         },
     )
 }
+
+// -- (BigExponentFloat, ToSciOptions) --
+
+pub fn big_exponent_float_to_sci_options_pair_gen() -> Generator<(BigExponentFloat, ToSciOptions)> {
+    Generator::new(
+        &exhaustive_big_exponent_float_to_sci_options_pair_gen,
+        &random_big_exponent_float_to_sci_options_pair_gen,
+        &special_random_big_exponent_float_to_sci_options_pair_gen,
+    )
+}
+
+// All `(BigExponentFloat, ToSciOptions)` pairs where the `BigExponentFloat` can be formatted using
+// the options and the resulting string has a manageable length.
+pub fn big_exponent_float_to_sci_options_pair_gen_var_1()
+-> Generator<(BigExponentFloat, ToSciOptions)> {
+    Generator::new(
+        &exhaustive_big_exponent_float_to_sci_options_pair_gen_var_1,
+        &random_big_exponent_float_to_sci_options_pair_gen_var_1,
+        &special_random_big_exponent_float_to_sci_options_pair_gen_var_1,
+    )
+}

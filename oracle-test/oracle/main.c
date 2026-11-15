@@ -62,6 +62,7 @@ static const oracle_mode modes[] = {
     {"arf_exponential", run_arf_exponential},
     {"arf_logarithm", run_arf_logarithm},
     {"arf_logarithm_general", run_arf_logarithm_general},
+    {"arf_string_general", run_arf_string_general},
     {"mag_set_ui", run_mag_set_ui},
     {"mag_set_ui_lower", run_mag_set_ui_lower},
     {"mag_set_fmpz", run_mag_set_fmpz},

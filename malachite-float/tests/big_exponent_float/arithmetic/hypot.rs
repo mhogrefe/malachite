@@ -6,23 +6,19 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::Square;
-use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, One, Two, Zero};
-use malachite_base::num::conversion::traits::FromStringBase;
+use malachite_base::num::basic::traits::One;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_float::big_exponent_float::ComparableBigExponentFloatRef;
 use malachite_float::big_exponent_float::arithmetic::hypot::hypot_prec_round_generic;
 use malachite_float::test_util::big_exponent_float::{
-    big_exponent_float_exponent_is_small, big_exponent_float_power_of_2,
-    float_to_big_exponent_float,
+    big_exponent_float_exponent_is_small, float_to_big_exponent_float, parse_big_exponent_float_hex,
 };
 use malachite_float::test_util::generators::{
     big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_6,
     float_float_unsigned_rounding_mode_quadruple_gen_var_24,
 };
 use malachite_float::{BigExponentFloat, Float};
-use malachite_nz::integer::Integer;
 use std::cmp::Ordering::{self, *};
 
 fn same(x: &BigExponentFloat, y: &BigExponentFloat) -> bool {
@@ -38,22 +34,6 @@ fn float_result_comparable(x: &Float, o: Ordering) -> bool {
         || !x.is_infinite() && (!x.is_zero() || o == Equal),
         |e| e > Float::MIN_EXPONENT + 1 && e < Float::MAX_EXPONENT - 1,
     )
-}
-
-fn pi() -> BigExponentFloat {
-    BigExponentFloat::from(core::f64::consts::PI)
-}
-
-fn hex(s: &str) -> BigExponentFloat {
-    BigExponentFloat::from_string_base(16, s).unwrap()
-}
-
-fn big() -> Integer {
-    Integer::from_str("100000000000000000000").unwrap()
-}
-
-fn p2(e: Integer) -> BigExponentFloat {
-    big_exponent_float_power_of_2(e)
 }
 
 // Whether `x` is finite and nonzero.
@@ -100,13 +80,22 @@ fn hypot_prec_round_all(
 }
 
 fn check(
-    x: &BigExponentFloat,
-    y: &BigExponentFloat,
+    x: &str,
+    x_hex: &str,
+    y: &str,
+    y_hex: &str,
     prec: u64,
     rm: RoundingMode,
-    out: &BigExponentFloat,
+    out: &str,
+    out_hex: &str,
     o: Ordering,
 ) {
+    assert_eq!(parse_big_exponent_float_hex(x_hex).to_string(), x);
+    let x = &parse_big_exponent_float_hex(x_hex);
+    assert_eq!(parse_big_exponent_float_hex(y_hex).to_string(), y);
+    let y = &parse_big_exponent_float_hex(y_hex);
+    assert_eq!(parse_big_exponent_float_hex(out_hex).to_string(), out);
+    let out = &parse_big_exponent_float_hex(out_hex);
     let r = hypot_prec_round_all(x, y, prec, rm);
     assert!(
         same(&r.0, out),
@@ -118,87 +107,173 @@ fn check(
 }
 
 fn check_pi(
-    x: &BigExponentFloat,
+    x: &str,
+    x_hex: &str,
     prec: u64,
     rm: RoundingMode,
-    out: &BigExponentFloat,
+    out: &str,
+    out_hex: &str,
     o: Ordering,
 ) {
+    // y = e, as an f64
     check(
         x,
-        &BigExponentFloat::from(core::f64::consts::E),
+        x_hex,
+        "2.7182818284590451",
+        "0x2.b7e151628aed2",
         prec,
         rm,
         out,
+        out_hex,
         o,
     );
 }
 
 #[test]
 fn test_hypot_prec_round() {
-    let nan = BigExponentFloat::NAN;
-    let inf = BigExponentFloat::INFINITY;
-    let ninf = BigExponentFloat::NEGATIVE_INFINITY;
-    let zero = BigExponentFloat::ZERO;
-    let one = BigExponentFloat::ONE;
-    check(&nan, &ninf, 10, Floor, &inf, Equal);
-    check(&ninf, &nan, 10, Floor, &inf, Equal);
-    check(&nan, &one, 10, Floor, &nan, Equal);
-    check(&one, &nan, 10, Floor, &nan, Equal);
-    check(&zero, &zero, 10, Floor, &zero, Equal);
     check(
-        &zero,
-        &BigExponentFloat::from(-3),
+        "NaN",
+        "NaN",
+        "-Infinity",
+        "-Infinity",
         10,
         Floor,
-        &BigExponentFloat::from(3),
+        "Infinity",
+        "Infinity",
         Equal,
     );
     check(
-        &BigExponentFloat::from(-3),
-        &zero,
-        1,
+        "-Infinity",
+        "-Infinity",
+        "NaN",
+        "NaN",
+        10,
         Floor,
-        &BigExponentFloat::TWO,
-        Less,
+        "Infinity",
+        "Infinity",
+        Equal,
+    );
+    check("NaN", "NaN", "1.0", "0x1.0", 10, Floor, "NaN", "NaN", Equal);
+    check("1.0", "0x1.0", "NaN", "NaN", 10, Floor, "NaN", "NaN", Equal);
+    check(
+        "0.0", "0x0.0", "0.0", "0x0.0", 10, Floor, "0.0", "0x0.0", Equal,
     );
     check(
-        &BigExponentFloat::from(3),
-        &BigExponentFloat::from(-4),
-        3,
-        Exact,
-        &BigExponentFloat::from(5),
-        Equal,
+        "0.0", "0x0.0", "-3.0", "-0x3.0", 10, Floor, "3.0", "0x3.0", Equal,
+    );
+    check(
+        "-3.0", "-0x3.0", "0.0", "0x0.0", 1, Floor, "2.0", "0x2.0", Less,
+    );
+    check(
+        "3.0", "0x3.0", "-4.0", "-0x4.0", 3, Exact, "5.0", "0x5.0", Equal,
     );
     // Exponents beyond the range of a `Float`: hypot(3 * 2^N, 4 * 2^N) = 5 * 2^N.
     check(
-        &(p2(big()) * BigExponentFloat::from(3)),
-        &(p2(big()) * BigExponentFloat::from(4)),
+        "7.1e30102999566398119521",
+        "0x3.0E+25000000000000000000",
+        "9.5e30102999566398119521",
+        "0x4.0E+25000000000000000000",
         3,
         Exact,
-        &(p2(big()) * BigExponentFloat::from(5)),
+        "1.2e30102999566398119522",
+        "0x5.0E+25000000000000000000",
         Equal,
     );
     // y far below x: the hypotenuse is just above |x|.
-    let tiny = p2(-big());
-    check(&one, &tiny, 10, Floor, &one, Less);
-    check(&one, &tiny, 10, Nearest, &one, Less);
-    check(&tiny, &one, 10, Ceiling, &hex("0x1.008"), Greater);
     check(
-        &p2(big()),
-        &-one.clone(),
+        "1.0",
+        "0x1.0",
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
+        10,
+        Floor,
+        "1.0",
+        "0x1.0",
+        Less,
+    );
+    check(
+        "1.0",
+        "0x1.0",
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
+        10,
+        Nearest,
+        "1.0",
+        "0x1.0",
+        Less,
+    );
+    check(
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
+        "1.0",
+        "0x1.0",
+        10,
+        Ceiling,
+        "1.0020",
+        "0x1.008",
+        Greater,
+    );
+    check(
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        "-1.0",
+        "-0x1.0",
         1,
         Up,
-        &p2(big() + Integer::ONE),
+        "4.7e30102999566398119521",
+        "0x2.0E+25000000000000000000",
         Greater,
     );
     // 1 + 2^-9 has 10 bits; at 9 bits it is a midpoint, but the hypotenuse is just above it.
-    let x = hex("0x1.008");
-    check(&x, &tiny, 9, Nearest, &hex("0x1.01"), Greater);
-    check(&x, &tiny, 10, Nearest, &x, Less);
-    check_pi(&pi(), 5, Floor, &hex("0x4.0"), Less);
-    check_pi(&pi(), 5, Ceiling, &hex("0x4.4"), Greater);
-    check_pi(&pi(), 20, Nearest, &hex("0x4.2784"), Greater);
+    check(
+        "1.0020",
+        "0x1.008",
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
+        9,
+        Nearest,
+        "1.004",
+        "0x1.01",
+        Greater,
+    );
+    check(
+        "1.0020",
+        "0x1.008",
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
+        10,
+        Nearest,
+        "1.0020",
+        "0x1.008",
+        Less,
+    );
+    check_pi(
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        5,
+        Floor,
+        "4.0",
+        "0x4.0",
+        Less,
+    );
+    check_pi(
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        5,
+        Ceiling,
+        "4.25",
+        "0x4.4",
+        Greater,
+    );
+    check_pi(
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        20,
+        Nearest,
+        "4.154358",
+        "0x4.2784",
+        Greater,
+    );
 }
 
 #[test]

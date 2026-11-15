@@ -6,22 +6,19 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use core::str::FromStr;
-use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, One, Two, Zero};
+use malachite_base::num::basic::traits::{One, Two};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_float::big_exponent_float::ComparableBigExponentFloatRef;
 use malachite_float::big_exponent_float::arithmetic::div::div_prec_round_generic;
 use malachite_float::test_util::big_exponent_float::{
-    big_exponent_float_exponent_is_small, big_exponent_float_power_of_2,
-    float_to_big_exponent_float, parse_big_exponent_float_hex,
+    big_exponent_float_exponent_is_small, float_to_big_exponent_float, parse_big_exponent_float_hex,
 };
 use malachite_float::test_util::generators::{
     big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_5,
     float_float_unsigned_rounding_mode_quadruple_gen_var_4,
 };
 use malachite_float::{BigExponentFloat, Float};
-use malachite_nz::integer::Integer;
 use malachite_q::Rational;
 use std::cmp::Ordering::{self, *};
 
@@ -80,20 +77,21 @@ fn div_prec_round_all(
 
 #[test]
 fn test_div_prec_round() {
-    let big = Integer::from_str("100000000000000000000").unwrap();
-    let huge = big_exponent_float_power_of_2(big.clone());
-    let tiny = big_exponent_float_power_of_2(-big.clone());
-    let one = BigExponentFloat::ONE;
-    let two = BigExponentFloat::TWO;
-    let neg_two = BigExponentFloat::from(-2.0);
-    let pi = parse_big_exponent_float_hex("0x3.243f6a8885a30#53");
-    let e = parse_big_exponent_float_hex("0x2.b7e151628aed2#53");
-    let check = |x: &BigExponentFloat,
-                 y: &BigExponentFloat,
+    let check = |x: &str,
+                 x_hex: &str,
+                 y: &str,
+                 y_hex: &str,
                  prec: u64,
                  rm: RoundingMode,
-                 out: &BigExponentFloat,
+                 out: &str,
+                 out_hex: &str,
                  o| {
+        assert_eq!(parse_big_exponent_float_hex(x_hex).to_string(), x);
+        let x = &parse_big_exponent_float_hex(x_hex);
+        assert_eq!(parse_big_exponent_float_hex(y_hex).to_string(), y);
+        let y = &parse_big_exponent_float_hex(y_hex);
+        assert_eq!(parse_big_exponent_float_hex(out_hex).to_string(), out);
+        let out = &parse_big_exponent_float_hex(out_hex);
         let r = div_prec_round_all(x, y, prec, rm);
         assert!(
             same(&r.0, out),
@@ -102,68 +100,118 @@ fn test_div_prec_round() {
         );
         assert_eq!(r.1, o);
     };
-    let nan = BigExponentFloat::NAN;
-    let inf = BigExponentFloat::INFINITY;
-    let neg_inf = BigExponentFloat::NEGATIVE_INFINITY;
-    let zero = BigExponentFloat::ZERO;
-    check(&nan, &one, 10, Floor, &nan, Equal);
-    check(&one, &nan, 10, Floor, &nan, Equal);
-    check(&one, &zero, 10, Floor, &nan, Equal);
-    check(&zero, &zero, 10, Floor, &nan, Equal);
-    check(&inf, &zero, 10, Floor, &nan, Equal);
-    check(&inf, &neg_inf, 10, Floor, &nan, Equal);
-    check(&inf, &two, 10, Floor, &inf, Equal);
-    check(&inf, &neg_two, 10, Floor, &neg_inf, Equal);
-    check(&neg_inf, &neg_two, 10, Floor, &inf, Equal);
-    check(&zero, &two, 10, Floor, &zero, Equal);
-    check(&zero, &inf, 10, Floor, &zero, Equal);
-    check(&two, &neg_inf, 10, Floor, &zero, Equal);
+    check("NaN", "NaN", "1.0", "0x1.0", 10, Floor, "NaN", "NaN", Equal);
+    check("1.0", "0x1.0", "NaN", "NaN", 10, Floor, "NaN", "NaN", Equal);
     check(
-        &one,
-        &BigExponentFloat::from(4.0),
-        1,
-        Exact,
-        &BigExponentFloat::from(0.25),
+        "1.0", "0x1.0", "0.0", "0x0.0", 10, Floor, "NaN", "NaN", Equal,
+    );
+    check(
+        "0.0", "0x0.0", "0.0", "0x0.0", 10, Floor, "NaN", "NaN", Equal,
+    );
+    check(
+        "Infinity", "Infinity", "0.0", "0x0.0", 10, Floor, "NaN", "NaN", Equal,
+    );
+    check(
+        "Infinity",
+        "Infinity",
+        "-Infinity",
+        "-Infinity",
+        10,
+        Floor,
+        "NaN",
+        "NaN",
         Equal,
     );
     check(
-        &neg_two,
-        &BigExponentFloat::from(0.5),
-        1,
-        Exact,
-        &BigExponentFloat::from(-4.0),
+        "Infinity", "Infinity", "2.0", "0x2.0", 10, Floor, "Infinity", "Infinity", Equal,
+    );
+    check(
+        "Infinity",
+        "Infinity",
+        "-2.0",
+        "-0x2.0",
+        10,
+        Floor,
+        "-Infinity",
+        "-Infinity",
         Equal,
     );
     check(
-        &huge,
-        &tiny,
-        1,
-        Exact,
-        &big_exponent_float_power_of_2(big.clone() * Integer::TWO),
+        "-Infinity",
+        "-Infinity",
+        "-2.0",
+        "-0x2.0",
+        10,
+        Floor,
+        "Infinity",
+        "Infinity",
         Equal,
     );
     check(
-        &tiny,
-        &huge,
-        1,
-        Exact,
-        &big_exponent_float_power_of_2(-big * Integer::TWO),
+        "0.0", "0x0.0", "2.0", "0x2.0", 10, Floor, "0.0", "0x0.0", Equal,
+    );
+    check(
+        "0.0", "0x0.0", "Infinity", "Infinity", 10, Floor, "0.0", "0x0.0", Equal,
+    );
+    check(
+        "2.0",
+        "0x2.0",
+        "-Infinity",
+        "-Infinity",
+        10,
+        Floor,
+        "0.0",
+        "0x0.0",
         Equal,
     );
     check(
-        &pi,
-        &e,
+        "1.0", "0x1.0", "4.0", "0x4.0", 1, Exact, "0.25", "0x0.4", Equal,
+    );
+    check(
+        "-2.0", "-0x2.0", "0.50", "0x0.8", 1, Exact, "-4.0", "-0x4.0", Equal,
+    );
+    check(
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
+        1,
+        Exact,
+        "5.6e60205999132796239042",
+        "0x1.0E+50000000000000000000",
+        Equal,
+    );
+    check(
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        1,
+        Exact,
+        "1.8e-60205999132796239043",
+        "0x1.0E-50000000000000000000",
+        Equal,
+    );
+    check(
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        "2.7182818284590451",
+        "0x2.b7e151628aed2",
         5,
         Floor,
-        &parse_big_exponent_float_hex("0x1.2#5"),
+        "1.12",
+        "0x1.2",
         Less,
     );
     check(
-        &pi,
-        &e,
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        "2.7182818284590451",
+        "0x2.b7e151628aed2",
         20,
         Nearest,
-        &parse_big_exponent_float_hex("0x1.27ddc#20"),
+        "1.155727",
+        "0x1.27ddc",
         Greater,
     );
 }

@@ -49,7 +49,7 @@ impl BigExponentFloat {
     ///
     /// let (x, o) =
     ///     BigExponentFloat::from_rational_prec_round(Rational::from_signeds(1, 3), 10, Floor);
-    /// assert_eq!(format!("{x:?}"), "0x0.554");
+    /// assert_eq!(x.to_string(), "0.3330");
     /// assert_eq!(o, Less);
     /// ```
     pub fn from_rational_prec_round(x: Rational, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
@@ -92,7 +92,7 @@ impl BigExponentFloat {
     ///     10,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{x:?}"), "-0x0.556");
+    /// assert_eq!(x.to_string(), "-0.33350");
     /// assert_eq!(o, Less);
     /// ```
     pub fn from_rational_prec_round_ref(
@@ -151,7 +151,7 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::from_rational_prec(Rational::from_signeds(1, 3), 10);
-    /// assert_eq!(format!("{x:?}"), "0x0.556");
+    /// assert_eq!(x.to_string(), "0.33350");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -181,7 +181,7 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::from_rational_prec_ref(&Rational::from_signeds(1, 3), 10);
-    /// assert_eq!(format!("{x:?}"), "0x0.556");
+    /// assert_eq!(x.to_string(), "0.33350");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -213,11 +213,8 @@ impl TryFrom<&Rational> for BigExponentFloat {
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(
-    ///     format!(
-    ///         "{:?}",
-    ///         BigExponentFloat::try_from(&Rational::from_signeds(-3, 8)).unwrap()
-    ///     ),
-    ///     "-0x0.6"
+    ///     (BigExponentFloat::try_from(&Rational::from_signeds(-3, 8)).unwrap()).to_string(),
+    ///     "-0.38"
     /// );
     /// assert_eq!(
     ///     BigExponentFloat::try_from(&Rational::from_signeds(1, 3)).unwrap_err(),
@@ -263,11 +260,8 @@ impl TryFrom<Rational> for BigExponentFloat {
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(
-    ///     format!(
-    ///         "{:?}",
-    ///         BigExponentFloat::try_from(Rational::from_signeds(3, 8)).unwrap()
-    ///     ),
-    ///     "0x0.6"
+    ///     (BigExponentFloat::try_from(Rational::from_signeds(3, 8)).unwrap()).to_string(),
+    ///     "0.38"
     /// );
     /// assert!(BigExponentFloat::try_from(Rational::from_signeds(1, 3)).is_err());
     /// ```

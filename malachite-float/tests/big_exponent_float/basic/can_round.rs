@@ -18,8 +18,9 @@ const RMS: [RoundingMode; 5] = [Floor, Ceiling, Down, Up, Nearest];
 
 #[test]
 fn test_can_round() {
-    let test = |s, err, rnd1, rnd2, prec, out| {
-        let x = parse_big_exponent_float_hex(s);
+    let test = |s, s_hex, err, rnd1, rnd2, prec, out| {
+        let x = parse_big_exponent_float_hex(s_hex);
+        assert_eq!(x.to_string(), s);
         assert_eq!(x.can_round(err, rnd1, rnd2, prec), out);
         assert_eq!(
             big_exponent_float_to_float(&x)
@@ -28,9 +29,10 @@ fn test_can_round() {
             out
         );
     };
-    test("0x1.0#1", 10, Nearest, Nearest, 5, true);
-    test("0x1.0#1", 5, Floor, Nearest, 5, false);
+    test("1.0", "0x1.0#1", 10, Nearest, Nearest, 5, true);
+    test("1.0", "0x1.0#1", 5, Floor, Nearest, 5, false);
     test(
+        "1.41421356237309504880168872420",
         "0x1.6a09e667f3bcc908b2fb13660#100",
         90,
         Nearest,
@@ -39,6 +41,7 @@ fn test_can_round() {
         true,
     );
     test(
+        "1.41421356237309504880168872420",
         "0x1.6a09e667f3bcc908b2fb13660#100",
         53,
         Nearest,

@@ -217,7 +217,7 @@ impl BigExponentFloat {
     ///
     /// let mut x = BigExponentFloat::ONE;
     /// assert_eq!(x.round_to_prec_round_assign(10, Nearest), Equal);
-    /// assert_eq!(format!("{x:?}"), "0x1.0");
+    /// assert_eq!(x.to_string(), "1.0");
     /// ```
     pub fn round_to_prec_round_assign(&mut self, prec: u64, rm: RoundingMode) -> Ordering {
         assert_ne!(prec, 0);
@@ -271,7 +271,7 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::TWO.round_to_prec_round(1, Floor);
-    /// assert_eq!(format!("{x:?}"), "0x2.0");
+    /// assert_eq!(x.to_string(), "2.0");
     /// assert_eq!(o, Equal);
     /// ```
     #[inline]
@@ -305,7 +305,7 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::TWO.round_to_prec_round_ref(1, Ceiling);
-    /// assert_eq!(format!("{x:?}"), "0x2.0");
+    /// assert_eq!(x.to_string(), "2.0");
     /// assert_eq!(o, Equal);
     /// ```
     #[inline]
@@ -337,7 +337,7 @@ impl BigExponentFloat {
     ///
     /// let mut x = BigExponentFloat::ONE;
     /// assert_eq!(x.round_to_prec_assign(1), Equal);
-    /// assert_eq!(format!("{x:?}"), "0x1.0");
+    /// assert_eq!(x.to_string(), "1.0");
     /// ```
     #[inline]
     pub fn round_to_prec_assign(&mut self, prec: u64) -> Ordering {
@@ -368,7 +368,7 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::ONE.round_to_prec(1);
-    /// assert_eq!(format!("{x:?}"), "0x1.0");
+    /// assert_eq!(x.to_string(), "1.0");
     /// assert_eq!(o, Equal);
     /// ```
     #[inline]
@@ -400,7 +400,7 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::ONE.round_to_prec_ref(1);
-    /// assert_eq!(format!("{x:?}"), "0x1.0");
+    /// assert_eq!(x.to_string(), "1.0");
     /// assert_eq!(o, Equal);
     /// ```
     #[inline]

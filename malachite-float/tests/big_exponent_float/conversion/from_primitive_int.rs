@@ -29,12 +29,16 @@ fn bef(f: &Float) -> BigExponentFloat {
 #[test]
 fn test_const_from() {
     const X: BigExponentFloat = BigExponentFloat::const_from_unsigned(0);
+    assert_eq!(X.to_string(), "0.0");
     assert_eq!(format!("{X:#x}"), "0x0.0");
     const Y: BigExponentFloat = BigExponentFloat::const_from_unsigned_times_power_of_2(3, -3);
+    assert_eq!(Y.to_string(), "0.38");
     assert_eq!(format!("{Y:#x}"), "0x0.6");
     const Z: BigExponentFloat = BigExponentFloat::const_from_signed(-123);
+    assert_eq!(Z.to_string(), "-123.0");
     assert_eq!(format!("{Z:#x}"), "-0x7b.0");
     const W: BigExponentFloat = BigExponentFloat::const_from_signed_times_power_of_2(-1, 100);
+    assert_eq!(W.to_string(), "-1.3e30");
     assert_eq!(format!("{W:#x}"), "-0x1.0E+25");
     for x in [X, Y, Z, W] {
         assert!(x.is_valid());

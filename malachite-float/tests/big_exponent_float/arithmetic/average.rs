@@ -6,19 +6,16 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{Average, AverageAssign};
-use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, One, Zero};
+use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_float::big_exponent_float::ComparableBigExponentFloatRef;
 use malachite_float::test_util::big_exponent_float::{
-    big_exponent_float_exponent_is_small, big_exponent_float_power_of_2,
-    float_to_big_exponent_float,
+    big_exponent_float_exponent_is_small, float_to_big_exponent_float, parse_big_exponent_float_hex,
 };
 use malachite_float::test_util::generators::*;
 use malachite_float::{BigExponentFloat, Float};
-use malachite_nz::integer::Integer;
 use malachite_q::Rational;
 use std::cmp::Ordering::{self, *};
 
@@ -35,14 +32,6 @@ fn float_result_comparable(x: &Float, o: Ordering) -> bool {
         || !x.is_infinite() && (!x.is_zero() || o == Equal),
         |e| e > Float::MIN_EXPONENT + 1 && e < Float::MAX_EXPONENT - 1,
     )
-}
-
-fn p2(e: Integer) -> BigExponentFloat {
-    big_exponent_float_power_of_2(e)
-}
-
-fn big() -> Integer {
-    Integer::from_str("100000000000000000000").unwrap()
 }
 
 fn average_prec_round_all(
@@ -100,27 +89,90 @@ fn average_exact_all(x: &BigExponentFloat, y: &BigExponentFloat) -> BigExponentF
 
 #[test]
 fn test_average() {
-    let nan = BigExponentFloat::NAN;
-    let inf = BigExponentFloat::INFINITY;
-    let ninf = BigExponentFloat::NEGATIVE_INFINITY;
-    assert!(same(&average_exact_all(&nan, &BigExponentFloat::ONE), &nan));
-    assert!(same(&average_exact_all(&inf, &ninf), &nan));
-    assert!(same(&average_exact_all(&inf, &BigExponentFloat::ONE), &inf));
-    assert!(same(
-        &average_exact_all(&BigExponentFloat::ZERO, &ninf),
-        &ninf
-    ));
+    let test = |x: &str, x_hex: &str, y: &str, y_hex: &str, out: &str, out_hex: &str| {
+        assert_eq!(parse_big_exponent_float_hex(x_hex).to_string(), x);
+        let x = &parse_big_exponent_float_hex(x_hex);
+        assert_eq!(parse_big_exponent_float_hex(y_hex).to_string(), y);
+        let y = &parse_big_exponent_float_hex(y_hex);
+        assert_eq!(parse_big_exponent_float_hex(out_hex).to_string(), out);
+        let out = &parse_big_exponent_float_hex(out_hex);
+        assert!(same(&average_exact_all(x, y), out));
+    };
+    test("NaN", "NaN", "1.0", "0x1.0", "NaN", "NaN");
+    test(
+        "Infinity",
+        "Infinity",
+        "-Infinity",
+        "-Infinity",
+        "NaN",
+        "NaN",
+    );
+    test(
+        "Infinity", "Infinity", "1.0", "0x1.0", "Infinity", "Infinity",
+    );
+    test(
+        "0.0",
+        "0x0.0",
+        "-Infinity",
+        "-Infinity",
+        "-Infinity",
+        "-Infinity",
+    );
     // (1.5 + 2.25) / 2 = 1.875
-    assert!(same(
-        &average_exact_all(&BigExponentFloat::from(1.5), &BigExponentFloat::from(2.25)),
-        &BigExponentFloat::from(1.875)
-    ));
-    // (2^N + 2^N) / 2 = 2^N, beyond `Float`'s range, and (2^N + 2^-N) / 2 = 2^(N - 1) + 2^(-N - 1).
-    assert!(same(&average_exact_all(&p2(big()), &p2(big())), &p2(big())));
-    let r = average_prec_round_all(&p2(big()), &p2(-big()), 1, Floor);
-    assert!(same_pair(&r, &(p2(big() - Integer::ONE), Less)));
-    let r = average_prec_round_all(&p2(big()), &p2(-big()), 1, Ceiling);
-    assert!(same_pair(&r, &(p2(big()), Greater)));
+    test("1.5", "0x1.8", "2.25", "0x2.4", "1.88", "0x1.e");
+    // (2^N + 2^N) / 2 = 2^N, beyond `Float`'s range
+    test(
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+    );
+
+    // (2^N + 2^-N) / 2 = 2^(N - 1) + 2^(-N - 1)
+    let test_prec_round = |x: &str,
+                           x_hex: &str,
+                           y: &str,
+                           y_hex: &str,
+                           prec: u64,
+                           rm: RoundingMode,
+                           out: &str,
+                           out_hex: &str,
+                           o: Ordering| {
+        assert_eq!(parse_big_exponent_float_hex(x_hex).to_string(), x);
+        let x = &parse_big_exponent_float_hex(x_hex);
+        assert_eq!(parse_big_exponent_float_hex(y_hex).to_string(), y);
+        let y = &parse_big_exponent_float_hex(y_hex);
+        assert_eq!(parse_big_exponent_float_hex(out_hex).to_string(), out);
+        let out = &parse_big_exponent_float_hex(out_hex);
+        assert!(same_pair(
+            &average_prec_round_all(x, y, prec, rm),
+            &(out.clone(), o)
+        ));
+    };
+    test_prec_round(
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
+        1,
+        Floor,
+        "1.2e30102999566398119521",
+        "0x8.0E+24999999999999999999",
+        Less,
+    );
+    test_prec_round(
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
+        1,
+        Ceiling,
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        Greater,
+    );
 }
 
 #[test]

@@ -20,34 +20,63 @@ fn same(x: &BigExponentFloat, y: &BigExponentFloat) -> bool {
 
 #[test]
 fn test_sqrt_5_prec_round() {
-    let cases: &[(u64, RoundingMode, &str, Ordering)] = &[
-        (1, Floor, "0x2.0", Less),
-        (1, Ceiling, "0x4.0", Greater),
-        (1, Down, "0x2.0", Less),
-        (1, Up, "0x4.0", Greater),
-        (1, Nearest, "0x2.0", Less),
-        (2, Floor, "0x2.0", Less),
-        (2, Ceiling, "0x3.0", Greater),
-        (2, Down, "0x2.0", Less),
-        (2, Up, "0x3.0", Greater),
-        (2, Nearest, "0x2.0", Less),
-        (10, Floor, "0x2.3c", Less),
-        (10, Ceiling, "0x2.3d", Greater),
-        (10, Down, "0x2.3c", Less),
-        (10, Up, "0x2.3d", Greater),
-        (10, Nearest, "0x2.3c", Less),
-        (100, Floor, "0x2.3c6ef372fe94f82be73980c08", Less),
-        (100, Ceiling, "0x2.3c6ef372fe94f82be73980c0c", Greater),
-        (100, Down, "0x2.3c6ef372fe94f82be73980c08", Less),
-        (100, Up, "0x2.3c6ef372fe94f82be73980c0c", Greater),
-        (100, Nearest, "0x2.3c6ef372fe94f82be73980c0c", Greater),
-    ];
-    for &(p, rm, out, o) in cases {
+    let test = |p: u64, rm: RoundingMode, out: &str, out_hex: &str, o: Ordering| {
         let (x, o_alt) = BigExponentFloat::sqrt_5_prec_round(p, rm);
         assert!(x.is_valid());
-        assert_eq!(format!("{x:?}"), out, "{:?}", (p, rm));
+        assert_eq!(format!("{x:?}"), out_hex, "{:?}", (p, rm));
+        assert_eq!(x.to_string(), out);
         assert_eq!(o_alt, o);
-    }
+    };
+    test(1, Floor, "2.0", "0x2.0", Less);
+    test(1, Ceiling, "4.0", "0x4.0", Greater);
+    test(1, Down, "2.0", "0x2.0", Less);
+    test(1, Up, "4.0", "0x4.0", Greater);
+    test(1, Nearest, "2.0", "0x2.0", Less);
+    test(2, Floor, "2.0", "0x2.0", Less);
+    test(2, Ceiling, "3.0", "0x3.0", Greater);
+    test(2, Down, "2.0", "0x2.0", Less);
+    test(2, Up, "3.0", "0x3.0", Greater);
+    test(2, Nearest, "2.0", "0x2.0", Less);
+    test(10, Floor, "2.234", "0x2.3c", Less);
+    test(10, Ceiling, "2.2383", "0x2.3d", Greater);
+    test(10, Down, "2.234", "0x2.3c", Less);
+    test(10, Up, "2.2383", "0x2.3d", Greater);
+    test(10, Nearest, "2.234", "0x2.3c", Less);
+    test(
+        100,
+        Floor,
+        "2.236067977499789696409173668728",
+        "0x2.3c6ef372fe94f82be73980c08",
+        Less,
+    );
+    test(
+        100,
+        Ceiling,
+        "2.2360679774997896964091736687316",
+        "0x2.3c6ef372fe94f82be73980c0c",
+        Greater,
+    );
+    test(
+        100,
+        Down,
+        "2.236067977499789696409173668728",
+        "0x2.3c6ef372fe94f82be73980c08",
+        Less,
+    );
+    test(
+        100,
+        Up,
+        "2.2360679774997896964091736687316",
+        "0x2.3c6ef372fe94f82be73980c0c",
+        Greater,
+    );
+    test(
+        100,
+        Nearest,
+        "2.2360679774997896964091736687316",
+        "0x2.3c6ef372fe94f82be73980c0c",
+        Greater,
+    );
 }
 
 #[test]
@@ -87,18 +116,22 @@ fn sqrt_5_prec_round_properties() {
 
 #[test]
 fn test_sqrt_5_prec() {
-    let cases: &[(u64, &str, Ordering)] = &[
-        (1, "0x2.0", Less),
-        (2, "0x2.0", Less),
-        (10, "0x2.3c", Less),
-        (100, "0x2.3c6ef372fe94f82be73980c0c", Greater),
-    ];
-    for &(p, out, o) in cases {
+    let test = |p: u64, out: &str, out_hex: &str, o: Ordering| {
         let (x, o_alt) = BigExponentFloat::sqrt_5_prec(p);
         assert!(x.is_valid());
-        assert_eq!(format!("{x:?}"), out, "{:?}", (p));
+        assert_eq!(format!("{x:?}"), out_hex, "{:?}", (p));
+        assert_eq!(x.to_string(), out);
         assert_eq!(o_alt, o);
-    }
+    };
+    test(1, "2.0", "0x2.0", Less);
+    test(2, "2.0", "0x2.0", Less);
+    test(10, "2.234", "0x2.3c", Less);
+    test(
+        100,
+        "2.2360679774997896964091736687316",
+        "0x2.3c6ef372fe94f82be73980c0c",
+        Greater,
+    );
 }
 
 #[test]

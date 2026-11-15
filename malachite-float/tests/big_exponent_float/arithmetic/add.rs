@@ -102,20 +102,27 @@ fn add_all(x: &BigExponentFloat, y: &BigExponentFloat) -> BigExponentFloat {
 fn test_add() {
     let big = Integer::from_str("100000000000000000000").unwrap();
     let huge = big_exponent_float_power_of_2(big.clone());
-    let tiny = big_exponent_float_power_of_2(-big.clone());
     let one = BigExponentFloat::ONE;
     let pi = parse_big_exponent_float_hex("0x3.243f6a8885a30#53");
-    let e = parse_big_exponent_float_hex("0x2.b7e151628aed2#53");
     let nan = BigExponentFloat::NAN;
     let inf = BigExponentFloat::INFINITY;
     let ninf = BigExponentFloat::NEGATIVE_INFINITY;
     let zero = BigExponentFloat::ZERO;
-    let check = |x: &BigExponentFloat,
-                 y: &BigExponentFloat,
+    let check = |x: &str,
+                 x_hex: &str,
+                 y: &str,
+                 y_hex: &str,
                  prec: u64,
                  rm: RoundingMode,
-                 out: &BigExponentFloat,
+                 out: &str,
+                 out_hex: &str,
                  o: Ordering| {
+        assert_eq!(parse_big_exponent_float_hex(x_hex).to_string(), x);
+        let x = &parse_big_exponent_float_hex(x_hex);
+        assert_eq!(parse_big_exponent_float_hex(y_hex).to_string(), y);
+        let y = &parse_big_exponent_float_hex(y_hex);
+        assert_eq!(parse_big_exponent_float_hex(out_hex).to_string(), out);
+        let out = &parse_big_exponent_float_hex(out_hex);
         let r = add_prec_round_all(x, y, prec, rm);
         assert!(
             same(&r.0, out),
@@ -125,78 +132,212 @@ fn test_add() {
         assert_eq!(r.1, o);
     };
 
-    check(&nan, &one, 10, Floor, &nan, Equal);
-    check(&inf, &ninf, 10, Floor, &nan, Equal);
-    check(&inf, &one, 10, Floor, &inf, Equal);
-    check(&one, &ninf, 10, Floor, &ninf, Equal);
-    check(&zero, &zero, 10, Floor, &zero, Equal);
-    check(&pi, &zero, 53, Exact, &pi, Equal);
-    check(&zero, &pi, 1, Floor, &(&one << 1u32), Less);
-    // x + (-x) is 0, which has no sign, in every rounding mode.
+    check("NaN", "NaN", "1.0", "0x1.0", 10, Floor, "NaN", "NaN", Equal);
     check(
-        &pi,
-        &big_exponent_float_negate(pi.clone()),
+        "Infinity",
+        "Infinity",
+        "-Infinity",
+        "-Infinity",
         10,
         Floor,
-        &zero,
+        "NaN",
+        "NaN",
         Equal,
     );
     check(
-        &huge,
-        &big_exponent_float_negate(huge.clone()),
+        "Infinity", "Infinity", "1.0", "0x1.0", 10, Floor, "Infinity", "Infinity", Equal,
+    );
+    check(
+        "1.0",
+        "0x1.0",
+        "-Infinity",
+        "-Infinity",
+        10,
+        Floor,
+        "-Infinity",
+        "-Infinity",
+        Equal,
+    );
+    check(
+        "0.0", "0x0.0", "0.0", "0x0.0", 10, Floor, "0.0", "0x0.0", Equal,
+    );
+    check(
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        "0.0",
+        "0x0.0",
+        53,
+        Exact,
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        Equal,
+    );
+    check(
+        "0.0",
+        "0x0.0",
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        1,
+        Floor,
+        "2.0",
+        "0x2.0",
+        Less,
+    );
+    // x + (-x) is 0, which has no sign, in every rounding mode.
+    check(
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        "-3.1415926535897931",
+        "-0x3.243f6a8885a3",
+        10,
+        Floor,
+        "0.0",
+        "0x0.0",
+        Equal,
+    );
+    check(
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        "-2.4e30102999566398119521",
+        "-0x1.0E+25000000000000000000",
         10,
         Ceiling,
-        &zero,
+        "0.0",
+        "0x0.0",
         Equal,
     );
     // A summand far below the other only affects the rounding.
-    let one_ulp = big_exponent_float_power_of_2(Integer::from(-9));
-    check(&one, &tiny, 10, Floor, &one, Less);
-    check(&one, &tiny, 10, Ceiling, &(&one + &one_ulp), Greater);
-    check(&one, &tiny, 10, Nearest, &one, Less);
     check(
-        &one,
-        &big_exponent_float_negate(tiny.clone()),
+        "1.0",
+        "0x1.0",
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
         10,
         Floor,
-        &(&one - &(&one_ulp >> 1u32)),
+        "1.0",
+        "0x1.0",
         Less,
     );
     check(
-        &one,
-        &big_exponent_float_negate(tiny.clone()),
+        "1.0",
+        "0x1.0",
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
         10,
         Ceiling,
-        &one,
+        "1.0020",
+        "0x1.008",
         Greater,
     );
-    check(&tiny, &huge, 10, Down, &huge, Less);
-    check(&tiny, &huge, 10, Up, &(&huge + &(&huge >> 9u32)), Greater);
+    check(
+        "1.0",
+        "0x1.0",
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
+        10,
+        Nearest,
+        "1.0",
+        "0x1.0",
+        Less,
+    );
+    check(
+        "1.0",
+        "0x1.0",
+        "-4.2e-30102999566398119522",
+        "-0x1.0E-25000000000000000000",
+        10,
+        Floor,
+        "0.99902",
+        "0x0.ffc",
+        Less,
+    );
+    check(
+        "1.0",
+        "0x1.0",
+        "-4.2e-30102999566398119522",
+        "-0x1.0E-25000000000000000000",
+        10,
+        Ceiling,
+        "1.0",
+        "0x1.0",
+        Greater,
+    );
+    check(
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        10,
+        Down,
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        Less,
+    );
+    check(
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        10,
+        Up,
+        "2.3699e30102999566398119521",
+        "0x1.008E+25000000000000000000",
+        Greater,
+    );
     // Sums at huge exponents are exact when they fit.
-    check(&huge, &huge, 1, Exact, &(&huge << 1u32), Equal);
-    check(&tiny, &tiny, 1, Exact, &(&tiny << 1u32), Equal);
     check(
-        &pi,
-        &e,
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        1,
+        Exact,
+        "4.7e30102999566398119521",
+        "0x2.0E+25000000000000000000",
+        Equal,
+    );
+    check(
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
+        1,
+        Exact,
+        "8.5e-30102999566398119522",
+        "0x2.0E-25000000000000000000",
+        Equal,
+    );
+    check(
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        "2.7182818284590451",
+        "0x2.b7e151628aed2",
         5,
         Floor,
-        &parse_big_exponent_float_hex("0x5.c#5"),
+        "5.75",
+        "0x5.c",
         Less,
     );
     check(
-        &pi,
-        &e,
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        "2.7182818284590451",
+        "0x2.b7e151628aed2",
         5,
         Ceiling,
-        &parse_big_exponent_float_hex("0x6.0#5"),
+        "6.0",
+        "0x6.0",
         Greater,
     );
     check(
-        &pi,
-        &e,
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        "2.7182818284590451",
+        "0x2.b7e151628aed2",
         20,
         Nearest,
-        &parse_big_exponent_float_hex("0x5.dc208#20"),
+        "5.8598709",
+        "0x5.dc208",
         Less,
     );
     // The exact sum spans the gap between the exponents.

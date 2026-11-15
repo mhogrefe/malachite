@@ -39,8 +39,8 @@ impl Neg for BigExponentFloat {
     ///     BigExponentFloat::NEGATIVE_INFINITY
     /// );
     /// assert_eq!(-BigExponentFloat::ZERO, BigExponentFloat::ZERO);
-    /// assert_eq!(format!("{:?}", -BigExponentFloat::ONE), "-0x1.0");
-    /// assert_eq!(format!("{:?}", -BigExponentFloat::from(-1.5)), "0x1.8");
+    /// assert_eq!((-BigExponentFloat::ONE).to_string(), "-1.0");
+    /// assert_eq!((-BigExponentFloat::from(-1.5)).to_string(), "1.5");
     /// ```
     #[inline]
     fn neg(mut self) -> Self {
@@ -78,8 +78,8 @@ impl Neg for &BigExponentFloat {
     ///     BigExponentFloat::NEGATIVE_INFINITY
     /// );
     /// assert_eq!(-&BigExponentFloat::ZERO, BigExponentFloat::ZERO);
-    /// assert_eq!(format!("{:?}", -&BigExponentFloat::ONE), "-0x1.0");
-    /// assert_eq!(format!("{:?}", -&BigExponentFloat::from(-1.5)), "0x1.8");
+    /// assert_eq!((-&BigExponentFloat::ONE).to_string(), "-1.0");
+    /// assert_eq!((-&BigExponentFloat::from(-1.5)).to_string(), "1.5");
     /// ```
     #[inline]
     fn neg(self) -> BigExponentFloat {
@@ -115,7 +115,7 @@ impl NegAssign for BigExponentFloat {
     ///
     /// let mut x = BigExponentFloat::ONE;
     /// x.neg_assign();
-    /// assert_eq!(format!("{x:?}"), "-0x1.0");
+    /// assert_eq!(x.to_string(), "-1.0");
     /// ```
     fn neg_assign(&mut self) {
         if let Self(Finite { sign, .. } | Infinity { sign }) = self {

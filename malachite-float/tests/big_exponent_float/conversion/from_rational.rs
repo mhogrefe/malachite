@@ -18,40 +18,56 @@ use std::str::FromStr;
 
 #[test]
 fn test_from_rational_prec_round() {
-    let test = |s, prec, rm, out: &str, o| {
+    let test = |s, prec, rm, out: &str, out_hex: &str, o| {
         let q = Rational::from_str(s).unwrap();
         let (x, o_out) = BigExponentFloat::from_rational_prec_round_ref(&q, prec, rm);
         assert!(x.is_valid());
-        assert_eq!(format!("{x:#x}"), out);
+        assert_eq!(format!("{x:#x}"), out_hex);
+        assert_eq!(x.to_string(), out);
         assert_eq!(o_out, o);
         let (x, o_out) = BigExponentFloat::from_rational_prec_round(q, prec, rm);
-        assert_eq!(format!("{x:#x}"), out);
+        assert_eq!(format!("{x:#x}"), out_hex);
         assert_eq!(o_out, o);
     };
-    test("0", 1, Floor, "0x0.0", Equal);
-    test("1/3", 10, Floor, "0x0.554", Less);
-    test("1/3", 10, Nearest, "0x0.556", Greater);
-    test("-1/3", 10, Floor, "-0x0.556", Less);
-    test("3/8", 1, Floor, "0x0.4", Less);
-    test("3/8", 2, Exact, "0x0.6", Equal);
-    test("255/256", 4, Up, "0x1.0", Greater);
+    test("0", 1, Floor, "0.0", "0x0.0", Equal);
+    test("1/3", 10, Floor, "0.3330", "0x0.554", Less);
+    test("1/3", 10, Nearest, "0.33350", "0x0.556", Greater);
+    test("-1/3", 10, Floor, "-0.33350", "-0x0.556", Less);
+    test("3/8", 1, Floor, "0.25", "0x0.4", Less);
+    test("3/8", 2, Exact, "0.38", "0x0.6", Equal);
+    test("255/256", 4, Up, "1.0", "0x1.0", Greater);
 }
 
 #[test]
 fn test_try_from_rational() {
-    let test = |s, out: Result<&str, BigExponentFloatFromRationalError>| {
+    let test = |s,
+                out: Result<&str, BigExponentFloatFromRationalError>,
+                out_hex: Result<&str, BigExponentFloatFromRationalError>| {
         let q = Rational::from_str(s).unwrap();
+        let x = BigExponentFloat::try_from(&q);
         assert_eq!(
-            BigExponentFloat::try_from(&q).map(|x| format!("{x:#x}")),
+            x.as_ref().map(ToString::to_string).map_err(|e| *e),
             out.map(ToString::to_string)
+        );
+        assert_eq!(
+            x.map(|x| format!("{x:#x}")),
+            out_hex.map(ToString::to_string)
         );
         assert_eq!(BigExponentFloat::convertible_from(&q), out.is_ok());
     };
-    test("0", Ok("0x0.0"));
-    test("3/8", Ok("0x0.6"));
-    test("-3/8", Ok("-0x0.6"));
-    test("1/3", Err(BigExponentFloatFromRationalError));
-    test("1/1267650600228229401496703205376", Ok("0x1.0E-25"));
+    test("0", Ok("0.0"), Ok("0x0.0"));
+    test("3/8", Ok("0.38"), Ok("0x0.6"));
+    test("-3/8", Ok("-0.38"), Ok("-0x0.6"));
+    test(
+        "1/3",
+        Err(BigExponentFloatFromRationalError),
+        Err(BigExponentFloatFromRationalError),
+    );
+    test(
+        "1/1267650600228229401496703205376",
+        Ok("7.9e-31"),
+        Ok("0x1.0E-25"),
+    );
 }
 
 #[test]

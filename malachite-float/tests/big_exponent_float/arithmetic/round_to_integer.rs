@@ -6,17 +6,15 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::Abs;
-use malachite_base::num::basic::traits::{Infinity, NaN, One, Two, Zero};
+use malachite_base::num::basic::traits::{One, Two};
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_float::BigExponentFloat;
 use malachite_float::big_exponent_float::ComparableBigExponentFloatRef;
 use malachite_float::test_util::big_exponent_float::{
-    big_exponent_float_exponent_is_small, big_exponent_float_power_of_2,
-    float_to_big_exponent_float,
+    big_exponent_float_exponent_is_small, float_to_big_exponent_float, parse_big_exponent_float_hex,
 };
 use malachite_float::test_util::generators::*;
 use malachite_nz::integer::Integer;
@@ -29,14 +27,6 @@ fn same(x: &BigExponentFloat, y: &BigExponentFloat) -> bool {
 
 fn same_pair(x: &(BigExponentFloat, Ordering), y: &(BigExponentFloat, Ordering)) -> bool {
     same(&x.0, &y.0) && x.1 == y.1
-}
-
-fn p2(e: Integer) -> BigExponentFloat {
-    big_exponent_float_power_of_2(e)
-}
-
-fn big() -> Integer {
-    Integer::from_str("100000000000000000000").unwrap()
 }
 
 fn same3(x: &(BigExponentFloat, Ordering, bool), y: &(BigExponentFloat, Ordering, bool)) -> bool {
@@ -74,33 +64,50 @@ fn round_to_integer_round_all(
 
 #[test]
 fn test_round_to_integer() {
-    let nan = BigExponentFloat::NAN;
-    let inf = BigExponentFloat::INFINITY;
-    assert!(same3(
-        &round_to_integer_round_all(&nan, Floor),
-        &(nan.clone(), Equal, false)
-    ));
-    assert!(same3(
-        &round_to_integer_round_all(&inf, Floor),
-        &(inf.clone(), Equal, false)
-    ));
-    assert!(same3(
-        &round_to_integer_round_all(&BigExponentFloat::ZERO, Floor),
-        &(BigExponentFloat::ZERO, Equal, true)
-    ));
-    let x = BigExponentFloat::from(-2.5);
-    for (rm, out, o) in [
-        (Floor, -3, Less),
-        (Ceiling, -2, Greater),
-        (Down, -2, Greater),
-        (Up, -3, Less),
-        (Nearest, -2, Greater),
-    ] {
+    let test_round = |x: &str,
+                      x_hex: &str,
+                      rm: RoundingMode,
+                      out: &str,
+                      out_hex: &str,
+                      o: Ordering,
+                      exact: bool| {
+        assert_eq!(parse_big_exponent_float_hex(x_hex).to_string(), x);
+        let x = &parse_big_exponent_float_hex(x_hex);
+        assert_eq!(parse_big_exponent_float_hex(out_hex).to_string(), out);
+        let out = &parse_big_exponent_float_hex(out_hex);
         assert!(same3(
-            &round_to_integer_round_all(&x, rm),
-            &(BigExponentFloat::from(out), o, false)
+            &round_to_integer_round_all(x, rm),
+            &(out.clone(), o, exact)
         ));
-    }
+    };
+    let test_prec_round = |x: &str,
+                           x_hex: &str,
+                           prec: u64,
+                           rm: RoundingMode,
+                           out: &str,
+                           out_hex: &str,
+                           o: Ordering,
+                           exact: bool| {
+        assert_eq!(parse_big_exponent_float_hex(x_hex).to_string(), x);
+        let x = &parse_big_exponent_float_hex(x_hex);
+        assert_eq!(parse_big_exponent_float_hex(out_hex).to_string(), out);
+        let out = &parse_big_exponent_float_hex(out_hex);
+        assert!(same3(
+            &round_to_integer_prec_round_all(x, prec, rm),
+            &(out.clone(), o, exact)
+        ));
+    };
+    test_round("NaN", "NaN", Floor, "NaN", "NaN", Equal, false);
+    test_round(
+        "Infinity", "Infinity", Floor, "Infinity", "Infinity", Equal, false,
+    );
+    test_round("0.0", "0x0.0", Floor, "0.0", "0x0.0", Equal, true);
+    let x = BigExponentFloat::from(-2.5);
+    test_round("-2.5", "-0x2.8", Floor, "-3.0", "-0x3.0", Less, false);
+    test_round("-2.5", "-0x2.8", Ceiling, "-2.0", "-0x2.0", Greater, false);
+    test_round("-2.5", "-0x2.8", Down, "-2.0", "-0x2.0", Greater, false);
+    test_round("-2.5", "-0x2.8", Up, "-3.0", "-0x3.0", Less, false);
+    test_round("-2.5", "-0x2.8", Nearest, "-2.0", "-0x2.0", Greater, false);
     assert!(same3(
         &x.round_to_integer_ties_away(),
         &(BigExponentFloat::from(-3), Less, false)
@@ -108,25 +115,16 @@ fn test_round_to_integer() {
     // A single rounding: the nearest integer to 10.5 representable with 2 bits is 12, while
     // rounding to an integer first gives 10, which rounds to 8.
     let x = BigExponentFloat::from(10.5);
-    assert!(same3(
-        &round_to_integer_prec_round_all(&x, 2, Nearest),
-        &(BigExponentFloat::from(12), Greater, false)
-    ));
+    test_prec_round("10.5", "0xa.8", 2, Nearest, "12.0", "0xc.0", Greater, false);
     assert!(same_pair(
         &x.round_to_integer_then_prec_round_ref(Nearest, 2, Nearest),
         &(BigExponentFloat::from(8), Less)
     ));
     // 7 is an integer, but needs rounding to fit 2 bits.
-    assert!(same3(
-        &round_to_integer_prec_round_all(&BigExponentFloat::from(7), 2, Nearest),
-        &(BigExponentFloat::from(8), Greater, true)
-    ));
+    test_prec_round("7.0", "0x7.0", 2, Nearest, "8.0", "0x8.0", Greater, true);
     // 2.5 at 2 bits: ties to even give 2, ties away 3.
     let x = BigExponentFloat::from(2.5);
-    assert!(same3(
-        &round_to_integer_prec_round_all(&x, 2, Nearest),
-        &(BigExponentFloat::TWO, Less, false)
-    ));
+    test_prec_round("2.5", "0x2.8", 2, Nearest, "2.0", "0x2.0", Less, false);
     assert!(same3(
         &x.round_to_integer_ties_away_prec_ref(2),
         &(BigExponentFloat::from(3), Greater, false)
@@ -136,38 +134,65 @@ fn test_round_to_integer() {
         &BigExponentFloat::from(5).round_to_integer_ties_away_prec(2),
         &(BigExponentFloat::from(6), Greater, true)
     ));
-    assert!(same3(
-        &round_to_integer_prec_round_all(&BigExponentFloat::from(5), 2, Nearest),
-        &(BigExponentFloat::from(4), Less, true)
-    ));
+    test_prec_round("5.0", "0x5.0", 2, Nearest, "4.0", "0x4.0", Less, true);
     // Exponents beyond `Float`'s range: 2^-N rounds to 0 or 1, and 3 * 2^N is an integer, which
     // rounds to 2^(N + 2) at 1 bit, rounding up.
-    let x = p2(-big());
-    assert!(same3(
-        &round_to_integer_round_all(&x, Up),
-        &(BigExponentFloat::ONE, Greater, false)
-    ));
-    assert!(same3(
-        &round_to_integer_round_all(&-&x, Floor),
-        &(BigExponentFloat::from(-1), Less, false)
-    ));
-    assert!(same3(
-        &round_to_integer_round_all(&x, Nearest),
-        &(BigExponentFloat::ZERO, Less, false)
-    ));
-    assert!(same3(
-        &round_to_integer_prec_round_all(&x, 10, Ceiling),
-        &(BigExponentFloat::ONE, Greater, false)
-    ));
-    let x = p2(big()) * BigExponentFloat::from(3);
-    assert!(same3(
-        &round_to_integer_round_all(&x, Floor),
-        &(x.clone(), Equal, true)
-    ));
-    assert!(same3(
-        &round_to_integer_prec_round_all(&x, 1, Up),
-        &(p2(big() + Integer::TWO), Greater, true)
-    ));
+    test_round(
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
+        Up,
+        "1.0",
+        "0x1.0",
+        Greater,
+        false,
+    );
+    test_round(
+        "-4.2e-30102999566398119522",
+        "-0x1.0E-25000000000000000000",
+        Floor,
+        "-1.0",
+        "-0x1.0",
+        Less,
+        false,
+    );
+    test_round(
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
+        Nearest,
+        "0.0",
+        "0x0.0",
+        Less,
+        false,
+    );
+    test_prec_round(
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
+        10,
+        Ceiling,
+        "1.0",
+        "0x1.0",
+        Greater,
+        false,
+    );
+    test_round(
+        "7.1e30102999566398119521",
+        "0x3.0E+25000000000000000000",
+        Floor,
+        "7.1e30102999566398119521",
+        "0x3.0E+25000000000000000000",
+        Equal,
+        true,
+    );
+    test_prec_round(
+        "7.1e30102999566398119521",
+        "0x3.0E+25000000000000000000",
+        1,
+        Up,
+        "9.5e30102999566398119521",
+        "0x4.0E+25000000000000000000",
+        Greater,
+        true,
+    );
 }
 
 #[test]

@@ -19,7 +19,9 @@ fn random_big_exponent_floats_helper(
     mean_special_p_numerator: u64,
     mean_special_p_denominator: u64,
     expected_values: &[&str],
+    expected_values_hex: &[&str],
     expected_common_values: &[(&str, usize)],
+    expected_common_values_hex: &[(&str, usize)],
 ) {
     random_big_exponent_floats_helper_helper(
         random_big_exponent_floats(
@@ -32,7 +34,9 @@ fn random_big_exponent_floats_helper(
             mean_special_p_denominator,
         ),
         expected_values,
+        expected_values_hex,
         expected_common_values,
+        expected_common_values_hex,
     );
 }
 
@@ -46,6 +50,10 @@ fn test_random_big_exponent_floats() {
         1,
         1,
         10,
+        &[
+            "-1.0", "2.0", "1.0", "NaN", "1.0", "0.50", "1.5", "-2.0e3", "0.12", "2.0", "2.0",
+            "0.0", "-1.0", "Infinity", "-1.0", "1.0", "-1.5", "NaN", "2.0", "-1.0",
+        ],
         &[
             "-0x1.0",
             "0x2.0",
@@ -69,6 +77,18 @@ fn test_random_big_exponent_floats() {
             "-0x1.0",
         ],
         &[
+            ("-1.0", 90637),
+            ("1.0", 89936),
+            ("0.0", 89797),
+            ("-0.50", 45148),
+            ("0.50", 45029),
+            ("2.0", 44931),
+            ("-2.0", 44874),
+            ("Infinity", 33640),
+            ("NaN", 33393),
+            ("-Infinity", 33191),
+        ],
+        &[
             ("-0x1.0", 90637),
             ("0x1.0", 89936),
             ("0x0.0", 89797),
@@ -90,6 +110,11 @@ fn test_random_big_exponent_floats() {
         1,
         10,
         &[
+            "-2.0", "3.0", "2.0e3", "NaN", "3.3e12", "1.0e3", "1.1201", "-9.69e-8", "3.5", "0.50",
+            "3.4e7", "0.0", "-5.7e-6", "Infinity", "-0.336", "3.3e4", "-14.0", "NaN", "0.25",
+            "-2.1e270",
+        ],
+        &[
             "-0x2.0",
             "0x3.0",
             "0x8.0E+2",
@@ -110,6 +135,18 @@ fn test_random_big_exponent_floats() {
             "NaN",
             "0x0.4",
             "-0x4.0E+224",
+        ],
+        &[
+            ("0.0", 89797),
+            ("Infinity", 33640),
+            ("NaN", 33393),
+            ("-Infinity", 33191),
+            ("-1.0", 18056),
+            ("1.0", 17980),
+            ("0.50", 14405),
+            ("-0.50", 14361),
+            ("2.0", 14349),
+            ("-2.0", 14320),
         ],
         &[
             ("0x0.0", 89797),
@@ -136,6 +173,28 @@ fn test_random_big_exponent_floats() {
             "NaN",
             "Infinity",
             "NaN",
+            "-3.209381",
+            "Infinity",
+            "5.6592979359462e-93",
+            "-Infinity",
+            "NaN",
+            "Infinity",
+            "8.77126288680912995725578965959e516777",
+            "0.0",
+            "0.0",
+            "Infinity",
+            "Infinity",
+            "0.0",
+            "NaN",
+            "Infinity",
+            "Infinity",
+            "Infinity",
+            "Infinity",
+        ],
+        &[
+            "NaN",
+            "Infinity",
+            "NaN",
             "-0x3.359a",
             "Infinity",
             "0x2.f382fe0c74E-77",
@@ -153,6 +212,18 @@ fn test_random_big_exponent_floats() {
             "Infinity",
             "Infinity",
             "Infinity",
+        ],
+        &[
+            ("0.0", 249619),
+            ("NaN", 166801),
+            ("Infinity", 166731),
+            ("-Infinity", 166014),
+            ("0.50", 120),
+            ("2.0", 118),
+            ("1.0", 111),
+            ("-2.0", 111),
+            ("-1.0", 107),
+            ("-0.50", 99),
         ],
         &[
             ("0x0.0", 249619),

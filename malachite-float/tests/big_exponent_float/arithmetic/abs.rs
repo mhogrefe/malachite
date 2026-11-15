@@ -8,13 +8,12 @@
 
 use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{Abs, AbsAssign};
-use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_float::BigExponentFloat;
 use malachite_float::big_exponent_float::ComparableBigExponentFloatRef;
 use malachite_float::test_util::big_exponent_float::{
     big_exponent_float_exponent_is_small, big_exponent_float_power_of_2,
-    float_to_big_exponent_float,
+    float_to_big_exponent_float, parse_big_exponent_float_hex,
 };
 use malachite_float::test_util::generators::{big_exponent_float_gen, float_gen};
 use malachite_nz::integer::Integer;
@@ -26,21 +25,24 @@ fn same(x: &BigExponentFloat, y: &BigExponentFloat) -> bool {
 
 #[test]
 fn test_abs() {
-    let test = |x: &BigExponentFloat, out: &str| {
+    let test = |s: &str, s_hex: &str, out: &str, out_hex: &str| {
+        let x = &parse_big_exponent_float_hex(s_hex);
+        assert_eq!(x.to_string(), s);
         let a = x.clone().abs();
         assert!(a.is_valid());
-        assert_eq!(format!("{a:#x}"), out);
-        assert_eq!(format!("{:#x}", x.abs()), out);
+        assert_eq!(format!("{a:#x}"), out_hex);
+        assert_eq!(a.to_string(), out);
+        assert_eq!(format!("{:#x}", x.abs()), out_hex);
         let mut m = x.clone();
         m.abs_assign();
-        assert_eq!(format!("{m:#x}"), out);
+        assert_eq!(format!("{m:#x}"), out_hex);
     };
-    test(&BigExponentFloat::NAN, "NaN");
-    test(&BigExponentFloat::INFINITY, "Infinity");
-    test(&BigExponentFloat::NEGATIVE_INFINITY, "Infinity");
-    test(&BigExponentFloat::ZERO, "0x0.0");
-    test(&BigExponentFloat::ONE, "0x1.0");
-    test(&BigExponentFloat::from(-1.5), "0x1.8");
+    test("NaN", "NaN", "NaN", "NaN");
+    test("Infinity", "Infinity", "Infinity", "Infinity");
+    test("-Infinity", "-Infinity", "Infinity", "Infinity");
+    test("0.0", "0x0.0", "0.0", "0x0.0");
+    test("1.0", "0x1.0", "1.0", "0x1.0");
+    test("-1.5", "-0x1.8", "1.5", "0x1.8");
     let huge = big_exponent_float_power_of_2(Integer::from_str("100000000000000000000").unwrap());
     assert!(same(&(-&huge).abs(), &huge));
 }

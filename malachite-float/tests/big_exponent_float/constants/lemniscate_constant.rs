@@ -20,34 +20,63 @@ fn same(x: &BigExponentFloat, y: &BigExponentFloat) -> bool {
 
 #[test]
 fn test_lemniscate_constant_prec_round() {
-    let cases: &[(u64, RoundingMode, &str, Ordering)] = &[
-        (1, Floor, "0x2.0", Less),
-        (1, Ceiling, "0x4.0", Greater),
-        (1, Down, "0x2.0", Less),
-        (1, Up, "0x4.0", Greater),
-        (1, Nearest, "0x2.0", Less),
-        (2, Floor, "0x2.0", Less),
-        (2, Ceiling, "0x3.0", Greater),
-        (2, Down, "0x2.0", Less),
-        (2, Up, "0x3.0", Greater),
-        (2, Nearest, "0x3.0", Greater),
-        (10, Floor, "0x2.9f", Less),
-        (10, Ceiling, "0x2.a", Greater),
-        (10, Down, "0x2.9f", Less),
-        (10, Up, "0x2.a", Greater),
-        (10, Nearest, "0x2.9f", Less),
-        (100, Floor, "0x2.9f3f29f3ea160dcf30eed758", Less),
-        (100, Ceiling, "0x2.9f3f29f3ea160dcf30eed7584", Greater),
-        (100, Down, "0x2.9f3f29f3ea160dcf30eed758", Less),
-        (100, Up, "0x2.9f3f29f3ea160dcf30eed7584", Greater),
-        (100, Nearest, "0x2.9f3f29f3ea160dcf30eed758", Less),
-    ];
-    for &(p, rm, out, o) in cases {
+    let test = |p: u64, rm: RoundingMode, out: &str, out_hex: &str, o: Ordering| {
         let (x, o_alt) = BigExponentFloat::lemniscate_constant_prec_round(p, rm);
         assert!(x.is_valid());
-        assert_eq!(format!("{x:?}"), out, "{:?}", (p, rm));
+        assert_eq!(format!("{x:?}"), out_hex, "{:?}", (p, rm));
+        assert_eq!(x.to_string(), out);
         assert_eq!(o_alt, o);
-    }
+    };
+    test(1, Floor, "2.0", "0x2.0", Less);
+    test(1, Ceiling, "4.0", "0x4.0", Greater);
+    test(1, Down, "2.0", "0x2.0", Less);
+    test(1, Up, "4.0", "0x4.0", Greater);
+    test(1, Nearest, "2.0", "0x2.0", Less);
+    test(2, Floor, "2.0", "0x2.0", Less);
+    test(2, Ceiling, "3.0", "0x3.0", Greater);
+    test(2, Down, "2.0", "0x2.0", Less);
+    test(2, Up, "3.0", "0x3.0", Greater);
+    test(2, Nearest, "3.0", "0x3.0", Greater);
+    test(10, Floor, "2.6211", "0x2.9f", Less);
+    test(10, Ceiling, "2.62", "0x2.a", Greater);
+    test(10, Down, "2.6211", "0x2.9f", Less);
+    test(10, Up, "2.62", "0x2.a", Greater);
+    test(10, Nearest, "2.6211", "0x2.9f", Less);
+    test(
+        100,
+        Floor,
+        "2.62205755429211981046483958989",
+        "0x2.9f3f29f3ea160dcf30eed758",
+        Less,
+    );
+    test(
+        100,
+        Ceiling,
+        "2.6220575542921198104648395898934",
+        "0x2.9f3f29f3ea160dcf30eed7584",
+        Greater,
+    );
+    test(
+        100,
+        Down,
+        "2.62205755429211981046483958989",
+        "0x2.9f3f29f3ea160dcf30eed758",
+        Less,
+    );
+    test(
+        100,
+        Up,
+        "2.6220575542921198104648395898934",
+        "0x2.9f3f29f3ea160dcf30eed7584",
+        Greater,
+    );
+    test(
+        100,
+        Nearest,
+        "2.62205755429211981046483958989",
+        "0x2.9f3f29f3ea160dcf30eed758",
+        Less,
+    );
 }
 
 #[test]
@@ -87,18 +116,22 @@ fn lemniscate_constant_prec_round_properties() {
 
 #[test]
 fn test_lemniscate_constant_prec() {
-    let cases: &[(u64, &str, Ordering)] = &[
-        (1, "0x2.0", Less),
-        (2, "0x3.0", Greater),
-        (10, "0x2.9f", Less),
-        (100, "0x2.9f3f29f3ea160dcf30eed758", Less),
-    ];
-    for &(p, out, o) in cases {
+    let test = |p: u64, out: &str, out_hex: &str, o: Ordering| {
         let (x, o_alt) = BigExponentFloat::lemniscate_constant_prec(p);
         assert!(x.is_valid());
-        assert_eq!(format!("{x:?}"), out, "{:?}", (p));
+        assert_eq!(format!("{x:?}"), out_hex, "{:?}", (p));
+        assert_eq!(x.to_string(), out);
         assert_eq!(o_alt, o);
-    }
+    };
+    test(1, "2.0", "0x2.0", Less);
+    test(2, "3.0", "0x3.0", Greater);
+    test(10, "2.6211", "0x2.9f", Less);
+    test(
+        100,
+        "2.62205755429211981046483958989",
+        "0x2.9f3f29f3ea160dcf30eed758",
+        Less,
+    );
 }
 
 #[test]

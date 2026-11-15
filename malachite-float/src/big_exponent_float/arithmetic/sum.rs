@@ -339,27 +339,27 @@ impl BigExponentFloat {
     ///     [BigExponentFloat::from(PI), BigExponentFloat::from(E), BigExponentFloat::from(SQRT_2)];
     ///
     /// let (result, o) = BigExponentFloat::sum_prec_round(&xs, 5, Floor);
-    /// assert_eq!(format!("{result:?}"), "0x7.4");
+    /// assert_eq!(result.to_string(), "7.25");
     /// assert_eq!(o, Less);
     ///
     /// let (result, o) = BigExponentFloat::sum_prec_round(&xs, 5, Ceiling);
-    /// assert_eq!(format!("{result:?}"), "0x7.8");
+    /// assert_eq!(result.to_string(), "7.50");
     /// assert_eq!(o, Greater);
     ///
     /// let (result, o) = BigExponentFloat::sum_prec_round(&xs, 5, Nearest);
-    /// assert_eq!(format!("{result:?}"), "0x7.4");
+    /// assert_eq!(result.to_string(), "7.25");
     /// assert_eq!(o, Less);
     ///
     /// let (result, o) = BigExponentFloat::sum_prec_round(&xs, 20, Floor);
-    /// assert_eq!(format!("{result:?}"), "0x7.462a8");
+    /// assert_eq!(result.to_string(), "7.2740860");
     /// assert_eq!(o, Less);
     ///
     /// let (result, o) = BigExponentFloat::sum_prec_round(&xs, 20, Ceiling);
-    /// assert_eq!(format!("{result:?}"), "0x7.462b");
+    /// assert_eq!(result.to_string(), "7.274094");
     /// assert_eq!(o, Greater);
     ///
     /// let (result, o) = BigExponentFloat::sum_prec_round(&xs, 20, Nearest);
-    /// assert_eq!(format!("{result:?}"), "0x7.462a8");
+    /// assert_eq!(result.to_string(), "7.2740860");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -414,11 +414,11 @@ impl BigExponentFloat {
     ///     [BigExponentFloat::from(PI), BigExponentFloat::from(E), BigExponentFloat::from(SQRT_2)];
     ///
     /// let (result, o) = BigExponentFloat::sum_prec(&xs, 5);
-    /// assert_eq!(format!("{result:?}"), "0x7.4");
+    /// assert_eq!(result.to_string(), "7.25");
     /// assert_eq!(o, Less);
     ///
     /// let (result, o) = BigExponentFloat::sum_prec(&xs, 20);
-    /// assert_eq!(format!("{result:?}"), "0x7.462a8");
+    /// assert_eq!(result.to_string(), "7.2740860");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -465,10 +465,7 @@ impl Sum<Self> for BigExponentFloat {
     ///     BigExponentFloat::from(0.25),
     ///     BigExponentFloat::from(3.0),
     /// ];
-    /// assert_eq!(
-    ///     format!("{:?}", BigExponentFloat::sum(xs.into_iter())),
-    ///     "0x4.c"
-    /// );
+    /// assert_eq!((BigExponentFloat::sum(xs.into_iter())).to_string(), "4.75");
     /// ```
     #[inline]
     fn sum<I: Iterator<Item = Self>>(xs: I) -> Self {
@@ -517,7 +514,7 @@ impl<'a> Sum<&'a Self> for BigExponentFloat {
     ///     BigExponentFloat::from(0.25),
     ///     BigExponentFloat::from(3.0),
     /// ];
-    /// assert_eq!(format!("{:?}", BigExponentFloat::sum(xs.iter())), "0x4.c");
+    /// assert_eq!((BigExponentFloat::sum(xs.iter())).to_string(), "4.75");
     /// ```
     #[inline]
     fn sum<I: Iterator<Item = &'a Self>>(xs: I) -> Self {

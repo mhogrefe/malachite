@@ -30,6 +30,7 @@ fn test_mantissa_and_exponent() {
     assert_eq!(m, 1u32);
     assert_eq!(e, Integer::from(1u64 << 40));
     let (m, e) = (&x).sci_mantissa_and_exponent();
+    assert_eq!(m.to_string(), "1.0");
     assert_eq!(format!("{m:#x}"), "0x1.0");
     assert_eq!(e, Integer::from(1u64 << 40));
     assert_eq!((&x).raw_exponent(), Integer::from((1u64 << 40) + 1));

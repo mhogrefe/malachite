@@ -109,7 +109,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x6.c");
+    /// assert_eq!(result.to_string(), "6.75");
     /// assert_eq!(o, Less);
     ///
     /// let (result, o) = BigExponentFloat::from(PI).add_mul_prec_round(
@@ -118,7 +118,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x7.0");
+    /// assert_eq!(result.to_string(), "7.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (result, o) = BigExponentFloat::from(PI).add_mul_prec_round(
@@ -127,7 +127,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Nearest,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x7.0");
+    /// assert_eq!(result.to_string(), "7.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (result, o) = BigExponentFloat::from(PI).add_mul_prec_round(
@@ -136,7 +136,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x6.fc5e8");
+    /// assert_eq!(result.to_string(), "6.9858170");
     /// assert_eq!(o, Less);
     ///
     /// let (result, o) = BigExponentFloat::from(PI).add_mul_prec_round(
@@ -145,7 +145,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x6.fc5f");
+    /// assert_eq!(result.to_string(), "6.985825");
     /// assert_eq!(o, Greater);
     ///
     /// let (result, o) = BigExponentFloat::from(PI).add_mul_prec_round(
@@ -154,7 +154,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Nearest,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x6.fc5f");
+    /// assert_eq!(result.to_string(), "6.985825");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -226,7 +226,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x6.c");
+    /// assert_eq!(result.to_string(), "6.75");
     /// assert_eq!(o, Less);
     ///
     /// let (result, o) = BigExponentFloat::from(PI).add_mul_prec_round_val_val_ref(
@@ -235,7 +235,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x7.0");
+    /// assert_eq!(result.to_string(), "7.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (result, o) = BigExponentFloat::from(PI).add_mul_prec_round_val_val_ref(
@@ -244,7 +244,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Nearest,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x7.0");
+    /// assert_eq!(result.to_string(), "7.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (result, o) = BigExponentFloat::from(PI).add_mul_prec_round_val_val_ref(
@@ -253,7 +253,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x6.fc5e8");
+    /// assert_eq!(result.to_string(), "6.9858170");
     /// assert_eq!(o, Less);
     ///
     /// let (result, o) = BigExponentFloat::from(PI).add_mul_prec_round_val_val_ref(
@@ -262,7 +262,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x6.fc5f");
+    /// assert_eq!(result.to_string(), "6.985825");
     /// assert_eq!(o, Greater);
     ///
     /// let (result, o) = BigExponentFloat::from(PI).add_mul_prec_round_val_val_ref(
@@ -271,7 +271,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Nearest,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x6.fc5f");
+    /// assert_eq!(result.to_string(), "6.985825");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -343,7 +343,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x6.c");
+    /// assert_eq!(result.to_string(), "6.75");
     /// assert_eq!(o, Less);
     ///
     /// let (result, o) = BigExponentFloat::from(PI).add_mul_prec_round_val_ref_val(
@@ -352,7 +352,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x7.0");
+    /// assert_eq!(result.to_string(), "7.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (result, o) = BigExponentFloat::from(PI).add_mul_prec_round_val_ref_val(
@@ -361,7 +361,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Nearest,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x7.0");
+    /// assert_eq!(result.to_string(), "7.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (result, o) = BigExponentFloat::from(PI).add_mul_prec_round_val_ref_val(
@@ -370,7 +370,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x6.fc5e8");
+    /// assert_eq!(result.to_string(), "6.9858170");
     /// assert_eq!(o, Less);
     ///
     /// let (result, o) = BigExponentFloat::from(PI).add_mul_prec_round_val_ref_val(
@@ -379,7 +379,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x6.fc5f");
+    /// assert_eq!(result.to_string(), "6.985825");
     /// assert_eq!(o, Greater);
     ///
     /// let (result, o) = BigExponentFloat::from(PI).add_mul_prec_round_val_ref_val(
@@ -388,7 +388,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Nearest,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x6.fc5f");
+    /// assert_eq!(result.to_string(), "6.985825");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -460,7 +460,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x6.c");
+    /// assert_eq!(result.to_string(), "6.75");
     /// assert_eq!(o, Less);
     ///
     /// let (result, o) = BigExponentFloat::from(PI).add_mul_prec_round_val_ref_ref(
@@ -469,7 +469,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x7.0");
+    /// assert_eq!(result.to_string(), "7.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (result, o) = BigExponentFloat::from(PI).add_mul_prec_round_val_ref_ref(
@@ -478,7 +478,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Nearest,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x7.0");
+    /// assert_eq!(result.to_string(), "7.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (result, o) = BigExponentFloat::from(PI).add_mul_prec_round_val_ref_ref(
@@ -487,7 +487,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x6.fc5e8");
+    /// assert_eq!(result.to_string(), "6.9858170");
     /// assert_eq!(o, Less);
     ///
     /// let (result, o) = BigExponentFloat::from(PI).add_mul_prec_round_val_ref_ref(
@@ -496,7 +496,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x6.fc5f");
+    /// assert_eq!(result.to_string(), "6.985825");
     /// assert_eq!(o, Greater);
     ///
     /// let (result, o) = BigExponentFloat::from(PI).add_mul_prec_round_val_ref_ref(
@@ -505,7 +505,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Nearest,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x6.fc5f");
+    /// assert_eq!(result.to_string(), "6.985825");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -577,7 +577,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x6.c");
+    /// assert_eq!(result.to_string(), "6.75");
     /// assert_eq!(o, Less);
     ///
     /// let (result, o) = (&BigExponentFloat::from(PI)).add_mul_prec_round_ref_val_val(
@@ -586,7 +586,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x7.0");
+    /// assert_eq!(result.to_string(), "7.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (result, o) = (&BigExponentFloat::from(PI)).add_mul_prec_round_ref_val_val(
@@ -595,7 +595,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Nearest,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x7.0");
+    /// assert_eq!(result.to_string(), "7.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (result, o) = (&BigExponentFloat::from(PI)).add_mul_prec_round_ref_val_val(
@@ -604,7 +604,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x6.fc5e8");
+    /// assert_eq!(result.to_string(), "6.9858170");
     /// assert_eq!(o, Less);
     ///
     /// let (result, o) = (&BigExponentFloat::from(PI)).add_mul_prec_round_ref_val_val(
@@ -613,7 +613,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x6.fc5f");
+    /// assert_eq!(result.to_string(), "6.985825");
     /// assert_eq!(o, Greater);
     ///
     /// let (result, o) = (&BigExponentFloat::from(PI)).add_mul_prec_round_ref_val_val(
@@ -622,7 +622,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Nearest,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x6.fc5f");
+    /// assert_eq!(result.to_string(), "6.985825");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -694,7 +694,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x6.c");
+    /// assert_eq!(result.to_string(), "6.75");
     /// assert_eq!(o, Less);
     ///
     /// let (result, o) = (&BigExponentFloat::from(PI)).add_mul_prec_round_ref_val_ref(
@@ -703,7 +703,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x7.0");
+    /// assert_eq!(result.to_string(), "7.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (result, o) = (&BigExponentFloat::from(PI)).add_mul_prec_round_ref_val_ref(
@@ -712,7 +712,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Nearest,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x7.0");
+    /// assert_eq!(result.to_string(), "7.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (result, o) = (&BigExponentFloat::from(PI)).add_mul_prec_round_ref_val_ref(
@@ -721,7 +721,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x6.fc5e8");
+    /// assert_eq!(result.to_string(), "6.9858170");
     /// assert_eq!(o, Less);
     ///
     /// let (result, o) = (&BigExponentFloat::from(PI)).add_mul_prec_round_ref_val_ref(
@@ -730,7 +730,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x6.fc5f");
+    /// assert_eq!(result.to_string(), "6.985825");
     /// assert_eq!(o, Greater);
     ///
     /// let (result, o) = (&BigExponentFloat::from(PI)).add_mul_prec_round_ref_val_ref(
@@ -739,7 +739,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Nearest,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x6.fc5f");
+    /// assert_eq!(result.to_string(), "6.985825");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -811,7 +811,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x6.c");
+    /// assert_eq!(result.to_string(), "6.75");
     /// assert_eq!(o, Less);
     ///
     /// let (result, o) = (&BigExponentFloat::from(PI)).add_mul_prec_round_ref_ref_val(
@@ -820,7 +820,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x7.0");
+    /// assert_eq!(result.to_string(), "7.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (result, o) = (&BigExponentFloat::from(PI)).add_mul_prec_round_ref_ref_val(
@@ -829,7 +829,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Nearest,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x7.0");
+    /// assert_eq!(result.to_string(), "7.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (result, o) = (&BigExponentFloat::from(PI)).add_mul_prec_round_ref_ref_val(
@@ -838,7 +838,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x6.fc5e8");
+    /// assert_eq!(result.to_string(), "6.9858170");
     /// assert_eq!(o, Less);
     ///
     /// let (result, o) = (&BigExponentFloat::from(PI)).add_mul_prec_round_ref_ref_val(
@@ -847,7 +847,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x6.fc5f");
+    /// assert_eq!(result.to_string(), "6.985825");
     /// assert_eq!(o, Greater);
     ///
     /// let (result, o) = (&BigExponentFloat::from(PI)).add_mul_prec_round_ref_ref_val(
@@ -856,7 +856,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Nearest,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x6.fc5f");
+    /// assert_eq!(result.to_string(), "6.985825");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -928,7 +928,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x6.c");
+    /// assert_eq!(result.to_string(), "6.75");
     /// assert_eq!(o, Less);
     ///
     /// let (result, o) = (&BigExponentFloat::from(PI)).add_mul_prec_round_ref_ref_ref(
@@ -937,7 +937,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x7.0");
+    /// assert_eq!(result.to_string(), "7.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (result, o) = (&BigExponentFloat::from(PI)).add_mul_prec_round_ref_ref_ref(
@@ -946,7 +946,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Nearest,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x7.0");
+    /// assert_eq!(result.to_string(), "7.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (result, o) = (&BigExponentFloat::from(PI)).add_mul_prec_round_ref_ref_ref(
@@ -955,7 +955,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x6.fc5e8");
+    /// assert_eq!(result.to_string(), "6.9858170");
     /// assert_eq!(o, Less);
     ///
     /// let (result, o) = (&BigExponentFloat::from(PI)).add_mul_prec_round_ref_ref_ref(
@@ -964,7 +964,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x6.fc5f");
+    /// assert_eq!(result.to_string(), "6.985825");
     /// assert_eq!(o, Greater);
     ///
     /// let (result, o) = (&BigExponentFloat::from(PI)).add_mul_prec_round_ref_ref_ref(
@@ -973,7 +973,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Nearest,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x6.fc5f");
+    /// assert_eq!(result.to_string(), "6.985825");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -1042,7 +1042,7 @@ impl BigExponentFloat {
     ///     ),
     ///     Less
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x6.c");
+    /// assert_eq!(x.to_string(), "6.75");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
@@ -1054,7 +1054,7 @@ impl BigExponentFloat {
     ///     ),
     ///     Greater
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x7.0");
+    /// assert_eq!(x.to_string(), "7.0");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
@@ -1066,7 +1066,7 @@ impl BigExponentFloat {
     ///     ),
     ///     Greater
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x7.0");
+    /// assert_eq!(x.to_string(), "7.0");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
@@ -1078,7 +1078,7 @@ impl BigExponentFloat {
     ///     ),
     ///     Less
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x6.fc5e8");
+    /// assert_eq!(x.to_string(), "6.9858170");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
@@ -1090,7 +1090,7 @@ impl BigExponentFloat {
     ///     ),
     ///     Greater
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x6.fc5f");
+    /// assert_eq!(x.to_string(), "6.985825");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
@@ -1102,7 +1102,7 @@ impl BigExponentFloat {
     ///     ),
     ///     Greater
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x6.fc5f");
+    /// assert_eq!(x.to_string(), "6.985825");
     /// ```
     #[inline]
     pub fn add_mul_prec_round_assign(
@@ -1174,7 +1174,7 @@ impl BigExponentFloat {
     ///     ),
     ///     Less
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x6.c");
+    /// assert_eq!(x.to_string(), "6.75");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
@@ -1186,7 +1186,7 @@ impl BigExponentFloat {
     ///     ),
     ///     Greater
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x7.0");
+    /// assert_eq!(x.to_string(), "7.0");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
@@ -1198,7 +1198,7 @@ impl BigExponentFloat {
     ///     ),
     ///     Greater
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x7.0");
+    /// assert_eq!(x.to_string(), "7.0");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
@@ -1210,7 +1210,7 @@ impl BigExponentFloat {
     ///     ),
     ///     Less
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x6.fc5e8");
+    /// assert_eq!(x.to_string(), "6.9858170");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
@@ -1222,7 +1222,7 @@ impl BigExponentFloat {
     ///     ),
     ///     Greater
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x6.fc5f");
+    /// assert_eq!(x.to_string(), "6.985825");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
@@ -1234,7 +1234,7 @@ impl BigExponentFloat {
     ///     ),
     ///     Greater
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x6.fc5f");
+    /// assert_eq!(x.to_string(), "6.985825");
     /// ```
     #[inline]
     pub fn add_mul_prec_round_assign_val_ref(
@@ -1306,7 +1306,7 @@ impl BigExponentFloat {
     ///     ),
     ///     Less
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x6.c");
+    /// assert_eq!(x.to_string(), "6.75");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
@@ -1318,7 +1318,7 @@ impl BigExponentFloat {
     ///     ),
     ///     Greater
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x7.0");
+    /// assert_eq!(x.to_string(), "7.0");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
@@ -1330,7 +1330,7 @@ impl BigExponentFloat {
     ///     ),
     ///     Greater
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x7.0");
+    /// assert_eq!(x.to_string(), "7.0");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
@@ -1342,7 +1342,7 @@ impl BigExponentFloat {
     ///     ),
     ///     Less
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x6.fc5e8");
+    /// assert_eq!(x.to_string(), "6.9858170");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
@@ -1354,7 +1354,7 @@ impl BigExponentFloat {
     ///     ),
     ///     Greater
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x6.fc5f");
+    /// assert_eq!(x.to_string(), "6.985825");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
@@ -1366,7 +1366,7 @@ impl BigExponentFloat {
     ///     ),
     ///     Greater
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x6.fc5f");
+    /// assert_eq!(x.to_string(), "6.985825");
     /// ```
     #[inline]
     pub fn add_mul_prec_round_assign_ref_val(
@@ -1437,7 +1437,7 @@ impl BigExponentFloat {
     ///     ),
     ///     Less
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x6.c");
+    /// assert_eq!(x.to_string(), "6.75");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
@@ -1449,7 +1449,7 @@ impl BigExponentFloat {
     ///     ),
     ///     Greater
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x7.0");
+    /// assert_eq!(x.to_string(), "7.0");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
@@ -1461,7 +1461,7 @@ impl BigExponentFloat {
     ///     ),
     ///     Greater
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x7.0");
+    /// assert_eq!(x.to_string(), "7.0");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
@@ -1473,7 +1473,7 @@ impl BigExponentFloat {
     ///     ),
     ///     Less
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x6.fc5e8");
+    /// assert_eq!(x.to_string(), "6.9858170");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
@@ -1485,7 +1485,7 @@ impl BigExponentFloat {
     ///     ),
     ///     Greater
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x6.fc5f");
+    /// assert_eq!(x.to_string(), "6.985825");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
@@ -1497,7 +1497,7 @@ impl BigExponentFloat {
     ///     ),
     ///     Greater
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x6.fc5f");
+    /// assert_eq!(x.to_string(), "6.985825");
     /// ```
     #[inline]
     pub fn add_mul_prec_round_assign_ref_ref(
@@ -1567,7 +1567,7 @@ impl BigExponentFloat {
     ///     BigExponentFloat::from(SQRT_2),
     ///     5,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x7.0");
+    /// assert_eq!(result.to_string(), "7.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (result, o) = BigExponentFloat::from(PI).add_mul_prec(
@@ -1575,7 +1575,7 @@ impl BigExponentFloat {
     ///     BigExponentFloat::from(SQRT_2),
     ///     20,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x6.fc5f");
+    /// assert_eq!(result.to_string(), "6.985825");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -1634,7 +1634,7 @@ impl BigExponentFloat {
     ///     &BigExponentFloat::from(SQRT_2),
     ///     5,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x7.0");
+    /// assert_eq!(result.to_string(), "7.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (result, o) = BigExponentFloat::from(PI).add_mul_prec_val_val_ref(
@@ -1642,7 +1642,7 @@ impl BigExponentFloat {
     ///     &BigExponentFloat::from(SQRT_2),
     ///     20,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x6.fc5f");
+    /// assert_eq!(result.to_string(), "6.985825");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -1701,7 +1701,7 @@ impl BigExponentFloat {
     ///     BigExponentFloat::from(SQRT_2),
     ///     5,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x7.0");
+    /// assert_eq!(result.to_string(), "7.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (result, o) = BigExponentFloat::from(PI).add_mul_prec_val_ref_val(
@@ -1709,7 +1709,7 @@ impl BigExponentFloat {
     ///     BigExponentFloat::from(SQRT_2),
     ///     20,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x6.fc5f");
+    /// assert_eq!(result.to_string(), "6.985825");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -1768,7 +1768,7 @@ impl BigExponentFloat {
     ///     &BigExponentFloat::from(SQRT_2),
     ///     5,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x7.0");
+    /// assert_eq!(result.to_string(), "7.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (result, o) = BigExponentFloat::from(PI).add_mul_prec_val_ref_ref(
@@ -1776,7 +1776,7 @@ impl BigExponentFloat {
     ///     &BigExponentFloat::from(SQRT_2),
     ///     20,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x6.fc5f");
+    /// assert_eq!(result.to_string(), "6.985825");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -1835,7 +1835,7 @@ impl BigExponentFloat {
     ///     BigExponentFloat::from(SQRT_2),
     ///     5,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x7.0");
+    /// assert_eq!(result.to_string(), "7.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (result, o) = (&BigExponentFloat::from(PI)).add_mul_prec_ref_val_val(
@@ -1843,7 +1843,7 @@ impl BigExponentFloat {
     ///     BigExponentFloat::from(SQRT_2),
     ///     20,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x6.fc5f");
+    /// assert_eq!(result.to_string(), "6.985825");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -1902,7 +1902,7 @@ impl BigExponentFloat {
     ///     &BigExponentFloat::from(SQRT_2),
     ///     5,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x7.0");
+    /// assert_eq!(result.to_string(), "7.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (result, o) = (&BigExponentFloat::from(PI)).add_mul_prec_ref_val_ref(
@@ -1910,7 +1910,7 @@ impl BigExponentFloat {
     ///     &BigExponentFloat::from(SQRT_2),
     ///     20,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x6.fc5f");
+    /// assert_eq!(result.to_string(), "6.985825");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -1969,7 +1969,7 @@ impl BigExponentFloat {
     ///     BigExponentFloat::from(SQRT_2),
     ///     5,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x7.0");
+    /// assert_eq!(result.to_string(), "7.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (result, o) = (&BigExponentFloat::from(PI)).add_mul_prec_ref_ref_val(
@@ -1977,7 +1977,7 @@ impl BigExponentFloat {
     ///     BigExponentFloat::from(SQRT_2),
     ///     20,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x6.fc5f");
+    /// assert_eq!(result.to_string(), "6.985825");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -2035,7 +2035,7 @@ impl BigExponentFloat {
     ///     &BigExponentFloat::from(SQRT_2),
     ///     5,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x7.0");
+    /// assert_eq!(result.to_string(), "7.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (result, o) = (&BigExponentFloat::from(PI)).add_mul_prec_ref_ref_ref(
@@ -2043,7 +2043,7 @@ impl BigExponentFloat {
     ///     &BigExponentFloat::from(SQRT_2),
     ///     20,
     /// );
-    /// assert_eq!(format!("{result:?}"), "0x6.fc5f");
+    /// assert_eq!(result.to_string(), "6.985825");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -2095,7 +2095,7 @@ impl BigExponentFloat {
     ///     x.add_mul_prec_assign(BigExponentFloat::from(E), BigExponentFloat::from(SQRT_2), 5),
     ///     Greater
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x7.0");
+    /// assert_eq!(x.to_string(), "7.0");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
@@ -2106,7 +2106,7 @@ impl BigExponentFloat {
     ///     ),
     ///     Greater
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x6.fc5f");
+    /// assert_eq!(x.to_string(), "6.985825");
     /// ```
     #[inline]
     pub fn add_mul_prec_assign(&mut self, y: Self, z: Self, prec: u64) -> Ordering {
@@ -2164,7 +2164,7 @@ impl BigExponentFloat {
     ///     ),
     ///     Greater
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x7.0");
+    /// assert_eq!(x.to_string(), "7.0");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
@@ -2175,7 +2175,7 @@ impl BigExponentFloat {
     ///     ),
     ///     Greater
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x6.fc5f");
+    /// assert_eq!(x.to_string(), "6.985825");
     /// ```
     #[inline]
     pub fn add_mul_prec_assign_val_ref(&mut self, y: Self, z: &Self, prec: u64) -> Ordering {
@@ -2233,7 +2233,7 @@ impl BigExponentFloat {
     ///     ),
     ///     Greater
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x7.0");
+    /// assert_eq!(x.to_string(), "7.0");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
@@ -2244,7 +2244,7 @@ impl BigExponentFloat {
     ///     ),
     ///     Greater
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x6.fc5f");
+    /// assert_eq!(x.to_string(), "6.985825");
     /// ```
     #[inline]
     pub fn add_mul_prec_assign_ref_val(&mut self, y: &Self, z: Self, prec: u64) -> Ordering {
@@ -2302,7 +2302,7 @@ impl BigExponentFloat {
     ///     ),
     ///     Greater
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x7.0");
+    /// assert_eq!(x.to_string(), "7.0");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
@@ -2313,7 +2313,7 @@ impl BigExponentFloat {
     ///     ),
     ///     Greater
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x6.fc5f");
+    /// assert_eq!(x.to_string(), "6.985825");
     /// ```
     #[inline]
     pub fn add_mul_prec_assign_ref_ref(&mut self, y: &Self, z: &Self, prec: u64) -> Ordering {
@@ -2371,12 +2371,10 @@ impl AddMul<Self, Self> for BigExponentFloat {
     /// use malachite_float::BigExponentFloat;
     ///
     /// assert_eq!(
-    ///     format!(
-    ///         "{:?}",
-    ///         BigExponentFloat::from(1.5)
-    ///             .add_mul(BigExponentFloat::from(0.25), BigExponentFloat::from(3.0))
-    ///     ),
-    ///     "0x2.4"
+    ///     (BigExponentFloat::from(1.5)
+    ///         .add_mul(BigExponentFloat::from(0.25), BigExponentFloat::from(3.0)))
+    ///     .to_string(),
+    ///     "2.25"
     /// );
     /// ```
     #[inline]
@@ -2421,12 +2419,10 @@ impl AddMul<Self, &Self> for BigExponentFloat {
     /// use malachite_float::BigExponentFloat;
     ///
     /// assert_eq!(
-    ///     format!(
-    ///         "{:?}",
-    ///         BigExponentFloat::from(1.5)
-    ///             .add_mul(BigExponentFloat::from(0.25), &BigExponentFloat::from(3.0))
-    ///     ),
-    ///     "0x2.4"
+    ///     (BigExponentFloat::from(1.5)
+    ///         .add_mul(BigExponentFloat::from(0.25), &BigExponentFloat::from(3.0)))
+    ///     .to_string(),
+    ///     "2.25"
     /// );
     /// ```
     #[inline]
@@ -2478,12 +2474,10 @@ impl AddMul<&Self, Self> for BigExponentFloat {
     /// use malachite_float::BigExponentFloat;
     ///
     /// assert_eq!(
-    ///     format!(
-    ///         "{:?}",
-    ///         BigExponentFloat::from(1.5)
-    ///             .add_mul(&BigExponentFloat::from(0.25), BigExponentFloat::from(3.0))
-    ///     ),
-    ///     "0x2.4"
+    ///     (BigExponentFloat::from(1.5)
+    ///         .add_mul(&BigExponentFloat::from(0.25), BigExponentFloat::from(3.0)))
+    ///     .to_string(),
+    ///     "2.25"
     /// );
     /// ```
     #[inline]
@@ -2535,12 +2529,10 @@ impl AddMul<&Self, &Self> for BigExponentFloat {
     /// use malachite_float::BigExponentFloat;
     ///
     /// assert_eq!(
-    ///     format!(
-    ///         "{:?}",
-    ///         BigExponentFloat::from(1.5)
-    ///             .add_mul(&BigExponentFloat::from(0.25), &BigExponentFloat::from(3.0))
-    ///     ),
-    ///     "0x2.4"
+    ///     (BigExponentFloat::from(1.5)
+    ///         .add_mul(&BigExponentFloat::from(0.25), &BigExponentFloat::from(3.0)))
+    ///     .to_string(),
+    ///     "2.25"
     /// );
     /// ```
     #[inline]
@@ -2592,12 +2584,10 @@ impl AddMul<BigExponentFloat, BigExponentFloat> for &BigExponentFloat {
     /// use malachite_float::BigExponentFloat;
     ///
     /// assert_eq!(
-    ///     format!(
-    ///         "{:?}",
-    ///         (&BigExponentFloat::from(1.5))
-    ///             .add_mul(BigExponentFloat::from(0.25), BigExponentFloat::from(3.0))
-    ///     ),
-    ///     "0x2.4"
+    ///     ((&BigExponentFloat::from(1.5))
+    ///         .add_mul(BigExponentFloat::from(0.25), BigExponentFloat::from(3.0)))
+    ///     .to_string(),
+    ///     "2.25"
     /// );
     /// ```
     #[inline]
@@ -2649,12 +2639,10 @@ impl AddMul<BigExponentFloat, &BigExponentFloat> for &BigExponentFloat {
     /// use malachite_float::BigExponentFloat;
     ///
     /// assert_eq!(
-    ///     format!(
-    ///         "{:?}",
-    ///         (&BigExponentFloat::from(1.5))
-    ///             .add_mul(BigExponentFloat::from(0.25), &BigExponentFloat::from(3.0))
-    ///     ),
-    ///     "0x2.4"
+    ///     ((&BigExponentFloat::from(1.5))
+    ///         .add_mul(BigExponentFloat::from(0.25), &BigExponentFloat::from(3.0)))
+    ///     .to_string(),
+    ///     "2.25"
     /// );
     /// ```
     #[inline]
@@ -2706,12 +2694,10 @@ impl AddMul<&BigExponentFloat, BigExponentFloat> for &BigExponentFloat {
     /// use malachite_float::BigExponentFloat;
     ///
     /// assert_eq!(
-    ///     format!(
-    ///         "{:?}",
-    ///         (&BigExponentFloat::from(1.5))
-    ///             .add_mul(&BigExponentFloat::from(0.25), BigExponentFloat::from(3.0))
-    ///     ),
-    ///     "0x2.4"
+    ///     ((&BigExponentFloat::from(1.5))
+    ///         .add_mul(&BigExponentFloat::from(0.25), BigExponentFloat::from(3.0)))
+    ///     .to_string(),
+    ///     "2.25"
     /// );
     /// ```
     #[inline]
@@ -2762,12 +2748,10 @@ impl AddMul<&BigExponentFloat, &BigExponentFloat> for &BigExponentFloat {
     /// use malachite_float::BigExponentFloat;
     ///
     /// assert_eq!(
-    ///     format!(
-    ///         "{:?}",
-    ///         (&BigExponentFloat::from(1.5))
-    ///             .add_mul(&BigExponentFloat::from(0.25), &BigExponentFloat::from(3.0))
-    ///     ),
-    ///     "0x2.4"
+    ///     ((&BigExponentFloat::from(1.5))
+    ///         .add_mul(&BigExponentFloat::from(0.25), &BigExponentFloat::from(3.0)))
+    ///     .to_string(),
+    ///     "2.25"
     /// );
     /// ```
     #[inline]
@@ -2810,7 +2794,7 @@ impl AddMulAssign<Self, Self> for BigExponentFloat {
     ///
     /// let mut x = BigExponentFloat::from(1.5);
     /// x.add_mul_assign(BigExponentFloat::from(0.25), BigExponentFloat::from(3.0));
-    /// assert_eq!(format!("{x:?}"), "0x2.4");
+    /// assert_eq!(x.to_string(), "2.25");
     /// ```
     #[inline]
     fn add_mul_assign(&mut self, y: Self, z: Self) {
@@ -2847,7 +2831,7 @@ impl AddMulAssign<Self, &Self> for BigExponentFloat {
     ///
     /// let mut x = BigExponentFloat::from(1.5);
     /// x.add_mul_assign(BigExponentFloat::from(0.25), &BigExponentFloat::from(3.0));
-    /// assert_eq!(format!("{x:?}"), "0x2.4");
+    /// assert_eq!(x.to_string(), "2.25");
     /// ```
     #[inline]
     fn add_mul_assign(&mut self, y: Self, z: &Self) {
@@ -2884,7 +2868,7 @@ impl AddMulAssign<&Self, Self> for BigExponentFloat {
     ///
     /// let mut x = BigExponentFloat::from(1.5);
     /// x.add_mul_assign(&BigExponentFloat::from(0.25), BigExponentFloat::from(3.0));
-    /// assert_eq!(format!("{x:?}"), "0x2.4");
+    /// assert_eq!(x.to_string(), "2.25");
     /// ```
     #[inline]
     fn add_mul_assign(&mut self, y: &Self, z: Self) {
@@ -2920,7 +2904,7 @@ impl AddMulAssign<&Self, &Self> for BigExponentFloat {
     ///
     /// let mut x = BigExponentFloat::from(1.5);
     /// x.add_mul_assign(&BigExponentFloat::from(0.25), &BigExponentFloat::from(3.0));
-    /// assert_eq!(format!("{x:?}"), "0x2.4");
+    /// assert_eq!(x.to_string(), "2.25");
     /// ```
     #[inline]
     fn add_mul_assign(&mut self, y: &Self, z: &Self) {

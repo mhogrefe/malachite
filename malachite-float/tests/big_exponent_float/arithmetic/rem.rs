@@ -15,7 +15,7 @@ use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_float::big_exponent_float::ComparableBigExponentFloatRef;
 use malachite_float::test_util::big_exponent_float::{
     big_exponent_float_exponent_is_small, big_exponent_float_power_of_2,
-    float_to_big_exponent_float,
+    float_to_big_exponent_float, parse_big_exponent_float_hex,
 };
 use malachite_float::test_util::generators::*;
 use malachite_float::{BigExponentFloat, Float};
@@ -222,52 +222,93 @@ fn rem_and_quotient_bits_exact_all(
 
 #[test]
 fn test_rem() {
-    let nan = BigExponentFloat::NAN;
-    let inf = BigExponentFloat::INFINITY;
-    let ninf = BigExponentFloat::NEGATIVE_INFINITY;
-    let zero = BigExponentFloat::ZERO;
-    let one = BigExponentFloat::ONE;
+    let test_prec_round = |x: &str,
+                           x_hex: &str,
+                           y: &str,
+                           y_hex: &str,
+                           prec: u64,
+                           rm: RoundingMode,
+                           out: &str,
+                           out_hex: &str,
+                           o: Ordering| {
+        assert_eq!(parse_big_exponent_float_hex(x_hex).to_string(), x);
+        let x = &parse_big_exponent_float_hex(x_hex);
+        assert_eq!(parse_big_exponent_float_hex(y_hex).to_string(), y);
+        let y = &parse_big_exponent_float_hex(y_hex);
+        assert_eq!(parse_big_exponent_float_hex(out_hex).to_string(), out);
+        let out = &parse_big_exponent_float_hex(out_hex);
+        assert!(same_pair(
+            &rem_prec_round_all(x, y, prec, rm),
+            &(out.clone(), o)
+        ));
+    };
+    let test_rem = |x: &str, x_hex: &str, y: &str, y_hex: &str, out: &str, out_hex: &str| {
+        assert_eq!(parse_big_exponent_float_hex(x_hex).to_string(), x);
+        let x = &parse_big_exponent_float_hex(x_hex);
+        assert_eq!(parse_big_exponent_float_hex(y_hex).to_string(), y);
+        let y = &parse_big_exponent_float_hex(y_hex);
+        assert_eq!(parse_big_exponent_float_hex(out_hex).to_string(), out);
+        let out = &parse_big_exponent_float_hex(out_hex);
+        assert!(same(&rem_exact_all(x, y), out));
+    };
+    let test_ieee_remainder =
+        |x: &str, x_hex: &str, y: &str, y_hex: &str, out: &str, out_hex: &str| {
+            assert_eq!(parse_big_exponent_float_hex(x_hex).to_string(), x);
+            let x = &parse_big_exponent_float_hex(x_hex);
+            assert_eq!(parse_big_exponent_float_hex(y_hex).to_string(), y);
+            let y = &parse_big_exponent_float_hex(y_hex);
+            assert_eq!(parse_big_exponent_float_hex(out_hex).to_string(), out);
+            let out = &parse_big_exponent_float_hex(out_hex);
+            assert!(same(&ieee_remainder_exact_all(x, y), out));
+        };
+    let test_quotient_bits = |x: &str, x_hex: &str, y: &str, y_hex: &str, out| {
+        assert_eq!(parse_big_exponent_float_hex(x_hex).to_string(), x);
+        let x = &parse_big_exponent_float_hex(x_hex);
+        assert_eq!(parse_big_exponent_float_hex(y_hex).to_string(), y);
+        let y = &parse_big_exponent_float_hex(y_hex);
+        assert_eq!(rem_and_quotient_bits_exact_all(x, y).1, out);
+    };
     let three = BigExponentFloat::from(3);
-    assert!(same(&rem_exact_all(&nan, &one), &nan));
-    assert!(same(&rem_exact_all(&inf, &one), &nan));
-    assert!(same(&rem_exact_all(&one, &zero), &nan));
-    assert!(same(&rem_exact_all(&one, &ninf), &one));
-    assert!(same(&rem_exact_all(&zero, &one), &zero));
+    test_rem("NaN", "NaN", "1.0", "0x1.0", "NaN", "NaN");
+    test_rem("Infinity", "Infinity", "1.0", "0x1.0", "NaN", "NaN");
+    test_rem("1.0", "0x1.0", "0.0", "0x0.0", "NaN", "NaN");
+    test_rem("1.0", "0x1.0", "-Infinity", "-Infinity", "1.0", "0x1.0");
+    test_rem("0.0", "0x0.0", "1.0", "0x1.0", "0.0", "0x0.0");
     // 10.5 = 3 * 3 + 1.5, and 10.5 = 3 * 4 - 1.5 with 3.5 rounding to the even 4.
-    let x = BigExponentFloat::from(10.5);
-    assert!(same(
-        &rem_exact_all(&x, &three),
-        &BigExponentFloat::from(1.5)
-    ));
-    assert!(same(
-        &rem_exact_all(&-&x, &three),
-        &BigExponentFloat::from(-1.5)
-    ));
-    assert!(same(
-        &ieee_remainder_exact_all(&x, &three),
-        &BigExponentFloat::from(-1.5)
-    ));
-    let q = rem_and_quotient_bits_exact_all(&x, &three).1;
-    assert_eq!(q, 3);
-    let q = rem_and_quotient_bits_exact_all(&x, &-&three).1;
-    assert_eq!(q, -3);
+    test_rem("10.5", "0xa.8", "3.0", "0x3.0", "1.5", "0x1.8");
+    test_rem("-10.5", "-0xa.8", "3.0", "0x3.0", "-1.5", "-0x1.8");
+    test_ieee_remainder("10.5", "0xa.8", "3.0", "0x3.0", "-1.5", "-0x1.8");
+    test_quotient_bits("10.5", "0xa.8", "3.0", "0x3.0", 3);
+    test_quotient_bits("10.5", "0xa.8", "-3.0", "-0x3.0", -3);
     // 7.5 = 3 * 2.5, which rounds to the even 2.
-    assert!(same(
-        &ieee_remainder_exact_all(&BigExponentFloat::from(7.5), &three),
-        &BigExponentFloat::from(1.5)
-    ));
+    test_ieee_remainder("7.50", "0x7.8", "3.0", "0x3.0", "1.5", "0x1.8");
     // Exponent gaps beyond `Float`'s range. 2^k mod 3 is 2 for odd k and 1 for even k, and 2^k mod
     // 5 is 1 for k divisible by 4.
     let n = big();
-    assert!(same(&rem_exact_all(&p2(n.clone()), &three), &one));
-    assert!(same(
-        &rem_exact_all(&p2(n.clone() + Integer::ONE), &three),
-        &BigExponentFloat::TWO
-    ));
-    assert!(same(
-        &rem_exact_all(&p2(n.clone()), &BigExponentFloat::from(5)),
-        &one
-    ));
+    test_rem(
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        "3.0",
+        "0x3.0",
+        "1.0",
+        "0x1.0",
+    );
+    test_rem(
+        "4.7e30102999566398119521",
+        "0x2.0E+25000000000000000000",
+        "3.0",
+        "0x3.0",
+        "2.0",
+        "0x2.0",
+    );
+    test_rem(
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        "5.0",
+        "0x5.0",
+        "1.0",
+        "0x1.0",
+    );
     // For even N, the quotient q = (2^N - 1) / 3, so 3q = -1 modulo 2^63.
     let q = rem_and_quotient_bits_exact_all(&p2(n.clone()), &three).1;
     assert_eq!(
@@ -276,46 +317,80 @@ fn test_rem() {
     );
     // 2^N mod 3 = 1 rounds the quotient down, so the IEEE remainder is 1 as well; 2^(N + 1) mod 3 =
     // 2 > 3/2 rounds it up, giving 2 - 3 = -1.
-    assert!(same(
-        &ieee_remainder_exact_all(&p2(n.clone()), &three),
-        &one
-    ));
-    assert!(same(
-        &ieee_remainder_exact_all(&p2(n.clone() + Integer::ONE), &three),
-        &BigExponentFloat::from(-1)
-    ));
+    test_ieee_remainder(
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        "3.0",
+        "0x3.0",
+        "1.0",
+        "0x1.0",
+    );
+    test_ieee_remainder(
+        "4.7e30102999566398119521",
+        "0x2.0E+25000000000000000000",
+        "3.0",
+        "0x3.0",
+        "-1.0",
+        "-0x1.0",
+    );
     // A dividend far below the divisor is its own remainder.
-    assert!(same(
-        &rem_exact_all(&p2(-n.clone()), &three),
-        &p2(-n.clone())
-    ));
+    test_rem(
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
+        "3.0",
+        "0x3.0",
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
+    );
     // ... unless it is more than half of it, for the IEEE remainder: 3 * 2^N / 2^(N + 2) = 3/4
     // rounds to 1, giving 3 * 2^N - 2^(N + 2) = -2^N. Half of it, 2^N / 2^(N + 1), is a tie, which
     // rounds to the even 0.
-    assert!(same(
-        &ieee_remainder_exact_all(&(p2(n.clone()) * &three), &p2(n.clone() + Integer::TWO)),
-        &-p2(n.clone())
-    ));
-    assert!(same(
-        &ieee_remainder_exact_all(&p2(n.clone()), &p2(n.clone() + Integer::ONE)),
-        &p2(n.clone())
-    ));
+    test_ieee_remainder(
+        "7.1e30102999566398119521",
+        "0x3.0E+25000000000000000000",
+        "9.5e30102999566398119521",
+        "0x4.0E+25000000000000000000",
+        "-2.4e30102999566398119521",
+        "-0x1.0E+25000000000000000000",
+    );
+    test_ieee_remainder(
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        "4.7e30102999566398119521",
+        "0x2.0E+25000000000000000000",
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+    );
     // The remainder of a power of 2 by an odd number 2^k * m with a huge k: 2^(N + 3) mod (2^N * 3)
     // = 2^N * (8 mod 3) = 2^(N + 1).
-    assert!(same(
-        &rem_exact_all(&p2(n.clone() + Integer::from(3)), &(p2(n.clone()) * &three)),
-        &p2(n.clone() + Integer::ONE)
-    ));
-    let q = rem_and_quotient_bits_exact_all(
-        &p2(n.clone() + Integer::from(3)),
-        &(p2(n.clone()) * &three),
-    )
-    .1;
-    assert_eq!(q, 2);
-    let r = rem_prec_round_all(&p2(n + Integer::ONE), &BigExponentFloat::from(7), 1, Exact);
+    test_rem(
+        "1.9e30102999566398119522",
+        "0x8.0E+25000000000000000000",
+        "7.1e30102999566398119521",
+        "0x3.0E+25000000000000000000",
+        "4.7e30102999566398119521",
+        "0x2.0E+25000000000000000000",
+    );
+    test_quotient_bits(
+        "1.9e30102999566398119522",
+        "0x8.0E+25000000000000000000",
+        "7.1e30102999566398119521",
+        "0x3.0E+25000000000000000000",
+        2,
+    );
     // 2^k mod 7 is 1, 2, 4 for k mod 3 = 0, 1, 2; 10^20 + 1 = 2 mod 3, since 10 = 1 mod 3, so the
     // remainder is 4.
-    assert!(same_pair(&r, &(BigExponentFloat::from(4), Equal)));
+    test_prec_round(
+        "4.7e30102999566398119521",
+        "0x2.0E+25000000000000000000",
+        "7.0",
+        "0x7.0",
+        1,
+        Exact,
+        "4.0",
+        "0x4.0",
+        Equal,
+    );
 }
 
 #[test]
@@ -940,36 +1015,101 @@ fn minus_two_thirds_mod_2_63() -> i64 {
 
 #[test]
 fn test_rem_rational() {
+    let test_rem = |x: &str,
+                    x_hex: &str,
+                    q: &Rational,
+                    prec: u64,
+                    rm: RoundingMode,
+                    out: &str,
+                    out_hex: &str| {
+        assert_eq!(parse_big_exponent_float_hex(x_hex).to_string(), x);
+        let x = &parse_big_exponent_float_hex(x_hex);
+        assert_eq!(parse_big_exponent_float_hex(out_hex).to_string(), out);
+        let out = &parse_big_exponent_float_hex(out_hex);
+        assert!(same(&rem_rational_all(x, q, prec, rm).0, out));
+    };
+    let test_ieee_remainder = |x: &str,
+                               x_hex: &str,
+                               q: &Rational,
+                               prec: u64,
+                               rm: RoundingMode,
+                               out: &str,
+                               out_hex: &str| {
+        assert_eq!(parse_big_exponent_float_hex(x_hex).to_string(), x);
+        let x = &parse_big_exponent_float_hex(x_hex);
+        assert_eq!(parse_big_exponent_float_hex(out_hex).to_string(), out);
+        let out = &parse_big_exponent_float_hex(out_hex);
+        assert!(same(&ieee_remainder_rational_all(x, q, prec, rm).0, out));
+    };
     let huge_odd = Integer::from(i64::MAX);
     let third = Rational::from_unsigneds(1u8, 3);
     // 2^k mod 3 is 2 for odd k, so (2^k - 2) / 3 is the quotient.
     let r = rem_rational_all(&p2(huge_odd.clone()), &Rational::from(3), 10, Nearest);
-    assert!(same(&r.0, &BigExponentFloat::from(2)));
+    test_rem(
+        "6.9e2776511644261678565",
+        "0x8.0E+2305843009213693951",
+        &Rational::from(3),
+        10,
+        Nearest,
+        "2.0",
+        "0x2.0",
+    );
     assert_eq!(r.1, Equal);
     assert_eq!(r.2, minus_two_thirds_mod_2_63());
     // The nearest quotient rounds up, since 2 > 3 / 2, leaving 2 - 3.
     let r = ieee_remainder_rational_all(&p2(huge_odd.clone()), &Rational::from(3), 10, Nearest);
-    assert!(same(&r.0, &BigExponentFloat::from(-1)));
+    test_ieee_remainder(
+        "6.9e2776511644261678565",
+        "0x8.0E+2305843009213693951",
+        &Rational::from(3),
+        10,
+        Nearest,
+        "-1.0",
+        "-0x1.0",
+    );
     assert_eq!(r.2, minus_two_thirds_mod_2_63() + 1);
     // 2^k mod 3/2 = (2^(k + 1) mod 3) / 2, and k + 1 is even.
-    let r = rem_rational_all(
-        &p2(huge_odd.clone()),
+    test_rem(
+        "6.9e2776511644261678565",
+        "0x8.0E+2305843009213693951",
         &Rational::from_unsigneds(3u8, 2),
         10,
         Nearest,
+        "0.50",
+        "0x0.8",
     );
-    assert!(same(&r.0, &BigExponentFloat::from(0.5)));
     // 2^N mod 5 for N = 10^20, computed independently.
-    let expected = Natural::TWO.mod_pow(Natural::exact_from(&big()), Natural::from(5u32));
-    let r = rem_rational_all(&p2(big()), &Rational::from(5), 10, Nearest);
-    assert!(same(&r.0, &BigExponentFloat::from(&expected)));
+    test_rem(
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        &Rational::from(5),
+        10,
+        Nearest,
+        "1.0",
+        "0x1.0",
+    );
     // A tiny x is its own truncated and nearest remainder.
     let tiny = p2(-big());
     let r = rem_rational_all(&tiny, &third, 10, Nearest);
-    assert!(same(&r.0, &tiny));
+    test_rem(
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
+        &third,
+        10,
+        Nearest,
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
+    );
     assert_eq!((r.1, r.2), (Equal, 0));
-    let r = ieee_remainder_rational_all(&-&tiny, &third, 10, Nearest);
-    assert!(same(&r.0, &-&tiny));
+    test_ieee_remainder(
+        "-4.2e-30102999566398119522",
+        "-0x1.0E-25000000000000000000",
+        &third,
+        10,
+        Nearest,
+        "-4.2e-30102999566398119522",
+        "-0x1.0E-25000000000000000000",
+    );
     // Signs: the remainder has x's sign, and the quotient bits have the quotient's sign.
     let r = rem_rational_all(
         &BigExponentFloat::from(-10.5),
@@ -977,7 +1117,15 @@ fn test_rem_rational() {
         10,
         Nearest,
     );
-    assert!(same(&r.0, &BigExponentFloat::from(-1.5)));
+    test_rem(
+        "-10.5",
+        "-0xa.8",
+        &Rational::from(3),
+        10,
+        Nearest,
+        "-1.5",
+        "-0x1.8",
+    );
     assert_eq!(r.2, -3);
     let r = rem_rational_all(
         &BigExponentFloat::from(10.5),
@@ -985,7 +1133,15 @@ fn test_rem_rational() {
         10,
         Nearest,
     );
-    assert!(same(&r.0, &BigExponentFloat::from(1.5)));
+    test_rem(
+        "10.5",
+        "0xa.8",
+        &Rational::from(-3),
+        10,
+        Nearest,
+        "1.5",
+        "0x1.8",
+    );
     assert_eq!(r.2, -3);
     let r = ieee_remainder_rational_all(
         &BigExponentFloat::from(10.5),
@@ -993,7 +1149,15 @@ fn test_rem_rational() {
         10,
         Nearest,
     );
-    assert!(same(&r.0, &BigExponentFloat::from(-1.5)));
+    test_ieee_remainder(
+        "10.5",
+        "0xa.8",
+        &Rational::from(3),
+        10,
+        Nearest,
+        "-1.5",
+        "-0x1.8",
+    );
     assert_eq!(r.2, 4);
     // Special cases
     for x in
@@ -1005,12 +1169,24 @@ fn test_rem_rational() {
     }
     let r = rem_rational_all(&BigExponentFloat::ONE, &Rational::ZERO, 10, Nearest);
     assert!(r.0.is_nan());
-    let r = rem_rational_all(&BigExponentFloat::ZERO, &third, 10, Nearest);
-    assert!(same(&r.0, &BigExponentFloat::ZERO));
+    test_rem("0.0", "0x0.0", &third, 10, Nearest, "0.0", "0x0.0");
 }
 
 #[test]
 fn test_rational_rem() {
+    let test_rem = |q: &Rational,
+                    x: &str,
+                    x_hex: &str,
+                    prec: u64,
+                    rm: RoundingMode,
+                    out: &str,
+                    out_hex: &str| {
+        assert_eq!(parse_big_exponent_float_hex(x_hex).to_string(), x);
+        let x = &parse_big_exponent_float_hex(x_hex);
+        assert_eq!(parse_big_exponent_float_hex(out_hex).to_string(), out);
+        let out = &parse_big_exponent_float_hex(out_hex);
+        assert!(same(&rational_rem_all(q, x, prec, rm).0, out));
+    };
     let t = Integer::from(i64::MAX);
     let tiny = p2(-t.clone());
     let third = Rational::from_unsigneds(1u8, 3);
@@ -1060,31 +1236,31 @@ fn test_rational_rem() {
         ));
         assert_eq!(r.2, 0);
     }
-    let r = rational_rem_all(&Rational::ZERO, &BigExponentFloat::ONE, 10, Nearest);
-    assert!(same(&r.0, &BigExponentFloat::ZERO));
+    test_rem(&Rational::ZERO, "1.0", "0x1.0", 10, Nearest, "0.0", "0x0.0");
 }
 
 #[test]
 fn test_rem_unsigned_and_ieee_quotient_bits() {
-    assert!(same(
-        &rem_unsigned_exact_all(&BigExponentFloat::from(10.5), 3),
-        &BigExponentFloat::from(1.5)
-    ));
-    assert!(same(
-        &rem_unsigned_exact_all(&BigExponentFloat::from(-10.5), 3),
-        &BigExponentFloat::from(-1.5)
-    ));
-    assert!(same(
-        &rem_unsigned_exact_all(&p2(Integer::from(i64::MAX)), 3),
-        &BigExponentFloat::from(2)
-    ));
-    assert!(rem_unsigned_exact_all(&BigExponentFloat::from(10.5), 0).is_nan());
-    assert!(rem_unsigned_exact_all(&BigExponentFloat::INFINITY, 3).is_nan());
-    assert!(rem_unsigned_exact_all(&BigExponentFloat::NAN, 3).is_nan());
-    assert!(same(
-        &rem_unsigned_exact_all(&BigExponentFloat::ZERO, 3),
-        &BigExponentFloat::ZERO
-    ));
+    let test_rem_unsigned = |x: &str, x_hex: &str, n: u64, out: &str, out_hex: &str| {
+        assert_eq!(parse_big_exponent_float_hex(x_hex).to_string(), x);
+        let x = &parse_big_exponent_float_hex(x_hex);
+        assert_eq!(parse_big_exponent_float_hex(out_hex).to_string(), out);
+        let out = &parse_big_exponent_float_hex(out_hex);
+        assert!(same(&rem_unsigned_exact_all(x, n), out));
+    };
+    test_rem_unsigned("10.5", "0xa.8", 3, "1.5", "0x1.8");
+    test_rem_unsigned("-10.5", "-0xa.8", 3, "-1.5", "-0x1.8");
+    test_rem_unsigned(
+        "6.9e2776511644261678565",
+        "0x8.0E+2305843009213693951",
+        3,
+        "2.0",
+        "0x2.0",
+    );
+    test_rem_unsigned("10.5", "0xa.8", 0, "NaN", "NaN");
+    test_rem_unsigned("Infinity", "Infinity", 3, "NaN", "NaN");
+    test_rem_unsigned("NaN", "NaN", 3, "NaN", "NaN");
+    test_rem_unsigned("0.0", "0x0.0", 3, "0.0", "0x0.0");
     let (r, q) = ieee_remainder_and_quotient_bits_exact_all(
         &p2(Integer::from(i64::MAX)),
         &BigExponentFloat::from(3),

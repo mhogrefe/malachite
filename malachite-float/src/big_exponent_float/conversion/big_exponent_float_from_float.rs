@@ -31,14 +31,14 @@ impl From<Float> for BigExponentFloat {
     /// use malachite_base::num::basic::traits::{NegativeZero, One};
     /// use malachite_float::{BigExponentFloat, Float};
     ///
-    /// assert_eq!(format!("{:?}", BigExponentFloat::from(Float::ONE)), "0x1.0");
+    /// assert_eq!(BigExponentFloat::from(Float::ONE).to_string(), "1.0");
     /// assert_eq!(
-    ///     format!("{:?}", BigExponentFloat::from(Float::from(-1.5))),
-    ///     "-0x1.8"
+    ///     (BigExponentFloat::from(Float::from(-1.5))).to_string(),
+    ///     "-1.5"
     /// );
     /// assert_eq!(
-    ///     format!("{:?}", BigExponentFloat::from(Float::NEGATIVE_ZERO)),
-    ///     "0x0.0"
+    ///     BigExponentFloat::from(Float::NEGATIVE_ZERO).to_string(),
+    ///     "0.0"
     /// );
     /// ```
     fn from(x: Float) -> Self {
@@ -83,12 +83,9 @@ impl From<&Float> for BigExponentFloat {
     /// use malachite_base::num::basic::traits::{Infinity, One};
     /// use malachite_float::{BigExponentFloat, Float};
     ///
+    /// assert_eq!(BigExponentFloat::from(&Float::ONE).to_string(), "1.0");
     /// assert_eq!(
-    ///     format!("{:?}", BigExponentFloat::from(&Float::ONE)),
-    ///     "0x1.0"
-    /// );
-    /// assert_eq!(
-    ///     format!("{:?}", BigExponentFloat::from(&Float::INFINITY)),
+    ///     BigExponentFloat::from(&Float::INFINITY).to_string(),
     ///     "Infinity"
     /// );
     /// ```

@@ -50,11 +50,11 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::liouvilles_constant_base_prec_round(2, 64, Floor);
-    /// assert_eq!(format!("{x:?}"), "0x0.c40001");
+    /// assert_eq!(x.to_string(), "0.765625060");
     /// assert_eq!(o, Less);
     ///
     /// let (x, o) = BigExponentFloat::liouvilles_constant_base_prec_round(2, 64, Ceiling);
-    /// assert_eq!(format!("{x:?}"), "0x0.c400010000000001");
+    /// assert_eq!(x.to_string(), "0.765625059604644775445");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -95,11 +95,11 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::liouvilles_constant_base_prec(2, 64);
-    /// assert_eq!(format!("{x:?}"), "0x0.c40001");
+    /// assert_eq!(x.to_string(), "0.765625060");
     /// assert_eq!(o, Less);
     ///
     /// let (x, o) = BigExponentFloat::liouvilles_constant_base_prec(3, 50);
-    /// assert_eq!(format!("{x:?}"), "0x0.722102754dfd4");
+    /// assert_eq!(x.to_string(), "0.4458161865604682");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -148,11 +148,11 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::liouvilles_constant_prec_round(100, Floor);
-    /// assert_eq!(format!("{x:?}"), "0x0.1c29068986fcdee34fc7466d12");
+    /// assert_eq!(x.to_string(), "0.11000100000000000000000099999997");
     /// assert_eq!(o, Less);
     ///
     /// let (x, o) = BigExponentFloat::liouvilles_constant_prec_round(100, Ceiling);
-    /// assert_eq!(format!("{x:?}"), "0x0.1c29068986fcdee34fc7466d14");
+    /// assert_eq!(x.to_string(), "0.1100010000000000000000010000001");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -198,7 +198,7 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::liouvilles_constant_prec(100);
-    /// assert_eq!(format!("{x:?}"), "0x0.1c29068986fcdee34fc7466d12");
+    /// assert_eq!(x.to_string(), "0.11000100000000000000000099999997");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]

@@ -247,12 +247,12 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::from(PI).min_prec_round(BigExponentFloat::from(E), 5, Floor);
-    /// assert_eq!(format!("{x:?}"), "0x2.a");
+    /// assert_eq!(x.to_string(), "2.62");
     /// assert_eq!(o, Less);
     ///
     /// let (x, o) =
     ///     BigExponentFloat::from(PI).min_prec_round(BigExponentFloat::from(E), 5, Ceiling);
-    /// assert_eq!(format!("{x:?}"), "0x2.c");
+    /// assert_eq!(x.to_string(), "2.75");
     /// assert_eq!(o, Greater);
     /// ```
     pub fn min_prec_round(self, other: Self, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
@@ -297,7 +297,7 @@ impl BigExponentFloat {
     ///
     /// let (x, o) =
     ///     BigExponentFloat::from(PI).min_prec_round_val_ref(&BigExponentFloat::from(E), 5, Floor);
-    /// assert_eq!(format!("{x:?}"), "0x2.a");
+    /// assert_eq!(x.to_string(), "2.62");
     /// assert_eq!(o, Less);
     ///
     /// let (x, o) = BigExponentFloat::from(PI).min_prec_round_val_ref(
@@ -305,7 +305,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x2.c");
+    /// assert_eq!(x.to_string(), "2.75");
     /// assert_eq!(o, Greater);
     /// ```
     pub fn min_prec_round_val_ref(
@@ -355,7 +355,7 @@ impl BigExponentFloat {
     ///
     /// let (x, o) =
     ///     BigExponentFloat::from(PI).min_prec_round_ref_val(BigExponentFloat::from(E), 5, Floor);
-    /// assert_eq!(format!("{x:?}"), "0x2.a");
+    /// assert_eq!(x.to_string(), "2.62");
     /// assert_eq!(o, Less);
     ///
     /// let (x, o) = BigExponentFloat::from(PI).min_prec_round_ref_val(
@@ -363,7 +363,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x2.c");
+    /// assert_eq!(x.to_string(), "2.75");
     /// assert_eq!(o, Greater);
     /// ```
     pub fn min_prec_round_ref_val(
@@ -413,7 +413,7 @@ impl BigExponentFloat {
     ///
     /// let (x, o) =
     ///     BigExponentFloat::from(PI).min_prec_round_ref_ref(&BigExponentFloat::from(E), 5, Floor);
-    /// assert_eq!(format!("{x:?}"), "0x2.a");
+    /// assert_eq!(x.to_string(), "2.62");
     /// assert_eq!(o, Less);
     ///
     /// let (x, o) = BigExponentFloat::from(PI).min_prec_round_ref_ref(
@@ -421,7 +421,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x2.c");
+    /// assert_eq!(x.to_string(), "2.75");
     /// assert_eq!(o, Greater);
     /// ```
     pub fn min_prec_round_ref_ref(
@@ -468,7 +468,7 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::from(PI).min_prec(BigExponentFloat::from(E), 5);
-    /// assert_eq!(format!("{x:?}"), "0x2.c");
+    /// assert_eq!(x.to_string(), "2.75");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -507,7 +507,7 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::from(PI).min_prec_val_ref(&BigExponentFloat::from(E), 5);
-    /// assert_eq!(format!("{x:?}"), "0x2.c");
+    /// assert_eq!(x.to_string(), "2.75");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -546,7 +546,7 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::from(PI).min_prec_ref_val(BigExponentFloat::from(E), 5);
-    /// assert_eq!(format!("{x:?}"), "0x2.c");
+    /// assert_eq!(x.to_string(), "2.75");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -585,7 +585,7 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::from(PI).min_prec_ref_ref(&BigExponentFloat::from(E), 5);
-    /// assert_eq!(format!("{x:?}"), "0x2.c");
+    /// assert_eq!(x.to_string(), "2.75");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -635,7 +635,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x3.0");
+    /// assert_eq!(x.to_string(), "3.0");
     /// assert_eq!(o, Equal);
     /// ```
     pub fn min_rational_prec_round(
@@ -693,7 +693,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x3.0");
+    /// assert_eq!(x.to_string(), "3.0");
     /// assert_eq!(o, Equal);
     /// ```
     pub fn min_rational_prec_round_val_ref(
@@ -751,7 +751,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x3.0");
+    /// assert_eq!(x.to_string(), "3.0");
     /// assert_eq!(o, Equal);
     /// ```
     pub fn min_rational_prec_round_ref_val(
@@ -809,7 +809,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x3.0");
+    /// assert_eq!(x.to_string(), "3.0");
     /// assert_eq!(o, Equal);
     /// ```
     pub fn min_rational_prec_round_ref_ref(
@@ -856,7 +856,7 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::from(3).min_rational_prec(Rational::from_signeds(22, 7), 5);
-    /// assert_eq!(format!("{x:?}"), "0x3.0");
+    /// assert_eq!(x.to_string(), "3.0");
     /// assert_eq!(o, Equal);
     /// ```
     #[inline]
@@ -896,7 +896,7 @@ impl BigExponentFloat {
     ///
     /// let (x, o) =
     ///     BigExponentFloat::from(3).min_rational_prec_val_ref(&Rational::from_signeds(22, 7), 5);
-    /// assert_eq!(format!("{x:?}"), "0x3.0");
+    /// assert_eq!(x.to_string(), "3.0");
     /// assert_eq!(o, Equal);
     /// ```
     #[inline]
@@ -936,7 +936,7 @@ impl BigExponentFloat {
     ///
     /// let (x, o) =
     ///     BigExponentFloat::from(3).min_rational_prec_ref_val(Rational::from_signeds(22, 7), 5);
-    /// assert_eq!(format!("{x:?}"), "0x3.0");
+    /// assert_eq!(x.to_string(), "3.0");
     /// assert_eq!(o, Equal);
     /// ```
     #[inline]
@@ -976,7 +976,7 @@ impl BigExponentFloat {
     ///
     /// let (x, o) =
     ///     BigExponentFloat::from(3).min_rational_prec_ref_ref(&Rational::from_signeds(22, 7), 5);
-    /// assert_eq!(format!("{x:?}"), "0x3.0");
+    /// assert_eq!(x.to_string(), "3.0");
     /// assert_eq!(o, Equal);
     /// ```
     #[inline]
@@ -1201,12 +1201,12 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::from(PI).max_prec_round(BigExponentFloat::from(E), 5, Floor);
-    /// assert_eq!(format!("{x:?}"), "0x3.2");
+    /// assert_eq!(x.to_string(), "3.12");
     /// assert_eq!(o, Less);
     ///
     /// let (x, o) =
     ///     BigExponentFloat::from(PI).max_prec_round(BigExponentFloat::from(E), 5, Ceiling);
-    /// assert_eq!(format!("{x:?}"), "0x3.4");
+    /// assert_eq!(x.to_string(), "3.25");
     /// assert_eq!(o, Greater);
     /// ```
     pub fn max_prec_round(self, other: Self, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
@@ -1251,7 +1251,7 @@ impl BigExponentFloat {
     ///
     /// let (x, o) =
     ///     BigExponentFloat::from(PI).max_prec_round_val_ref(&BigExponentFloat::from(E), 5, Floor);
-    /// assert_eq!(format!("{x:?}"), "0x3.2");
+    /// assert_eq!(x.to_string(), "3.12");
     /// assert_eq!(o, Less);
     ///
     /// let (x, o) = BigExponentFloat::from(PI).max_prec_round_val_ref(
@@ -1259,7 +1259,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x3.4");
+    /// assert_eq!(x.to_string(), "3.25");
     /// assert_eq!(o, Greater);
     /// ```
     pub fn max_prec_round_val_ref(
@@ -1309,7 +1309,7 @@ impl BigExponentFloat {
     ///
     /// let (x, o) =
     ///     BigExponentFloat::from(PI).max_prec_round_ref_val(BigExponentFloat::from(E), 5, Floor);
-    /// assert_eq!(format!("{x:?}"), "0x3.2");
+    /// assert_eq!(x.to_string(), "3.12");
     /// assert_eq!(o, Less);
     ///
     /// let (x, o) = BigExponentFloat::from(PI).max_prec_round_ref_val(
@@ -1317,7 +1317,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x3.4");
+    /// assert_eq!(x.to_string(), "3.25");
     /// assert_eq!(o, Greater);
     /// ```
     pub fn max_prec_round_ref_val(
@@ -1367,7 +1367,7 @@ impl BigExponentFloat {
     ///
     /// let (x, o) =
     ///     BigExponentFloat::from(PI).max_prec_round_ref_ref(&BigExponentFloat::from(E), 5, Floor);
-    /// assert_eq!(format!("{x:?}"), "0x3.2");
+    /// assert_eq!(x.to_string(), "3.12");
     /// assert_eq!(o, Less);
     ///
     /// let (x, o) = BigExponentFloat::from(PI).max_prec_round_ref_ref(
@@ -1375,7 +1375,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x3.4");
+    /// assert_eq!(x.to_string(), "3.25");
     /// assert_eq!(o, Greater);
     /// ```
     pub fn max_prec_round_ref_ref(
@@ -1422,7 +1422,7 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::from(PI).max_prec(BigExponentFloat::from(E), 5);
-    /// assert_eq!(format!("{x:?}"), "0x3.2");
+    /// assert_eq!(x.to_string(), "3.12");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -1461,7 +1461,7 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::from(PI).max_prec_val_ref(&BigExponentFloat::from(E), 5);
-    /// assert_eq!(format!("{x:?}"), "0x3.2");
+    /// assert_eq!(x.to_string(), "3.12");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -1500,7 +1500,7 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::from(PI).max_prec_ref_val(BigExponentFloat::from(E), 5);
-    /// assert_eq!(format!("{x:?}"), "0x3.2");
+    /// assert_eq!(x.to_string(), "3.12");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -1539,7 +1539,7 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::from(PI).max_prec_ref_ref(&BigExponentFloat::from(E), 5);
-    /// assert_eq!(format!("{x:?}"), "0x3.2");
+    /// assert_eq!(x.to_string(), "3.12");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -1589,7 +1589,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x3.2");
+    /// assert_eq!(x.to_string(), "3.12");
     /// assert_eq!(o, Less);
     /// ```
     pub fn max_rational_prec_round(
@@ -1647,7 +1647,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x3.2");
+    /// assert_eq!(x.to_string(), "3.12");
     /// assert_eq!(o, Less);
     /// ```
     pub fn max_rational_prec_round_val_ref(
@@ -1705,7 +1705,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x3.2");
+    /// assert_eq!(x.to_string(), "3.12");
     /// assert_eq!(o, Less);
     /// ```
     pub fn max_rational_prec_round_ref_val(
@@ -1763,7 +1763,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x3.2");
+    /// assert_eq!(x.to_string(), "3.12");
     /// assert_eq!(o, Less);
     /// ```
     pub fn max_rational_prec_round_ref_ref(
@@ -1810,7 +1810,7 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::from(3).max_rational_prec(Rational::from_signeds(22, 7), 5);
-    /// assert_eq!(format!("{x:?}"), "0x3.2");
+    /// assert_eq!(x.to_string(), "3.12");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -1850,7 +1850,7 @@ impl BigExponentFloat {
     ///
     /// let (x, o) =
     ///     BigExponentFloat::from(3).max_rational_prec_val_ref(&Rational::from_signeds(22, 7), 5);
-    /// assert_eq!(format!("{x:?}"), "0x3.2");
+    /// assert_eq!(x.to_string(), "3.12");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -1890,7 +1890,7 @@ impl BigExponentFloat {
     ///
     /// let (x, o) =
     ///     BigExponentFloat::from(3).max_rational_prec_ref_val(Rational::from_signeds(22, 7), 5);
-    /// assert_eq!(format!("{x:?}"), "0x3.2");
+    /// assert_eq!(x.to_string(), "3.12");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -1930,7 +1930,7 @@ impl BigExponentFloat {
     ///
     /// let (x, o) =
     ///     BigExponentFloat::from(3).max_rational_prec_ref_ref(&Rational::from_signeds(22, 7), 5);
-    /// assert_eq!(format!("{x:?}"), "0x3.2");
+    /// assert_eq!(x.to_string(), "3.12");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]

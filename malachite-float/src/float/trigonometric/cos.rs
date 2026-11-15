@@ -631,7 +631,7 @@ pub(crate) fn trig_near_zero(
     loop {
         let (m, abs_err, shift) = trig_near_zero_approx(x, w, &mut p, p_hint, cos);
         let m_bits = m.significant_bits();
-        assert!(m_bits <= const { Float::MAX_EXPONENT as u64 });
+        assert!(m_bits <= Float::MAX_EXPONENT_U64);
         let err = m_bits - abs_err;
         let s = Float::from_integer_prec(m, m_bits).0;
         if float_can_round(s.significand_ref().unwrap(), err, prec, rm) {

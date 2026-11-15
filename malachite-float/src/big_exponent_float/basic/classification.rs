@@ -224,21 +224,18 @@ impl BigExponentFloat {
     /// use malachite_base::num::basic::traits::{Infinity, NaN, One, Zero};
     /// use malachite_float::BigExponentFloat;
     ///
+    /// assert_eq!(BigExponentFloat::NAN.into_non_nan(), None);
     /// assert_eq!(
-    ///     format!("{:?}", BigExponentFloat::NAN.into_non_nan()),
-    ///     "None"
+    ///     BigExponentFloat::INFINITY.into_non_nan(),
+    ///     Some(BigExponentFloat::INFINITY)
     /// );
     /// assert_eq!(
-    ///     format!("{:?}", BigExponentFloat::INFINITY.into_non_nan()),
-    ///     "Some(Infinity)"
+    ///     BigExponentFloat::ZERO.into_non_nan(),
+    ///     Some(BigExponentFloat::ZERO)
     /// );
     /// assert_eq!(
-    ///     format!("{:?}", BigExponentFloat::ZERO.into_non_nan()),
-    ///     "Some(0x0.0)"
-    /// );
-    /// assert_eq!(
-    ///     format!("{:?}", BigExponentFloat::ONE.into_non_nan()),
-    ///     "Some(0x1.0)"
+    ///     BigExponentFloat::ONE.into_non_nan(),
+    ///     Some(BigExponentFloat::ONE)
     /// );
     /// ```
     #[allow(clippy::missing_const_for_fn)] // destructor doesn't work with const
@@ -264,18 +261,18 @@ impl BigExponentFloat {
     /// use malachite_base::num::basic::traits::{Infinity, NaN, One, Zero};
     /// use malachite_float::BigExponentFloat;
     ///
-    /// assert_eq!(format!("{:?}", BigExponentFloat::NAN.to_non_nan()), "None");
+    /// assert_eq!(BigExponentFloat::NAN.to_non_nan(), None);
     /// assert_eq!(
-    ///     format!("{:?}", BigExponentFloat::INFINITY.to_non_nan()),
-    ///     "Some(Infinity)"
+    ///     BigExponentFloat::INFINITY.to_non_nan(),
+    ///     Some(BigExponentFloat::INFINITY)
     /// );
     /// assert_eq!(
-    ///     format!("{:?}", BigExponentFloat::ZERO.to_non_nan()),
-    ///     "Some(0x0.0)"
+    ///     BigExponentFloat::ZERO.to_non_nan(),
+    ///     Some(BigExponentFloat::ZERO)
     /// );
     /// assert_eq!(
-    ///     format!("{:?}", BigExponentFloat::ONE.to_non_nan()),
-    ///     "Some(0x1.0)"
+    ///     BigExponentFloat::ONE.to_non_nan(),
+    ///     Some(BigExponentFloat::ONE)
     /// );
     /// ```
     pub fn to_non_nan(&self) -> Option<Self> {
@@ -296,18 +293,15 @@ impl BigExponentFloat {
     /// use malachite_base::num::basic::traits::{Infinity, NaN, One, Zero};
     /// use malachite_float::BigExponentFloat;
     ///
-    /// assert_eq!(format!("{:?}", BigExponentFloat::NAN.into_finite()), "None");
+    /// assert_eq!(BigExponentFloat::NAN.into_finite(), None);
+    /// assert_eq!(BigExponentFloat::INFINITY.into_finite(), None);
     /// assert_eq!(
-    ///     format!("{:?}", BigExponentFloat::INFINITY.into_finite()),
-    ///     "None"
+    ///     BigExponentFloat::ZERO.into_finite(),
+    ///     Some(BigExponentFloat::ZERO)
     /// );
     /// assert_eq!(
-    ///     format!("{:?}", BigExponentFloat::ZERO.into_finite()),
-    ///     "Some(0x0.0)"
-    /// );
-    /// assert_eq!(
-    ///     format!("{:?}", BigExponentFloat::ONE.into_finite()),
-    ///     "Some(0x1.0)"
+    ///     BigExponentFloat::ONE.into_finite(),
+    ///     Some(BigExponentFloat::ONE)
     /// );
     /// ```
     #[allow(clippy::missing_const_for_fn)] // destructor doesn't work with const
@@ -333,18 +327,15 @@ impl BigExponentFloat {
     /// use malachite_base::num::basic::traits::{Infinity, NaN, One, Zero};
     /// use malachite_float::BigExponentFloat;
     ///
-    /// assert_eq!(format!("{:?}", BigExponentFloat::NAN.to_finite()), "None");
+    /// assert_eq!(BigExponentFloat::NAN.to_finite(), None);
+    /// assert_eq!(BigExponentFloat::INFINITY.to_finite(), None);
     /// assert_eq!(
-    ///     format!("{:?}", BigExponentFloat::INFINITY.to_finite()),
-    ///     "None"
+    ///     BigExponentFloat::ZERO.to_finite(),
+    ///     Some(BigExponentFloat::ZERO)
     /// );
     /// assert_eq!(
-    ///     format!("{:?}", BigExponentFloat::ZERO.to_finite()),
-    ///     "Some(0x0.0)"
-    /// );
-    /// assert_eq!(
-    ///     format!("{:?}", BigExponentFloat::ONE.to_finite()),
-    ///     "Some(0x1.0)"
+    ///     BigExponentFloat::ONE.to_finite(),
+    ///     Some(BigExponentFloat::ONE)
     /// );
     /// ```
     pub fn to_finite(&self) -> Option<Self> {

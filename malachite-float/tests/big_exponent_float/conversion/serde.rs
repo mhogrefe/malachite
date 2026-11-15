@@ -7,23 +7,25 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_float::BigExponentFloat;
-use malachite_float::test_util::big_exponent_float::big_exponent_float_power_of_2;
+use malachite_float::test_util::big_exponent_float::parse_big_exponent_float_hex;
 use malachite_float::test_util::generators::big_exponent_float_gen;
-use malachite_nz::integer::Integer;
 
 #[test]
 fn test_serde() {
-    let test = |x: BigExponentFloat, out: &str| {
+    let test = |t: &str, t_hex: &str, out: &str| {
+        let x = parse_big_exponent_float_hex(t_hex);
+        assert_eq!(x.to_string(), t);
         let s = serde_json::to_string(&x).unwrap();
         assert_eq!(s, out);
         let y: BigExponentFloat = serde_json::from_str(&s).unwrap();
         assert_eq!(format!("{y:#x}"), format!("{x:#x}"));
     };
-    test(BigExponentFloat::from(1.5f64), "\"0x1.8\"");
-    test(BigExponentFloat::from(-1.5f64), "\"-0x1.8\"");
-    test(BigExponentFloat::from(f64::NAN), "\"NaN\"");
+    test("1.5", "0x1.8", "\"0x1.8\"");
+    test("-1.5", "-0x1.8", "\"-0x1.8\"");
+    test("NaN", "NaN", "\"NaN\"");
     test(
-        big_exponent_float_power_of_2(Integer::from(1u64 << 40)),
+        "8.1e330985980541",
+        "0x1.0E+274877906944",
         "\"0x1.0E+274877906944\"",
     );
     assert!(serde_json::from_str::<BigExponentFloat>("\"0x1.g\"").is_err());

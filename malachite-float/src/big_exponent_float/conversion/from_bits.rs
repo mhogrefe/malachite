@@ -41,7 +41,7 @@ impl BigExponentFloat {
     /// // 0.010101..., which is 1/3
     /// let bits = [false, true].into_iter().cycle();
     /// let (x, o) = BigExponentFloat::non_dyadic_from_bits_prec_round(bits, 10, Floor);
-    /// assert_eq!(format!("{x:?}"), "0x0.554");
+    /// assert_eq!(x.to_string(), "0.3330");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -79,7 +79,7 @@ impl BigExponentFloat {
     ///
     /// let bits = [false, true].into_iter().cycle();
     /// let (x, o) = BigExponentFloat::non_dyadic_from_bits_prec(bits, 10);
-    /// assert_eq!(format!("{x:?}"), "0x0.556");
+    /// assert_eq!(x.to_string(), "0.33350");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]

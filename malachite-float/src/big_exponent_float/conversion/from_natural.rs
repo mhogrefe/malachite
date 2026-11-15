@@ -34,13 +34,10 @@ impl From<Natural> for BigExponentFloat {
     /// use malachite_float::BigExponentFloat;
     /// use malachite_nz::natural::Natural;
     ///
+    /// assert_eq!(BigExponentFloat::from(Natural::ZERO).to_string(), "0.0");
     /// assert_eq!(
-    ///     format!("{:?}", BigExponentFloat::from(Natural::ZERO)),
-    ///     "0x0.0"
-    /// );
-    /// assert_eq!(
-    ///     format!("{:?}", BigExponentFloat::from(Natural::from(12u32))),
-    ///     "0xc.0"
+    ///     (BigExponentFloat::from(Natural::from(12u32))).to_string(),
+    ///     "12.0"
     /// );
     /// ```
     fn from(x: Natural) -> Self {
@@ -73,13 +70,10 @@ impl From<&Natural> for BigExponentFloat {
     /// use malachite_float::BigExponentFloat;
     /// use malachite_nz::natural::Natural;
     ///
+    /// assert_eq!(BigExponentFloat::from(&Natural::ZERO).to_string(), "0.0");
     /// assert_eq!(
-    ///     format!("{:?}", BigExponentFloat::from(&Natural::ZERO)),
-    ///     "0x0.0"
-    /// );
-    /// assert_eq!(
-    ///     format!("{:?}", BigExponentFloat::from(&Natural::from(12u32))),
-    ///     "0xc.0"
+    ///     (BigExponentFloat::from(&Natural::from(12u32))).to_string(),
+    ///     "12.0"
     /// );
     /// ```
     #[inline]
@@ -115,7 +109,7 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::from_natural_prec_round(Natural::from(123u32), 4, Floor);
-    /// assert_eq!(format!("{x:?}"), "0x78.0");
+    /// assert_eq!(x.to_string(), "120.0");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -150,7 +144,7 @@ impl BigExponentFloat {
     ///
     /// let (x, o) =
     ///     BigExponentFloat::from_natural_prec_round_ref(&Natural::from(123u32), 4, Ceiling);
-    /// assert_eq!(format!("{x:?}"), "0x8.0E+1");
+    /// assert_eq!(x.to_string(), "1.3e2");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -183,7 +177,7 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::from_natural_prec(Natural::from(123u32), 4);
-    /// assert_eq!(format!("{x:?}"), "0x78.0");
+    /// assert_eq!(x.to_string(), "120.0");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -213,7 +207,7 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::from_natural_prec_ref(&Natural::from(123u32), 4);
-    /// assert_eq!(format!("{x:?}"), "0x78.0");
+    /// assert_eq!(x.to_string(), "120.0");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]

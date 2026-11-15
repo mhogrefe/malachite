@@ -165,27 +165,27 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (rsqrt, o) = BigExponentFloat::from(PI).reciprocal_sqrt_prec_round(5, Floor);
-    /// assert_eq!(format!("{rsqrt:?}"), "0x0.9");
+    /// assert_eq!(rsqrt.to_string(), "0.562");
     /// assert_eq!(o, Less);
     ///
     /// let (rsqrt, o) = BigExponentFloat::from(PI).reciprocal_sqrt_prec_round(5, Ceiling);
-    /// assert_eq!(format!("{rsqrt:?}"), "0x0.98");
+    /// assert_eq!(rsqrt.to_string(), "0.594");
     /// assert_eq!(o, Greater);
     ///
     /// let (rsqrt, o) = BigExponentFloat::from(PI).reciprocal_sqrt_prec_round(5, Nearest);
-    /// assert_eq!(format!("{rsqrt:?}"), "0x0.9");
+    /// assert_eq!(rsqrt.to_string(), "0.562");
     /// assert_eq!(o, Less);
     ///
     /// let (rsqrt, o) = BigExponentFloat::from(PI).reciprocal_sqrt_prec_round(20, Floor);
-    /// assert_eq!(format!("{rsqrt:?}"), "0x0.906eb");
+    /// assert_eq!(rsqrt.to_string(), "0.56418896");
     /// assert_eq!(o, Less);
     ///
     /// let (rsqrt, o) = BigExponentFloat::from(PI).reciprocal_sqrt_prec_round(20, Ceiling);
-    /// assert_eq!(format!("{rsqrt:?}"), "0x0.906ec");
+    /// assert_eq!(rsqrt.to_string(), "0.5641899");
     /// assert_eq!(o, Greater);
     ///
     /// let (rsqrt, o) = BigExponentFloat::from(PI).reciprocal_sqrt_prec_round(20, Nearest);
-    /// assert_eq!(format!("{rsqrt:?}"), "0x0.906ec");
+    /// assert_eq!(rsqrt.to_string(), "0.5641899");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -238,27 +238,27 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (rsqrt, o) = (&BigExponentFloat::from(PI)).reciprocal_sqrt_prec_round_ref(5, Floor);
-    /// assert_eq!(format!("{rsqrt:?}"), "0x0.9");
+    /// assert_eq!(rsqrt.to_string(), "0.562");
     /// assert_eq!(o, Less);
     ///
     /// let (rsqrt, o) = (&BigExponentFloat::from(PI)).reciprocal_sqrt_prec_round_ref(5, Ceiling);
-    /// assert_eq!(format!("{rsqrt:?}"), "0x0.98");
+    /// assert_eq!(rsqrt.to_string(), "0.594");
     /// assert_eq!(o, Greater);
     ///
     /// let (rsqrt, o) = (&BigExponentFloat::from(PI)).reciprocal_sqrt_prec_round_ref(5, Nearest);
-    /// assert_eq!(format!("{rsqrt:?}"), "0x0.9");
+    /// assert_eq!(rsqrt.to_string(), "0.562");
     /// assert_eq!(o, Less);
     ///
     /// let (rsqrt, o) = (&BigExponentFloat::from(PI)).reciprocal_sqrt_prec_round_ref(20, Floor);
-    /// assert_eq!(format!("{rsqrt:?}"), "0x0.906eb");
+    /// assert_eq!(rsqrt.to_string(), "0.56418896");
     /// assert_eq!(o, Less);
     ///
     /// let (rsqrt, o) = (&BigExponentFloat::from(PI)).reciprocal_sqrt_prec_round_ref(20, Ceiling);
-    /// assert_eq!(format!("{rsqrt:?}"), "0x0.906ec");
+    /// assert_eq!(rsqrt.to_string(), "0.5641899");
     /// assert_eq!(o, Greater);
     ///
     /// let (rsqrt, o) = (&BigExponentFloat::from(PI)).reciprocal_sqrt_prec_round_ref(20, Nearest);
-    /// assert_eq!(format!("{rsqrt:?}"), "0x0.906ec");
+    /// assert_eq!(rsqrt.to_string(), "0.5641899");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -306,27 +306,27 @@ impl BigExponentFloat {
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(x.reciprocal_sqrt_prec_round_assign(5, Floor), Less);
-    /// assert_eq!(format!("{x:?}"), "0x0.9");
+    /// assert_eq!(x.to_string(), "0.562");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(x.reciprocal_sqrt_prec_round_assign(5, Ceiling), Greater);
-    /// assert_eq!(format!("{x:?}"), "0x0.98");
+    /// assert_eq!(x.to_string(), "0.594");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(x.reciprocal_sqrt_prec_round_assign(5, Nearest), Less);
-    /// assert_eq!(format!("{x:?}"), "0x0.9");
+    /// assert_eq!(x.to_string(), "0.562");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(x.reciprocal_sqrt_prec_round_assign(20, Floor), Less);
-    /// assert_eq!(format!("{x:?}"), "0x0.906eb");
+    /// assert_eq!(x.to_string(), "0.56418896");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(x.reciprocal_sqrt_prec_round_assign(20, Ceiling), Greater);
-    /// assert_eq!(format!("{x:?}"), "0x0.906ec");
+    /// assert_eq!(x.to_string(), "0.5641899");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(x.reciprocal_sqrt_prec_round_assign(20, Nearest), Greater);
-    /// assert_eq!(format!("{x:?}"), "0x0.906ec");
+    /// assert_eq!(x.to_string(), "0.5641899");
     /// ```
     #[inline]
     pub fn reciprocal_sqrt_prec_round_assign(&mut self, prec: u64, rm: RoundingMode) -> Ordering {
@@ -378,11 +378,11 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (rsqrt, o) = BigExponentFloat::from(PI).reciprocal_sqrt_prec(5);
-    /// assert_eq!(format!("{rsqrt:?}"), "0x0.9");
+    /// assert_eq!(rsqrt.to_string(), "0.562");
     /// assert_eq!(o, Less);
     ///
     /// let (rsqrt, o) = BigExponentFloat::from(PI).reciprocal_sqrt_prec(20);
-    /// assert_eq!(format!("{rsqrt:?}"), "0x0.906ec");
+    /// assert_eq!(rsqrt.to_string(), "0.5641899");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -429,11 +429,11 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (rsqrt, o) = (&BigExponentFloat::from(PI)).reciprocal_sqrt_prec_ref(5);
-    /// assert_eq!(format!("{rsqrt:?}"), "0x0.9");
+    /// assert_eq!(rsqrt.to_string(), "0.562");
     /// assert_eq!(o, Less);
     ///
     /// let (rsqrt, o) = (&BigExponentFloat::from(PI)).reciprocal_sqrt_prec_ref(20);
-    /// assert_eq!(format!("{rsqrt:?}"), "0x0.906ec");
+    /// assert_eq!(rsqrt.to_string(), "0.5641899");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -475,11 +475,11 @@ impl BigExponentFloat {
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(x.reciprocal_sqrt_prec_assign(5), Less);
-    /// assert_eq!(format!("{x:?}"), "0x0.9");
+    /// assert_eq!(x.to_string(), "0.562");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(x.reciprocal_sqrt_prec_assign(20), Greater);
-    /// assert_eq!(format!("{x:?}"), "0x0.906ec");
+    /// assert_eq!(x.to_string(), "0.5641899");
     /// ```
     #[inline]
     pub fn reciprocal_sqrt_prec_assign(&mut self, prec: u64) -> Ordering {

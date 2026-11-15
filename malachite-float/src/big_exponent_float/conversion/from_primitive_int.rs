@@ -37,7 +37,7 @@ impl BigExponentFloat {
     ///
     /// const THREE_EIGHTHS: BigExponentFloat =
     ///     BigExponentFloat::const_from_unsigned_times_power_of_2(3, -3);
-    /// assert_eq!(format!("{THREE_EIGHTHS:?}"), "0x0.6");
+    /// assert_eq!(THREE_EIGHTHS.to_string(), "0.38");
     /// ```
     pub const fn const_from_unsigned_times_power_of_2(x: Limb, pow: SignedLimb) -> Self {
         if x == 0 {
@@ -64,7 +64,7 @@ impl BigExponentFloat {
     /// use malachite_float::BigExponentFloat;
     ///
     /// const TEN: BigExponentFloat = BigExponentFloat::const_from_unsigned(10);
-    /// assert_eq!(format!("{TEN:?}"), "0xa.0");
+    /// assert_eq!(TEN.to_string(), "10.0");
     /// ```
     #[inline]
     pub const fn const_from_unsigned(x: Limb) -> Self {
@@ -89,7 +89,7 @@ impl BigExponentFloat {
     ///
     /// const NEGATIVE_THREE_EIGHTHS: BigExponentFloat =
     ///     BigExponentFloat::const_from_signed_times_power_of_2(-3, -3);
-    /// assert_eq!(format!("{NEGATIVE_THREE_EIGHTHS:?}"), "-0x0.6");
+    /// assert_eq!(NEGATIVE_THREE_EIGHTHS.to_string(), "-0.38");
     /// ```
     pub const fn const_from_signed_times_power_of_2(x: SignedLimb, pow: SignedLimb) -> Self {
         let mut y = Self::const_from_unsigned_times_power_of_2(x.unsigned_abs(), pow);
@@ -112,7 +112,7 @@ impl BigExponentFloat {
     /// use malachite_float::BigExponentFloat;
     ///
     /// const NEGATIVE_TEN: BigExponentFloat = BigExponentFloat::const_from_signed(-10);
-    /// assert_eq!(format!("{NEGATIVE_TEN:?}"), "-0xa.0");
+    /// assert_eq!(NEGATIVE_TEN.to_string(), "-10.0");
     /// ```
     #[inline]
     pub const fn const_from_signed(x: SignedLimb) -> Self {
@@ -137,7 +137,7 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::from_unsigned_prec_round(123u8, 4, Floor);
-    /// assert_eq!(format!("{x:?}"), "0x78.0");
+    /// assert_eq!(x.to_string(), "120.0");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -168,7 +168,7 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::from_unsigned_prec(123u8, 4);
-    /// assert_eq!(format!("{x:?}"), "0x78.0");
+    /// assert_eq!(x.to_string(), "120.0");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -197,7 +197,7 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::from_signed_prec_round(-123i8, 4, Floor);
-    /// assert_eq!(format!("{x:?}"), "-0x8.0E+1");
+    /// assert_eq!(x.to_string(), "-1.3e2");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -228,7 +228,7 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::from_signed_prec(-123i8, 4);
-    /// assert_eq!(format!("{x:?}"), "-0x78.0");
+    /// assert_eq!(x.to_string(), "-120.0");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]

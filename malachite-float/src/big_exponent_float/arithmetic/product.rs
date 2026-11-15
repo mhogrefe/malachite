@@ -121,27 +121,27 @@ impl BigExponentFloat {
     ///     [BigExponentFloat::from(PI), BigExponentFloat::from(E), BigExponentFloat::from(SQRT_2)];
     ///
     /// let (result, o) = BigExponentFloat::product_prec_round(&xs, 5, Floor);
-    /// assert_eq!(format!("{result:?}"), "0xc.0");
+    /// assert_eq!(result.to_string(), "12.0");
     /// assert_eq!(o, Less);
     ///
     /// let (result, o) = BigExponentFloat::product_prec_round(&xs, 5, Ceiling);
-    /// assert_eq!(format!("{result:?}"), "0xc.8");
+    /// assert_eq!(result.to_string(), "12.5");
     /// assert_eq!(o, Greater);
     ///
     /// let (result, o) = BigExponentFloat::product_prec_round(&xs, 5, Nearest);
-    /// assert_eq!(format!("{result:?}"), "0xc.0");
+    /// assert_eq!(result.to_string(), "12.0");
     /// assert_eq!(o, Less);
     ///
     /// let (result, o) = BigExponentFloat::product_prec_round(&xs, 20, Floor);
-    /// assert_eq!(format!("{result:?}"), "0xc.13b6");
+    /// assert_eq!(result.to_string(), "12.07700");
     /// assert_eq!(o, Less);
     ///
     /// let (result, o) = BigExponentFloat::product_prec_round(&xs, 20, Ceiling);
-    /// assert_eq!(format!("{result:?}"), "0xc.13b7");
+    /// assert_eq!(result.to_string(), "12.077011");
     /// assert_eq!(o, Greater);
     ///
     /// let (result, o) = BigExponentFloat::product_prec_round(&xs, 20, Nearest);
-    /// assert_eq!(format!("{result:?}"), "0xc.13b7");
+    /// assert_eq!(result.to_string(), "12.077011");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -197,11 +197,11 @@ impl BigExponentFloat {
     ///     [BigExponentFloat::from(PI), BigExponentFloat::from(E), BigExponentFloat::from(SQRT_2)];
     ///
     /// let (result, o) = BigExponentFloat::product_prec(&xs, 5);
-    /// assert_eq!(format!("{result:?}"), "0xc.0");
+    /// assert_eq!(result.to_string(), "12.0");
     /// assert_eq!(o, Less);
     ///
     /// let (result, o) = BigExponentFloat::product_prec(&xs, 20);
-    /// assert_eq!(format!("{result:?}"), "0xc.13b7");
+    /// assert_eq!(result.to_string(), "12.077011");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -244,8 +244,8 @@ impl Product<Self> for BigExponentFloat {
     ///     BigExponentFloat::from(3.0),
     /// ];
     /// assert_eq!(
-    ///     format!("{:?}", BigExponentFloat::product(xs.into_iter())),
-    ///     "0x1.2"
+    ///     (BigExponentFloat::product(xs.into_iter())).to_string(),
+    ///     "1.12"
     /// );
     /// ```
     #[inline]
@@ -287,10 +287,7 @@ impl<'a> Product<&'a Self> for BigExponentFloat {
     ///     BigExponentFloat::from(0.25),
     ///     BigExponentFloat::from(3.0),
     /// ];
-    /// assert_eq!(
-    ///     format!("{:?}", BigExponentFloat::product(xs.iter())),
-    ///     "0x1.2"
-    /// );
+    /// assert_eq!((BigExponentFloat::product(xs.iter())).to_string(), "1.12");
     /// ```
     #[inline]
     fn product<I: Iterator<Item = &'a Self>>(xs: I) -> Self {

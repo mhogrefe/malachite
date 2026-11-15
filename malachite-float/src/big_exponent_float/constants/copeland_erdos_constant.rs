@@ -50,11 +50,11 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::copeland_erdos_constant_base_prec_round(16, 100, Floor);
-    /// assert_eq!(format!("{x:?}"), "0x0.2357bd1113171d1f25292b2f34");
+    /// assert_eq!(x.to_string(), "0.13805753390178350683643564212329");
     /// assert_eq!(o, Less);
     ///
     /// let (x, o) = BigExponentFloat::copeland_erdos_constant_base_prec_round(16, 100, Ceiling);
-    /// assert_eq!(format!("{x:?}"), "0x0.2357bd1113171d1f25292b2f38");
+    /// assert_eq!(x.to_string(), "0.1380575339017835068364356421235");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -95,11 +95,11 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::copeland_erdos_constant_base_prec(16, 100);
-    /// assert_eq!(format!("{x:?}"), "0x0.2357bd1113171d1f25292b2f34");
+    /// assert_eq!(x.to_string(), "0.13805753390178350683643564212329");
     /// assert_eq!(o, Less);
     ///
     /// let (x, o) = BigExponentFloat::copeland_erdos_constant_base_prec(3, 50);
-    /// assert_eq!(format!("{x:?}"), "0x0.cd3f746be387");
+    /// assert_eq!(x.to_string(), "0.8017494929695452");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -149,11 +149,11 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::copeland_erdos_constant_prec_round(100, Floor);
-    /// assert_eq!(format!("{x:?}"), "0x0.3c579092098975475a5c13b984");
+    /// assert_eq!(x.to_string(), "0.23571113171923293137414347535946");
     /// assert_eq!(o, Less);
     ///
     /// let (x, o) = BigExponentFloat::copeland_erdos_constant_prec_round(100, Ceiling);
-    /// assert_eq!(format!("{x:?}"), "0x0.3c579092098975475a5c13b988");
+    /// assert_eq!(x.to_string(), "0.2357111317192329313741434753597");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -200,7 +200,7 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::copeland_erdos_constant_prec(100);
-    /// assert_eq!(format!("{x:?}"), "0x0.3c579092098975475a5c13b988");
+    /// assert_eq!(x.to_string(), "0.2357111317192329313741434753597");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]

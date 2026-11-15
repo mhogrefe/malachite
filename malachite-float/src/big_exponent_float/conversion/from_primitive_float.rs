@@ -33,7 +33,7 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::from_primitive_float_prec_round(1.75f64, 2, Floor);
-    /// assert_eq!(format!("{x:?}"), "0x1.8");
+    /// assert_eq!(x.to_string(), "1.5");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -67,7 +67,7 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::from_primitive_float_prec(1.75f64, 2);
-    /// assert_eq!(format!("{x:?}"), "0x2.0");
+    /// assert_eq!(x.to_string(), "2.0");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]

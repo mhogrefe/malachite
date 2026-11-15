@@ -36,8 +36,8 @@ impl AbsSquared for BigExponentFloat {
     /// use malachite_float::BigExponentFloat;
     ///
     /// assert_eq!(
-    ///     format!("{:?}", BigExponentFloat::from(-1.5).abs_squared()),
-    ///     "0x2.4"
+    ///     BigExponentFloat::from(-1.5).abs_squared().to_string(),
+    ///     "2.25"
     /// );
     /// assert_eq!(
     ///     BigExponentFloat::NEGATIVE_INFINITY.abs_squared(),
@@ -75,8 +75,8 @@ impl AbsSquared for &BigExponentFloat {
     /// use malachite_float::BigExponentFloat;
     ///
     /// assert_eq!(
-    ///     format!("{:?}", (&BigExponentFloat::from(-1.5)).abs_squared()),
-    ///     "0x2.4"
+    ///     ((&BigExponentFloat::from(-1.5)).abs_squared()).to_string(),
+    ///     "2.25"
     /// );
     /// assert_eq!(
     ///     (&BigExponentFloat::NEGATIVE_INFINITY).abs_squared(),
@@ -111,7 +111,7 @@ impl AbsSquaredAssign for BigExponentFloat {
     ///
     /// let mut x = BigExponentFloat::from(-1.5);
     /// x.abs_squared_assign();
-    /// assert_eq!(format!("{x:?}"), "0x2.4");
+    /// assert_eq!(x.to_string(), "2.25");
     /// ```
     #[inline]
     fn abs_squared_assign(&mut self) {

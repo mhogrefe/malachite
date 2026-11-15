@@ -14,22 +14,18 @@ use std::str::FromStr;
 
 #[test]
 fn test_try_from_gaussian_integer() {
-    let test = |s, out: Option<&str>| {
+    let test = |s, out: Option<&str>, out_hex: Option<&str>| {
         let z = GaussianInteger::from_str(s).unwrap();
-        assert_eq!(
-            BigExponentFloat::try_from(&z)
-                .ok()
-                .map(|x| format!("{x:#x}"))
-                .as_deref(),
-            out
-        );
+        let x = BigExponentFloat::try_from(&z).ok();
+        assert_eq!(x.as_ref().map(ToString::to_string).as_deref(), out);
+        assert_eq!(x.map(|x| format!("{x:#x}")).as_deref(), out_hex);
         assert_eq!(BigExponentFloat::convertible_from(&z), out.is_some());
         assert_eq!(BigExponentFloat::try_from(z).is_ok(), out.is_some());
     };
-    test("0", Some("0x0.0"));
-    test("-3", Some("-0x3.0"));
-    test("1+i", None);
-    test("i", None);
+    test("0", Some("0.0"), Some("0x0.0"));
+    test("-3", Some("-3.0"), Some("-0x3.0"));
+    test("1+i", None, None);
+    test("i", None, None);
 }
 
 #[test]

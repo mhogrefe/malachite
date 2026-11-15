@@ -128,27 +128,27 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (reciprocal, o) = BigExponentFloat::from(PI).reciprocal_prec_round(5, Floor);
-    /// assert_eq!(format!("{reciprocal:?}"), "0x0.5");
+    /// assert_eq!(reciprocal.to_string(), "0.31");
     /// assert_eq!(o, Less);
     ///
     /// let (reciprocal, o) = BigExponentFloat::from(PI).reciprocal_prec_round(5, Ceiling);
-    /// assert_eq!(format!("{reciprocal:?}"), "0x0.54");
+    /// assert_eq!(reciprocal.to_string(), "0.328");
     /// assert_eq!(o, Greater);
     ///
     /// let (reciprocal, o) = BigExponentFloat::from(PI).reciprocal_prec_round(5, Nearest);
-    /// assert_eq!(format!("{reciprocal:?}"), "0x0.5");
+    /// assert_eq!(reciprocal.to_string(), "0.31");
     /// assert_eq!(o, Less);
     ///
     /// let (reciprocal, o) = BigExponentFloat::from(PI).reciprocal_prec_round(20, Floor);
-    /// assert_eq!(format!("{reciprocal:?}"), "0x0.517cc");
+    /// assert_eq!(reciprocal.to_string(), "0.3183098");
     /// assert_eq!(o, Less);
     ///
     /// let (reciprocal, o) = BigExponentFloat::from(PI).reciprocal_prec_round(20, Ceiling);
-    /// assert_eq!(format!("{reciprocal:?}"), "0x0.517cc8");
+    /// assert_eq!(reciprocal.to_string(), "0.31831026");
     /// assert_eq!(o, Greater);
     ///
     /// let (reciprocal, o) = BigExponentFloat::from(PI).reciprocal_prec_round(20, Nearest);
-    /// assert_eq!(format!("{reciprocal:?}"), "0x0.517cc");
+    /// assert_eq!(reciprocal.to_string(), "0.3183098");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -198,27 +198,27 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (reciprocal, o) = (&BigExponentFloat::from(PI)).reciprocal_prec_round_ref(5, Floor);
-    /// assert_eq!(format!("{reciprocal:?}"), "0x0.5");
+    /// assert_eq!(reciprocal.to_string(), "0.31");
     /// assert_eq!(o, Less);
     ///
     /// let (reciprocal, o) = (&BigExponentFloat::from(PI)).reciprocal_prec_round_ref(5, Ceiling);
-    /// assert_eq!(format!("{reciprocal:?}"), "0x0.54");
+    /// assert_eq!(reciprocal.to_string(), "0.328");
     /// assert_eq!(o, Greater);
     ///
     /// let (reciprocal, o) = (&BigExponentFloat::from(PI)).reciprocal_prec_round_ref(5, Nearest);
-    /// assert_eq!(format!("{reciprocal:?}"), "0x0.5");
+    /// assert_eq!(reciprocal.to_string(), "0.31");
     /// assert_eq!(o, Less);
     ///
     /// let (reciprocal, o) = (&BigExponentFloat::from(PI)).reciprocal_prec_round_ref(20, Floor);
-    /// assert_eq!(format!("{reciprocal:?}"), "0x0.517cc");
+    /// assert_eq!(reciprocal.to_string(), "0.3183098");
     /// assert_eq!(o, Less);
     ///
     /// let (reciprocal, o) = (&BigExponentFloat::from(PI)).reciprocal_prec_round_ref(20, Ceiling);
-    /// assert_eq!(format!("{reciprocal:?}"), "0x0.517cc8");
+    /// assert_eq!(reciprocal.to_string(), "0.31831026");
     /// assert_eq!(o, Greater);
     ///
     /// let (reciprocal, o) = (&BigExponentFloat::from(PI)).reciprocal_prec_round_ref(20, Nearest);
-    /// assert_eq!(format!("{reciprocal:?}"), "0x0.517cc");
+    /// assert_eq!(reciprocal.to_string(), "0.3183098");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -264,27 +264,27 @@ impl BigExponentFloat {
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(x.reciprocal_prec_round_assign(5, Floor), Less);
-    /// assert_eq!(format!("{x:?}"), "0x0.5");
+    /// assert_eq!(x.to_string(), "0.31");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(x.reciprocal_prec_round_assign(5, Ceiling), Greater);
-    /// assert_eq!(format!("{x:?}"), "0x0.54");
+    /// assert_eq!(x.to_string(), "0.328");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(x.reciprocal_prec_round_assign(5, Nearest), Less);
-    /// assert_eq!(format!("{x:?}"), "0x0.5");
+    /// assert_eq!(x.to_string(), "0.31");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(x.reciprocal_prec_round_assign(20, Floor), Less);
-    /// assert_eq!(format!("{x:?}"), "0x0.517cc");
+    /// assert_eq!(x.to_string(), "0.3183098");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(x.reciprocal_prec_round_assign(20, Ceiling), Greater);
-    /// assert_eq!(format!("{x:?}"), "0x0.517cc8");
+    /// assert_eq!(x.to_string(), "0.31831026");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(x.reciprocal_prec_round_assign(20, Nearest), Less);
-    /// assert_eq!(format!("{x:?}"), "0x0.517cc");
+    /// assert_eq!(x.to_string(), "0.3183098");
     /// ```
     #[inline]
     pub fn reciprocal_prec_round_assign(&mut self, prec: u64, rm: RoundingMode) -> Ordering {
@@ -332,11 +332,11 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (reciprocal, o) = BigExponentFloat::from(PI).reciprocal_prec(5);
-    /// assert_eq!(format!("{reciprocal:?}"), "0x0.5");
+    /// assert_eq!(reciprocal.to_string(), "0.31");
     /// assert_eq!(o, Less);
     ///
     /// let (reciprocal, o) = BigExponentFloat::from(PI).reciprocal_prec(20);
-    /// assert_eq!(format!("{reciprocal:?}"), "0x0.517cc");
+    /// assert_eq!(reciprocal.to_string(), "0.3183098");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -379,11 +379,11 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (reciprocal, o) = (&BigExponentFloat::from(PI)).reciprocal_prec_ref(5);
-    /// assert_eq!(format!("{reciprocal:?}"), "0x0.5");
+    /// assert_eq!(reciprocal.to_string(), "0.31");
     /// assert_eq!(o, Less);
     ///
     /// let (reciprocal, o) = (&BigExponentFloat::from(PI)).reciprocal_prec_ref(20);
-    /// assert_eq!(format!("{reciprocal:?}"), "0x0.517cc");
+    /// assert_eq!(reciprocal.to_string(), "0.3183098");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -423,11 +423,11 @@ impl BigExponentFloat {
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(x.reciprocal_prec_assign(5), Less);
-    /// assert_eq!(format!("{x:?}"), "0x0.5");
+    /// assert_eq!(x.to_string(), "0.31");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(x.reciprocal_prec_assign(20), Less);
-    /// assert_eq!(format!("{x:?}"), "0x0.517cc");
+    /// assert_eq!(x.to_string(), "0.3183098");
     /// ```
     #[inline]
     pub fn reciprocal_prec_assign(&mut self, prec: u64) -> Ordering {

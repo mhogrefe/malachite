@@ -53,11 +53,11 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::prouhet_thue_morse_constant_prec_round(100, Floor);
-    /// assert_eq!(format!("{x:?}"), "0x0.69969669966969969669699668");
+    /// assert_eq!(x.to_string(), "0.41245403364010759778336136825838");
     /// assert_eq!(o, Less);
     ///
     /// let (x, o) = BigExponentFloat::prouhet_thue_morse_constant_prec_round(100, Ceiling);
-    /// assert_eq!(format!("{x:?}"), "0x0.6996966996696996966969967");
+    /// assert_eq!(x.to_string(), "0.4124540336401075977833613682588");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -106,15 +106,15 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::prouhet_thue_morse_constant_prec(1);
-    /// assert_eq!(format!("{x:?}"), "0x0.8");
+    /// assert_eq!(x.to_string(), "0.50");
     /// assert_eq!(o, Greater);
     ///
     /// let (x, o) = BigExponentFloat::prouhet_thue_morse_constant_prec(10);
-    /// assert_eq!(format!("{x:?}"), "0x0.69a");
+    /// assert_eq!(x.to_string(), "0.41260");
     /// assert_eq!(o, Greater);
     ///
     /// let (x, o) = BigExponentFloat::prouhet_thue_morse_constant_prec(100);
-    /// assert_eq!(format!("{x:?}"), "0x0.69969669966969969669699668");
+    /// assert_eq!(x.to_string(), "0.41245403364010759778336136825838");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]

@@ -166,7 +166,7 @@ impl ComparableBigExponentFloat {
     /// use malachite_float::big_exponent_float::ComparableBigExponentFloat;
     ///
     /// let x = ComparableBigExponentFloat(BigExponentFloat::ONE);
-    /// assert_eq!(format!("{:?}", x.as_ref().0), "0x1.0");
+    /// assert_eq!(x.as_ref().0.to_string(), "1.0");
     /// ```
     pub const fn as_ref(&self) -> ComparableBigExponentFloatRef<'_> {
         ComparableBigExponentFloatRef(&self.0)

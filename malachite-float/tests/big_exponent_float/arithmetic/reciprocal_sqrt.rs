@@ -6,22 +6,19 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::Square;
-use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, One, Two, Zero};
-use malachite_base::num::conversion::traits::FromStringBase;
+use malachite_base::num::basic::traits::{One, Two};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_float::big_exponent_float::ComparableBigExponentFloatRef;
 use malachite_float::big_exponent_float::arithmetic::reciprocal_sqrt::reciprocal_sqrt_prec_round_generic;
 use malachite_float::test_util::big_exponent_float::{
-    big_exponent_float_power_of_2, float_to_big_exponent_float,
+    float_to_big_exponent_float, parse_big_exponent_float_hex,
 };
 use malachite_float::test_util::generators::{
     big_exponent_float_unsigned_rounding_mode_triple_gen_var_5,
     float_unsigned_rounding_mode_triple_gen_var_15,
 };
 use malachite_float::{BigExponentFloat, Float};
-use malachite_nz::integer::Integer;
 use std::cmp::Ordering::{self, *};
 
 fn same(x: &BigExponentFloat, y: &BigExponentFloat) -> bool {
@@ -37,22 +34,6 @@ fn float_result_comparable(x: &Float, o: Ordering) -> bool {
         || !x.is_infinite() && (!x.is_zero() || o == Equal),
         |e| e > Float::MIN_EXPONENT + 1 && e < Float::MAX_EXPONENT - 1,
     )
-}
-
-fn pi() -> BigExponentFloat {
-    BigExponentFloat::from(core::f64::consts::PI)
-}
-
-fn hex(s: &str) -> BigExponentFloat {
-    BigExponentFloat::from_string_base(16, s).unwrap()
-}
-
-fn big() -> Integer {
-    Integer::from_str("100000000000000000000").unwrap()
-}
-
-fn p2(e: Integer) -> BigExponentFloat {
-    big_exponent_float_power_of_2(e)
 }
 
 // Whether `x` is finite and nonzero.
@@ -81,7 +62,11 @@ fn reciprocal_sqrt_prec_round_all(
     r
 }
 
-fn check(x: &BigExponentFloat, prec: u64, rm: RoundingMode, out: &BigExponentFloat, o: Ordering) {
+fn check(x: &str, x_hex: &str, prec: u64, rm: RoundingMode, out: &str, out_hex: &str, o: Ordering) {
+    assert_eq!(parse_big_exponent_float_hex(x_hex).to_string(), x);
+    let x = &parse_big_exponent_float_hex(x_hex);
+    assert_eq!(parse_big_exponent_float_hex(out_hex).to_string(), out);
+    let out = &parse_big_exponent_float_hex(out_hex);
     let r = reciprocal_sqrt_prec_round_all(x, prec, rm);
     assert!(same(&r.0, out), "{x:?} {prec} {rm}: {:?} != {out:?}", r.0);
     assert_eq!(r.1, o);
@@ -93,50 +78,79 @@ fn check(x: &BigExponentFloat, prec: u64, rm: RoundingMode, out: &BigExponentFlo
 
 #[test]
 fn test_reciprocal_sqrt_prec_round() {
-    let nan = BigExponentFloat::NAN;
-    let inf = BigExponentFloat::INFINITY;
-    let zero = BigExponentFloat::ZERO;
-    check(&nan, 10, Floor, &nan, Equal);
-    check(&BigExponentFloat::NEGATIVE_INFINITY, 10, Floor, &nan, Equal);
-    check(&BigExponentFloat::from(-4.0), 10, Floor, &nan, Equal);
-    check(&inf, 10, Floor, &zero, Equal);
-    check(&zero, 10, Floor, &inf, Equal);
-    check(
-        &BigExponentFloat::from(0.25),
-        1,
-        Exact,
-        &BigExponentFloat::TWO,
-        Equal,
-    );
-    check(
-        &BigExponentFloat::from(4),
-        1,
-        Exact,
-        &BigExponentFloat::from(0.5),
-        Equal,
-    );
+    check("NaN", "NaN", 10, Floor, "NaN", "NaN", Equal);
+    check("-Infinity", "-Infinity", 10, Floor, "NaN", "NaN", Equal);
+    check("-4.0", "-0x4.0", 10, Floor, "NaN", "NaN", Equal);
+    check("Infinity", "Infinity", 10, Floor, "0.0", "0x0.0", Equal);
+    check("0.0", "0x0.0", 10, Floor, "Infinity", "Infinity", Equal);
+    check("0.25", "0x0.4", 1, Exact, "2.0", "0x2.0", Equal);
+    check("4.0", "0x4.0", 1, Exact, "0.50", "0x0.8", Equal);
     // An even exponent beyond the range of a `Float`: 1/sqrt(2^(2N)) = 2^(-N).
-    check(&p2(big() * Integer::TWO), 1, Exact, &p2(-big()), Equal);
-    check(&p2(-big() * Integer::TWO), 1, Exact, &p2(big()), Equal);
+    check(
+        "5.6e60205999132796239042",
+        "0x1.0E+50000000000000000000",
+        1,
+        Exact,
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
+        Equal,
+    );
+    check(
+        "1.8e-60205999132796239043",
+        "0x1.0E-50000000000000000000",
+        1,
+        Exact,
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        Equal,
+    );
     // An odd one: 1/sqrt(2^(2N + 1)) = 2^(-N - 1) * sqrt(2), and sqrt(2) rounds down to 1 and up to
     // 2 at 1 bit.
     check(
-        &p2(big() * Integer::TWO + Integer::ONE),
+        "1.1e60205999132796239043",
+        "0x2.0E+50000000000000000000",
         1,
         Floor,
-        &p2(-big() - Integer::ONE),
+        "2.1e-30102999566398119522",
+        "0x8.0E-25000000000000000001",
         Less,
     );
     check(
-        &p2(big() * Integer::TWO + Integer::ONE),
+        "1.1e60205999132796239043",
+        "0x2.0E+50000000000000000000",
         1,
         Ceiling,
-        &p2(-big()),
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
         Greater,
     );
-    check(&pi(), 5, Floor, &hex("0x0.9"), Less);
-    check(&pi(), 5, Ceiling, &hex("0x0.98"), Greater);
-    check(&pi(), 20, Nearest, &hex("0x0.906ec"), Greater);
+    check(
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        5,
+        Floor,
+        "0.562",
+        "0x0.9",
+        Less,
+    );
+    check(
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        5,
+        Ceiling,
+        "0.594",
+        "0x0.98",
+        Greater,
+    );
+    check(
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        20,
+        Nearest,
+        "0.5641899",
+        "0x0.906ec",
+        Greater,
+    );
 }
 
 #[test]

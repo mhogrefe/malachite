@@ -81,27 +81,27 @@ impl BigExponentFloat {
     /// let ys = [BigExponentFloat::from(SQRT_2), BigExponentFloat::from(LN_2)];
     ///
     /// let (result, o) = BigExponentFloat::dot_prec_round(&xs, &ys, 5, Floor);
-    /// assert_eq!(format!("{result:?}"), "0x6.4");
+    /// assert_eq!(result.to_string(), "6.25");
     /// assert_eq!(o, Less);
     ///
     /// let (result, o) = BigExponentFloat::dot_prec_round(&xs, &ys, 5, Ceiling);
-    /// assert_eq!(format!("{result:?}"), "0x6.8");
+    /// assert_eq!(result.to_string(), "6.50");
     /// assert_eq!(o, Greater);
     ///
     /// let (result, o) = BigExponentFloat::dot_prec_round(&xs, &ys, 5, Nearest);
-    /// assert_eq!(format!("{result:?}"), "0x6.4");
+    /// assert_eq!(result.to_string(), "6.25");
     /// assert_eq!(o, Less);
     ///
     /// let (result, o) = BigExponentFloat::dot_prec_round(&xs, &ys, 20, Floor);
-    /// assert_eq!(format!("{result:?}"), "0x6.53b98");
+    /// assert_eq!(result.to_string(), "6.3270493");
     /// assert_eq!(o, Less);
     ///
     /// let (result, o) = BigExponentFloat::dot_prec_round(&xs, &ys, 20, Ceiling);
-    /// assert_eq!(format!("{result:?}"), "0x6.53ba");
+    /// assert_eq!(result.to_string(), "6.327057");
     /// assert_eq!(o, Greater);
     ///
     /// let (result, o) = BigExponentFloat::dot_prec_round(&xs, &ys, 20, Nearest);
-    /// assert_eq!(format!("{result:?}"), "0x6.53b98");
+    /// assert_eq!(result.to_string(), "6.3270493");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -163,11 +163,11 @@ impl BigExponentFloat {
     /// let ys = [BigExponentFloat::from(SQRT_2), BigExponentFloat::from(LN_2)];
     ///
     /// let (result, o) = BigExponentFloat::dot_prec(&xs, &ys, 5);
-    /// assert_eq!(format!("{result:?}"), "0x6.4");
+    /// assert_eq!(result.to_string(), "6.25");
     /// assert_eq!(o, Less);
     ///
     /// let (result, o) = BigExponentFloat::dot_prec(&xs, &ys, 20);
-    /// assert_eq!(format!("{result:?}"), "0x6.53b98");
+    /// assert_eq!(result.to_string(), "6.3270493");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -211,7 +211,7 @@ impl BigExponentFloat {
     ///
     /// let xs = [BigExponentFloat::from(1.5), BigExponentFloat::from(0.25)];
     /// let ys = [BigExponentFloat::from(3.0), BigExponentFloat::from(-0.5)];
-    /// assert_eq!(format!("{:?}", BigExponentFloat::dot(&xs, &ys)), "0x4.6");
+    /// assert_eq!(BigExponentFloat::dot(&xs, &ys).to_string(), "4.38");
     /// ```
     pub fn dot(xs: &[Self], ys: &[Self]) -> Self {
         assert_eq!(xs.len(), ys.len());

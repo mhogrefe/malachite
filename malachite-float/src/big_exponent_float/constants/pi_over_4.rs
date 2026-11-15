@@ -44,11 +44,11 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::pi_over_4_prec_round(100, Floor);
-    /// assert_eq!(format!("{x:?}"), "0x0.c90fdaa22168c234c4c6628b8");
+    /// assert_eq!(x.to_string(), "0.7853981633974483096156608458198");
     /// assert_eq!(o, Less);
     ///
     /// let (x, o) = BigExponentFloat::pi_over_4_prec_round(100, Ceiling);
-    /// assert_eq!(format!("{x:?}"), "0x0.c90fdaa22168c234c4c6628b9");
+    /// assert_eq!(x.to_string(), "0.78539816339744830961566084582062");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -88,15 +88,15 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::pi_over_4_prec(1);
-    /// assert_eq!(format!("{x:?}"), "0x1.0");
+    /// assert_eq!(x.to_string(), "1.0");
     /// assert_eq!(o, Greater);
     ///
     /// let (x, o) = BigExponentFloat::pi_over_4_prec(10);
-    /// assert_eq!(format!("{x:?}"), "0x0.c9");
+    /// assert_eq!(x.to_string(), "0.7852");
     /// assert_eq!(o, Less);
     ///
     /// let (x, o) = BigExponentFloat::pi_over_4_prec(100);
-    /// assert_eq!(format!("{x:?}"), "0x0.c90fdaa22168c234c4c6628b8");
+    /// assert_eq!(x.to_string(), "0.7853981633974483096156608458198");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]

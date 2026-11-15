@@ -12,13 +12,13 @@ use malachite_base::num::conversion::traits::{ConvertibleFrom, RoundingFrom};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_float::BigExponentFloat;
 use malachite_float::test_util::big_exponent_float::{
-    big_exponent_float_exponent_is_small, big_exponent_float_negate, big_exponent_float_power_of_2,
-    big_exponent_float_to_float,
+    big_exponent_float_exponent_is_small, big_exponent_float_power_of_2,
+    big_exponent_float_to_float, parse_big_exponent_float_hex,
 };
 use malachite_float::test_util::generators::big_exponent_float_gen_var_1;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use std::cmp::Ordering::*;
+use std::cmp::Ordering::{self, *};
 
 const ROUNDING_MODES: [RoundingMode; 5] = [Floor, Ceiling, Down, Up, Nearest];
 
@@ -30,41 +30,62 @@ fn test_natural_from_big_exponent_float() {
     assert_eq!(n, Natural::from(1u32) << (1u64 << 24));
     assert!(Natural::convertible_from(&x));
     assert_eq!(Natural::rounding_from(&x, Exact), (n, Equal));
+
+    let test = |x: &str, x_hex: &str, rm: RoundingMode, out: &str, o: Ordering| {
+        assert_eq!(parse_big_exponent_float_hex(x_hex).to_string(), x);
+        let x = &parse_big_exponent_float_hex(x_hex);
+        let (n, o_alt) = Natural::rounding_from(x, rm);
+        assert_eq!(n.to_string(), out);
+        assert_eq!(o_alt, o);
+    };
     // - a tiny positive value, beyond `Float`'s range
-    let x = big_exponent_float_power_of_2(-Integer::from(1u64 << 40));
-    assert_eq!(
-        Natural::rounding_from(&x, Floor),
-        (Natural::from(0u32), Less)
+    test("1.2e-330985980542", "0x1.0E-274877906944", Floor, "0", Less);
+    test(
+        "1.2e-330985980542",
+        "0x1.0E-274877906944",
+        Nearest,
+        "0",
+        Less,
     );
-    assert_eq!(
-        Natural::rounding_from(&x, Nearest),
-        (Natural::from(0u32), Less)
-    );
-    assert_eq!(
-        Natural::rounding_from(&x, Up),
-        (Natural::from(1u32), Greater)
-    );
-    assert_eq!(
-        Natural::try_from(&x),
-        Err(UnsignedFromFloatError::FloatNonIntegerOrOutOfRange)
-    );
+    test("1.2e-330985980542", "0x1.0E-274877906944", Up, "1", Greater);
     // - negative values
-    let x = big_exponent_float_negate(big_exponent_float_power_of_2(Integer::from(1u64 << 40)));
-    assert_eq!(
-        Natural::rounding_from(&x, Ceiling),
-        (Natural::from(0u32), Greater)
+    test(
+        "-8.1e330985980541",
+        "-0x1.0E+274877906944",
+        Ceiling,
+        "0",
+        Greater,
     );
-    assert_eq!(
-        Natural::try_from(&x),
-        Err(UnsignedFromFloatError::FloatNegative)
+    test("-Infinity", "-Infinity", Down, "0", Greater);
+
+    let test_try_from = |x: &str, x_hex: &str, out: Result<&str, UnsignedFromFloatError>| {
+        assert_eq!(parse_big_exponent_float_hex(x_hex).to_string(), x);
+        let x = &parse_big_exponent_float_hex(x_hex);
+        assert_eq!(
+            Natural::try_from(x).map(|n| n.to_string()),
+            out.map(ToString::to_string)
+        );
+        assert_eq!(Natural::convertible_from(x), out.is_ok());
+    };
+    test_try_from(
+        "1.2e-330985980542",
+        "0x1.0E-274877906944",
+        Err(UnsignedFromFloatError::FloatNonIntegerOrOutOfRange),
     );
-    assert_eq!(
-        Natural::rounding_from(&BigExponentFloat::NEGATIVE_INFINITY, Down),
-        (Natural::from(0u32), Greater)
+    test_try_from(
+        "-8.1e330985980541",
+        "-0x1.0E+274877906944",
+        Err(UnsignedFromFloatError::FloatNegative),
     );
-    assert_eq!(
-        Natural::try_from(&BigExponentFloat::NAN),
-        Err(UnsignedFromFloatError::FloatInfiniteOrNan)
+    test_try_from(
+        "NaN",
+        "NaN",
+        Err(UnsignedFromFloatError::FloatInfiniteOrNan),
+    );
+    test_try_from(
+        "Infinity",
+        "Infinity",
+        Err(UnsignedFromFloatError::FloatInfiniteOrNan),
     );
     assert_eq!(
         Natural::try_from(BigExponentFloat::INFINITY),

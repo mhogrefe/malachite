@@ -44,11 +44,11 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::sqrt_5_over_5_prec_round(100, Floor);
-    /// assert_eq!(format!("{x:?}"), "0x0.727c9716ffb764d594a519c02");
+    /// assert_eq!(x.to_string(), "0.4472135954999579392818347337460");
     /// assert_eq!(o, Less);
     ///
     /// let (x, o) = BigExponentFloat::sqrt_5_over_5_prec_round(100, Ceiling);
-    /// assert_eq!(format!("{x:?}"), "0x0.727c9716ffb764d594a519c028");
+    /// assert_eq!(x.to_string(), "0.44721359549995793928183473374639");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -88,15 +88,15 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::sqrt_5_over_5_prec(1);
-    /// assert_eq!(format!("{x:?}"), "0x0.8");
+    /// assert_eq!(x.to_string(), "0.50");
     /// assert_eq!(o, Greater);
     ///
     /// let (x, o) = BigExponentFloat::sqrt_5_over_5_prec(10);
-    /// assert_eq!(format!("{x:?}"), "0x0.728");
+    /// assert_eq!(x.to_string(), "0.4473");
     /// assert_eq!(o, Greater);
     ///
     /// let (x, o) = BigExponentFloat::sqrt_5_over_5_prec(100);
-    /// assert_eq!(format!("{x:?}"), "0x0.727c9716ffb764d594a519c028");
+    /// assert_eq!(x.to_string(), "0.44721359549995793928183473374639");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]

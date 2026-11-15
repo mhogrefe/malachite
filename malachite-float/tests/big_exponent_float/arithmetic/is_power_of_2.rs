@@ -6,37 +6,46 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{IsPowerOf2, PowerOf2};
-use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, Zero};
 use malachite_float::BigExponentFloat;
-use malachite_float::test_util::big_exponent_float::big_exponent_float_power_of_2;
+use malachite_float::test_util::big_exponent_float::parse_big_exponent_float_hex;
 use malachite_float::test_util::generators::{
     big_exponent_float_gen, big_exponent_float_gen_var_1_float,
 };
-use malachite_nz::integer::Integer;
 
 #[test]
 fn test_is_power_of_2() {
-    for (x, out) in [
-        (1.0, true),
-        (2.0, true),
-        (0.5, true),
-        (1024.0, true),
-        (3.0, false),
-        (0.75, false),
-        (-2.0, false),
-    ] {
-        assert_eq!(BigExponentFloat::from(x).is_power_of_2(), out);
-    }
-    assert!(!BigExponentFloat::ZERO.is_power_of_2());
-    assert!(!BigExponentFloat::NAN.is_power_of_2());
-    assert!(!BigExponentFloat::INFINITY.is_power_of_2());
-    assert!(!BigExponentFloat::NEGATIVE_INFINITY.is_power_of_2());
-    let big = Integer::from_str("100000000000000000000").unwrap();
-    assert!(big_exponent_float_power_of_2(big.clone()).is_power_of_2());
-    assert!(big_exponent_float_power_of_2(-big.clone()).is_power_of_2());
-    assert!(!(-big_exponent_float_power_of_2(big)).is_power_of_2());
+    let test = |x: &str, x_hex: &str, out| {
+        assert_eq!(parse_big_exponent_float_hex(x_hex).to_string(), x);
+        let x = &parse_big_exponent_float_hex(x_hex);
+        assert_eq!(x.is_power_of_2(), out);
+    };
+    test("1.0", "0x1.0", true);
+    test("2.0", "0x2.0", true);
+    test("0.50", "0x0.8", true);
+    test("1.0e3", "0x4.0E+2", true);
+    test("3.0", "0x3.0", false);
+    test("0.75", "0x0.c", false);
+    test("-2.0", "-0x2.0", false);
+    test("0.0", "0x0.0", false);
+    test("NaN", "NaN", false);
+    test("Infinity", "Infinity", false);
+    test("-Infinity", "-Infinity", false);
+    test(
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        true,
+    );
+    test(
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
+        true,
+    );
+    test(
+        "-2.4e30102999566398119521",
+        "-0x1.0E+25000000000000000000",
+        false,
+    );
 }
 
 #[test]

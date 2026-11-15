@@ -7,17 +7,15 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
-use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, One, Zero};
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_float::big_exponent_float::ComparableBigExponentFloatRef;
 use malachite_float::test_util::big_exponent_float::{
-    big_exponent_float_exponent_is_small, big_exponent_float_power_of_2,
-    float_to_big_exponent_float,
+    big_exponent_float_exponent_is_small, float_to_big_exponent_float, parse_big_exponent_float_hex,
 };
 use malachite_float::test_util::generators::*;
 use malachite_float::{BigExponentFloat, Float};
-use malachite_nz::integer::Integer;
 use malachite_q::Rational;
 use std::cmp::Ordering::{self, *};
 
@@ -34,14 +32,6 @@ fn float_result_comparable(x: &Float, o: Ordering) -> bool {
         || !x.is_infinite() && (!x.is_zero() || o == Equal),
         |e| e > Float::MIN_EXPONENT + 1 && e < Float::MAX_EXPONENT - 1,
     )
-}
-
-fn p2(e: Integer) -> BigExponentFloat {
-    big_exponent_float_power_of_2(e)
-}
-
-fn big() -> Integer {
-    Integer::from_str("100000000000000000000").unwrap()
 }
 
 fn positive_difference_prec_round_all(
@@ -114,32 +104,87 @@ fn positive_difference_exact_all(x: &BigExponentFloat, y: &BigExponentFloat) -> 
 
 #[test]
 fn test_positive_difference() {
-    let nan = BigExponentFloat::NAN;
-    let inf = BigExponentFloat::INFINITY;
-    let ninf = BigExponentFloat::NEGATIVE_INFINITY;
-    let zero = BigExponentFloat::ZERO;
-    let one = BigExponentFloat::ONE;
-    assert!(same(&positive_difference_exact_all(&nan, &one), &nan));
-    assert!(same(&positive_difference_exact_all(&one, &nan), &nan));
-    assert!(same(&positive_difference_exact_all(&inf, &inf), &zero));
-    assert!(same(&positive_difference_exact_all(&ninf, &ninf), &zero));
-    assert!(same(&positive_difference_exact_all(&inf, &one), &inf));
-    assert!(same(&positive_difference_exact_all(&one, &ninf), &inf));
-    assert!(same(&positive_difference_exact_all(&one, &inf), &zero));
-    assert!(same(
-        &positive_difference_exact_all(&one, &BigExponentFloat::from(2)),
-        &zero
-    ));
+    let test = |x: &str, x_hex: &str, y: &str, y_hex: &str, out: &str, out_hex: &str| {
+        assert_eq!(parse_big_exponent_float_hex(x_hex).to_string(), x);
+        let x = &parse_big_exponent_float_hex(x_hex);
+        assert_eq!(parse_big_exponent_float_hex(y_hex).to_string(), y);
+        let y = &parse_big_exponent_float_hex(y_hex);
+        assert_eq!(parse_big_exponent_float_hex(out_hex).to_string(), out);
+        let out = &parse_big_exponent_float_hex(out_hex);
+        assert!(same(&positive_difference_exact_all(x, y), out));
+    };
+    test("NaN", "NaN", "1.0", "0x1.0", "NaN", "NaN");
+    test("1.0", "0x1.0", "NaN", "NaN", "NaN", "NaN");
+    test(
+        "Infinity", "Infinity", "Infinity", "Infinity", "0.0", "0x0.0",
+    );
+    test(
+        "-Infinity",
+        "-Infinity",
+        "-Infinity",
+        "-Infinity",
+        "0.0",
+        "0x0.0",
+    );
+    test(
+        "Infinity", "Infinity", "1.0", "0x1.0", "Infinity", "Infinity",
+    );
+    test(
+        "1.0",
+        "0x1.0",
+        "-Infinity",
+        "-Infinity",
+        "Infinity",
+        "Infinity",
+    );
+    test("1.0", "0x1.0", "Infinity", "Infinity", "0.0", "0x0.0");
+    test("1.0", "0x1.0", "2.0", "0x2.0", "0.0", "0x0.0");
     // 2.25 - 1.5 = 0.75
-    assert!(same(
-        &positive_difference_exact_all(&BigExponentFloat::from(2.25), &BigExponentFloat::from(1.5)),
-        &BigExponentFloat::from(0.75)
-    ));
+    test("2.25", "0x2.4", "1.5", "0x1.8", "0.75", "0x0.c");
+
     // 2^N - 2^-N, beyond `Float`'s range, is just below 2^N.
-    let r = positive_difference_prec_round_all(&p2(big()), &p2(-big()), 1, Floor);
-    assert!(same_pair(&r, &(p2(big() - Integer::ONE), Less)));
-    let r = positive_difference_prec_round_all(&p2(-big()), &p2(big()), 1, Floor);
-    assert!(same_pair(&r, &(zero, Equal)));
+    let test_prec_round = |x: &str,
+                           x_hex: &str,
+                           y: &str,
+                           y_hex: &str,
+                           prec: u64,
+                           rm: RoundingMode,
+                           out: &str,
+                           out_hex: &str,
+                           o: Ordering| {
+        assert_eq!(parse_big_exponent_float_hex(x_hex).to_string(), x);
+        let x = &parse_big_exponent_float_hex(x_hex);
+        assert_eq!(parse_big_exponent_float_hex(y_hex).to_string(), y);
+        let y = &parse_big_exponent_float_hex(y_hex);
+        assert_eq!(parse_big_exponent_float_hex(out_hex).to_string(), out);
+        let out = &parse_big_exponent_float_hex(out_hex);
+        assert!(same_pair(
+            &positive_difference_prec_round_all(x, y, prec, rm),
+            &(out.clone(), o)
+        ));
+    };
+    test_prec_round(
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
+        1,
+        Floor,
+        "1.2e30102999566398119521",
+        "0x8.0E+24999999999999999999",
+        Less,
+    );
+    test_prec_round(
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        1,
+        Floor,
+        "0.0",
+        "0x0.0",
+        Equal,
+    );
 }
 
 #[test]
@@ -319,55 +364,132 @@ fn rational_positive_difference_all(
 
 #[test]
 fn test_positive_difference_rational() {
-    let third = Rational::from_unsigneds(1u8, 3);
-    let r = positive_difference_rational_all(&BigExponentFloat::NAN, &third, 10, Nearest);
-    assert!(r.0.is_nan());
-    let r = positive_difference_rational_all(&BigExponentFloat::INFINITY, &third, 10, Nearest);
-    assert!(same(&r.0, &BigExponentFloat::INFINITY));
-    for x in
-        [BigExponentFloat::NEGATIVE_INFINITY, BigExponentFloat::from(0.25), BigExponentFloat::ZERO]
-    {
-        let r = positive_difference_rational_all(&x, &third, 10, Nearest);
-        assert!(same(&r.0, &BigExponentFloat::ZERO));
-        assert_eq!(r.1, Equal);
-    }
+    let test = |x: &str,
+                x_hex: &str,
+                y: &str,
+                prec: u64,
+                rm: RoundingMode,
+                out: &str,
+                out_hex: &str,
+                o: Ordering| {
+        assert_eq!(parse_big_exponent_float_hex(x_hex).to_string(), x);
+        let x = &parse_big_exponent_float_hex(x_hex);
+        assert_eq!(parse_big_exponent_float_hex(out_hex).to_string(), out);
+        let out = &parse_big_exponent_float_hex(out_hex);
+        let y = Rational::from_str(y).unwrap();
+        let r = positive_difference_rational_all(x, &y, prec, rm);
+        assert!(same(&r.0, out));
+        assert_eq!(r.1, o);
+    };
+    test("NaN", "NaN", "1/3", 10, Nearest, "NaN", "NaN", Equal);
+    test(
+        "Infinity", "Infinity", "1/3", 10, Nearest, "Infinity", "Infinity", Equal,
+    );
+    test(
+        "-Infinity",
+        "-Infinity",
+        "1/3",
+        10,
+        Nearest,
+        "0.0",
+        "0x0.0",
+        Equal,
+    );
+    test("0.25", "0x0.4", "1/3", 10, Nearest, "0.0", "0x0.0", Equal);
+    test("0.0", "0x0.0", "1/3", 10, Nearest, "0.0", "0x0.0", Equal);
     // 1/2 - 1/3 = 1/6
-    let r = positive_difference_rational_all(&BigExponentFloat::from(0.5), &third, 10, Floor);
-    assert!(same_pair(
-        &r,
-        &BigExponentFloat::from_rational_prec_round(Rational::from_unsigneds(1u8, 6), 10, Floor)
-    ));
+    let o =
+        BigExponentFloat::from_rational_prec_round(Rational::from_unsigneds(1u8, 6), 10, Floor).1;
+    test("0.50", "0x0.8", "1/3", 10, Floor, "0.1665", "0x0.2aa", o);
     // 2^N - 1/3 rounds to 2^N at any moderate precision.
-    let r = positive_difference_rational_all(&p2(big()), &third, 10, Nearest);
-    assert!(same(&r.0, &p2(big())));
-    assert_eq!(r.1, Greater);
+    test(
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        "1/3",
+        10,
+        Nearest,
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        Greater,
+    );
 }
 
 #[test]
 fn test_rational_positive_difference() {
-    let third = Rational::from_unsigneds(1u8, 3);
-    let r = rational_positive_difference_all(&third, &BigExponentFloat::NAN, 10, Nearest);
-    assert!(r.0.is_nan());
-    let r =
-        rational_positive_difference_all(&third, &BigExponentFloat::NEGATIVE_INFINITY, 10, Nearest);
-    assert!(same(&r.0, &BigExponentFloat::INFINITY));
-    for y in [BigExponentFloat::INFINITY, BigExponentFloat::from(0.5), p2(big())] {
-        let r = rational_positive_difference_all(&third, &y, 10, Nearest);
-        assert!(same(&r.0, &BigExponentFloat::ZERO));
-        assert_eq!(r.1, Equal);
-    }
+    let test = |x: &str,
+                y: &str,
+                y_hex: &str,
+                prec: u64,
+                rm: RoundingMode,
+                out: &str,
+                out_hex: &str,
+                o: Ordering| {
+        assert_eq!(parse_big_exponent_float_hex(y_hex).to_string(), y);
+        let y = &parse_big_exponent_float_hex(y_hex);
+        assert_eq!(parse_big_exponent_float_hex(out_hex).to_string(), out);
+        let out = &parse_big_exponent_float_hex(out_hex);
+        let x = Rational::from_str(x).unwrap();
+        let r = rational_positive_difference_all(&x, y, prec, rm);
+        assert!(same(&r.0, out));
+        assert_eq!(r.1, o);
+    };
+    test("1/3", "NaN", "NaN", 10, Nearest, "NaN", "NaN", Equal);
+    test(
+        "1/3",
+        "-Infinity",
+        "-Infinity",
+        10,
+        Nearest,
+        "Infinity",
+        "Infinity",
+        Equal,
+    );
+    test(
+        "1/3", "Infinity", "Infinity", 10, Nearest, "0.0", "0x0.0", Equal,
+    );
+    test("1/3", "0.50", "0x0.8", 10, Nearest, "0.0", "0x0.0", Equal);
+    test(
+        "1/3",
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        10,
+        Nearest,
+        "0.0",
+        "0x0.0",
+        Equal,
+    );
     // 1/3 - 1/4 = 1/12, rounded in each direction.
-    for rm in [Floor, Ceiling, Down, Up, Nearest] {
-        let r = rational_positive_difference_all(&third, &BigExponentFloat::from(0.25), 10, rm);
-        assert!(same_pair(
-            &r,
-            &BigExponentFloat::from_rational_prec_round(Rational::from_unsigneds(1u8, 12), 10, rm)
-        ));
-    }
+    let o =
+        BigExponentFloat::from_rational_prec_round(Rational::from_unsigneds(1u8, 12), 10, Floor).1;
+    test("1/3", "0.25", "0x0.4", 10, Floor, "0.08325", "0x0.155", o);
+    let o =
+        BigExponentFloat::from_rational_prec_round(Rational::from_unsigneds(1u8, 12), 10, Ceiling)
+            .1;
+    test(
+        "1/3", "0.25", "0x0.4", 10, Ceiling, "0.083374", "0x0.1558", o,
+    );
+    let o =
+        BigExponentFloat::from_rational_prec_round(Rational::from_unsigneds(1u8, 12), 10, Down).1;
+    test("1/3", "0.25", "0x0.4", 10, Down, "0.08325", "0x0.155", o);
+    let o = BigExponentFloat::from_rational_prec_round(Rational::from_unsigneds(1u8, 12), 10, Up).1;
+    test("1/3", "0.25", "0x0.4", 10, Up, "0.083374", "0x0.1558", o);
+    let o =
+        BigExponentFloat::from_rational_prec_round(Rational::from_unsigneds(1u8, 12), 10, Nearest)
+            .1;
+    test(
+        "1/3", "0.25", "0x0.4", 10, Nearest, "0.083374", "0x0.1558", o,
+    );
     // 1/3 + 2^N rounds to 2^N at any moderate precision.
-    let r = rational_positive_difference_all(&third, &-p2(big()), 10, Nearest);
-    assert!(same(&r.0, &p2(big())));
-    assert_eq!(r.1, Less);
+    test(
+        "1/3",
+        "-2.4e30102999566398119521",
+        "-0x1.0E+25000000000000000000",
+        10,
+        Nearest,
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        Less,
+    );
 }
 
 #[test]

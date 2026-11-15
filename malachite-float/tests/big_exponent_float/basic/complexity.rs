@@ -18,19 +18,20 @@ use std::str::FromStr;
 
 #[test]
 fn test_complexity_and_significant_bits() {
-    let test = |s, complexity, bits| {
-        let x = parse_big_exponent_float_hex(s);
+    let test = |s, s_hex, complexity, bits| {
+        let x = parse_big_exponent_float_hex(s_hex);
+        assert_eq!(x.to_string(), s);
         assert_eq!(x.complexity(), complexity);
         assert_eq!(x.significant_bits(), bits);
     };
-    test("NaN", 1, 1);
-    test("Infinity", 1, 1);
-    test("0x0.0", 1, 1);
-    test("0x1.0#1", 1, 1);
-    test("0x1.0000000000000000000000000#100", 1, 1);
-    test("0x3.243f6a8885a30#53", 50, 50);
-    test("0x1.0E+25#1", 100, 1);
-    test("0x1.0E-25#1", 100, 1);
+    test("NaN", "NaN", 1, 1);
+    test("Infinity", "Infinity", 1, 1);
+    test("0.0", "0x0.0", 1, 1);
+    test("1.0", "0x1.0#1", 1, 1);
+    test("1.0", "0x1.0000000000000000000000000#100", 1, 1);
+    test("3.1415926535897931", "0x3.243f6a8885a30#53", 50, 50);
+    test("1.3e30", "0x1.0E+25#1", 100, 1);
+    test("7.9e-31", "0x1.0E-25#1", 100, 1);
     // - an exponent too large for a `u64` saturates
     let x = big_exponent_float_power_of_2(Integer::from_str("100000000000000000000000").unwrap());
     assert_eq!(x.complexity(), u64::MAX);

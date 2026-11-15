@@ -221,8 +221,12 @@ pub mod big_exponent_float {
         pub mod rational_from_big_exponent_float;
         pub mod serde;
         pub mod string {
+            pub mod from_sci_string;
             pub mod from_string;
+            pub mod latex;
+            pub mod to_sci;
             pub mod to_string;
+            pub mod typst;
         }
     }
     pub mod exhaustive {

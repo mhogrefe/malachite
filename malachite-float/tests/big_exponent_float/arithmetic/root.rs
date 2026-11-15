@@ -6,15 +6,13 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{Abs, Pow};
-use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, One, Two, Zero};
-use malachite_base::num::conversion::traits::FromStringBase;
+use malachite_base::num::basic::traits::{One, Two};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_float::big_exponent_float::ComparableBigExponentFloatRef;
 use malachite_float::big_exponent_float::arithmetic::root::root_prec_round_generic;
 use malachite_float::test_util::big_exponent_float::{
-    big_exponent_float_power_of_2, float_to_big_exponent_float,
+    float_to_big_exponent_float, parse_big_exponent_float_hex,
 };
 use malachite_float::test_util::generators::{
     big_exponent_float_signed_unsigned_rounding_mode_quadruple_gen_var_1,
@@ -25,7 +23,6 @@ use malachite_float::test_util::generators::{
     float_unsigned_unsigned_rounding_mode_quadruple_gen_var_13,
 };
 use malachite_float::{BigExponentFloat, Float};
-use malachite_nz::integer::Integer;
 use std::cmp::Ordering::{self, *};
 
 fn same(x: &BigExponentFloat, y: &BigExponentFloat) -> bool {
@@ -41,22 +38,6 @@ fn float_result_comparable(x: &Float, o: Ordering) -> bool {
         || !x.is_infinite() && (!x.is_zero() || o == Equal),
         |e| e > Float::MIN_EXPONENT + 1 && e < Float::MAX_EXPONENT - 1,
     )
-}
-
-fn pi() -> BigExponentFloat {
-    BigExponentFloat::from(core::f64::consts::PI)
-}
-
-fn hex(s: &str) -> BigExponentFloat {
-    BigExponentFloat::from_string_base(16, s).unwrap()
-}
-
-fn big() -> Integer {
-    Integer::from_str("100000000000000000000").unwrap()
-}
-
-fn p2(e: Integer) -> BigExponentFloat {
-    big_exponent_float_power_of_2(e)
 }
 
 // Whether `x` is finite and nonzero.
@@ -112,13 +93,19 @@ fn root_s_prec_round_all(
 }
 
 fn check_u(
-    x: &BigExponentFloat,
+    x: &str,
+    x_hex: &str,
     k: u64,
     prec: u64,
     rm: RoundingMode,
-    out: &BigExponentFloat,
+    out: &str,
+    out_hex: &str,
     o: Ordering,
 ) {
+    assert_eq!(parse_big_exponent_float_hex(x_hex).to_string(), x);
+    let x = &parse_big_exponent_float_hex(x_hex);
+    assert_eq!(parse_big_exponent_float_hex(out_hex).to_string(), out);
+    let out = &parse_big_exponent_float_hex(out_hex);
     let r = root_u_prec_round_all(x, k, prec, rm);
     assert!(
         same(&r.0, out),
@@ -133,13 +120,19 @@ fn check_u(
 }
 
 fn check_s(
-    x: &BigExponentFloat,
+    x: &str,
+    x_hex: &str,
     k: i64,
     prec: u64,
     rm: RoundingMode,
-    out: &BigExponentFloat,
+    out: &str,
+    out_hex: &str,
     o: Ordering,
 ) {
+    assert_eq!(parse_big_exponent_float_hex(x_hex).to_string(), x);
+    let x = &parse_big_exponent_float_hex(x_hex);
+    assert_eq!(parse_big_exponent_float_hex(out_hex).to_string(), out);
+    let out = &parse_big_exponent_float_hex(out_hex);
     let r = root_s_prec_round_all(x, k, prec, rm);
     assert!(
         same(&r.0, out),
@@ -154,81 +147,92 @@ fn check_s(
 }
 
 fn check_u_pi(
-    x: &BigExponentFloat,
+    x: &str,
+    x_hex: &str,
     prec: u64,
     rm: RoundingMode,
-    out: &BigExponentFloat,
+    out: &str,
+    out_hex: &str,
     o: Ordering,
 ) {
-    check_u(x, 4, prec, rm, out, o);
+    check_u(x, x_hex, 4, prec, rm, out, out_hex, o);
 }
 
 fn check_s_pi(
-    x: &BigExponentFloat,
+    x: &str,
+    x_hex: &str,
     prec: u64,
     rm: RoundingMode,
-    out: &BigExponentFloat,
+    out: &str,
+    out_hex: &str,
     o: Ordering,
 ) {
-    check_s(x, -4, prec, rm, out, o);
+    check_s(x, x_hex, -4, prec, rm, out, out_hex, o);
 }
 
 #[test]
 fn test_root_u_prec_round() {
-    let nan = BigExponentFloat::NAN;
-    let inf = BigExponentFloat::INFINITY;
-    let ninf = BigExponentFloat::NEGATIVE_INFINITY;
-    let zero = BigExponentFloat::ZERO;
-    check_u(&BigExponentFloat::ONE, 0, 10, Floor, &nan, Equal);
-    check_u(&nan, 3, 10, Floor, &nan, Equal);
-    check_u(&inf, 4, 10, Floor, &inf, Equal);
-    check_u(&ninf, 5, 10, Floor, &ninf, Equal);
-    check_u(&ninf, 4, 10, Floor, &nan, Equal);
-    check_u(&zero, 4, 10, Floor, &zero, Equal);
-    check_u(&BigExponentFloat::from(-16), 4, 10, Floor, &nan, Equal);
+    check_u("1.0", "0x1.0", 0, 10, Floor, "NaN", "NaN", Equal);
+    check_u("NaN", "NaN", 3, 10, Floor, "NaN", "NaN", Equal);
     check_u(
-        &BigExponentFloat::from(81),
-        4,
-        2,
-        Exact,
-        &BigExponentFloat::from(3),
-        Equal,
+        "Infinity", "Infinity", 4, 10, Floor, "Infinity", "Infinity", Equal,
     );
     check_u(
-        &BigExponentFloat::from(-243),
+        "-Infinity",
+        "-Infinity",
         5,
-        2,
-        Exact,
-        &BigExponentFloat::from(-3),
+        10,
+        Floor,
+        "-Infinity",
+        "-Infinity",
         Equal,
     );
-    check_u(
-        &BigExponentFloat::from(3),
-        1,
-        1,
-        Floor,
-        &BigExponentFloat::TWO,
-        Less,
-    );
+    check_u("-Infinity", "-Infinity", 4, 10, Floor, "NaN", "NaN", Equal);
+    check_u("0.0", "0x0.0", 4, 10, Floor, "0.0", "0x0.0", Equal);
+    check_u("-16.0", "-0x1.0E+1", 4, 10, Floor, "NaN", "NaN", Equal);
+    check_u("81.00", "0x51.0", 4, 2, Exact, "3.0", "0x3.0", Equal);
+    check_u("-243.0", "-0xf3.0", 5, 2, Exact, "-3.0", "-0x3.0", Equal);
+    check_u("3.0", "0x3.0", 1, 1, Floor, "2.0", "0x2.0", Less);
     // 2^(5N)^(1/5) = 2^N, beyond the range of a `Float`; 2^(5N + 2)^(1/5) = 2^N * 2^(2/5) rounds
     // down to 2^N and up to 2^(N + 1) at 1 bit.
-    let five = Integer::from(5);
-    check_u(&p2(big() * &five), 5, 1, Exact, &p2(big()), Equal);
-    check_u(&p2(-big() * &five), 5, 1, Exact, &p2(-big()), Equal);
     check_u(
-        &p2(big() * &five + Integer::TWO),
+        "7.4e150514997831990597606",
+        "0x1.0E+125000000000000000000",
+        5,
+        1,
+        Exact,
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        Equal,
+    );
+    check_u(
+        "1.4e-150514997831990597607",
+        "0x1.0E-125000000000000000000",
+        5,
+        1,
+        Exact,
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
+        Equal,
+    );
+    check_u(
+        "3.0e150514997831990597607",
+        "0x4.0E+125000000000000000000",
         5,
         1,
         Floor,
-        &p2(big()),
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
         Less,
     );
     check_u(
-        &p2(big() * &five + Integer::TWO),
+        "3.0e150514997831990597607",
+        "0x4.0E+125000000000000000000",
         5,
         1,
         Ceiling,
-        &p2(big() + Integer::ONE),
+        "4.7e30102999566398119521",
+        "0x2.0E+25000000000000000000",
         Greater,
     );
     // An order beyond `Float`'s exponent range, with an exponent that cannot be scaled into it, so
@@ -236,89 +240,175 @@ fn test_root_u_prec_round() {
     // and 2^62/k = 1/2 - 1/(2^64 + 2), so the root is sqrt(8) * (1 - O(2^-64)). That rounds like
     // sqrt(8), which is irrational and not within 2^-60 of a 10-bit rounding breakpoint.
     let k = (1u64 << 63) + 1;
-    let x = p2(Integer::from(k) + Integer::from(1u64 << 62));
-    let (sqrt_8_floor, o) = BigExponentFloat::from(8).sqrt_prec_round(10, Floor);
+    let o = BigExponentFloat::from(8).sqrt_prec_round(10, Floor).1;
     assert_eq!(o, Less);
-    let sqrt_8_ceiling = BigExponentFloat::from(8).sqrt_prec_round(10, Ceiling).0;
-    check_u(&x, k, 10, Floor, &sqrt_8_floor, Less);
-    check_u(&x, k, 10, Ceiling, &sqrt_8_ceiling, Greater);
-    check_u(&-&x, k, 10, Ceiling, &-&sqrt_8_floor, Greater);
+    check_u(
+        "3.2e4164767466392517849",
+        "0x2.0E+3458764513820540928",
+        k,
+        10,
+        Floor,
+        "2.828",
+        "0x2.d4",
+        Less,
+    );
+    check_u(
+        "3.2e4164767466392517849",
+        "0x2.0E+3458764513820540928",
+        k,
+        10,
+        Ceiling,
+        "2.8320",
+        "0x2.d5",
+        Greater,
+    );
+    check_u(
+        "-3.2e4164767466392517849",
+        "-0x2.0E+3458764513820540928",
+        k,
+        10,
+        Ceiling,
+        "-2.828",
+        "-0x2.d4",
+        Greater,
+    );
     // ... and an exact root at such an order: (2^(2k))^(1/k) = 4.
     check_u(
-        &p2(Integer::from(k) * Integer::TWO),
+        "7.6e5553023288523357132",
+        "0x4.0E+4611686018427387904",
         k,
         1,
         Exact,
-        &BigExponentFloat::from(4),
+        "4.0",
+        "0x4.0",
         Equal,
     );
-    check_u_pi(&pi(), 5, Floor, &hex("0x1.5"), Less);
-    check_u_pi(&pi(), 5, Ceiling, &hex("0x1.6"), Greater);
-    check_u_pi(&pi(), 20, Nearest, &hex("0x1.54d26"), Less);
+    check_u_pi(
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        5,
+        Floor,
+        "1.31",
+        "0x1.5",
+        Less,
+    );
+    check_u_pi(
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        5,
+        Ceiling,
+        "1.38",
+        "0x1.6",
+        Greater,
+    );
+    check_u_pi(
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        20,
+        Nearest,
+        "1.3313351",
+        "0x1.54d26",
+        Less,
+    );
 }
 
 #[test]
 fn test_root_s_prec_round() {
-    let nan = BigExponentFloat::NAN;
-    let inf = BigExponentFloat::INFINITY;
-    let ninf = BigExponentFloat::NEGATIVE_INFINITY;
-    let zero = BigExponentFloat::ZERO;
-    check_s(&BigExponentFloat::ONE, 0, 10, Floor, &nan, Equal);
-    check_s(&nan, -3, 10, Floor, &nan, Equal);
-    check_s(&inf, -4, 10, Floor, &zero, Equal);
-    check_s(&ninf, -5, 10, Floor, &zero, Equal);
-    check_s(&ninf, -4, 10, Floor, &nan, Equal);
+    check_s("1.0", "0x1.0", 0, 10, Floor, "NaN", "NaN", Equal);
+    check_s("NaN", "NaN", -3, 10, Floor, "NaN", "NaN", Equal);
+    check_s("Infinity", "Infinity", -4, 10, Floor, "0.0", "0x0.0", Equal);
+    check_s(
+        "-Infinity",
+        "-Infinity",
+        -5,
+        10,
+        Floor,
+        "0.0",
+        "0x0.0",
+        Equal,
+    );
+    check_s("-Infinity", "-Infinity", -4, 10, Floor, "NaN", "NaN", Equal);
     // Without a negative zero, 0^(1/k) for negative odd k could be either infinity.
-    check_s(&zero, -4, 10, Floor, &inf, Equal);
-    check_s(&zero, -3, 10, Floor, &nan, Equal);
-    check_s(&zero, -1, 10, Floor, &nan, Equal);
-    check_s(&zero, -2, 10, Floor, &inf, Equal);
+    check_s("0.0", "0x0.0", -4, 10, Floor, "Infinity", "Infinity", Equal);
+    check_s("0.0", "0x0.0", -3, 10, Floor, "NaN", "NaN", Equal);
+    check_s("0.0", "0x0.0", -1, 10, Floor, "NaN", "NaN", Equal);
+    check_s("0.0", "0x0.0", -2, 10, Floor, "Infinity", "Infinity", Equal);
     // 81^(-1/4) = 1/3.
-    let (third, o) = BigExponentFloat::from(3).reciprocal_prec_round(2, Floor);
-    check_s(&BigExponentFloat::from(81), -4, 2, Floor, &third, o);
+    let o = BigExponentFloat::from(3).reciprocal_prec_round(2, Floor).1;
+    check_s("81.00", "0x51.0", -4, 2, Floor, "0.25", "0x0.4", o);
+    check_s("0.031", "0x0.08", -5, 2, Exact, "2.0", "0x2.0", Equal);
+    check_s("-0.031", "-0x0.08", -5, 2, Exact, "-2.0", "-0x2.0", Equal);
     check_s(
-        &BigExponentFloat::from(1.0 / 32.0),
+        "7.4e150514997831990597606",
+        "0x1.0E+125000000000000000000",
         -5,
-        2,
+        1,
         Exact,
-        &BigExponentFloat::TWO,
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
         Equal,
     );
     check_s(
-        &BigExponentFloat::from(-1.0 / 32.0),
-        -5,
-        2,
-        Exact,
-        &-BigExponentFloat::TWO,
-        Equal,
-    );
-    let five = Integer::from(5);
-    check_s(&p2(big() * &five), -5, 1, Exact, &p2(-big()), Equal);
-    check_s(
-        &p2(big() * &five + Integer::TWO),
+        "3.0e150514997831990597607",
+        "0x4.0E+125000000000000000000",
         -5,
         1,
         Floor,
-        &p2(-big() - Integer::ONE),
+        "2.1e-30102999566398119522",
+        "0x8.0E-25000000000000000001",
         Less,
     );
     let k = i64::MIN;
     // (2^(2^64))^(1/-2^63) = 1/4.
     check_s(
-        &p2(Integer::from(1u128 << 64)),
+        "1.9e5553023288523357132",
+        "0x1.0E+4611686018427387904",
         k,
         1,
         Exact,
-        &BigExponentFloat::from(0.25),
+        "0.25",
+        "0x0.4",
         Equal,
     );
     // (2^(2^63 + 2^62))^(1/-2^63) = 2^(-3/2) = sqrt(1/8).
-    let x = p2(Integer::from(1u128 << 63) + Integer::from(1u64 << 62));
-    let (expected, o) = BigExponentFloat::from(0.125).sqrt_prec_round(10, Nearest);
-    check_s(&x, k, 10, Nearest, &expected, o);
-    check_s_pi(&pi(), 5, Floor, &hex("0x0.c"), Less);
-    check_s_pi(&pi(), 5, Ceiling, &hex("0x0.c8"), Greater);
-    check_s_pi(&pi(), 20, Nearest, &hex("0x0.c049c"), Less);
+    let o = BigExponentFloat::from(0.125).sqrt_prec_round(10, Nearest).1;
+    check_s(
+        "1.6e4164767466392517849",
+        "0x1.0E+3458764513820540928",
+        k,
+        10,
+        Nearest,
+        "0.3535",
+        "0x0.5a8",
+        o,
+    );
+    check_s_pi(
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        5,
+        Floor,
+        "0.75",
+        "0x0.c",
+        Less,
+    );
+    check_s_pi(
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        5,
+        Ceiling,
+        "0.781",
+        "0x0.c8",
+        Greater,
+    );
+    check_s_pi(
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        20,
+        Nearest,
+        "0.7511253",
+        "0x0.c049c",
+        Less,
+    );
 }
 
 // Orders too large to scale x by a multiple of the order into `Float`'s exponent range by the

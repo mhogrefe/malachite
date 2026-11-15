@@ -13,35 +13,67 @@ use malachite_base::num::conversion::traits::{ConvertibleFrom, RoundingFrom};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_float::test_util::big_exponent_float::{
     big_exponent_float_negate, big_exponent_float_power_of_2, big_exponent_float_to_float,
+    parse_big_exponent_float_hex,
 };
 use malachite_float::test_util::generators::big_exponent_float_gen_var_1;
 use malachite_float::{BigExponentFloat, Float};
 use malachite_nz::integer::Integer;
-use std::cmp::Ordering::*;
+use std::cmp::Ordering::{self, *};
 use std::panic::catch_unwind;
 
 const ROUNDING_MODES: [RoundingMode; 5] = [Floor, Ceiling, Down, Up, Nearest];
 
 #[test]
 fn test_primitive_int_from_big_exponent_float() {
+    let test_u8 = |x: &str, x_hex: &str, rm: RoundingMode, out: u8, o: Ordering| {
+        assert_eq!(parse_big_exponent_float_hex(x_hex).to_string(), x);
+        let x = &parse_big_exponent_float_hex(x_hex);
+        assert_eq!(u8::rounding_from(x, rm), (out, o));
+    };
     let big = big_exponent_float_power_of_2(Integer::from(1u64 << 40));
-    assert_eq!(u8::rounding_from(&big, Floor), (u8::MAX, Less));
+    test_u8(
+        "8.1e330985980541",
+        "0x1.0E+274877906944",
+        Floor,
+        u8::MAX,
+        Less,
+    );
+    test_u8("1.2e-330985980542", "0x1.0E-274877906944", Nearest, 0, Less);
+    test_u8("1.2e-330985980542", "0x1.0E-274877906944", Up, 1, Greater);
+
+    let test_i32 = |x: &str, x_hex: &str, rm: RoundingMode, out: i32, o: Ordering| {
+        assert_eq!(parse_big_exponent_float_hex(x_hex).to_string(), x);
+        let x = &parse_big_exponent_float_hex(x_hex);
+        assert_eq!(i32::rounding_from(x, rm), (out, o));
+    };
+    test_i32(
+        "-8.1e330985980541",
+        "-0x1.0E+274877906944",
+        Ceiling,
+        i32::MIN,
+        Greater,
+    );
+
+    let test_i8 = |x: &str, x_hex: &str, rm: RoundingMode, out: i8, o: Ordering| {
+        assert_eq!(parse_big_exponent_float_hex(x_hex).to_string(), x);
+        let x = &parse_big_exponent_float_hex(x_hex);
+        assert_eq!(i8::rounding_from(x, rm), (out, o));
+    };
+    test_i8(
+        "-1.2e-330985980542",
+        "-0x1.0E-274877906944",
+        Floor,
+        -1,
+        Less,
+    );
+
     assert_eq!(
         u64::try_from(&big),
         Err(UnsignedFromFloatError::FloatNonIntegerOrOutOfRange)
     );
-    let neg_big = big_exponent_float_negate(big);
-    assert_eq!(i32::rounding_from(&neg_big, Ceiling), (i32::MIN, Greater));
     assert_eq!(
-        i32::try_from(&neg_big),
+        i32::try_from(&big_exponent_float_negate(big)),
         Err(SignedFromFloatError::FloatNonIntegerOrOutOfRange)
-    );
-    let tiny = big_exponent_float_power_of_2(-Integer::from(1u64 << 40));
-    assert_eq!(u8::rounding_from(&tiny, Nearest), (0, Less));
-    assert_eq!(u8::rounding_from(&tiny, Up), (1, Greater));
-    assert_eq!(
-        i8::rounding_from(&big_exponent_float_negate(tiny), Floor),
-        (-1, Less)
     );
 }
 

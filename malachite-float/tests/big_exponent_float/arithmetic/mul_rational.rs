@@ -6,22 +6,19 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use core::str::FromStr;
-use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, One, Zero};
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_float::big_exponent_float::ComparableBigExponentFloatRef;
 use malachite_float::big_exponent_float::arithmetic::mul_rational::mul_rational_prec_round_generic;
 use malachite_float::test_util::big_exponent_float::{
-    big_exponent_float_exponent_is_small, big_exponent_float_power_of_2,
-    float_to_big_exponent_float,
+    big_exponent_float_exponent_is_small, float_to_big_exponent_float, parse_big_exponent_float_hex,
 };
 use malachite_float::test_util::generators::{
     big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_4,
     big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_4_float,
 };
 use malachite_float::{BigExponentFloat, Float};
-use malachite_nz::integer::Integer;
 use malachite_q::Rational;
 use std::cmp::Ordering::{self, *};
 
@@ -83,12 +80,18 @@ fn mul_rational_prec_round_all(
 
 #[test]
 fn test_mul_rational_prec_round() {
-    let check = |x: &BigExponentFloat,
+    let check = |x: &str,
+                 x_hex: &str,
                  y: &Rational,
                  prec: u64,
                  rm: RoundingMode,
-                 out: &BigExponentFloat,
+                 out: &str,
+                 out_hex: &str,
                  o| {
+        assert_eq!(parse_big_exponent_float_hex(x_hex).to_string(), x);
+        let x = &parse_big_exponent_float_hex(x_hex);
+        assert_eq!(parse_big_exponent_float_hex(out_hex).to_string(), out);
+        let out = &parse_big_exponent_float_hex(out_hex);
         let r = mul_rational_prec_round_all(x, y, prec, rm);
         assert!(
             same(&r.0, out),
@@ -97,37 +100,69 @@ fn test_mul_rational_prec_round() {
         );
         assert_eq!(r.1, o);
     };
-    let big = Integer::from_str("100000000000000000000").unwrap();
-    let huge = big_exponent_float_power_of_2(big.clone());
-    let tiny = big_exponent_float_power_of_2(-big.clone());
-    let nan = BigExponentFloat::NAN;
-    let inf = BigExponentFloat::INFINITY;
-    let neg_inf = BigExponentFloat::NEGATIVE_INFINITY;
-    let zero = BigExponentFloat::ZERO;
-    let one = BigExponentFloat::ONE;
     let third = Rational::from_unsigneds(1u8, 3);
     let neg_third = -&third;
     let q_zero = Rational::ZERO;
     // 1/3 rounded to 10 bits.
-    let third_floor = BigExponentFloat::from_rational_prec_round_ref(&third, 10, Floor).0;
-    let third_ceiling = BigExponentFloat::from_rational_prec_round_ref(&third, 10, Ceiling).0;
-    check(&nan, &third, 10, Floor, &nan, Equal);
-    check(&inf, &q_zero, 10, Floor, &nan, Equal);
-    check(&inf, &third, 10, Floor, &inf, Equal);
-    check(&inf, &neg_third, 10, Floor, &neg_inf, Equal);
-    check(&neg_inf, &third, 10, Floor, &neg_inf, Equal);
-    check(&neg_inf, &neg_third, 10, Floor, &inf, Equal);
-    check(&zero, &third, 10, Floor, &zero, Equal);
-    check(&one, &q_zero, 10, Floor, &zero, Equal);
-    check(&BigExponentFloat::from(3u32), &third, 1, Exact, &one, Equal);
-    check(&one, &third, 10, Floor, &third_floor, Less);
-    check(&huge, &third, 10, Floor, &(&third_floor * &huge), Less);
+    check("NaN", "NaN", &third, 10, Floor, "NaN", "NaN", Equal);
     check(
-        &tiny,
+        "Infinity", "Infinity", &q_zero, 10, Floor, "NaN", "NaN", Equal,
+    );
+    check(
+        "Infinity", "Infinity", &third, 10, Floor, "Infinity", "Infinity", Equal,
+    );
+    check(
+        "Infinity",
+        "Infinity",
+        &neg_third,
+        10,
+        Floor,
+        "-Infinity",
+        "-Infinity",
+        Equal,
+    );
+    check(
+        "-Infinity",
+        "-Infinity",
+        &third,
+        10,
+        Floor,
+        "-Infinity",
+        "-Infinity",
+        Equal,
+    );
+    check(
+        "-Infinity",
+        "-Infinity",
+        &neg_third,
+        10,
+        Floor,
+        "Infinity",
+        "Infinity",
+        Equal,
+    );
+    check("0.0", "0x0.0", &third, 10, Floor, "0.0", "0x0.0", Equal);
+    check("1.0", "0x1.0", &q_zero, 10, Floor, "0.0", "0x0.0", Equal);
+    check("3.0", "0x3.0", &third, 1, Exact, "1.0", "0x1.0", Equal);
+    check("1.0", "0x1.0", &third, 10, Floor, "0.3330", "0x0.554", Less);
+    check(
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        &third,
+        10,
+        Floor,
+        "7.877e30102999566398119520",
+        "0x5.54E+24999999999999999999",
+        Less,
+    );
+    check(
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
         &third,
         10,
         Ceiling,
-        &(&third_ceiling * &tiny),
+        "1.4099e-30102999566398119522",
+        "0x5.56E-25000000000000000001",
         Greater,
     );
 }

@@ -7,18 +7,22 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::IsUnit;
-use malachite_base::num::basic::traits::{NaN, NegativeInfinity, Zero};
-use malachite_float::BigExponentFloat;
+use malachite_float::test_util::big_exponent_float::parse_big_exponent_float_hex;
 use malachite_float::test_util::generators::{
     big_exponent_float_gen, big_exponent_float_gen_var_1_float,
 };
 
 #[test]
 fn test_is_unit() {
-    assert!(BigExponentFloat::from(-1.5).is_unit());
-    assert!(!BigExponentFloat::ZERO.is_unit());
-    assert!(!BigExponentFloat::NAN.is_unit());
-    assert!(!BigExponentFloat::NEGATIVE_INFINITY.is_unit());
+    let test = |x: &str, x_hex: &str, out| {
+        assert_eq!(parse_big_exponent_float_hex(x_hex).to_string(), x);
+        let x = &parse_big_exponent_float_hex(x_hex);
+        assert_eq!(x.is_unit(), out);
+    };
+    test("-1.5", "-0x1.8", true);
+    test("0.0", "0x0.0", false);
+    test("NaN", "NaN", false);
+    test("-Infinity", "-Infinity", false);
 }
 
 #[test]

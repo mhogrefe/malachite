@@ -8,13 +8,13 @@
 
 use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{Parity, Pow, PowAssign};
-use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, One, Zero};
-use malachite_base::num::conversion::traits::{FromStringBase, RoundingFrom};
+use malachite_base::num::basic::traits::One;
+use malachite_base::num::conversion::traits::RoundingFrom;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_float::big_exponent_float::ComparableBigExponentFloatRef;
 use malachite_float::big_exponent_float::arithmetic::pow::pow_prec_round_float_kernels;
 use malachite_float::test_util::big_exponent_float::{
-    big_exponent_float_power_of_2, float_to_big_exponent_float,
+    big_exponent_float_power_of_2, float_to_big_exponent_float, parse_big_exponent_float_hex,
 };
 use malachite_float::test_util::generators::{
     big_exponent_float_integer_unsigned_rounding_mode_quadruple_gen_var_1,
@@ -42,14 +42,6 @@ fn float_result_comparable(x: &Float, o: Ordering) -> bool {
         || !x.is_infinite() && (!x.is_zero() || o == Equal),
         |e| e > Float::MIN_EXPONENT + 1 && e < Float::MAX_EXPONENT - 1,
     )
-}
-
-fn pi() -> BigExponentFloat {
-    BigExponentFloat::from(core::f64::consts::PI)
-}
-
-fn hex(s: &str) -> BigExponentFloat {
-    BigExponentFloat::from_string_base(16, s).unwrap()
 }
 
 fn big() -> Integer {
@@ -135,13 +127,19 @@ fn pow_integer_prec_round_all(
 }
 
 fn check(
-    x: &BigExponentFloat,
+    x: &str,
+    x_hex: &str,
     n: &Integer,
     prec: u64,
     rm: RoundingMode,
-    out: &BigExponentFloat,
+    out: &str,
+    out_hex: &str,
     o: Ordering,
 ) {
+    assert_eq!(parse_big_exponent_float_hex(x_hex).to_string(), x);
+    let x = &parse_big_exponent_float_hex(x_hex);
+    assert_eq!(parse_big_exponent_float_hex(out_hex).to_string(), out);
+    let out = &parse_big_exponent_float_hex(out_hex);
     let r = pow_integer_prec_round_all(x, n, prec, rm);
     assert!(
         same(&r.0, out),
@@ -155,10 +153,12 @@ fn check(
 
 fn check_pi(
     op: &str,
-    x: &BigExponentFloat,
+    x: &str,
+    x_hex: &str,
     prec: u64,
     rm: RoundingMode,
-    out: &BigExponentFloat,
+    out: &str,
+    out_hex: &str,
     o: Ordering,
 ) {
     let n = match op {
@@ -166,73 +166,114 @@ fn check_pi(
         "pow_s" => Integer::from(-3),
         _ => Integer::from(-10),
     };
-    check(x, &n, prec, rm, out, o);
+    check(x, x_hex, &n, prec, rm, out, out_hex, o);
 }
 
 #[test]
 fn test_pow_prec_round() {
-    let nan = BigExponentFloat::NAN;
-    let inf = BigExponentFloat::INFINITY;
-    let ninf = BigExponentFloat::NEGATIVE_INFINITY;
-    let zero = BigExponentFloat::ZERO;
-    let one = BigExponentFloat::ONE;
     let i = Integer::from;
-    check(&nan, &i(0), 10, Floor, &one, Equal);
-    check(&nan, &i(3), 10, Floor, &nan, Equal);
-    check(&inf, &i(3), 10, Floor, &inf, Equal);
-    check(&inf, &i(-3), 10, Floor, &zero, Equal);
-    check(&ninf, &i(3), 10, Floor, &ninf, Equal);
-    check(&ninf, &i(4), 10, Floor, &inf, Equal);
-    check(&ninf, &i(-3), 10, Floor, &zero, Equal);
-    check(&zero, &i(3), 10, Floor, &zero, Equal);
-    // Without a negative zero, 0^n for negative odd n could be either infinity.
-    check(&zero, &i(-3), 10, Floor, &nan, Equal);
-    check(&zero, &i(-1), 10, Floor, &nan, Equal);
-    check(&zero, &i(-4), 10, Floor, &inf, Equal);
+    check("NaN", "NaN", &i(0), 10, Floor, "1.0", "0x1.0", Equal);
+    check("NaN", "NaN", &i(3), 10, Floor, "NaN", "NaN", Equal);
     check(
-        &BigExponentFloat::from(3),
-        &i(4),
-        7,
-        Exact,
-        &BigExponentFloat::from(81),
-        Equal,
-    );
-    check(
-        &BigExponentFloat::from(-3),
+        "Infinity",
+        "Infinity",
         &i(3),
-        5,
-        Exact,
-        &BigExponentFloat::from(-27),
+        10,
+        Floor,
+        "Infinity",
+        "Infinity",
         Equal,
     );
     check(
-        &BigExponentFloat::from(-2),
+        "Infinity",
+        "Infinity",
         &i(-3),
+        10,
+        Floor,
+        "0.0",
+        "0x0.0",
+        Equal,
+    );
+    check(
+        "-Infinity",
+        "-Infinity",
+        &i(3),
+        10,
+        Floor,
+        "-Infinity",
+        "-Infinity",
+        Equal,
+    );
+    check(
+        "-Infinity",
+        "-Infinity",
+        &i(4),
+        10,
+        Floor,
+        "Infinity",
+        "Infinity",
+        Equal,
+    );
+    check(
+        "-Infinity",
+        "-Infinity",
+        &i(-3),
+        10,
+        Floor,
+        "0.0",
+        "0x0.0",
+        Equal,
+    );
+    check("0.0", "0x0.0", &i(3), 10, Floor, "0.0", "0x0.0", Equal);
+    // Without a negative zero, 0^n for negative odd n could be either infinity.
+    check("0.0", "0x0.0", &i(-3), 10, Floor, "NaN", "NaN", Equal);
+    check("0.0", "0x0.0", &i(-1), 10, Floor, "NaN", "NaN", Equal);
+    check(
+        "0.0",
+        "0x0.0",
+        &i(-4),
+        10,
+        Floor,
+        "Infinity",
+        "Infinity",
+        Equal,
+    );
+    check("3.0", "0x3.0", &i(4), 7, Exact, "81.00", "0x51.0", Equal);
+    check("-3.0", "-0x3.0", &i(3), 5, Exact, "-27.0", "-0x1b.0", Equal);
+    check("-2.0", "-0x2.0", &i(-3), 1, Exact, "-0.12", "-0x0.2", Equal);
+    // 3^4 = 81 = 0b1010001 rounds to 0b1010000 at 3 bits.
+    check("3.0", "0x3.0", &i(4), 3, Floor, "80.0", "0x5.0E+1", Less);
+    // Powers of powers of 2 beyond `Float`'s exponent range: (2^N)^N = 2^(N^2).
+    check(
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        &big(),
         1,
         Exact,
-        &BigExponentFloat::from(-0.125),
+        "7.9e3010299956639811952137388947244930267681",
+        "0x1.0E+2500000000000000000000000000000000000000",
         Equal,
     );
-    // 3^4 = 81 = 0b1010001 rounds to 0b1010000 at 3 bits.
     check(
-        &BigExponentFloat::from(3),
-        &i(4),
-        3,
-        Floor,
-        &BigExponentFloat::from(80),
-        Less,
-    );
-    // Powers of powers of 2 beyond `Float`'s exponent range: (2^N)^N = 2^(N^2).
-    check(&p2(big()), &big(), 1, Exact, &p2(big() * big()), Equal);
-    check(
-        &-p2(big()),
+        "-2.4e30102999566398119521",
+        "-0x1.0E+25000000000000000000",
         &(big() + Integer::ONE),
         1,
         Exact,
-        &-p2(big() * (big() + Integer::ONE)),
+        "-1.9e3010299956639811952167491946811328387203",
+        "-0x1.0E+2500000000000000000025000000000000000000",
         Equal,
     );
-    check(&p2(-big()), &-big(), 1, Exact, &p2(big() * big()), Equal);
+    check(
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
+        &-big(),
+        1,
+        Exact,
+        "7.9e3010299956639811952137388947244930267681",
+        "0x1.0E+2500000000000000000000000000000000000000",
+        Equal,
+    );
     // A huge exponent of another value: (1 + 2^-10)^(2^70) is far beyond `Float`'s range. Its
     // binary exponent is floor(2^70 * log2(1 + 2^-10)) + 1, and its floor and ceiling at 100 bits
     // are adjacent.
@@ -249,34 +290,103 @@ fn test_pow_prec_round() {
     assert!(same(&ceiling, &(floor + ulp)));
     // The scaling of x by a power of 2 is undone exactly: (2^N * 3)^5 = 2^(5N) * 243.
     check(
-        &(p2(big()) * BigExponentFloat::from(3)),
+        "7.1e30102999566398119521",
+        "0x3.0E+25000000000000000000",
         &i(5),
         8,
         Exact,
-        &(p2(big() * Integer::from(5)) * BigExponentFloat::from(243)),
+        "1.799e150514997831990597609",
+        "0xf.3E+125000000000000000001",
         Equal,
     );
-    check_pi("pow_u", &pi(), 5, Floor, &hex("0x1f.0"), Less);
-    check_pi("pow_u", &pi(), 5, Ceiling, &hex("0x2.0E+1"), Greater);
-    check_pi("pow_u", &pi(), 20, Nearest, &hex("0x1f.019c"), Greater);
-    check_pi("pow_s", &pi(), 5, Floor, &hex("0x0.08"), Less);
-    check_pi("pow_s", &pi(), 5, Ceiling, &hex("0x0.088"), Greater);
-    check_pi("pow_s", &pi(), 20, Nearest, &hex("0x0.0841a3"), Greater);
-    check_pi("pow_integer", &pi(), 5, Floor, &hex("0x0.0000b"), Less);
     check_pi(
-        "pow_integer",
-        &pi(),
+        "pow_u",
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        5,
+        Floor,
+        "31.0",
+        "0x1f.0",
+        Less,
+    );
+    check_pi(
+        "pow_u",
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
         5,
         Ceiling,
-        &hex("0x0.0000b8"),
+        "32.0",
+        "0x2.0E+1",
+        Greater,
+    );
+    check_pi(
+        "pow_u",
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        20,
+        Nearest,
+        "31.00629",
+        "0x1f.019c",
+        Greater,
+    );
+    check_pi(
+        "pow_s",
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        5,
+        Floor,
+        "0.031",
+        "0x0.08",
+        Less,
+    );
+    check_pi(
+        "pow_s",
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        5,
+        Ceiling,
+        "0.0332",
+        "0x0.088",
+        Greater,
+    );
+    check_pi(
+        "pow_s",
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        20,
+        Nearest,
+        "0.032251537",
+        "0x0.0841a3",
         Greater,
     );
     check_pi(
         "pow_integer",
-        &pi(),
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        5,
+        Floor,
+        "0.0000105",
+        "0x0.0000b",
+        Less,
+    );
+    check_pi(
+        "pow_integer",
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        5,
+        Ceiling,
+        "0.0000110",
+        "0x0.0000b8",
+        Greater,
+    );
+    check_pi(
+        "pow_integer",
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
         20,
         Nearest,
-        &hex("0x0.0000b326e"),
+        "0.00001067828",
+        "0x0.0000b326e",
         Greater,
     );
 }
@@ -407,33 +517,27 @@ fn pow_all(x: &BigExponentFloat, n: u64) -> BigExponentFloat {
 
 #[test]
 fn test_pow() {
-    let i = |x: i64| BigExponentFloat::from(x);
-    assert!(same(
-        &pow_all(&BigExponentFloat::NAN, 0),
-        &BigExponentFloat::ONE
-    ));
-    assert!(same(
-        &pow_all(&BigExponentFloat::NAN, 1),
-        &BigExponentFloat::NAN
-    ));
-    assert!(same(
-        &pow_all(&BigExponentFloat::NEGATIVE_INFINITY, 3),
-        &BigExponentFloat::NEGATIVE_INFINITY
-    ));
-    assert!(same(
-        &pow_all(&BigExponentFloat::NEGATIVE_INFINITY, 2),
-        &BigExponentFloat::INFINITY
-    ));
-    assert!(same(
-        &pow_all(&BigExponentFloat::ZERO, 2),
-        &BigExponentFloat::ZERO
-    ));
-    assert!(same(&pow_all(&i(-3), 3), &i(-27)));
-    assert!(same(
-        &pow_all(&BigExponentFloat::from(1.5), 2),
-        &BigExponentFloat::from(2.25)
-    ));
-    assert!(same(&pow_all(&p2(big()), 3), &p2(big() * Integer::from(3))));
+    let test = |x: &str, x_hex: &str, n: u64, out: &str, out_hex: &str| {
+        assert_eq!(parse_big_exponent_float_hex(x_hex).to_string(), x);
+        let x = &parse_big_exponent_float_hex(x_hex);
+        assert_eq!(parse_big_exponent_float_hex(out_hex).to_string(), out);
+        let out = &parse_big_exponent_float_hex(out_hex);
+        assert!(same(&pow_all(x, n), out));
+    };
+    test("NaN", "NaN", 0, "1.0", "0x1.0");
+    test("NaN", "NaN", 1, "NaN", "NaN");
+    test("-Infinity", "-Infinity", 3, "-Infinity", "-Infinity");
+    test("-Infinity", "-Infinity", 2, "Infinity", "Infinity");
+    test("0.0", "0x0.0", 2, "0.0", "0x0.0");
+    test("-3.0", "-0x3.0", 3, "-27.0", "-0x1b.0");
+    test("1.5", "0x1.8", 2, "2.25", "0x2.4");
+    test(
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        3,
+        "1.3e90308998699194358564",
+        "0x1.0E+75000000000000000000",
+    );
 }
 
 #[test]

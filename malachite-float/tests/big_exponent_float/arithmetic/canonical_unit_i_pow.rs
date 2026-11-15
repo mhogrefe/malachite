@@ -7,9 +7,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{Abs, CanonicalUnitIPow};
-use malachite_base::num::basic::traits::{NaN, NegativeInfinity, Zero};
 use malachite_float::BigExponentFloat;
 use malachite_float::big_exponent_float::ComparableBigExponentFloatRef;
+use malachite_float::test_util::big_exponent_float::parse_big_exponent_float_hex;
 use malachite_float::test_util::generators::{
     big_exponent_float_gen, big_exponent_float_gen_var_1_float,
 };
@@ -20,13 +20,15 @@ fn same(x: &BigExponentFloat, y: &BigExponentFloat) -> bool {
 
 #[test]
 fn test_canonical_unit_i_pow() {
-    assert_eq!(BigExponentFloat::NAN.canonical_unit_i_pow(), 0);
-    assert_eq!(
-        BigExponentFloat::NEGATIVE_INFINITY.canonical_unit_i_pow(),
-        2
-    );
-    assert_eq!(BigExponentFloat::ZERO.canonical_unit_i_pow(), 0);
-    assert_eq!(BigExponentFloat::from(-1.5).canonical_unit_i_pow(), 2);
+    let test = |x: &str, x_hex: &str, out| {
+        assert_eq!(parse_big_exponent_float_hex(x_hex).to_string(), x);
+        let x = &parse_big_exponent_float_hex(x_hex);
+        assert_eq!(x.canonical_unit_i_pow(), out);
+    };
+    test("NaN", "NaN", 0);
+    test("-Infinity", "-Infinity", 2);
+    test("0.0", "0x0.0", 0);
+    test("-1.5", "-0x1.8", 2);
 }
 
 #[test]

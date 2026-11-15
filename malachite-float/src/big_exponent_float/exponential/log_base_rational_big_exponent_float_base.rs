@@ -77,7 +77,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{y:?}"), "-0x0.78");
+    /// assert_eq!(y.to_string(), "-0.469");
     /// assert_eq!(o, Less);
     ///
     /// let (y, o) = BigExponentFloat::log_base_rational_big_exponent_float_base_prec_round(
@@ -86,7 +86,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{y:?}"), "-0x0.74");
+    /// assert_eq!(y.to_string(), "-0.453");
     /// assert_eq!(o, Greater);
     ///
     /// let (y, o) = BigExponentFloat::log_base_rational_big_exponent_float_base_prec_round(
@@ -95,7 +95,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Nearest,
     /// );
-    /// assert_eq!(format!("{y:?}"), "-0x0.78");
+    /// assert_eq!(y.to_string(), "-0.469");
     /// assert_eq!(o, Less);
     ///
     /// let (y, o) = BigExponentFloat::log_base_rational_big_exponent_float_base_prec_round(
@@ -104,7 +104,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{y:?}"), "-0x0.770888");
+    /// assert_eq!(y.to_string(), "-0.46497393");
     /// assert_eq!(o, Less);
     ///
     /// let (y, o) = BigExponentFloat::log_base_rational_big_exponent_float_base_prec_round(
@@ -113,7 +113,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{y:?}"), "-0x0.77088");
+    /// assert_eq!(y.to_string(), "-0.464973");
     /// assert_eq!(o, Greater);
     ///
     /// let (y, o) = BigExponentFloat::log_base_rational_big_exponent_float_base_prec_round(
@@ -122,7 +122,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Nearest,
     /// );
-    /// assert_eq!(format!("{y:?}"), "-0x0.77088");
+    /// assert_eq!(y.to_string(), "-0.464973");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -195,7 +195,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{y:?}"), "-0x0.78");
+    /// assert_eq!(y.to_string(), "-0.469");
     /// assert_eq!(o, Less);
     ///
     /// let (y, o) = BigExponentFloat::log_base_rational_big_exponent_float_base_prec_round_ref(
@@ -204,7 +204,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{y:?}"), "-0x0.74");
+    /// assert_eq!(y.to_string(), "-0.453");
     /// assert_eq!(o, Greater);
     ///
     /// let (y, o) = BigExponentFloat::log_base_rational_big_exponent_float_base_prec_round_ref(
@@ -213,7 +213,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Nearest,
     /// );
-    /// assert_eq!(format!("{y:?}"), "-0x0.78");
+    /// assert_eq!(y.to_string(), "-0.469");
     /// assert_eq!(o, Less);
     ///
     /// let (y, o) = BigExponentFloat::log_base_rational_big_exponent_float_base_prec_round_ref(
@@ -222,7 +222,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{y:?}"), "-0x0.770888");
+    /// assert_eq!(y.to_string(), "-0.46497393");
     /// assert_eq!(o, Less);
     ///
     /// let (y, o) = BigExponentFloat::log_base_rational_big_exponent_float_base_prec_round_ref(
@@ -231,7 +231,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{y:?}"), "-0x0.77088");
+    /// assert_eq!(y.to_string(), "-0.464973");
     /// assert_eq!(o, Greater);
     ///
     /// let (y, o) = BigExponentFloat::log_base_rational_big_exponent_float_base_prec_round_ref(
@@ -240,7 +240,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Nearest,
     /// );
-    /// assert_eq!(format!("{y:?}"), "-0x0.77088");
+    /// assert_eq!(y.to_string(), "-0.464973");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -310,7 +310,7 @@ impl BigExponentFloat {
     ///     BigExponentFloat::from(3),
     ///     5,
     /// );
-    /// assert_eq!(format!("{y:?}"), "-0x0.78");
+    /// assert_eq!(y.to_string(), "-0.469");
     /// assert_eq!(o, Less);
     ///
     /// let (y, o) = BigExponentFloat::log_base_rational_big_exponent_float_base_prec(
@@ -318,7 +318,7 @@ impl BigExponentFloat {
     ///     BigExponentFloat::from(3),
     ///     20,
     /// );
-    /// assert_eq!(format!("{y:?}"), "-0x0.77088");
+    /// assert_eq!(y.to_string(), "-0.464973");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -383,7 +383,7 @@ impl BigExponentFloat {
     ///     &BigExponentFloat::from(3),
     ///     5,
     /// );
-    /// assert_eq!(format!("{y:?}"), "-0x0.78");
+    /// assert_eq!(y.to_string(), "-0.469");
     /// assert_eq!(o, Less);
     ///
     /// let (y, o) = BigExponentFloat::log_base_rational_big_exponent_float_base_prec_ref(
@@ -391,7 +391,7 @@ impl BigExponentFloat {
     ///     &BigExponentFloat::from(3),
     ///     20,
     /// );
-    /// assert_eq!(format!("{y:?}"), "-0x0.77088");
+    /// assert_eq!(y.to_string(), "-0.464973");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]

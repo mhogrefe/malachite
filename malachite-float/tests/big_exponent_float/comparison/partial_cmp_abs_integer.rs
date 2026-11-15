@@ -8,12 +8,9 @@
 
 use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::Abs;
-use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, One, OneHalf, Zero};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
-use malachite_float::BigExponentFloat;
 use malachite_float::test_util::big_exponent_float::{
-    big_exponent_float_negate, big_exponent_float_power_of_2, float_to_big_exponent_float,
-    parse_big_exponent_float_hex,
+    big_exponent_float_negate, float_to_big_exponent_float, parse_big_exponent_float_hex,
 };
 use malachite_float::test_util::generators::{
     big_exponent_float_integer_pair_gen, float_integer_pair_gen,
@@ -23,12 +20,9 @@ use std::cmp::Ordering;
 
 #[test]
 fn test_partial_cmp_abs_integer() {
-    let big = Integer::from_str("100000000000000000000").unwrap();
-    let huge = big_exponent_float_power_of_2(big.clone());
-    let tiny = big_exponent_float_power_of_2(-big);
-    let neg_huge = big_exponent_float_negate(huge.clone());
-    let neg_tiny = big_exponent_float_negate(tiny.clone());
-    let test = |x: BigExponentFloat, y: &str| {
+    let test = |s: &str, s_hex: &str, y: &str| {
+        let x = parse_big_exponent_float_hex(s_hex);
+        assert_eq!(x.to_string(), s);
         let y = Integer::from_str(y).unwrap();
         let x_abs = if x.is_sign_negative() {
             big_exponent_float_negate(x.clone())
@@ -40,45 +34,84 @@ fn test_partial_cmp_abs_integer() {
         assert_eq!(x.partial_cmp_abs(&y), out);
         assert_eq!(y.partial_cmp_abs(&x), out.map(Ordering::reverse));
     };
-    test(BigExponentFloat::NAN, "0");
-    test(BigExponentFloat::INFINITY, "0");
-    test(BigExponentFloat::NEGATIVE_INFINITY, "0");
-    test(BigExponentFloat::ZERO, "0");
-    test(BigExponentFloat::ZERO, "1");
-    test(BigExponentFloat::ONE, "1");
-    test(BigExponentFloat::ONE_HALF, "1");
-    test(BigExponentFloat::ONE, "0");
-    test(parse_big_exponent_float_hex("0x3.243f6a8885a30#53"), "3");
-    test(parse_big_exponent_float_hex("0x3.243f6a8885a30#53"), "4");
-    test(parse_big_exponent_float_hex("0xff.0#8"), "255");
-    test(parse_big_exponent_float_hex("0xff.8#9"), "255");
+    test("NaN", "NaN", "0");
+    test("Infinity", "Infinity", "0");
+    test("-Infinity", "-Infinity", "0");
+    test("0.0", "0x0.0", "0");
+    test("0.0", "0x0.0", "1");
+    test("1.0", "0x1.0", "1");
+    test("0.50", "0x0.8", "1");
+    test("1.0", "0x1.0", "0");
+    test("3.1415926535897931", "0x3.243f6a8885a3", "3");
+    test("3.1415926535897931", "0x3.243f6a8885a3", "4");
+    test("255.0", "0xff.0", "255");
+    test("255.5", "0xff.8", "255");
     test(
-        parse_big_exponent_float_hex("0x1.0E+40#1"),
+        "1.5e48",
+        "0x1.0E+40",
         "1461501637330902918203684832716283019655932542976",
     );
     test(
-        parse_big_exponent_float_hex("0x1.0E+40#1"),
+        "1.5e48",
+        "0x1.0E+40",
         "1461501637330902918203684832716283019655932542977",
     );
-    test(huge.clone(), "0");
     test(
-        huge.clone(),
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        "0",
+    );
+    test(
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
         "1461501637330902918203684832716283019655932542976",
     );
-    test(tiny.clone(), "0");
-    test(tiny.clone(), "1");
-    test(neg_huge.clone(), "0");
-    test(neg_tiny.clone(), "0");
-    test(BigExponentFloat::NEGATIVE_INFINITY, "-1000");
-    test(BigExponentFloat::NAN, "-1");
-    test(BigExponentFloat::ZERO, "-1");
-    test(parse_big_exponent_float_hex("-0x3.243f6a8885a30#53"), "-3");
-    test(parse_big_exponent_float_hex("-0x3.243f6a8885a30#53"), "-4");
-    test(parse_big_exponent_float_hex("-0xff.0#8"), "-255");
-    test(huge.clone(), "-1");
-    test(neg_huge.clone(), "-1000000000000000000000000000000");
-    test(neg_tiny.clone(), "-1");
-    test(tiny.clone(), "-1");
+    test(
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
+        "0",
+    );
+    test(
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
+        "1",
+    );
+    test(
+        "-2.4e30102999566398119521",
+        "-0x1.0E+25000000000000000000",
+        "0",
+    );
+    test(
+        "-4.2e-30102999566398119522",
+        "-0x1.0E-25000000000000000000",
+        "0",
+    );
+    test("-Infinity", "-Infinity", "-1000");
+    test("NaN", "NaN", "-1");
+    test("0.0", "0x0.0", "-1");
+    test("-3.1415926535897931", "-0x3.243f6a8885a3", "-3");
+    test("-3.1415926535897931", "-0x3.243f6a8885a3", "-4");
+    test("-255.0", "-0xff.0", "-255");
+    test(
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        "-1",
+    );
+    test(
+        "-2.4e30102999566398119521",
+        "-0x1.0E+25000000000000000000",
+        "-1000000000000000000000000000000",
+    );
+    test(
+        "-4.2e-30102999566398119522",
+        "-0x1.0E-25000000000000000000",
+        "-1",
+    );
+    test(
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
+        "-1",
+    );
 }
 
 #[test]

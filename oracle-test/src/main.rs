@@ -8028,6 +8028,22 @@ fn test_against_flint() {
             "arf_logarithm_general",
         );
     }
+    // `BigExponentFloat`'s string conversions in bases that are not powers of 2, checked with exact
+    // FLINT arithmetic and arb ball arithmetic.
+    for demo_name in [
+        "demo_big_exponent_float_to_string",
+        "demo_big_exponent_float_to_string_base_non_power_of_2",
+        "demo_big_exponent_float_to_string_base_upper_non_power_of_2",
+        "demo_big_exponent_float_to_sci_with_options",
+        "demo_big_exponent_float_from_sci_string_with_options_prec",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-float",
+            demo_name,
+            "arf_string_general",
+        );
+    }
     // Malachite's internal `Mag` (FLINT's `mag_t`).
     for (demo_name, flint_mode) in [
         ("demo_mag_from_u64", "mag_set_ui"),

@@ -6,23 +6,20 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{Abs, Square};
-use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, One, Two, Zero};
+use malachite_base::num::basic::traits::{One, Two};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_float::big_exponent_float::ComparableBigExponentFloatRef;
 use malachite_float::big_exponent_float::arithmetic::sqrt::sqrt_prec_round_generic;
 use malachite_float::test_util::big_exponent_float::{
-    big_exponent_float_exponent_is_small, big_exponent_float_power_of_2,
-    float_to_big_exponent_float, parse_big_exponent_float_hex,
+    big_exponent_float_exponent_is_small, float_to_big_exponent_float, parse_big_exponent_float_hex,
 };
 use malachite_float::test_util::generators::{
     big_exponent_float_gen_var_3, big_exponent_float_unsigned_rounding_mode_triple_gen_var_4,
     float_unsigned_rounding_mode_triple_gen_var_13,
 };
 use malachite_float::{BigExponentFloat, Float};
-use malachite_nz::integer::Integer;
 use malachite_q::Rational;
 use std::cmp::Ordering::{self, *};
 
@@ -64,74 +61,68 @@ fn sqrt_prec_round_all(
 
 #[test]
 fn test_sqrt_prec_round() {
-    let big = Integer::from_str("100000000000000000000").unwrap();
-    let pi = parse_big_exponent_float_hex("0x3.243f6a8885a30#53");
-    let check = |x: &BigExponentFloat, prec: u64, rm: RoundingMode, out: &BigExponentFloat, o| {
+    let check = |x: &str, x_hex: &str, prec: u64, rm: RoundingMode, out: &str, out_hex: &str, o| {
+        assert_eq!(parse_big_exponent_float_hex(x_hex).to_string(), x);
+        let x = &parse_big_exponent_float_hex(x_hex);
+        assert_eq!(parse_big_exponent_float_hex(out_hex).to_string(), out);
+        let out = &parse_big_exponent_float_hex(out_hex);
         let r = sqrt_prec_round_all(x, prec, rm);
         assert!(same(&r.0, out), "{x:?} {prec} {rm}: {:?} != {out:?}", r.0);
         assert_eq!(r.1, o);
     };
-    let nan = BigExponentFloat::NAN;
-    let inf = BigExponentFloat::INFINITY;
-    check(&nan, 10, Floor, &nan, Equal);
-    check(&BigExponentFloat::NEGATIVE_INFINITY, 10, Floor, &nan, Equal);
-    check(&BigExponentFloat::from(-4.0), 10, Floor, &nan, Equal);
-    check(&inf, 10, Floor, &inf, Equal);
+    check("NaN", "NaN", 10, Floor, "NaN", "NaN", Equal);
+    check("-Infinity", "-Infinity", 10, Floor, "NaN", "NaN", Equal);
+    check("-4.0", "-0x4.0", 10, Floor, "NaN", "NaN", Equal);
     check(
-        &BigExponentFloat::ZERO,
-        10,
-        Floor,
-        &BigExponentFloat::ZERO,
-        Equal,
+        "Infinity", "Infinity", 10, Floor, "Infinity", "Infinity", Equal,
     );
-    check(
-        &BigExponentFloat::from(2.25),
-        2,
-        Exact,
-        &BigExponentFloat::from(1.5),
-        Equal,
-    );
-    check(
-        &BigExponentFloat::from(0.25),
-        1,
-        Exact,
-        &BigExponentFloat::from(0.5),
-        Equal,
-    );
+    check("0.0", "0x0.0", 10, Floor, "0.0", "0x0.0", Equal);
+    check("2.25", "0x2.4", 2, Exact, "1.5", "0x1.8", Equal);
+    check("0.25", "0x0.4", 1, Exact, "0.50", "0x0.8", Equal);
     // An even and an odd exponent, each beyond the range of a `Float`.
     check(
-        &big_exponent_float_power_of_2(big.clone() * Integer::TWO),
+        "5.6e60205999132796239042",
+        "0x1.0E+50000000000000000000",
         1,
         Exact,
-        &big_exponent_float_power_of_2(big.clone()),
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
         Equal,
     );
     check(
-        &big_exponent_float_power_of_2(-big.clone() * Integer::TWO),
+        "1.8e-60205999132796239043",
+        "0x1.0E-50000000000000000000",
         1,
         Exact,
-        &big_exponent_float_power_of_2(-big.clone()),
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
         Equal,
     );
     check(
-        &big_exponent_float_power_of_2(big.clone() * Integer::TWO + Integer::ONE),
+        "1.1e60205999132796239043",
+        "0x2.0E+50000000000000000000",
         1,
         Floor,
-        &big_exponent_float_power_of_2(big),
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
         Less,
     );
     check(
-        &pi,
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
         5,
         Floor,
-        &parse_big_exponent_float_hex("0x1.c#5"),
+        "1.8",
+        "0x1.c",
         Less,
     );
     check(
-        &pi,
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
         20,
         Nearest,
-        &parse_big_exponent_float_hex("0x1.c5bf8#20"),
+        "1.772453",
+        "0x1.c5bf8",
         Less,
     );
 }

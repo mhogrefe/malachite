@@ -40,7 +40,7 @@ impl BigExponentFloat {
     /// let digits = std::iter::repeat(1);
     /// let (x, o) =
     ///     BigExponentFloat::non_dyadic_from_power_of_2_digits_prec_round(digits, 2, 10, Floor);
-    /// assert_eq!(format!("{x:?}"), "0x0.554");
+    /// assert_eq!(x.to_string(), "0.3330");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -78,7 +78,7 @@ impl BigExponentFloat {
     ///
     /// let digits = std::iter::repeat(1);
     /// let (x, o) = BigExponentFloat::non_dyadic_from_power_of_2_digits_prec(digits, 2, 10);
-    /// assert_eq!(format!("{x:?}"), "0x0.556");
+    /// assert_eq!(x.to_string(), "0.33350");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -117,7 +117,7 @@ impl BigExponentFloat {
     /// // 0.333... in base 10, which is 1/3
     /// let digits = std::iter::repeat(3);
     /// let (x, o) = BigExponentFloat::non_dyadic_from_digits_prec_round(digits, 10, 10, Floor);
-    /// assert_eq!(format!("{x:?}"), "0x0.554");
+    /// assert_eq!(x.to_string(), "0.3330");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -154,7 +154,7 @@ impl BigExponentFloat {
     ///
     /// let digits = std::iter::repeat(3);
     /// let (x, o) = BigExponentFloat::non_dyadic_from_digits_prec(digits, 10, 10);
-    /// assert_eq!(format!("{x:?}"), "0x0.556");
+    /// assert_eq!(x.to_string(), "0.33350");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]

@@ -20,34 +20,63 @@ fn same(x: &BigExponentFloat, y: &BigExponentFloat) -> bool {
 
 #[test]
 fn test_sqrt_2_prec_round() {
-    let cases: &[(u64, RoundingMode, &str, Ordering)] = &[
-        (1, Floor, "0x1.0", Less),
-        (1, Ceiling, "0x2.0", Greater),
-        (1, Down, "0x1.0", Less),
-        (1, Up, "0x2.0", Greater),
-        (1, Nearest, "0x1.0", Less),
-        (2, Floor, "0x1.0", Less),
-        (2, Ceiling, "0x1.8", Greater),
-        (2, Down, "0x1.0", Less),
-        (2, Up, "0x1.8", Greater),
-        (2, Nearest, "0x1.8", Greater),
-        (10, Floor, "0x1.6a", Less),
-        (10, Ceiling, "0x1.6a8", Greater),
-        (10, Down, "0x1.6a", Less),
-        (10, Up, "0x1.6a8", Greater),
-        (10, Nearest, "0x1.6a", Less),
-        (100, Floor, "0x1.6a09e667f3bcc908b2fb1366e", Less),
-        (100, Ceiling, "0x1.6a09e667f3bcc908b2fb1367", Greater),
-        (100, Down, "0x1.6a09e667f3bcc908b2fb1366e", Less),
-        (100, Up, "0x1.6a09e667f3bcc908b2fb1367", Greater),
-        (100, Nearest, "0x1.6a09e667f3bcc908b2fb1366e", Less),
-    ];
-    for &(p, rm, out, o) in cases {
+    let test = |p: u64, rm: RoundingMode, out: &str, out_hex: &str, o: Ordering| {
         let (x, o_alt) = BigExponentFloat::sqrt_2_prec_round(p, rm);
         assert!(x.is_valid());
-        assert_eq!(format!("{x:?}"), out, "{:?}", (p, rm));
+        assert_eq!(format!("{x:?}"), out_hex, "{:?}", (p, rm));
+        assert_eq!(x.to_string(), out);
         assert_eq!(o_alt, o);
-    }
+    };
+    test(1, Floor, "1.0", "0x1.0", Less);
+    test(1, Ceiling, "2.0", "0x2.0", Greater);
+    test(1, Down, "1.0", "0x1.0", Less);
+    test(1, Up, "2.0", "0x2.0", Greater);
+    test(1, Nearest, "1.0", "0x1.0", Less);
+    test(2, Floor, "1.0", "0x1.0", Less);
+    test(2, Ceiling, "1.5", "0x1.8", Greater);
+    test(2, Down, "1.0", "0x1.0", Less);
+    test(2, Up, "1.5", "0x1.8", Greater);
+    test(2, Nearest, "1.5", "0x1.8", Greater);
+    test(10, Floor, "1.414", "0x1.6a", Less);
+    test(10, Ceiling, "1.4160", "0x1.6a8", Greater);
+    test(10, Down, "1.414", "0x1.6a", Less);
+    test(10, Up, "1.4160", "0x1.6a8", Greater);
+    test(10, Nearest, "1.414", "0x1.6a", Less);
+    test(
+        100,
+        Floor,
+        "1.4142135623730950488016887242092",
+        "0x1.6a09e667f3bcc908b2fb1366e",
+        Less,
+    );
+    test(
+        100,
+        Ceiling,
+        "1.414213562373095048801688724211",
+        "0x1.6a09e667f3bcc908b2fb1367",
+        Greater,
+    );
+    test(
+        100,
+        Down,
+        "1.4142135623730950488016887242092",
+        "0x1.6a09e667f3bcc908b2fb1366e",
+        Less,
+    );
+    test(
+        100,
+        Up,
+        "1.414213562373095048801688724211",
+        "0x1.6a09e667f3bcc908b2fb1367",
+        Greater,
+    );
+    test(
+        100,
+        Nearest,
+        "1.4142135623730950488016887242092",
+        "0x1.6a09e667f3bcc908b2fb1366e",
+        Less,
+    );
 }
 
 #[test]
@@ -87,18 +116,22 @@ fn sqrt_2_prec_round_properties() {
 
 #[test]
 fn test_sqrt_2_prec() {
-    let cases: &[(u64, &str, Ordering)] = &[
-        (1, "0x1.0", Less),
-        (2, "0x1.8", Greater),
-        (10, "0x1.6a", Less),
-        (100, "0x1.6a09e667f3bcc908b2fb1366e", Less),
-    ];
-    for &(p, out, o) in cases {
+    let test = |p: u64, out: &str, out_hex: &str, o: Ordering| {
         let (x, o_alt) = BigExponentFloat::sqrt_2_prec(p);
         assert!(x.is_valid());
-        assert_eq!(format!("{x:?}"), out, "{:?}", (p));
+        assert_eq!(format!("{x:?}"), out_hex, "{:?}", (p));
+        assert_eq!(x.to_string(), out);
         assert_eq!(o_alt, o);
-    }
+    };
+    test(1, "1.0", "0x1.0", Less);
+    test(2, "1.5", "0x1.8", Greater);
+    test(10, "1.414", "0x1.6a", Less);
+    test(
+        100,
+        "1.4142135623730950488016887242092",
+        "0x1.6a09e667f3bcc908b2fb1366e",
+        Less,
+    );
 }
 
 #[test]

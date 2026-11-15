@@ -88,9 +88,9 @@ pub mod from_natural;
 /// ```
 /// use malachite_float::BigExponentFloat;
 ///
-/// assert_eq!(format!("{:?}", BigExponentFloat::from(1.5f64)), "0x1.8");
-/// assert_eq!(format!("{:?}", BigExponentFloat::from(-0.0f32)), "0x0.0");
-/// assert_eq!(format!("{:?}", BigExponentFloat::from(f64::NAN)), "NaN");
+/// assert_eq!(BigExponentFloat::from(1.5f64).to_string(), "1.5");
+/// assert_eq!(BigExponentFloat::from(-0.0f32).to_string(), "0.0");
+/// assert_eq!(BigExponentFloat::from(f64::NAN).to_string(), "NaN");
 /// ```
 pub mod from_primitive_float;
 /// Functions for converting a primitive integer to a [`BigExponentFloat`].
@@ -99,12 +99,12 @@ pub mod from_primitive_float;
 /// ```
 /// use malachite_float::BigExponentFloat;
 ///
-/// assert_eq!(format!("{:?}", BigExponentFloat::from(0u8)), "0x0.0");
-/// assert_eq!(format!("{:?}", BigExponentFloat::from(12u32)), "0xc.0");
-/// assert_eq!(format!("{:?}", BigExponentFloat::from(-12i64)), "-0xc.0");
+/// assert_eq!(BigExponentFloat::from(0u8).to_string(), "0.0");
+/// assert_eq!(BigExponentFloat::from(12u32).to_string(), "12.0");
+/// assert_eq!(BigExponentFloat::from(-12i64).to_string(), "-12.0");
 /// assert_eq!(
-///     format!("{:?}", BigExponentFloat::from(u128::MAX)),
-///     "0xffffffffffffffffffffffffffffffff.0"
+///     BigExponentFloat::from(u128::MAX).to_string(),
+///     "340282366920938463463374607431768211455.0"
 /// );
 /// ```
 pub mod from_primitive_int;
@@ -147,7 +147,7 @@ pub mod is_real;
 ///
 /// let m = BigExponentFloat::ONE.to_significand().unwrap();
 /// let x = BigExponentFloat::from_raw_mantissa_and_exponent(m, Integer::from(3));
-/// assert_eq!(format!("{x:?}"), "0x4.0");
+/// assert_eq!(x.to_string(), "4.0");
 /// ```
 ///
 /// # integer_mantissa_and_exponent
@@ -172,7 +172,7 @@ pub mod is_real;
 ///     Integer::from(-2),
 /// )
 /// .unwrap();
-/// assert_eq!(format!("{x:?}"), "0x0.c");
+/// assert_eq!(x.to_string(), "0.75");
 /// ```
 ///
 /// # sci_mantissa_and_exponent
@@ -181,7 +181,7 @@ pub mod is_real;
 /// use malachite_float::{BigExponentFloat, Float};
 ///
 /// let (m, e) = BigExponentFloat::from(Float::from(-6.0)).sci_mantissa_and_exponent();
-/// assert_eq!(format!("{m:?}"), "0x1.8");
+/// assert_eq!(m.to_string(), "1.5");
 /// assert_eq!(e, 2);
 /// ```
 ///
@@ -193,7 +193,7 @@ pub mod is_real;
 ///
 /// let m = BigExponentFloat::from(Float::from(1.5));
 /// let x = BigExponentFloat::from_sci_mantissa_and_exponent(m, Integer::from(2)).unwrap();
-/// assert_eq!(format!("{x:?}"), "0x6.0");
+/// assert_eq!(x.to_string(), "6.0");
 /// let m = BigExponentFloat::from(Float::from(3.0));
 /// assert!(BigExponentFloat::from_sci_mantissa_and_exponent(m, Integer::from(2)).is_none());
 /// ```

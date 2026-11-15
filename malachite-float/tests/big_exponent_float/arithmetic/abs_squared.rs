@@ -7,9 +7,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{AbsSquared, AbsSquaredAssign, Square};
-use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity};
 use malachite_float::BigExponentFloat;
 use malachite_float::big_exponent_float::ComparableBigExponentFloatRef;
+use malachite_float::test_util::big_exponent_float::parse_big_exponent_float_hex;
 use malachite_float::test_util::generators::big_exponent_float_gen;
 
 fn same(x: &BigExponentFloat, y: &BigExponentFloat) -> bool {
@@ -18,19 +18,17 @@ fn same(x: &BigExponentFloat, y: &BigExponentFloat) -> bool {
 
 #[test]
 fn test_abs_squared() {
-    assert!(same(
-        &BigExponentFloat::NEGATIVE_INFINITY.abs_squared(),
-        &BigExponentFloat::INFINITY
-    ));
-    assert!(same(
-        &BigExponentFloat::NAN.abs_squared(),
-        &BigExponentFloat::NAN
-    ));
+    let test = |x: &str, x_hex: &str, out: &str, out_hex: &str| {
+        assert_eq!(parse_big_exponent_float_hex(x_hex).to_string(), x);
+        let x = &parse_big_exponent_float_hex(x_hex);
+        assert_eq!(parse_big_exponent_float_hex(out_hex).to_string(), out);
+        let out = &parse_big_exponent_float_hex(out_hex);
+        assert!(same(&x.abs_squared(), out));
+    };
+    test("-Infinity", "-Infinity", "Infinity", "Infinity");
+    test("NaN", "NaN", "NaN", "NaN");
     // (-1.5)^2 = 2.25
-    assert!(same(
-        &BigExponentFloat::from(-1.5).abs_squared(),
-        &BigExponentFloat::from(2.25)
-    ));
+    test("-1.5", "-0x1.8", "2.25", "0x2.4");
 }
 
 #[test]

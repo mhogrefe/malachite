@@ -8,20 +8,21 @@
 
 use malachite_base::num::conversion::traits::IsReal;
 use malachite_float::test_util::big_exponent_float::{
-    big_exponent_float_power_of_2, big_exponent_float_to_float,
+    big_exponent_float_to_float, parse_big_exponent_float_hex,
 };
 use malachite_float::test_util::generators::{
     big_exponent_float_gen, big_exponent_float_gen_var_1,
 };
-use malachite_nz::integer::Integer;
 
 #[test]
 fn test_is_real() {
-    assert!(big_exponent_float_power_of_2(Integer::from(1u64 << 40)).is_real());
-    assert_eq!(
-        big_exponent_float_power_of_2(-Integer::from(1u64 << 40)).is_real(),
-        true
-    );
+    let test = |x: &str, x_hex: &str, out| {
+        assert_eq!(parse_big_exponent_float_hex(x_hex).to_string(), x);
+        let x = &parse_big_exponent_float_hex(x_hex);
+        assert_eq!(x.is_real(), out);
+    };
+    test("8.1e330985980541", "0x1.0E+274877906944", true);
+    test("1.2e-330985980542", "0x1.0E-274877906944", true);
 }
 
 #[test]

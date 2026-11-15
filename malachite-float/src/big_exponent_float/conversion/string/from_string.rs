@@ -9,36 +9,44 @@ use crate::big_exponent_float::BigExponentFloat;
 use crate::big_exponent_float::conversion::string::to_string::power_of_2_base_log;
 use core::str::FromStr;
 use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, Zero};
-use malachite_base::num::conversion::traits::{FromStringBase, IntegerMantissaAndExponent};
+use malachite_base::num::conversion::string::options::FromSciStringOptions;
+use malachite_base::num::conversion::traits::{
+    FromSciString, FromStringBase, IntegerMantissaAndExponent,
+};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 
 impl FromStringBase for BigExponentFloat {
-    /// Converts a string, in a specified base, to a [`BigExponentFloat`]. The base must for now be
-    /// a power of 2: 2, 4, 8, 16, or 32.
+    /// Converts a string, in a specified base, to a [`BigExponentFloat`].
     ///
-    /// The string is in the format that
+    /// In a power-of-2 base (2, 4, 8, 16, or 32) the string is in the format that
     /// [`ToStringBase`](malachite_base::num::conversion::traits::ToStringBase) writes: an optional
     /// `-`, digits with an optional `.`, and an optional exponent, written as `E` (or `e`) followed
     /// by a decimal number, giving the power of the base by which to multiply. The number's sign is
     /// optional in bases 2, 4, and 8, and mandatory in bases 16 and 32, where `E` is also a digit.
     /// A `0b`, `0o`, or `0x` prefix after the sign is accepted in bases 2, 8, and 16 respectively,
     /// so the `#`-flag output of [`Binary`](core::fmt::Binary), [`Octal`](core::fmt::Octal), and
-    /// [`LowerHex`](core::fmt::LowerHex) is accepted too. `NaN`, `Infinity`, and `-Infinity` are
-    /// also accepted. Digits may be uppercase or lowercase.
+    /// [`LowerHex`](core::fmt::LowerHex) is accepted too. The value of such a string is always
+    /// exactly representable, so no rounding takes place.
     ///
-    /// The value of the string is always exactly representable, so no rounding takes place. If the
-    /// string is not valid, `None` is returned.
+    /// In any other base, from 3 to 36, this is
+    /// [`from_sci_string_with_options`](malachite_base::num::conversion::traits::FromSciString::from_sci_string_with_options)
+    /// in that base: the precision is inferred from the digits, and the value is rounded to
+    /// nearest.
+    ///
+    /// In every base `NaN`, `Infinity`, and `-Infinity` are accepted, digits may be uppercase or
+    /// lowercase, and the exponent may be arbitrarily large. If the string is not valid, `None` is
+    /// returned.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n)$
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
     ///
-    /// $M(n) = O(n)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `s.len()`.
     ///
     /// # Panics
-    /// Panics if `base` is not 2, 4, 8, 16, or 32.
+    /// Panics if `base` is less than 2 or greater than 36.
     ///
     /// # Examples
     /// ```
@@ -46,15 +54,26 @@ impl FromStringBase for BigExponentFloat {
     /// use malachite_float::BigExponentFloat;
     ///
     /// let x = BigExponentFloat::from_string_base(16, "-0x1.8").unwrap();
-    /// assert_eq!(format!("{x:?}"), "-0x1.8");
+    /// assert_eq!(x.to_string(), "-1.5");
     /// let x = BigExponentFloat::from_string_base(2, "1.1E+100000000000000000000").unwrap();
     /// assert_eq!(
     ///     x.get_exponent().unwrap().to_string(),
     ///     "100000000000000000001"
     /// );
     /// assert!(BigExponentFloat::from_string_base(16, "1.g").is_none());
+    ///
+    /// let x = BigExponentFloat::from_string_base(10, "0.1").unwrap();
+    /// assert_eq!(x.to_string(), "0.102");
+    /// let x = BigExponentFloat::from_string_base(3, "1.1e100000000000000000000").unwrap();
+    /// assert_eq!(x.to_string(), "4.3e47712125471966243729");
     /// ```
     fn from_string_base(base: u8, s: &str) -> Option<Self> {
+        assert!((2..=36).contains(&base), "base out of range");
+        if !base.is_power_of_two() {
+            let mut options = FromSciStringOptions::default();
+            options.set_base(base);
+            return Self::from_sci_string_with_options(s, options);
+        }
         let log_base = power_of_2_base_log(base);
         match s {
             "NaN" => return Some(Self::NAN),
@@ -105,5 +124,61 @@ impl FromStringBase for BigExponentFloat {
         } else {
             x
         })
+    }
+}
+
+impl FromStr for BigExponentFloat {
+    type Err = ();
+
+    /// Converts a string to a [`BigExponentFloat`].
+    ///
+    /// This is [`from_string_base`](BigExponentFloat::from_string_base) in base 10, so it reads
+    /// what [`Display`](core::fmt::Display) writes. The precision is inferred from the digits and
+    /// the value is rounded to nearest, so `BigExponentFloat::from_str(&x.to_string())` is in
+    /// general only close to `x`; [`Debug`](core::fmt::Debug)'s hexadecimal output, which
+    /// [`from_string_base`](BigExponentFloat::from_string_base) reads exactly in base 16, is the
+    /// exact round trip.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `s.len()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_float::BigExponentFloat;
+    ///
+    /// assert_eq!(
+    ///     BigExponentFloat::from_str("1.5").unwrap().to_string(),
+    ///     "1.5"
+    /// );
+    /// assert_eq!(
+    ///     BigExponentFloat::from_str("NaN").unwrap().to_string(),
+    ///     "NaN"
+    /// );
+    /// assert_eq!(
+    ///     BigExponentFloat::from_str("-Infinity").unwrap().to_string(),
+    ///     "-Infinity"
+    /// );
+    /// // There is only one zero.
+    /// assert_eq!(
+    ///     BigExponentFloat::from_str("-0.0").unwrap().to_string(),
+    ///     "0.0"
+    /// );
+    /// assert_eq!(
+    ///     BigExponentFloat::from_str("2.5e-100000000000000000000")
+    ///         .unwrap()
+    ///         .to_string(),
+    ///     "2.49e-100000000000000000000"
+    /// );
+    ///
+    /// assert!(BigExponentFloat::from_str("abc").is_err());
+    /// ```
+    #[inline]
+    fn from_str(s: &str) -> Result<Self, ()> {
+        Self::from_string_base(10, s).ok_or(())
     }
 }

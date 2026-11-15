@@ -7,14 +7,14 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
-use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, One, Two, Zero};
+use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_float::big_exponent_float::ComparableBigExponentFloatRef;
 use malachite_float::big_exponent_float::arithmetic::sum::sum_prec_round_generic;
 use malachite_float::test_util::big_exponent_float::{
     big_exponent_float_exponent_is_small, big_exponent_float_power_of_2,
-    float_to_big_exponent_float,
+    float_to_big_exponent_float, parse_big_exponent_float_hex,
 };
 use malachite_float::test_util::generators::{
     big_exponent_float_vec_gen_var_1,
@@ -70,81 +70,98 @@ fn sum_all(xs: &[BigExponentFloat]) -> BigExponentFloat {
 
 #[test]
 fn test_sum_prec_round() {
-    let check =
-        |xs: &[BigExponentFloat], prec: u64, rm: RoundingMode, out: &BigExponentFloat, o| {
-            let r = sum_prec_round_all(xs, prec, rm);
-            assert!(same(&r.0, out), "{:?} != {out:?}", r.0);
-            assert_eq!(r.1, o);
-        };
+    let check = |xs_hex: &[&str], prec: u64, rm: RoundingMode, out: &str, out_hex: &str, o| {
+        let xs = &xs_hex
+            .iter()
+            .map(|s| parse_big_exponent_float_hex(s))
+            .collect::<Vec<_>>();
+        assert_eq!(parse_big_exponent_float_hex(out_hex).to_string(), out);
+        let out = &parse_big_exponent_float_hex(out_hex);
+        let r = sum_prec_round_all(xs, prec, rm);
+        assert!(same(&r.0, out), "{:?} != {out:?}", r.0);
+        assert_eq!(r.1, o);
+    };
     let big = Integer::from_str("100000000000000000000").unwrap();
-    let huge = big_exponent_float_power_of_2(big.clone());
-    let tiny = big_exponent_float_power_of_2(-big.clone());
     let one = BigExponentFloat::ONE;
     let neg = |x: &BigExponentFloat| -x;
-    check(&[], 10, Floor, &BigExponentFloat::ZERO, Equal);
+    check(&[], 10, Floor, "0.0", "0x0.0", Equal);
+    check(&["NaN", "0x1.0"], 10, Floor, "NaN", "NaN", Equal);
+    check(&["Infinity", "-Infinity"], 10, Floor, "NaN", "NaN", Equal);
     check(
-        &[BigExponentFloat::NAN, one.clone()],
+        &["Infinity", "0x1.0"],
         10,
         Floor,
-        &BigExponentFloat::NAN,
-        Equal,
-    );
-    check(
-        &[BigExponentFloat::INFINITY, BigExponentFloat::NEGATIVE_INFINITY],
-        10,
-        Floor,
-        &BigExponentFloat::NAN,
-        Equal,
-    );
-    check(
-        &[BigExponentFloat::INFINITY, one.clone()],
-        10,
-        Floor,
-        &BigExponentFloat::INFINITY,
+        "Infinity",
+        "Infinity",
         Equal,
     );
     // The huge terms cancel, leaving the small ones, which are far apart.
     check(
-        &[huge.clone(), one.clone(), neg(&huge)],
+        &["0x1.0E+25000000000000000000", "0x1.0", "-0x1.0E+25000000000000000000"],
         10,
         Exact,
-        &one,
+        "1.0",
+        "0x1.0",
         Equal,
     );
     check(
-        &[huge.clone(), tiny.clone(), one.clone(), neg(&huge)],
+        &[
+            "0x1.0E+25000000000000000000",
+            "0x1.0E-25000000000000000000",
+            "0x1.0",
+            "-0x1.0E+25000000000000000000",
+        ],
         1,
         Floor,
-        &one,
+        "1.0",
+        "0x1.0",
         Less,
     );
     check(
-        &[huge.clone(), tiny.clone(), one.clone(), neg(&huge)],
+        &[
+            "0x1.0E+25000000000000000000",
+            "0x1.0E-25000000000000000000",
+            "0x1.0",
+            "-0x1.0E+25000000000000000000",
+        ],
         1,
         Ceiling,
-        &BigExponentFloat::from(2.0),
+        "2.0",
+        "0x2.0",
         Greater,
     );
     // A tiny term decides a tie.
     check(
-        &[one.clone(), big_exponent_float_power_of_2(Integer::from(-10)), tiny.clone()],
+        &["0x1.0", "0x0.004", "0x1.0E-25000000000000000000"],
         10,
         Nearest,
-        &BigExponentFloat::from(1.0 + 1.0 / 512.0),
+        "1.0020",
+        "0x1.008",
         Greater,
     );
     check(
-        &[one.clone(), big_exponent_float_power_of_2(Integer::from(-10)), neg(&tiny)],
+        &["0x1.0", "0x0.004", "-0x1.0E-25000000000000000000"],
         10,
         Nearest,
-        &one,
+        "1.0",
+        "0x1.0",
         Less,
     );
     // The eight equal terms sum to 8 - 2^-7, which -8 almost cancels: they must be added exactly,
     // not rounded first.
     let mut xs = vec![BigExponentFloat::from(1.0 - 1.0 / 1024.0); 8];
     xs.push(BigExponentFloat::from(-8.0));
-    check(&xs, 2, Exact, &BigExponentFloat::from(-1.0 / 128.0), Equal);
+    check(
+        &[
+            "0x0.ffc", "0x0.ffc", "0x0.ffc", "0x0.ffc", "0x0.ffc", "0x0.ffc", "0x0.ffc", "0x0.ffc",
+            "-0x8.0",
+        ],
+        2,
+        Exact,
+        "-0.0078",
+        "-0x0.02",
+        Equal,
+    );
     // Two clusters of three terms each, 2^100000000000000000000 apart; the upper cluster's sum,
     // 2^(N - 1) + 2^(N - 1) + 2^(N - 3), is a midpoint at 3 bits, and the lower cluster's sign
     // decides the tie.
@@ -154,29 +171,80 @@ fn test_sum_prec_round() {
     let mut xs = upper.to_vec();
     xs.extend([one.clone(), one.clone(), one.clone()]);
     check(
-        &xs,
+        &[
+            "0x8.0E+24999999999999999999",
+            "0x8.0E+24999999999999999999",
+            "0x2.0E+24999999999999999999",
+            "0x1.0",
+            "0x1.0",
+            "0x1.0",
+        ],
         3,
         Nearest,
-        &(&huge + p2(&(&big - Integer::TWO))),
+        "3.0e30102999566398119521",
+        "0x1.4E+25000000000000000000",
         Greater,
     );
-    check(&xs, 3, Floor, &huge, Less);
+    check(
+        &[
+            "0x8.0E+24999999999999999999",
+            "0x8.0E+24999999999999999999",
+            "0x2.0E+24999999999999999999",
+            "0x1.0",
+            "0x1.0",
+            "0x1.0",
+        ],
+        3,
+        Floor,
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        Less,
+    );
     let mut xs = upper.to_vec();
     xs.extend([neg(&one), neg(&one), neg(&one)]);
-    check(&xs, 3, Nearest, &huge, Less);
     check(
-        &xs,
+        &[
+            "0x8.0E+24999999999999999999",
+            "0x8.0E+24999999999999999999",
+            "0x2.0E+24999999999999999999",
+            "-0x1.0",
+            "-0x1.0",
+            "-0x1.0",
+        ],
+        3,
+        Nearest,
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        Less,
+    );
+    check(
+        &[
+            "0x8.0E+24999999999999999999",
+            "0x8.0E+24999999999999999999",
+            "0x2.0E+24999999999999999999",
+            "-0x1.0",
+            "-0x1.0",
+            "-0x1.0",
+        ],
         3,
         Ceiling,
-        &(&huge + p2(&(&big - Integer::TWO))),
+        "3.0e30102999566398119521",
+        "0x1.4E+25000000000000000000",
         Greater,
     );
     // Terms in several clusters, all cancelling but the lowest.
     check(
-        &[huge.clone(), neg(&huge), one.clone(), neg(&one), tiny.clone()],
+        &[
+            "0x1.0E+25000000000000000000",
+            "-0x1.0E+25000000000000000000",
+            "0x1.0",
+            "-0x1.0",
+            "0x1.0E-25000000000000000000",
+        ],
         3,
         Exact,
-        &tiny,
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
         Equal,
     );
 }

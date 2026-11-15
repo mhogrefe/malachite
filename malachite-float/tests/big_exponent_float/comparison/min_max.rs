@@ -7,12 +7,11 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
-use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, One, OneHalf, Zero};
+use malachite_base::num::basic::traits::{NaN, One, OneHalf, Zero};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_float::big_exponent_float::ComparableBigExponentFloatRef;
 use malachite_float::test_util::big_exponent_float::{
-    big_exponent_float_negate, big_exponent_float_power_of_2, float_to_big_exponent_float,
-    parse_big_exponent_float_hex,
+    big_exponent_float_power_of_2, float_to_big_exponent_float, parse_big_exponent_float_hex,
 };
 use malachite_float::test_util::generators::{
     big_exponent_float_pair_gen, big_exponent_float_rational_pair_gen, float_pair_gen,
@@ -35,47 +34,120 @@ fn test_min_max() {
     let big = Integer::from_str("100000000000000000000").unwrap();
     let huge = big_exponent_float_power_of_2(big.clone());
     let tiny = big_exponent_float_power_of_2(-big);
-    let neg_huge = big_exponent_float_negate(huge.clone());
     let pi = parse_big_exponent_float_hex("0x3.243f6a8885a30#53");
-    let test = |x: &BigExponentFloat,
-                y: &BigExponentFloat,
-                min: &BigExponentFloat,
-                max: &BigExponentFloat| {
-        assert!(same(&x.clone().min(y.clone()), min));
-        assert!(same(&x.clone().min_val_ref(y), min));
-        assert!(same(&x.min_ref_val(y.clone()), min));
-        assert!(same(&x.min_ref_ref(y), min));
-        assert!(same(&x.clone().max(y.clone()), max));
-        assert!(same(&x.clone().max_val_ref(y), max));
-        assert!(same(&x.max_ref_val(y.clone()), max));
-        assert!(same(&x.max_ref_ref(y), max));
-    };
+    let test =
+        |s: &str, s_hex: &str, t: &str, t_hex: &str, u: &str, u_hex: &str, v: &str, v_hex: &str| {
+            let x = &parse_big_exponent_float_hex(s_hex);
+            assert_eq!(x.to_string(), s);
+            let y = &parse_big_exponent_float_hex(t_hex);
+            assert_eq!(y.to_string(), t);
+            let min = &parse_big_exponent_float_hex(u_hex);
+            assert_eq!(min.to_string(), u);
+            let max = &parse_big_exponent_float_hex(v_hex);
+            assert_eq!(max.to_string(), v);
+            assert!(same(&x.clone().min(y.clone()), min));
+            assert!(same(&x.clone().min_val_ref(y), min));
+            assert!(same(&x.min_ref_val(y.clone()), min));
+            assert!(same(&x.min_ref_ref(y), min));
+            assert!(same(&x.clone().max(y.clone()), max));
+            assert!(same(&x.clone().max_val_ref(y), max));
+            assert!(same(&x.max_ref_val(y.clone()), max));
+            assert!(same(&x.max_ref_ref(y), max));
+        };
     let nan = BigExponentFloat::NAN;
-    test(&nan, &nan, &nan, &nan);
-    test(&nan, &pi, &pi, &pi);
-    test(&pi, &nan, &pi, &pi);
-    test(&nan, &huge, &huge, &huge);
-    test(&BigExponentFloat::ZERO, &pi, &BigExponentFloat::ZERO, &pi);
-    test(&pi, &BigExponentFloat::ONE, &BigExponentFloat::ONE, &pi);
-    test(&pi, &huge, &pi, &huge);
-    test(&neg_huge, &tiny, &neg_huge, &tiny);
+    test("NaN", "NaN", "NaN", "NaN", "NaN", "NaN", "NaN", "NaN");
     test(
-        &tiny,
-        &BigExponentFloat::ZERO,
-        &BigExponentFloat::ZERO,
-        &tiny,
+        "NaN",
+        "NaN",
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
     );
     test(
-        &BigExponentFloat::NEGATIVE_INFINITY,
-        &BigExponentFloat::INFINITY,
-        &BigExponentFloat::NEGATIVE_INFINITY,
-        &BigExponentFloat::INFINITY,
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        "NaN",
+        "NaN",
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
     );
     test(
-        &BigExponentFloat::ONE_HALF,
-        &BigExponentFloat::ONE_HALF,
-        &BigExponentFloat::ONE_HALF,
-        &BigExponentFloat::ONE_HALF,
+        "NaN",
+        "NaN",
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+    );
+    test(
+        "0.0",
+        "0x0.0",
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        "0.0",
+        "0x0.0",
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+    );
+    test(
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        "1.0",
+        "0x1.0",
+        "1.0",
+        "0x1.0",
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+    );
+    test(
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+        "3.1415926535897931",
+        "0x3.243f6a8885a3",
+        "2.4e30102999566398119521",
+        "0x1.0E+25000000000000000000",
+    );
+    test(
+        "-2.4e30102999566398119521",
+        "-0x1.0E+25000000000000000000",
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
+        "-2.4e30102999566398119521",
+        "-0x1.0E+25000000000000000000",
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
+    );
+    test(
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
+        "0.0",
+        "0x0.0",
+        "0.0",
+        "0x0.0",
+        "4.2e-30102999566398119522",
+        "0x1.0E-25000000000000000000",
+    );
+    test(
+        "-Infinity",
+        "-Infinity",
+        "Infinity",
+        "Infinity",
+        "-Infinity",
+        "-Infinity",
+        "Infinity",
+        "Infinity",
+    );
+    test(
+        "0.50", "0x0.8", "0.50", "0x0.8", "0.50", "0x0.8", "0.50", "0x0.8",
     );
 
     // - rounding the selected operand

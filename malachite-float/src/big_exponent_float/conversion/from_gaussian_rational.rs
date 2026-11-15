@@ -35,12 +35,10 @@ impl TryFrom<&GaussianRational> for BigExponentFloat {
     /// use malachite_q::gaussian_rational::GaussianRational;
     ///
     /// assert_eq!(
-    ///     format!(
-    ///         "{:?}",
-    ///         BigExponentFloat::try_from(&GaussianRational::from(Rational::from_signeds(-3, 8)))
-    ///             .unwrap()
-    ///     ),
-    ///     "-0x0.6"
+    ///     (BigExponentFloat::try_from(&GaussianRational::from(Rational::from_signeds(-3, 8)))
+    ///         .unwrap())
+    ///     .to_string(),
+    ///     "-0.38"
     /// );
     /// assert!(
     ///     BigExponentFloat::try_from(&GaussianRational::from(Rational::from_signeds(1, 3)))
@@ -77,12 +75,10 @@ impl TryFrom<GaussianRational> for BigExponentFloat {
     /// use malachite_q::gaussian_rational::GaussianRational;
     ///
     /// assert_eq!(
-    ///     format!(
-    ///         "{:?}",
-    ///         BigExponentFloat::try_from(GaussianRational::from(Rational::from_signeds(-3, 8)))
-    ///             .unwrap()
-    ///     ),
-    ///     "-0x0.6"
+    ///     (BigExponentFloat::try_from(GaussianRational::from(Rational::from_signeds(-3, 8)))
+    ///         .unwrap())
+    ///     .to_string(),
+    ///     "-0.38"
     /// );
     /// assert!(
     ///     BigExponentFloat::try_from(GaussianRational::from(Rational::from_signeds(1, 3)))

@@ -163,7 +163,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{p:?}"), "0x8.8");
+    /// assert_eq!(p.to_string(), "8.50");
     /// assert_eq!(o, Less);
     ///
     /// let (p, o) = BigExponentFloat::power_of_2_of_big_exponent_float_prec_round(
@@ -171,7 +171,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{p:?}"), "0x9.0");
+    /// assert_eq!(p.to_string(), "9.00");
     /// assert_eq!(o, Greater);
     ///
     /// let (p, o) = BigExponentFloat::power_of_2_of_big_exponent_float_prec_round(
@@ -179,7 +179,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Nearest,
     /// );
-    /// assert_eq!(format!("{p:?}"), "0x9.0");
+    /// assert_eq!(p.to_string(), "9.00");
     /// assert_eq!(o, Greater);
     ///
     /// let (p, o) = BigExponentFloat::power_of_2_of_big_exponent_float_prec_round(
@@ -187,7 +187,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{p:?}"), "0x8.d331");
+    /// assert_eq!(p.to_string(), "8.8249664");
     /// assert_eq!(o, Less);
     ///
     /// let (p, o) = BigExponentFloat::power_of_2_of_big_exponent_float_prec_round(
@@ -195,7 +195,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{p:?}"), "0x8.d332");
+    /// assert_eq!(p.to_string(), "8.824982");
     /// assert_eq!(o, Greater);
     ///
     /// let (p, o) = BigExponentFloat::power_of_2_of_big_exponent_float_prec_round(
@@ -203,7 +203,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Nearest,
     /// );
-    /// assert_eq!(format!("{p:?}"), "0x8.d332");
+    /// assert_eq!(p.to_string(), "8.824982");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -265,7 +265,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{p:?}"), "0x8.8");
+    /// assert_eq!(p.to_string(), "8.50");
     /// assert_eq!(o, Less);
     ///
     /// let (p, o) = BigExponentFloat::power_of_2_of_big_exponent_float_prec_round_ref(
@@ -273,7 +273,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{p:?}"), "0x9.0");
+    /// assert_eq!(p.to_string(), "9.00");
     /// assert_eq!(o, Greater);
     ///
     /// let (p, o) = BigExponentFloat::power_of_2_of_big_exponent_float_prec_round_ref(
@@ -281,7 +281,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Nearest,
     /// );
-    /// assert_eq!(format!("{p:?}"), "0x9.0");
+    /// assert_eq!(p.to_string(), "9.00");
     /// assert_eq!(o, Greater);
     ///
     /// let (p, o) = BigExponentFloat::power_of_2_of_big_exponent_float_prec_round_ref(
@@ -289,7 +289,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{p:?}"), "0x8.d331");
+    /// assert_eq!(p.to_string(), "8.8249664");
     /// assert_eq!(o, Less);
     ///
     /// let (p, o) = BigExponentFloat::power_of_2_of_big_exponent_float_prec_round_ref(
@@ -297,7 +297,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{p:?}"), "0x8.d332");
+    /// assert_eq!(p.to_string(), "8.824982");
     /// assert_eq!(o, Greater);
     ///
     /// let (p, o) = BigExponentFloat::power_of_2_of_big_exponent_float_prec_round_ref(
@@ -305,7 +305,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Nearest,
     /// );
-    /// assert_eq!(format!("{p:?}"), "0x8.d332");
+    /// assert_eq!(p.to_string(), "8.824982");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -361,42 +361,42 @@ impl BigExponentFloat {
     ///     x.power_of_2_of_big_exponent_float_prec_round_assign(5, Floor),
     ///     Less
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x8.8");
+    /// assert_eq!(x.to_string(), "8.50");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
     ///     x.power_of_2_of_big_exponent_float_prec_round_assign(5, Ceiling),
     ///     Greater
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x9.0");
+    /// assert_eq!(x.to_string(), "9.00");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
     ///     x.power_of_2_of_big_exponent_float_prec_round_assign(5, Nearest),
     ///     Greater
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x9.0");
+    /// assert_eq!(x.to_string(), "9.00");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
     ///     x.power_of_2_of_big_exponent_float_prec_round_assign(20, Floor),
     ///     Less
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x8.d331");
+    /// assert_eq!(x.to_string(), "8.8249664");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
     ///     x.power_of_2_of_big_exponent_float_prec_round_assign(20, Ceiling),
     ///     Greater
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x8.d332");
+    /// assert_eq!(x.to_string(), "8.824982");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
     ///     x.power_of_2_of_big_exponent_float_prec_round_assign(20, Nearest),
     ///     Greater
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x8.d332");
+    /// assert_eq!(x.to_string(), "8.824982");
     /// ```
     #[inline]
     pub fn power_of_2_of_big_exponent_float_prec_round_assign(
@@ -453,19 +453,19 @@ impl BigExponentFloat {
     ///
     /// let (p, o) =
     ///     BigExponentFloat::power_of_2_of_big_exponent_float_prec(BigExponentFloat::from(PI), 5);
-    /// assert_eq!(format!("{p:?}"), "0x9.0");
+    /// assert_eq!(p.to_string(), "9.00");
     /// assert_eq!(o, Greater);
     ///
     /// let (p, o) =
     ///     BigExponentFloat::power_of_2_of_big_exponent_float_prec(BigExponentFloat::from(PI), 20);
-    /// assert_eq!(format!("{p:?}"), "0x8.d332");
+    /// assert_eq!(p.to_string(), "8.824982");
     /// assert_eq!(o, Greater);
     ///
     /// let (p, o) = BigExponentFloat::power_of_2_of_big_exponent_float_prec(
     ///     BigExponentFloat::from(1.0e10),
     ///     10,
     /// );
-    /// assert_eq!(format!("{p:?}"), "0x1.0E+2500000000");
+    /// assert_eq!(p.to_string(), "4.4e3010299956");
     /// assert_eq!(o, Equal);
     /// ```
     #[inline]
@@ -515,14 +515,14 @@ impl BigExponentFloat {
     ///     &BigExponentFloat::from(PI),
     ///     5,
     /// );
-    /// assert_eq!(format!("{p:?}"), "0x9.0");
+    /// assert_eq!(p.to_string(), "9.00");
     /// assert_eq!(o, Greater);
     ///
     /// let (p, o) = BigExponentFloat::power_of_2_of_big_exponent_float_prec_ref(
     ///     &BigExponentFloat::from(PI),
     ///     20,
     /// );
-    /// assert_eq!(format!("{p:?}"), "0x8.d332");
+    /// assert_eq!(p.to_string(), "8.824982");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -564,11 +564,11 @@ impl BigExponentFloat {
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(x.power_of_2_of_big_exponent_float_prec_assign(5), Greater);
-    /// assert_eq!(format!("{x:?}"), "0x9.0");
+    /// assert_eq!(x.to_string(), "9.00");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(x.power_of_2_of_big_exponent_float_prec_assign(20), Greater);
-    /// assert_eq!(format!("{x:?}"), "0x8.d332");
+    /// assert_eq!(x.to_string(), "8.824982");
     /// ```
     #[inline]
     pub fn power_of_2_of_big_exponent_float_prec_assign(&mut self, prec: u64) -> Ordering {
@@ -628,7 +628,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{p:?}"), "0x1.8");
+    /// assert_eq!(p.to_string(), "1.5");
     /// assert_eq!(o, Less);
     ///
     /// let (p, o) = BigExponentFloat::power_of_2_rational_prec_round(
@@ -636,7 +636,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{p:?}"), "0x1.9");
+    /// assert_eq!(p.to_string(), "1.56");
     /// assert_eq!(o, Greater);
     ///
     /// let (p, o) = BigExponentFloat::power_of_2_rational_prec_round(
@@ -644,7 +644,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Nearest,
     /// );
-    /// assert_eq!(format!("{p:?}"), "0x1.8");
+    /// assert_eq!(p.to_string(), "1.5");
     /// assert_eq!(o, Less);
     ///
     /// let (p, o) = BigExponentFloat::power_of_2_rational_prec_round(
@@ -652,7 +652,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{p:?}"), "0x1.8406");
+    /// assert_eq!(p.to_string(), "1.51572");
     /// assert_eq!(o, Less);
     ///
     /// let (p, o) = BigExponentFloat::power_of_2_rational_prec_round(
@@ -660,7 +660,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{p:?}"), "0x1.84062");
+    /// assert_eq!(p.to_string(), "1.5157185");
     /// assert_eq!(o, Greater);
     ///
     /// let (p, o) = BigExponentFloat::power_of_2_rational_prec_round(
@@ -668,7 +668,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Nearest,
     /// );
-    /// assert_eq!(format!("{p:?}"), "0x1.8406");
+    /// assert_eq!(p.to_string(), "1.51572");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -726,7 +726,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{p:?}"), "0x1.8");
+    /// assert_eq!(p.to_string(), "1.5");
     /// assert_eq!(o, Less);
     ///
     /// let (p, o) = BigExponentFloat::power_of_2_rational_prec_round_ref(
@@ -734,7 +734,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{p:?}"), "0x1.9");
+    /// assert_eq!(p.to_string(), "1.56");
     /// assert_eq!(o, Greater);
     ///
     /// let (p, o) = BigExponentFloat::power_of_2_rational_prec_round_ref(
@@ -742,7 +742,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Nearest,
     /// );
-    /// assert_eq!(format!("{p:?}"), "0x1.8");
+    /// assert_eq!(p.to_string(), "1.5");
     /// assert_eq!(o, Less);
     ///
     /// let (p, o) = BigExponentFloat::power_of_2_rational_prec_round_ref(
@@ -750,7 +750,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{p:?}"), "0x1.8406");
+    /// assert_eq!(p.to_string(), "1.51572");
     /// assert_eq!(o, Less);
     ///
     /// let (p, o) = BigExponentFloat::power_of_2_rational_prec_round_ref(
@@ -758,7 +758,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{p:?}"), "0x1.84062");
+    /// assert_eq!(p.to_string(), "1.5157185");
     /// assert_eq!(o, Greater);
     ///
     /// let (p, o) = BigExponentFloat::power_of_2_rational_prec_round_ref(
@@ -766,7 +766,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Nearest,
     /// );
-    /// assert_eq!(format!("{p:?}"), "0x1.8406");
+    /// assert_eq!(p.to_string(), "1.51572");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -818,19 +818,19 @@ impl BigExponentFloat {
     ///
     /// let (p, o) =
     ///     BigExponentFloat::power_of_2_rational_prec(Rational::from_unsigneds(3u8, 5), 5);
-    /// assert_eq!(format!("{p:?}"), "0x1.8");
+    /// assert_eq!(p.to_string(), "1.5");
     /// assert_eq!(o, Less);
     ///
     /// let (p, o) =
     ///     BigExponentFloat::power_of_2_rational_prec(Rational::from_unsigneds(3u8, 5), 20);
-    /// assert_eq!(format!("{p:?}"), "0x1.8406");
+    /// assert_eq!(p.to_string(), "1.51572");
     /// assert_eq!(o, Less);
     ///
     /// let (p, o) = BigExponentFloat::power_of_2_rational_prec(
     ///     Rational::from_unsigneds(30000000001u64, 3),
     ///     10,
     /// );
-    /// assert_eq!(format!("{p:?}"), "0x1.428E+2500000000");
+    /// assert_eq!(p.to_string(), "5.4967e3010299956");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -874,12 +874,12 @@ impl BigExponentFloat {
     ///
     /// let (p, o) =
     ///     BigExponentFloat::power_of_2_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 5);
-    /// assert_eq!(format!("{p:?}"), "0x1.8");
+    /// assert_eq!(p.to_string(), "1.5");
     /// assert_eq!(o, Less);
     ///
     /// let (p, o) =
     ///     BigExponentFloat::power_of_2_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 20);
-    /// assert_eq!(format!("{p:?}"), "0x1.8406");
+    /// assert_eq!(p.to_string(), "1.51572");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]

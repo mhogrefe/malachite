@@ -214,32 +214,32 @@ impl BigExponentFloat {
     ///
     /// let (hypot, o) =
     ///     BigExponentFloat::from(PI).hypot_prec_round(BigExponentFloat::from(E), 5, Floor);
-    /// assert_eq!(format!("{hypot:?}"), "0x4.0");
+    /// assert_eq!(hypot.to_string(), "4.0");
     /// assert_eq!(o, Less);
     ///
     /// let (hypot, o) =
     ///     BigExponentFloat::from(PI).hypot_prec_round(BigExponentFloat::from(E), 5, Ceiling);
-    /// assert_eq!(format!("{hypot:?}"), "0x4.4");
+    /// assert_eq!(hypot.to_string(), "4.25");
     /// assert_eq!(o, Greater);
     ///
     /// let (hypot, o) =
     ///     BigExponentFloat::from(PI).hypot_prec_round(BigExponentFloat::from(E), 5, Nearest);
-    /// assert_eq!(format!("{hypot:?}"), "0x4.4");
+    /// assert_eq!(hypot.to_string(), "4.25");
     /// assert_eq!(o, Greater);
     ///
     /// let (hypot, o) =
     ///     BigExponentFloat::from(PI).hypot_prec_round(BigExponentFloat::from(E), 20, Floor);
-    /// assert_eq!(format!("{hypot:?}"), "0x4.27838");
+    /// assert_eq!(hypot.to_string(), "4.1543503");
     /// assert_eq!(o, Less);
     ///
     /// let (hypot, o) =
     ///     BigExponentFloat::from(PI).hypot_prec_round(BigExponentFloat::from(E), 20, Ceiling);
-    /// assert_eq!(format!("{hypot:?}"), "0x4.2784");
+    /// assert_eq!(hypot.to_string(), "4.154358");
     /// assert_eq!(o, Greater);
     ///
     /// let (hypot, o) =
     ///     BigExponentFloat::from(PI).hypot_prec_round(BigExponentFloat::from(E), 20, Nearest);
-    /// assert_eq!(format!("{hypot:?}"), "0x4.2784");
+    /// assert_eq!(hypot.to_string(), "4.154358");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -295,7 +295,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{hypot:?}"), "0x4.0");
+    /// assert_eq!(hypot.to_string(), "4.0");
     /// assert_eq!(o, Less);
     ///
     /// let (hypot, o) = BigExponentFloat::from(PI).hypot_prec_round_val_ref(
@@ -303,7 +303,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{hypot:?}"), "0x4.4");
+    /// assert_eq!(hypot.to_string(), "4.25");
     /// assert_eq!(o, Greater);
     ///
     /// let (hypot, o) = BigExponentFloat::from(PI).hypot_prec_round_val_ref(
@@ -311,7 +311,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Nearest,
     /// );
-    /// assert_eq!(format!("{hypot:?}"), "0x4.4");
+    /// assert_eq!(hypot.to_string(), "4.25");
     /// assert_eq!(o, Greater);
     ///
     /// let (hypot, o) = BigExponentFloat::from(PI).hypot_prec_round_val_ref(
@@ -319,7 +319,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{hypot:?}"), "0x4.27838");
+    /// assert_eq!(hypot.to_string(), "4.1543503");
     /// assert_eq!(o, Less);
     ///
     /// let (hypot, o) = BigExponentFloat::from(PI).hypot_prec_round_val_ref(
@@ -327,7 +327,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{hypot:?}"), "0x4.2784");
+    /// assert_eq!(hypot.to_string(), "4.154358");
     /// assert_eq!(o, Greater);
     ///
     /// let (hypot, o) = BigExponentFloat::from(PI).hypot_prec_round_val_ref(
@@ -335,7 +335,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Nearest,
     /// );
-    /// assert_eq!(format!("{hypot:?}"), "0x4.2784");
+    /// assert_eq!(hypot.to_string(), "4.154358");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -396,7 +396,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{hypot:?}"), "0x4.0");
+    /// assert_eq!(hypot.to_string(), "4.0");
     /// assert_eq!(o, Less);
     ///
     /// let (hypot, o) = (&BigExponentFloat::from(PI)).hypot_prec_round_ref_val(
@@ -404,7 +404,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{hypot:?}"), "0x4.4");
+    /// assert_eq!(hypot.to_string(), "4.25");
     /// assert_eq!(o, Greater);
     ///
     /// let (hypot, o) = (&BigExponentFloat::from(PI)).hypot_prec_round_ref_val(
@@ -412,7 +412,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Nearest,
     /// );
-    /// assert_eq!(format!("{hypot:?}"), "0x4.4");
+    /// assert_eq!(hypot.to_string(), "4.25");
     /// assert_eq!(o, Greater);
     ///
     /// let (hypot, o) = (&BigExponentFloat::from(PI)).hypot_prec_round_ref_val(
@@ -420,7 +420,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{hypot:?}"), "0x4.27838");
+    /// assert_eq!(hypot.to_string(), "4.1543503");
     /// assert_eq!(o, Less);
     ///
     /// let (hypot, o) = (&BigExponentFloat::from(PI)).hypot_prec_round_ref_val(
@@ -428,7 +428,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{hypot:?}"), "0x4.2784");
+    /// assert_eq!(hypot.to_string(), "4.154358");
     /// assert_eq!(o, Greater);
     ///
     /// let (hypot, o) = (&BigExponentFloat::from(PI)).hypot_prec_round_ref_val(
@@ -436,7 +436,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Nearest,
     /// );
-    /// assert_eq!(format!("{hypot:?}"), "0x4.2784");
+    /// assert_eq!(hypot.to_string(), "4.154358");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -497,7 +497,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{hypot:?}"), "0x4.0");
+    /// assert_eq!(hypot.to_string(), "4.0");
     /// assert_eq!(o, Less);
     ///
     /// let (hypot, o) = (&BigExponentFloat::from(PI)).hypot_prec_round_ref_ref(
@@ -505,7 +505,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{hypot:?}"), "0x4.4");
+    /// assert_eq!(hypot.to_string(), "4.25");
     /// assert_eq!(o, Greater);
     ///
     /// let (hypot, o) = (&BigExponentFloat::from(PI)).hypot_prec_round_ref_ref(
@@ -513,7 +513,7 @@ impl BigExponentFloat {
     ///     5,
     ///     Nearest,
     /// );
-    /// assert_eq!(format!("{hypot:?}"), "0x4.4");
+    /// assert_eq!(hypot.to_string(), "4.25");
     /// assert_eq!(o, Greater);
     ///
     /// let (hypot, o) = (&BigExponentFloat::from(PI)).hypot_prec_round_ref_ref(
@@ -521,7 +521,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Floor,
     /// );
-    /// assert_eq!(format!("{hypot:?}"), "0x4.27838");
+    /// assert_eq!(hypot.to_string(), "4.1543503");
     /// assert_eq!(o, Less);
     ///
     /// let (hypot, o) = (&BigExponentFloat::from(PI)).hypot_prec_round_ref_ref(
@@ -529,7 +529,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(format!("{hypot:?}"), "0x4.2784");
+    /// assert_eq!(hypot.to_string(), "4.154358");
     /// assert_eq!(o, Greater);
     ///
     /// let (hypot, o) = (&BigExponentFloat::from(PI)).hypot_prec_round_ref_ref(
@@ -537,7 +537,7 @@ impl BigExponentFloat {
     ///     20,
     ///     Nearest,
     /// );
-    /// assert_eq!(format!("{hypot:?}"), "0x4.2784");
+    /// assert_eq!(hypot.to_string(), "4.154358");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -594,42 +594,42 @@ impl BigExponentFloat {
     ///     x.hypot_prec_round_assign(BigExponentFloat::from(E), 5, Floor),
     ///     Less
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x4.0");
+    /// assert_eq!(x.to_string(), "4.0");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
     ///     x.hypot_prec_round_assign(BigExponentFloat::from(E), 5, Ceiling),
     ///     Greater
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x4.4");
+    /// assert_eq!(x.to_string(), "4.25");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
     ///     x.hypot_prec_round_assign(BigExponentFloat::from(E), 5, Nearest),
     ///     Greater
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x4.4");
+    /// assert_eq!(x.to_string(), "4.25");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
     ///     x.hypot_prec_round_assign(BigExponentFloat::from(E), 20, Floor),
     ///     Less
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x4.27838");
+    /// assert_eq!(x.to_string(), "4.1543503");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
     ///     x.hypot_prec_round_assign(BigExponentFloat::from(E), 20, Ceiling),
     ///     Greater
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x4.2784");
+    /// assert_eq!(x.to_string(), "4.154358");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
     ///     x.hypot_prec_round_assign(BigExponentFloat::from(E), 20, Nearest),
     ///     Greater
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x4.2784");
+    /// assert_eq!(x.to_string(), "4.154358");
     /// ```
     #[inline]
     pub fn hypot_prec_round_assign(
@@ -688,42 +688,42 @@ impl BigExponentFloat {
     ///     x.hypot_prec_round_assign_ref(&BigExponentFloat::from(E), 5, Floor),
     ///     Less
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x4.0");
+    /// assert_eq!(x.to_string(), "4.0");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
     ///     x.hypot_prec_round_assign_ref(&BigExponentFloat::from(E), 5, Ceiling),
     ///     Greater
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x4.4");
+    /// assert_eq!(x.to_string(), "4.25");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
     ///     x.hypot_prec_round_assign_ref(&BigExponentFloat::from(E), 5, Nearest),
     ///     Greater
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x4.4");
+    /// assert_eq!(x.to_string(), "4.25");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
     ///     x.hypot_prec_round_assign_ref(&BigExponentFloat::from(E), 20, Floor),
     ///     Less
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x4.27838");
+    /// assert_eq!(x.to_string(), "4.1543503");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
     ///     x.hypot_prec_round_assign_ref(&BigExponentFloat::from(E), 20, Ceiling),
     ///     Greater
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x4.2784");
+    /// assert_eq!(x.to_string(), "4.154358");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
     ///     x.hypot_prec_round_assign_ref(&BigExponentFloat::from(E), 20, Nearest),
     ///     Greater
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x4.2784");
+    /// assert_eq!(x.to_string(), "4.154358");
     /// ```
     #[inline]
     pub fn hypot_prec_round_assign_ref(
@@ -778,11 +778,11 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (hypot, o) = BigExponentFloat::from(PI).hypot_prec(BigExponentFloat::from(E), 5);
-    /// assert_eq!(format!("{hypot:?}"), "0x4.4");
+    /// assert_eq!(hypot.to_string(), "4.25");
     /// assert_eq!(o, Greater);
     ///
     /// let (hypot, o) = BigExponentFloat::from(PI).hypot_prec(BigExponentFloat::from(E), 20);
-    /// assert_eq!(format!("{hypot:?}"), "0x4.2784");
+    /// assert_eq!(hypot.to_string(), "4.154358");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -829,12 +829,12 @@ impl BigExponentFloat {
     ///
     /// let (hypot, o) =
     ///     BigExponentFloat::from(PI).hypot_prec_val_ref(&BigExponentFloat::from(E), 5);
-    /// assert_eq!(format!("{hypot:?}"), "0x4.4");
+    /// assert_eq!(hypot.to_string(), "4.25");
     /// assert_eq!(o, Greater);
     ///
     /// let (hypot, o) =
     ///     BigExponentFloat::from(PI).hypot_prec_val_ref(&BigExponentFloat::from(E), 20);
-    /// assert_eq!(format!("{hypot:?}"), "0x4.2784");
+    /// assert_eq!(hypot.to_string(), "4.154358");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -881,12 +881,12 @@ impl BigExponentFloat {
     ///
     /// let (hypot, o) =
     ///     (&BigExponentFloat::from(PI)).hypot_prec_ref_val(BigExponentFloat::from(E), 5);
-    /// assert_eq!(format!("{hypot:?}"), "0x4.4");
+    /// assert_eq!(hypot.to_string(), "4.25");
     /// assert_eq!(o, Greater);
     ///
     /// let (hypot, o) =
     ///     (&BigExponentFloat::from(PI)).hypot_prec_ref_val(BigExponentFloat::from(E), 20);
-    /// assert_eq!(format!("{hypot:?}"), "0x4.2784");
+    /// assert_eq!(hypot.to_string(), "4.154358");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -933,12 +933,12 @@ impl BigExponentFloat {
     ///
     /// let (hypot, o) =
     ///     (&BigExponentFloat::from(PI)).hypot_prec_ref_ref(&BigExponentFloat::from(E), 5);
-    /// assert_eq!(format!("{hypot:?}"), "0x4.4");
+    /// assert_eq!(hypot.to_string(), "4.25");
     /// assert_eq!(o, Greater);
     ///
     /// let (hypot, o) =
     ///     (&BigExponentFloat::from(PI)).hypot_prec_ref_ref(&BigExponentFloat::from(E), 20);
-    /// assert_eq!(format!("{hypot:?}"), "0x4.2784");
+    /// assert_eq!(hypot.to_string(), "4.154358");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -981,11 +981,11 @@ impl BigExponentFloat {
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(x.hypot_prec_assign(BigExponentFloat::from(E), 5), Greater);
-    /// assert_eq!(format!("{x:?}"), "0x4.4");
+    /// assert_eq!(x.to_string(), "4.25");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(x.hypot_prec_assign(BigExponentFloat::from(E), 20), Greater);
-    /// assert_eq!(format!("{x:?}"), "0x4.2784");
+    /// assert_eq!(x.to_string(), "4.154358");
     /// ```
     #[inline]
     pub fn hypot_prec_assign(&mut self, other: Self, prec: u64) -> Ordering {
@@ -1033,14 +1033,14 @@ impl BigExponentFloat {
     ///     x.hypot_prec_assign_ref(&BigExponentFloat::from(E), 5),
     ///     Greater
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x4.4");
+    /// assert_eq!(x.to_string(), "4.25");
     ///
     /// let mut x = BigExponentFloat::from(PI);
     /// assert_eq!(
     ///     x.hypot_prec_assign_ref(&BigExponentFloat::from(E), 20),
     ///     Greater
     /// );
-    /// assert_eq!(format!("{x:?}"), "0x4.2784");
+    /// assert_eq!(x.to_string(), "4.154358");
     /// ```
     #[inline]
     pub fn hypot_prec_assign_ref(&mut self, other: &Self, prec: u64) -> Ordering {

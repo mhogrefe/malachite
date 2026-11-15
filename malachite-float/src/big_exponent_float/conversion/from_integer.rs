@@ -34,17 +34,14 @@ impl From<Integer> for BigExponentFloat {
     /// use malachite_float::BigExponentFloat;
     /// use malachite_nz::integer::Integer;
     ///
+    /// assert_eq!(BigExponentFloat::from(Integer::ZERO).to_string(), "0.0");
     /// assert_eq!(
-    ///     format!("{:?}", BigExponentFloat::from(Integer::ZERO)),
-    ///     "0x0.0"
+    ///     (BigExponentFloat::from(Integer::from(12u32))).to_string(),
+    ///     "12.0"
     /// );
     /// assert_eq!(
-    ///     format!("{:?}", BigExponentFloat::from(Integer::from(12u32))),
-    ///     "0xc.0"
-    /// );
-    /// assert_eq!(
-    ///     format!("{:?}", BigExponentFloat::from(Integer::from(-12))),
-    ///     "-0xc.0"
+    ///     (BigExponentFloat::from(Integer::from(-12))).to_string(),
+    ///     "-12.0"
     /// );
     /// ```
     fn from(x: Integer) -> Self {
@@ -79,17 +76,14 @@ impl From<&Integer> for BigExponentFloat {
     /// use malachite_float::BigExponentFloat;
     /// use malachite_nz::integer::Integer;
     ///
+    /// assert_eq!(BigExponentFloat::from(&Integer::ZERO).to_string(), "0.0");
     /// assert_eq!(
-    ///     format!("{:?}", BigExponentFloat::from(&Integer::ZERO)),
-    ///     "0x0.0"
+    ///     (BigExponentFloat::from(&Integer::from(12u32))).to_string(),
+    ///     "12.0"
     /// );
     /// assert_eq!(
-    ///     format!("{:?}", BigExponentFloat::from(&Integer::from(12u32))),
-    ///     "0xc.0"
-    /// );
-    /// assert_eq!(
-    ///     format!("{:?}", BigExponentFloat::from(&Integer::from(-12))),
-    ///     "-0xc.0"
+    ///     (BigExponentFloat::from(&Integer::from(-12))).to_string(),
+    ///     "-12.0"
     /// );
     /// ```
     #[inline]
@@ -125,7 +119,7 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::from_integer_prec_round(Integer::from(123u32), 4, Floor);
-    /// assert_eq!(format!("{x:?}"), "0x78.0");
+    /// assert_eq!(x.to_string(), "120.0");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -160,7 +154,7 @@ impl BigExponentFloat {
     ///
     /// let (x, o) =
     ///     BigExponentFloat::from_integer_prec_round_ref(&Integer::from(123u32), 4, Ceiling);
-    /// assert_eq!(format!("{x:?}"), "0x8.0E+1");
+    /// assert_eq!(x.to_string(), "1.3e2");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -193,7 +187,7 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::from_integer_prec(Integer::from(123u32), 4);
-    /// assert_eq!(format!("{x:?}"), "0x78.0");
+    /// assert_eq!(x.to_string(), "120.0");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -223,7 +217,7 @@ impl BigExponentFloat {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = BigExponentFloat::from_integer_prec_ref(&Integer::from(123u32), 4);
-    /// assert_eq!(format!("{x:?}"), "0x78.0");
+    /// assert_eq!(x.to_string(), "120.0");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]

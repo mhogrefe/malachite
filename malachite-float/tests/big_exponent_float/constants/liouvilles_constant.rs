@@ -23,74 +23,157 @@ fn same(x: &BigExponentFloat, y: &BigExponentFloat) -> bool {
 
 #[test]
 fn test_liouvilles_constant_base_prec_round() {
-    let cases: &[(u64, u64, RoundingMode, &str, Ordering)] = &[
-        (2, 1, Floor, "0x0.8", Less),
-        (2, 1, Ceiling, "0x1.0", Greater),
-        (2, 1, Down, "0x0.8", Less),
-        (2, 1, Up, "0x1.0", Greater),
-        (2, 1, Nearest, "0x1.0", Greater),
-        (2, 2, Floor, "0x0.c", Less),
-        (2, 2, Ceiling, "0x1.0", Greater),
-        (2, 2, Down, "0x0.c", Less),
-        (2, 2, Up, "0x1.0", Greater),
-        (2, 2, Nearest, "0x0.c", Less),
-        (2, 10, Floor, "0x0.c4", Less),
-        (2, 10, Ceiling, "0x0.c44", Greater),
-        (2, 10, Down, "0x0.c4", Less),
-        (2, 10, Up, "0x0.c44", Greater),
-        (2, 10, Nearest, "0x0.c4", Less),
-        (2, 100, Floor, "0x0.c40001", Less),
-        (2, 100, Ceiling, "0x0.c400010000000000000000001", Greater),
-        (2, 100, Down, "0x0.c40001", Less),
-        (2, 100, Up, "0x0.c400010000000000000000001", Greater),
-        (2, 100, Nearest, "0x0.c40001", Less),
-        (3, 1, Floor, "0x0.4", Less),
-        (3, 1, Ceiling, "0x0.8", Greater),
-        (3, 1, Down, "0x0.4", Less),
-        (3, 1, Up, "0x0.8", Greater),
-        (3, 1, Nearest, "0x0.8", Greater),
-        (3, 2, Floor, "0x0.6", Less),
-        (3, 2, Ceiling, "0x0.8", Greater),
-        (3, 2, Down, "0x0.6", Less),
-        (3, 2, Up, "0x0.8", Greater),
-        (3, 2, Nearest, "0x0.8", Greater),
-        (3, 10, Floor, "0x0.722", Less),
-        (3, 10, Ceiling, "0x0.724", Greater),
-        (3, 10, Down, "0x0.722", Less),
-        (3, 10, Up, "0x0.724", Greater),
-        (3, 10, Nearest, "0x0.722", Less),
-        (3, 100, Floor, "0x0.722102754dfd33a95c713adf5", Less),
-        (3, 100, Ceiling, "0x0.722102754dfd33a95c713adf58", Greater),
-        (3, 100, Down, "0x0.722102754dfd33a95c713adf5", Less),
-        (3, 100, Up, "0x0.722102754dfd33a95c713adf58", Greater),
-        (3, 100, Nearest, "0x0.722102754dfd33a95c713adf58", Greater),
-        (10, 1, Floor, "0x0.1", Less),
-        (10, 1, Ceiling, "0x0.2", Greater),
-        (10, 1, Down, "0x0.1", Less),
-        (10, 1, Up, "0x0.2", Greater),
-        (10, 1, Nearest, "0x0.2", Greater),
-        (10, 2, Floor, "0x0.18", Less),
-        (10, 2, Ceiling, "0x0.2", Greater),
-        (10, 2, Down, "0x0.18", Less),
-        (10, 2, Up, "0x0.2", Greater),
-        (10, 2, Nearest, "0x0.2", Greater),
-        (10, 10, Floor, "0x0.1c28", Less),
-        (10, 10, Ceiling, "0x0.1c3", Greater),
-        (10, 10, Down, "0x0.1c28", Less),
-        (10, 10, Up, "0x0.1c3", Greater),
-        (10, 10, Nearest, "0x0.1c28", Less),
-        (10, 100, Floor, "0x0.1c29068986fcdee34fc7466d12", Less),
-        (10, 100, Ceiling, "0x0.1c29068986fcdee34fc7466d14", Greater),
-        (10, 100, Down, "0x0.1c29068986fcdee34fc7466d12", Less),
-        (10, 100, Up, "0x0.1c29068986fcdee34fc7466d14", Greater),
-        (10, 100, Nearest, "0x0.1c29068986fcdee34fc7466d12", Less),
-    ];
-    for &(b, p, rm, out, o) in cases {
+    let test = |b: u64, p: u64, rm: RoundingMode, out: &str, out_hex: &str, o: Ordering| {
         let (x, o_alt) = BigExponentFloat::liouvilles_constant_base_prec_round(b, p, rm);
         assert!(x.is_valid());
-        assert_eq!(format!("{x:?}"), out, "{:?}", (b, p, rm));
+        assert_eq!(format!("{x:?}"), out_hex, "{:?}", (b, p, rm));
+        assert_eq!(x.to_string(), out);
         assert_eq!(o_alt, o);
-    }
+    };
+    test(2, 1, Floor, "0.50", "0x0.8", Less);
+    test(2, 1, Ceiling, "1.0", "0x1.0", Greater);
+    test(2, 1, Down, "0.50", "0x0.8", Less);
+    test(2, 1, Up, "1.0", "0x1.0", Greater);
+    test(2, 1, Nearest, "1.0", "0x1.0", Greater);
+    test(2, 2, Floor, "0.75", "0x0.c", Less);
+    test(2, 2, Ceiling, "1.0", "0x1.0", Greater);
+    test(2, 2, Down, "0.75", "0x0.c", Less);
+    test(2, 2, Up, "1.0", "0x1.0", Greater);
+    test(2, 2, Nearest, "0.75", "0x0.c", Less);
+    test(2, 10, Floor, "0.766", "0x0.c4", Less);
+    test(2, 10, Ceiling, "0.76660", "0x0.c44", Greater);
+    test(2, 10, Down, "0.766", "0x0.c4", Less);
+    test(2, 10, Up, "0.76660", "0x0.c44", Greater);
+    test(2, 10, Nearest, "0.766", "0x0.c4", Less);
+    test(2, 100, Floor, "0.765625060", "0x0.c40001", Less);
+    test(
+        2,
+        100,
+        Ceiling,
+        "0.76562505960464477539062500000079",
+        "0x0.c400010000000000000000001",
+        Greater,
+    );
+    test(2, 100, Down, "0.765625060", "0x0.c40001", Less);
+    test(
+        2,
+        100,
+        Up,
+        "0.76562505960464477539062500000079",
+        "0x0.c400010000000000000000001",
+        Greater,
+    );
+    test(2, 100, Nearest, "0.765625060", "0x0.c40001", Less);
+    test(3, 1, Floor, "0.25", "0x0.4", Less);
+    test(3, 1, Ceiling, "0.50", "0x0.8", Greater);
+    test(3, 1, Down, "0.25", "0x0.4", Less);
+    test(3, 1, Up, "0.50", "0x0.8", Greater);
+    test(3, 1, Nearest, "0.50", "0x0.8", Greater);
+    test(3, 2, Floor, "0.38", "0x0.6", Less);
+    test(3, 2, Ceiling, "0.50", "0x0.8", Greater);
+    test(3, 2, Down, "0.38", "0x0.6", Less);
+    test(3, 2, Up, "0.50", "0x0.8", Greater);
+    test(3, 2, Nearest, "0.50", "0x0.8", Greater);
+    test(3, 10, Floor, "0.44580", "0x0.722", Less);
+    test(3, 10, Ceiling, "0.4463", "0x0.724", Greater);
+    test(3, 10, Down, "0.44580", "0x0.722", Less);
+    test(3, 10, Up, "0.4463", "0x0.724", Greater);
+    test(3, 10, Nearest, "0.44580", "0x0.722", Less);
+    test(
+        3,
+        100,
+        Floor,
+        "0.4458161865604680038295105585484",
+        "0x0.722102754dfd33a95c713adf5",
+        Less,
+    );
+    test(
+        3,
+        100,
+        Ceiling,
+        "0.44581618656046800382951055854881",
+        "0x0.722102754dfd33a95c713adf58",
+        Greater,
+    );
+    test(
+        3,
+        100,
+        Down,
+        "0.4458161865604680038295105585484",
+        "0x0.722102754dfd33a95c713adf5",
+        Less,
+    );
+    test(
+        3,
+        100,
+        Up,
+        "0.44581618656046800382951055854881",
+        "0x0.722102754dfd33a95c713adf58",
+        Greater,
+    );
+    test(
+        3,
+        100,
+        Nearest,
+        "0.44581618656046800382951055854881",
+        "0x0.722102754dfd33a95c713adf58",
+        Greater,
+    );
+    test(10, 1, Floor, "0.062", "0x0.1", Less);
+    test(10, 1, Ceiling, "0.12", "0x0.2", Greater);
+    test(10, 1, Down, "0.062", "0x0.1", Less);
+    test(10, 1, Up, "0.12", "0x0.2", Greater);
+    test(10, 1, Nearest, "0.12", "0x0.2", Greater);
+    test(10, 2, Floor, "0.094", "0x0.18", Less);
+    test(10, 2, Ceiling, "0.12", "0x0.2", Greater);
+    test(10, 2, Down, "0.094", "0x0.18", Less);
+    test(10, 2, Up, "0.12", "0x0.2", Greater);
+    test(10, 2, Nearest, "0.12", "0x0.2", Greater);
+    test(10, 10, Floor, "0.10999", "0x0.1c28", Less);
+    test(10, 10, Ceiling, "0.1101", "0x0.1c3", Greater);
+    test(10, 10, Down, "0.10999", "0x0.1c28", Less);
+    test(10, 10, Up, "0.1101", "0x0.1c3", Greater);
+    test(10, 10, Nearest, "0.10999", "0x0.1c28", Less);
+    test(
+        10,
+        100,
+        Floor,
+        "0.11000100000000000000000099999997",
+        "0x0.1c29068986fcdee34fc7466d12",
+        Less,
+    );
+    test(
+        10,
+        100,
+        Ceiling,
+        "0.1100010000000000000000010000001",
+        "0x0.1c29068986fcdee34fc7466d14",
+        Greater,
+    );
+    test(
+        10,
+        100,
+        Down,
+        "0.11000100000000000000000099999997",
+        "0x0.1c29068986fcdee34fc7466d12",
+        Less,
+    );
+    test(
+        10,
+        100,
+        Up,
+        "0.1100010000000000000000010000001",
+        "0x0.1c29068986fcdee34fc7466d14",
+        Greater,
+    );
+    test(
+        10,
+        100,
+        Nearest,
+        "0.11000100000000000000000099999997",
+        "0x0.1c29068986fcdee34fc7466d12",
+        Less,
+    );
 }
 
 #[test]
@@ -136,26 +219,37 @@ fn liouvilles_constant_base_prec_round_properties() {
 
 #[test]
 fn test_liouvilles_constant_base_prec() {
-    let cases: &[(u64, u64, &str, Ordering)] = &[
-        (2, 1, "0x1.0", Greater),
-        (2, 2, "0x0.c", Less),
-        (2, 10, "0x0.c4", Less),
-        (2, 100, "0x0.c40001", Less),
-        (3, 1, "0x0.8", Greater),
-        (3, 2, "0x0.8", Greater),
-        (3, 10, "0x0.722", Less),
-        (3, 100, "0x0.722102754dfd33a95c713adf58", Greater),
-        (10, 1, "0x0.2", Greater),
-        (10, 2, "0x0.2", Greater),
-        (10, 10, "0x0.1c28", Less),
-        (10, 100, "0x0.1c29068986fcdee34fc7466d12", Less),
-    ];
-    for &(b, p, out, o) in cases {
+    let test = |b: u64, p: u64, out: &str, out_hex: &str, o: Ordering| {
         let (x, o_alt) = BigExponentFloat::liouvilles_constant_base_prec(b, p);
         assert!(x.is_valid());
-        assert_eq!(format!("{x:?}"), out, "{:?}", (b, p));
+        assert_eq!(format!("{x:?}"), out_hex, "{:?}", (b, p));
+        assert_eq!(x.to_string(), out);
         assert_eq!(o_alt, o);
-    }
+    };
+    test(2, 1, "1.0", "0x1.0", Greater);
+    test(2, 2, "0.75", "0x0.c", Less);
+    test(2, 10, "0.766", "0x0.c4", Less);
+    test(2, 100, "0.765625060", "0x0.c40001", Less);
+    test(3, 1, "0.50", "0x0.8", Greater);
+    test(3, 2, "0.50", "0x0.8", Greater);
+    test(3, 10, "0.44580", "0x0.722", Less);
+    test(
+        3,
+        100,
+        "0.44581618656046800382951055854881",
+        "0x0.722102754dfd33a95c713adf58",
+        Greater,
+    );
+    test(10, 1, "0.12", "0x0.2", Greater);
+    test(10, 2, "0.12", "0x0.2", Greater);
+    test(10, 10, "0.10999", "0x0.1c28", Less);
+    test(
+        10,
+        100,
+        "0.11000100000000000000000099999997",
+        "0x0.1c29068986fcdee34fc7466d12",
+        Less,
+    );
 }
 
 #[test]
@@ -185,34 +279,63 @@ fn liouvilles_constant_base_prec_properties() {
 
 #[test]
 fn test_liouvilles_constant_prec_round() {
-    let cases: &[(u64, RoundingMode, &str, Ordering)] = &[
-        (1, Floor, "0x0.1", Less),
-        (1, Ceiling, "0x0.2", Greater),
-        (1, Down, "0x0.1", Less),
-        (1, Up, "0x0.2", Greater),
-        (1, Nearest, "0x0.2", Greater),
-        (2, Floor, "0x0.18", Less),
-        (2, Ceiling, "0x0.2", Greater),
-        (2, Down, "0x0.18", Less),
-        (2, Up, "0x0.2", Greater),
-        (2, Nearest, "0x0.2", Greater),
-        (10, Floor, "0x0.1c28", Less),
-        (10, Ceiling, "0x0.1c3", Greater),
-        (10, Down, "0x0.1c28", Less),
-        (10, Up, "0x0.1c3", Greater),
-        (10, Nearest, "0x0.1c28", Less),
-        (100, Floor, "0x0.1c29068986fcdee34fc7466d12", Less),
-        (100, Ceiling, "0x0.1c29068986fcdee34fc7466d14", Greater),
-        (100, Down, "0x0.1c29068986fcdee34fc7466d12", Less),
-        (100, Up, "0x0.1c29068986fcdee34fc7466d14", Greater),
-        (100, Nearest, "0x0.1c29068986fcdee34fc7466d12", Less),
-    ];
-    for &(p, rm, out, o) in cases {
+    let test = |p: u64, rm: RoundingMode, out: &str, out_hex: &str, o: Ordering| {
         let (x, o_alt) = BigExponentFloat::liouvilles_constant_prec_round(p, rm);
         assert!(x.is_valid());
-        assert_eq!(format!("{x:?}"), out, "{:?}", (p, rm));
+        assert_eq!(format!("{x:?}"), out_hex, "{:?}", (p, rm));
+        assert_eq!(x.to_string(), out);
         assert_eq!(o_alt, o);
-    }
+    };
+    test(1, Floor, "0.062", "0x0.1", Less);
+    test(1, Ceiling, "0.12", "0x0.2", Greater);
+    test(1, Down, "0.062", "0x0.1", Less);
+    test(1, Up, "0.12", "0x0.2", Greater);
+    test(1, Nearest, "0.12", "0x0.2", Greater);
+    test(2, Floor, "0.094", "0x0.18", Less);
+    test(2, Ceiling, "0.12", "0x0.2", Greater);
+    test(2, Down, "0.094", "0x0.18", Less);
+    test(2, Up, "0.12", "0x0.2", Greater);
+    test(2, Nearest, "0.12", "0x0.2", Greater);
+    test(10, Floor, "0.10999", "0x0.1c28", Less);
+    test(10, Ceiling, "0.1101", "0x0.1c3", Greater);
+    test(10, Down, "0.10999", "0x0.1c28", Less);
+    test(10, Up, "0.1101", "0x0.1c3", Greater);
+    test(10, Nearest, "0.10999", "0x0.1c28", Less);
+    test(
+        100,
+        Floor,
+        "0.11000100000000000000000099999997",
+        "0x0.1c29068986fcdee34fc7466d12",
+        Less,
+    );
+    test(
+        100,
+        Ceiling,
+        "0.1100010000000000000000010000001",
+        "0x0.1c29068986fcdee34fc7466d14",
+        Greater,
+    );
+    test(
+        100,
+        Down,
+        "0.11000100000000000000000099999997",
+        "0x0.1c29068986fcdee34fc7466d12",
+        Less,
+    );
+    test(
+        100,
+        Up,
+        "0.1100010000000000000000010000001",
+        "0x0.1c29068986fcdee34fc7466d14",
+        Greater,
+    );
+    test(
+        100,
+        Nearest,
+        "0.11000100000000000000000099999997",
+        "0x0.1c29068986fcdee34fc7466d12",
+        Less,
+    );
 }
 
 #[test]
@@ -252,18 +375,22 @@ fn liouvilles_constant_prec_round_properties() {
 
 #[test]
 fn test_liouvilles_constant_prec() {
-    let cases: &[(u64, &str, Ordering)] = &[
-        (1, "0x0.2", Greater),
-        (2, "0x0.2", Greater),
-        (10, "0x0.1c28", Less),
-        (100, "0x0.1c29068986fcdee34fc7466d12", Less),
-    ];
-    for &(p, out, o) in cases {
+    let test = |p: u64, out: &str, out_hex: &str, o: Ordering| {
         let (x, o_alt) = BigExponentFloat::liouvilles_constant_prec(p);
         assert!(x.is_valid());
-        assert_eq!(format!("{x:?}"), out, "{:?}", (p));
+        assert_eq!(format!("{x:?}"), out_hex, "{:?}", (p));
+        assert_eq!(x.to_string(), out);
         assert_eq!(o_alt, o);
-    }
+    };
+    test(1, "0.12", "0x0.2", Greater);
+    test(2, "0.12", "0x0.2", Greater);
+    test(10, "0.10999", "0x0.1c28", Less);
+    test(
+        100,
+        "0.11000100000000000000000099999997",
+        "0x0.1c29068986fcdee34fc7466d12",
+        Less,
+    );
 }
 
 #[test]
