@@ -8752,7 +8752,7 @@ impl Float {
     /// - $f(x,y)=\text{NaN}$ if $x$ is `NaN`, if $x<0$, if $x$ is $\pm0$ or $\infty$ and $y=0$, or
     ///   if $x=1$ and $y$ is infinite
     /// - $f(x,0)=1.0$ if $x$ is finite and positive
-    /// - $f(1.0,y)=1.0$ if $y$ is finite
+    /// - $f(1.0,y)=1.0$ if $y$ is finite or `NaN`
     /// - $f(\infty,y)=\infty$ if $y>0$, and $0.0$ if $y<0$
     /// - $f(\pm0.0,y)=0.0$ if $y>0$, and $\infty$ if $y<0$
     /// - $f(x,\infty)=\infty$ if $x>1$, and $0.0$ if $0<x<1$
@@ -8875,7 +8875,7 @@ impl Float {
     /// - $f(x,y)=\text{NaN}$ if $x$ is `NaN`, if $x<0$, if $x$ is $\pm0$ or $\infty$ and $y=0$, or
     ///   if $x=1$ and $y$ is infinite
     /// - $f(x,0)=1.0$ if $x$ is finite and positive
-    /// - $f(1.0,y)=1.0$ if $y$ is finite
+    /// - $f(1.0,y)=1.0$ if $y$ is finite or `NaN`
     /// - $f(\infty,y)=\infty$ if $y>0$, and $0.0$ if $y<0$
     /// - $f(\pm0.0,y)=0.0$ if $y>0$, and $\infty$ if $y<0$
     /// - $f(x,\infty)=\infty$ if $x>1$, and $0.0$ if $0<x<1$
@@ -8985,7 +8985,7 @@ impl Float {
     /// - $f(x,y)=\text{NaN}$ if $x$ is `NaN`, if $x<0$, if $x$ is $\pm0$ or $\infty$ and $y=0$, or
     ///   if $x=1$ and $y$ is infinite
     /// - $f(x,0)=1.0$ if $x$ is finite and positive
-    /// - $f(1.0,y)=1.0$ if $y$ is finite
+    /// - $f(1.0,y)=1.0$ if $y$ is finite or `NaN`
     /// - $f(\infty,y)=\infty$ if $y>0$, and $0.0$ if $y<0$
     /// - $f(\pm0.0,y)=0.0$ if $y>0$, and $\infty$ if $y<0$
     /// - $f(x,\infty)=\infty$ if $x>1$, and $0.0$ if $0<x<1$
@@ -9109,7 +9109,7 @@ impl Float {
     /// - $f(x,y)=\text{NaN}$ if $x$ is `NaN`, if $x<0$, if $x$ is $\pm0$ or $\infty$ and $y=0$, or
     ///   if $x=1$ and $y$ is infinite
     /// - $f(x,0)=1.0$ if $x$ is finite and positive
-    /// - $f(1.0,y)=1.0$ if $y$ is finite
+    /// - $f(1.0,y)=1.0$ if $y$ is finite or `NaN`
     /// - $f(\infty,y)=\infty$ if $y>0$, and $0.0$ if $y<0$
     /// - $f(\pm0.0,y)=0.0$ if $y>0$, and $\infty$ if $y<0$
     /// - $f(x,\infty)=\infty$ if $x>1$, and $0.0$ if $0<x<1$

@@ -10,13 +10,21 @@ use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign};
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
-use malachite_float::big_exponent_float::arithmetic::add_mul::add_mul_prec_round_generic;
+use malachite_float::big_exponent_float::arithmetic::add_mul::{
+    add_mul_prec_round_generic, add_mul_rational_prec_round_generic,
+};
 use malachite_float::test_util::bench::bucketers::*;
+use malachite_float::test_util::bench::bucketers::{
+    pair_2_quintuple_1_2_3_4_big_exponent_float_big_exponent_float_rational_max_complexity_bucketer as pair_2_rational_quintuple_bucketer,
+    quintuple_1_2_3_4_big_exponent_float_big_exponent_float_rational_max_complexity_bucketer as rational_quintuple_bucketer,
+};
 use malachite_float::test_util::generators::*;
 use malachite_float::test_util::generators::{
     big_exponent_float_big_exponent_float_big_exponent_float_unsigned_quadruple_gen_var_1 as quadruple_gen_var_1,
     big_exponent_float_big_exponent_float_big_exponent_float_unsigned_rounding_mode_quintuple_gen_var_1 as quintuple_gen_var_1,
     big_exponent_float_big_exponent_float_big_exponent_float_unsigned_rounding_mode_quintuple_gen_var_1_float as quintuple_gen_var_1_float,
+    big_exponent_float_big_exponent_float_rational_unsigned_rounding_mode_quintuple_gen_var_1 as rational_quintuple_gen,
+    big_exponent_float_big_exponent_float_rational_unsigned_rounding_mode_quintuple_gen_var_1_float as rational_quintuple_gen_float,
 };
 
 pub(crate) fn register(runner: &mut Runner) {
@@ -43,6 +51,24 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(
         runner,
         benchmark_big_exponent_float_add_mul_prec_round_float_comparison
+    );
+    register_demo!(runner, demo_big_exponent_float_add_mul_rational_prec_round);
+    register_demo!(runner, demo_big_exponent_float_add_mul_rational_prec);
+    register_bench!(
+        runner,
+        benchmark_big_exponent_float_add_mul_rational_prec_round_evaluation_strategy
+    );
+    register_bench!(
+        runner,
+        benchmark_big_exponent_float_add_mul_rational_prec_evaluation_strategy
+    );
+    register_bench!(
+        runner,
+        benchmark_big_exponent_float_add_mul_rational_prec_round_algorithms
+    );
+    register_bench!(
+        runner,
+        benchmark_big_exponent_float_add_mul_rational_prec_round_float_comparison
     );
 }
 
@@ -415,6 +441,283 @@ fn benchmark_big_exponent_float_add_mul_prec_round_float_comparison(
             }),
             ("Float", &mut |((x, y, z, prec, rm), _)| {
                 no_out!(x.add_mul_prec_round_ref_ref_ref(&y, &z, prec, rm));
+            }),
+        ],
+    );
+}
+
+fn demo_big_exponent_float_add_mul_rational_prec_round(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec, rm) in rational_quintuple_gen().get(gm, config).take(limit) {
+        let (r, o) = x.add_mul_rational_prec_round_ref_ref_ref(&y, &z, prec, rm);
+        println!("{x:#x}.add_mul_rational_prec_round({y:#x}, {z}, {prec}, {rm}) = ({r:#x}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_add_mul_rational_prec(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z, prec, _) in rational_quintuple_gen().get(gm, config).take(limit) {
+        let (r, o) = x.add_mul_rational_prec_ref_ref_ref(&y, &z, prec);
+        println!("{x:#x}.add_mul_rational_prec({y:#x}, {z}, {prec}) = ({r:#x}, {o:?})");
+    }
+}
+
+fn benchmark_big_exponent_float_add_mul_rational_prec_round_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "BigExponentFloat.add_mul_rational_prec_round(BigExponentFloat, Rational, u64, \
+        RoundingMode)",
+        BenchmarkType::EvaluationStrategy,
+        rational_quintuple_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &rational_quintuple_bucketer("x", "y", "z", "prec"),
+        &mut [
+            (
+                "BigExponentFloat.add_mul_rational_prec_round(BigExponentFloat, Rational, u64, \
+                RoundingMode)",
+                &mut |(x, y, z, prec, rm)| {
+                    no_out!(x.add_mul_rational_prec_round(y, z, prec, rm));
+                },
+            ),
+            (
+                "BigExponentFloat.add_mul_rational_prec_round_val_val_ref(BigExponentFloat, \
+                &Rational, u64, RoundingMode)",
+                &mut |(x, y, z, prec, rm)| {
+                    no_out!(x.add_mul_rational_prec_round_val_val_ref(y, &z, prec, rm));
+                },
+            ),
+            (
+                "BigExponentFloat.add_mul_rational_prec_round_val_ref_val(&BigExponentFloat, \
+                Rational, u64, RoundingMode)",
+                &mut |(x, y, z, prec, rm)| {
+                    no_out!(x.add_mul_rational_prec_round_val_ref_val(&y, z, prec, rm));
+                },
+            ),
+            (
+                "BigExponentFloat.add_mul_rational_prec_round_val_ref_ref(&BigExponentFloat, \
+                &Rational, u64, RoundingMode)",
+                &mut |(x, y, z, prec, rm)| {
+                    no_out!(x.add_mul_rational_prec_round_val_ref_ref(&y, &z, prec, rm));
+                },
+            ),
+            (
+                "(&BigExponentFloat).add_mul_rational_prec_round_ref_val_val(BigExponentFloat, \
+                Rational, u64, RoundingMode)",
+                &mut |(x, y, z, prec, rm)| {
+                    no_out!(x.add_mul_rational_prec_round_ref_val_val(y, z, prec, rm));
+                },
+            ),
+            (
+                "(&BigExponentFloat).add_mul_rational_prec_round_ref_val_ref(BigExponentFloat, \
+                &Rational, u64, RoundingMode)",
+                &mut |(x, y, z, prec, rm)| {
+                    no_out!(x.add_mul_rational_prec_round_ref_val_ref(y, &z, prec, rm));
+                },
+            ),
+            (
+                "(&BigExponentFloat).add_mul_rational_prec_round_ref_ref_val(&BigExponentFloat, \
+                Rational, u64, RoundingMode)",
+                &mut |(x, y, z, prec, rm)| {
+                    no_out!(x.add_mul_rational_prec_round_ref_ref_val(&y, z, prec, rm));
+                },
+            ),
+            (
+                "(&BigExponentFloat).add_mul_rational_prec_round_ref_ref_ref(&BigExponentFloat, \
+                &Rational, u64, RoundingMode)",
+                &mut |(x, y, z, prec, rm)| {
+                    no_out!(x.add_mul_rational_prec_round_ref_ref_ref(&y, &z, prec, rm));
+                },
+            ),
+            (
+                "BigExponentFloat.add_mul_rational_prec_round_assign(BigExponentFloat, Rational, \
+                u64, RoundingMode)",
+                &mut |(mut x, y, z, prec, rm)| {
+                    no_out!(x.add_mul_rational_prec_round_assign(y, z, prec, rm));
+                },
+            ),
+            (
+                "BigExponentFloat.add_mul_rational_prec_round_assign_val_ref(BigExponentFloat, \
+                &Rational, u64, RoundingMode)",
+                &mut |(mut x, y, z, prec, rm)| {
+                    no_out!(x.add_mul_rational_prec_round_assign_val_ref(y, &z, prec, rm));
+                },
+            ),
+            (
+                "BigExponentFloat.add_mul_rational_prec_round_assign_ref_val(&BigExponentFloat, \
+                Rational, u64, RoundingMode)",
+                &mut |(mut x, y, z, prec, rm)| {
+                    no_out!(x.add_mul_rational_prec_round_assign_ref_val(&y, z, prec, rm));
+                },
+            ),
+            (
+                "BigExponentFloat.add_mul_rational_prec_round_assign_ref_ref(&BigExponentFloat, \
+                &Rational, u64, RoundingMode)",
+                &mut |(mut x, y, z, prec, rm)| {
+                    no_out!(x.add_mul_rational_prec_round_assign_ref_ref(&y, &z, prec, rm));
+                },
+            ),
+        ],
+    );
+}
+
+fn benchmark_big_exponent_float_add_mul_rational_prec_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "BigExponentFloat.add_mul_rational_prec(BigExponentFloat, Rational, u64)",
+        BenchmarkType::EvaluationStrategy,
+        rational_quintuple_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &rational_quintuple_bucketer("x", "y", "z", "prec"),
+        &mut [
+            (
+                "BigExponentFloat.add_mul_rational_prec(BigExponentFloat, Rational, u64)",
+                &mut |(x, y, z, prec, _)| {
+                    no_out!(x.add_mul_rational_prec(y, z, prec));
+                },
+            ),
+            (
+                "BigExponentFloat.add_mul_rational_prec_val_val_ref(BigExponentFloat, &Rational, \
+                u64)",
+                &mut |(x, y, z, prec, _)| {
+                    no_out!(x.add_mul_rational_prec_val_val_ref(y, &z, prec));
+                },
+            ),
+            (
+                "BigExponentFloat.add_mul_rational_prec_val_ref_val(&BigExponentFloat, Rational, \
+                u64)",
+                &mut |(x, y, z, prec, _)| {
+                    no_out!(x.add_mul_rational_prec_val_ref_val(&y, z, prec));
+                },
+            ),
+            (
+                "BigExponentFloat.add_mul_rational_prec_val_ref_ref(&BigExponentFloat, \
+                &Rational, u64)",
+                &mut |(x, y, z, prec, _)| {
+                    no_out!(x.add_mul_rational_prec_val_ref_ref(&y, &z, prec));
+                },
+            ),
+            (
+                "(&BigExponentFloat).add_mul_rational_prec_ref_val_val(BigExponentFloat, \
+                Rational, u64)",
+                &mut |(x, y, z, prec, _)| {
+                    no_out!(x.add_mul_rational_prec_ref_val_val(y, z, prec));
+                },
+            ),
+            (
+                "(&BigExponentFloat).add_mul_rational_prec_ref_val_ref(BigExponentFloat, \
+                &Rational, u64)",
+                &mut |(x, y, z, prec, _)| {
+                    no_out!(x.add_mul_rational_prec_ref_val_ref(y, &z, prec));
+                },
+            ),
+            (
+                "(&BigExponentFloat).add_mul_rational_prec_ref_ref_val(&BigExponentFloat, \
+                Rational, u64)",
+                &mut |(x, y, z, prec, _)| {
+                    no_out!(x.add_mul_rational_prec_ref_ref_val(&y, z, prec));
+                },
+            ),
+            (
+                "(&BigExponentFloat).add_mul_rational_prec_ref_ref_ref(&BigExponentFloat, \
+                &Rational, u64)",
+                &mut |(x, y, z, prec, _)| {
+                    no_out!(x.add_mul_rational_prec_ref_ref_ref(&y, &z, prec));
+                },
+            ),
+            (
+                "BigExponentFloat.add_mul_rational_prec_assign(BigExponentFloat, Rational, u64)",
+                &mut |(mut x, y, z, prec, _)| {
+                    no_out!(x.add_mul_rational_prec_assign(y, z, prec));
+                },
+            ),
+            (
+                "BigExponentFloat.add_mul_rational_prec_assign_val_ref(BigExponentFloat, \
+                &Rational, u64)",
+                &mut |(mut x, y, z, prec, _)| {
+                    no_out!(x.add_mul_rational_prec_assign_val_ref(y, &z, prec));
+                },
+            ),
+            (
+                "BigExponentFloat.add_mul_rational_prec_assign_ref_val(&BigExponentFloat, \
+                Rational, u64)",
+                &mut |(mut x, y, z, prec, _)| {
+                    no_out!(x.add_mul_rational_prec_assign_ref_val(&y, z, prec));
+                },
+            ),
+            (
+                "BigExponentFloat.add_mul_rational_prec_assign_ref_ref(&BigExponentFloat, \
+                &Rational, u64)",
+                &mut |(mut x, y, z, prec, _)| {
+                    no_out!(x.add_mul_rational_prec_assign_ref_ref(&y, &z, prec));
+                },
+            ),
+        ],
+    );
+}
+
+fn benchmark_big_exponent_float_add_mul_rational_prec_round_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "BigExponentFloat.add_mul_rational_prec_round(BigExponentFloat, Rational, u64, \
+        RoundingMode)",
+        BenchmarkType::Algorithms,
+        rational_quintuple_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &rational_quintuple_bucketer("x", "y", "z", "prec"),
+        &mut [
+            ("Float kernels", &mut |(x, y, z, prec, rm)| {
+                no_out!(x.add_mul_rational_prec_round_ref_ref_ref(&y, &z, prec, rm));
+            }),
+            ("generic", &mut |(x, y, z, prec, rm)| {
+                no_out!(add_mul_rational_prec_round_generic(
+                    &x, &y, &z, false, prec, rm
+                ));
+            }),
+        ],
+    );
+}
+
+fn benchmark_big_exponent_float_add_mul_rational_prec_round_float_comparison(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "BigExponentFloat.add_mul_rational_prec_round(BigExponentFloat, Rational, u64, \
+        RoundingMode)",
+        BenchmarkType::LibraryComparison,
+        rational_quintuple_gen_float().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_2_rational_quintuple_bucketer("x", "y", "z", "prec"),
+        &mut [
+            ("BigExponentFloat", &mut |(_, (x, y, z, prec, rm))| {
+                no_out!(x.add_mul_rational_prec_round_ref_ref_ref(&y, &z, prec, rm));
+            }),
+            ("Float", &mut |((x, y, z, prec, rm), _)| {
+                no_out!(x.add_mul_rational_prec_round_ref_ref_ref(&y, &z, prec, rm));
             }),
         ],
     );

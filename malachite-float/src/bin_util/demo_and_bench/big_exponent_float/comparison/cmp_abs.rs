@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
+use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs, PartialOrdAbsDouble};
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
@@ -23,12 +23,17 @@ use std::cmp::Ordering::*;
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_partial_cmp_abs);
     register_demo!(runner, demo_comparable_big_exponent_float_ref_cmp_abs);
+    register_demo!(runner, demo_big_exponent_float_partial_cmp_abs_double);
 
     register_bench!(
         runner,
         benchmark_big_exponent_float_partial_cmp_abs_float_comparison
     );
     register_bench!(runner, benchmark_comparable_big_exponent_float_ref_cmp_abs);
+    register_bench!(
+        runner,
+        benchmark_big_exponent_float_partial_cmp_abs_double_algorithms
+    );
 }
 
 fn demo_big_exponent_float_partial_cmp_abs(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -96,5 +101,39 @@ fn benchmark_comparable_big_exponent_float_ref_cmp_abs(
         &mut [("Malachite", &mut |(x, y)| {
             no_out!(ComparableBigExponentFloatRef(&x).cmp_abs(&ComparableBigExponentFloatRef(&y)));
         })],
+    );
+}
+
+fn demo_big_exponent_float_partial_cmp_abs_double(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in big_exponent_float_pair_gen().get(gm, config).take(limit) {
+        println!(
+            "({x:#x}).partial_cmp_abs_double(&{y:#x}) = {:?}",
+            x.partial_cmp_abs_double(&y)
+        );
+    }
+}
+
+fn benchmark_big_exponent_float_partial_cmp_abs_double_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "BigExponentFloat.partial_cmp_abs_double(&BigExponentFloat)",
+        BenchmarkType::Algorithms,
+        big_exponent_float_pair_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_big_exponent_float_max_complexity_bucketer("x", "y"),
+        &mut [
+            ("no doubling", &mut |(x, y)| {
+                no_out!(x.partial_cmp_abs_double(&y));
+            }),
+            ("doubling first", &mut |(x, y)| {
+                no_out!(x.partial_cmp_abs(&(&y << 1u32)));
+            }),
+        ],
     );
 }

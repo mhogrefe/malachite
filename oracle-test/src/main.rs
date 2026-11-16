@@ -8197,6 +8197,55 @@ fn test_against_flint() {
     ] {
         check_demo_against_flint(&oracle, "../malachite-float", demo_name, "arf_ihyp");
     }
+    // `BigExponentFloat`'s roots of `Rational`s, checked with exact integer arithmetic.
+    for demo_name in [
+        "demo_big_exponent_float_cbrt_rational_prec",
+        "demo_big_exponent_float_cbrt_rational_prec_round",
+        "demo_big_exponent_float_reciprocal_sqrt_rational_prec",
+        "demo_big_exponent_float_reciprocal_sqrt_rational_prec_round",
+        "demo_big_exponent_float_root_s_rational_prec",
+        "demo_big_exponent_float_root_s_rational_prec_round",
+        "demo_big_exponent_float_root_u_rational_prec",
+        "demo_big_exponent_float_root_u_rational_prec_round",
+        "demo_big_exponent_float_sqrt_rational_prec",
+        "demo_big_exponent_float_sqrt_rational_prec_round",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-float", demo_name, "arf_qroot");
+    }
+    // `BigExponentFloat`'s fused operations with a `Rational` term, checked with exact arithmetic.
+    for demo_name in [
+        "demo_big_exponent_float_add_mul_rational_prec",
+        "demo_big_exponent_float_add_mul_rational_prec_round",
+        "demo_big_exponent_float_mul_add_mul_rational_prec",
+        "demo_big_exponent_float_mul_add_mul_rational_prec_round",
+        "demo_big_exponent_float_mul_sub_mul_rational_prec",
+        "demo_big_exponent_float_mul_sub_mul_rational_prec_round",
+        "demo_big_exponent_float_sub_mul_rational_prec",
+        "demo_big_exponent_float_sub_mul_rational_prec_round",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-float", demo_name, "arf_qfused");
+    }
+    // `BigExponentFloat`'s general powers, checked with arb ball arithmetic and exact powers.
+    for demo_name in [
+        "demo_big_exponent_float_pow_prec",
+        "demo_big_exponent_float_pow_prec_round",
+        "demo_big_exponent_float_pow_rational_prec",
+        "demo_big_exponent_float_pow_rational_prec_round",
+        "demo_big_exponent_float_powr_prec",
+        "demo_big_exponent_float_powr_prec_round",
+        "demo_big_exponent_float_rational_pow_prec",
+        "demo_big_exponent_float_rational_pow_prec_round",
+        "demo_big_exponent_float_rational_pow_rational_prec",
+        "demo_big_exponent_float_rational_pow_rational_prec_round",
+        "demo_big_exponent_float_unsigned_pow_prec",
+        "demo_big_exponent_float_unsigned_pow_prec_round",
+        "demo_big_exponent_float_unsigned_pow_rational_prec",
+        "demo_big_exponent_float_unsigned_pow_rational_prec_round",
+        "demo_big_exponent_float_unsigned_pow_unsigned_prec",
+        "demo_big_exponent_float_unsigned_pow_unsigned_prec_round",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-float", demo_name, "arf_pow");
+    }
     // `BigExponentFloat`'s AGM, checked with FLINT's arb ball arithmetic.
     for demo_name in [
         "demo_big_exponent_float_agm_prec_round",

@@ -8,7 +8,9 @@
 
 use crate::big_exponent_float::BigExponentFloat;
 use crate::big_exponent_float::arithmetic::add::add_prec_round_generic;
-use crate::big_exponent_float::arithmetic::add_mul::add_mul_prec_round_generic;
+use crate::big_exponent_float::arithmetic::add_mul::{
+    add_mul_prec_round_generic, add_mul_rational_prec_round_generic,
+};
 use crate::big_exponent_float::arithmetic::add_rational::add_rational_prec_round_generic;
 use crate::big_exponent_float::arithmetic::div::div_prec_round_generic;
 use crate::big_exponent_float::arithmetic::div_rational::div_rational_prec_round_generic;
@@ -16,7 +18,10 @@ use crate::big_exponent_float::arithmetic::hypot::hypot_prec_round_generic;
 use crate::big_exponent_float::arithmetic::mul::mul_prec_round_generic;
 use crate::big_exponent_float::arithmetic::mul_add_mul::mul_add_mul_prec_round_generic;
 use crate::big_exponent_float::arithmetic::mul_rational::mul_rational_prec_round_generic;
-use crate::big_exponent_float::arithmetic::pow::pow_prec_round_float_kernels;
+use crate::big_exponent_float::arithmetic::pow::{
+    pow_prec_round_float_kernels, pow_prec_round_generic, pow_rational_prec_round_generic,
+    rational_pow_prec_round_generic,
+};
 use crate::big_exponent_float::arithmetic::rational_div_big_exponent_float::rational_div_big_exponent_float_prec_round_generic;
 use crate::big_exponent_float::arithmetic::reciprocal::reciprocal_prec_round_generic;
 use crate::big_exponent_float::arithmetic::reciprocal_sqrt::reciprocal_sqrt_prec_round_generic;
@@ -11116,5 +11121,280 @@ pub fn exhaustive_big_exponent_float_to_sci_options_pair_gen_var_1()
             exhaustive_to_sci_options(),
         )
         .filter(|(x, options)| big_exponent_float_to_sci_options_valid(x, *options)),
+    )
+}
+
+// -- (BigExponentFloat, BigExponentFloat, Rational, u64, RoundingMode) and (BigExponentFloat,
+// BigExponentFloat, BigExponentFloat, Rational, u64, RoundingMode) --
+
+// Whether `rm` may be used to round x + yz (or x - yz, if `negate`) to `p` bits: it is not `Exact`,
+// or the result is representable.
+pub fn big_exponent_float_add_mul_rational_prec_round_valid(
+    x: &BigExponentFloat,
+    y: &BigExponentFloat,
+    z: &Rational,
+    p: u64,
+    rm: RoundingMode,
+    negate: bool,
+) -> bool {
+    rm != Exact || add_mul_rational_prec_round_generic(x, y, z, negate, p, Floor).1 == Equal
+}
+
+// Whether `rm` may be used to round xy + zw (or xy - zw, if `negate`) to `p` bits: it is not
+// `Exact`, or the result is representable.
+pub fn big_exponent_float_mul_add_mul_rational_prec_round_valid(
+    x: &BigExponentFloat,
+    y: &BigExponentFloat,
+    z: &BigExponentFloat,
+    w: &Rational,
+    p: u64,
+    rm: RoundingMode,
+    negate: bool,
+) -> bool {
+    rm != Exact || add_mul_rational_prec_round_generic(&(x * y), z, w, negate, p, Floor).1 == Equal
+}
+
+// The unsigned is positive, and the rounding mode is `Exact` only if the result of
+// `add_mul_rational` is representable.
+#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
+pub fn exhaustive_big_exponent_float_big_exponent_float_rational_unsigned_rounding_mode_quintuple_gen_var_1()
+-> It<(
+    BigExponentFloat,
+    BigExponentFloat,
+    Rational,
+    u64,
+    RoundingMode,
+)> {
+    Box::new(
+        reshape_4_1_to_5(Box::new(lex_pairs(
+            exhaustive_quadruples_xxyz_custom_output(
+                exhaustive_big_exponent_floats(),
+                exhaustive_rationals(),
+                exhaustive_positive_primitive_ints::<u64>(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, z, p, rm)| {
+            big_exponent_float_add_mul_rational_prec_round_valid(x, y, z, *p, *rm, false)
+        }),
+    )
+}
+
+// The unsigned is positive, and the rounding mode is `Exact` only if the result of
+// `sub_mul_rational` is representable.
+#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
+pub fn exhaustive_big_exponent_float_big_exponent_float_rational_unsigned_rounding_mode_quintuple_gen_var_2()
+-> It<(
+    BigExponentFloat,
+    BigExponentFloat,
+    Rational,
+    u64,
+    RoundingMode,
+)> {
+    Box::new(
+        reshape_4_1_to_5(Box::new(lex_pairs(
+            exhaustive_quadruples_xxyz_custom_output(
+                exhaustive_big_exponent_floats(),
+                exhaustive_rationals(),
+                exhaustive_positive_primitive_ints::<u64>(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, z, p, rm)| {
+            big_exponent_float_add_mul_rational_prec_round_valid(x, y, z, *p, *rm, true)
+        }),
+    )
+}
+
+// The unsigned is positive, and the rounding mode is `Exact` only if the result of
+// `mul_add_mul_rational` is representable.
+#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
+pub fn exhaustive_big_exponent_float_big_exponent_float_big_exponent_float_rational_unsigned_rounding_mode_sextuple_gen_var_1()
+-> It<(
+    BigExponentFloat,
+    BigExponentFloat,
+    BigExponentFloat,
+    Rational,
+    u64,
+    RoundingMode,
+)> {
+    Box::new(
+        reshape_5_1_to_6(Box::new(lex_pairs(
+            exhaustive_quintuples_xxxyz_custom_output(
+                exhaustive_big_exponent_floats(),
+                exhaustive_rationals(),
+                exhaustive_positive_primitive_ints::<u64>(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, z, w, p, rm)| {
+            big_exponent_float_mul_add_mul_rational_prec_round_valid(x, y, z, w, *p, *rm, false)
+        }),
+    )
+}
+
+// The unsigned is positive, and the rounding mode is `Exact` only if the result of
+// `mul_sub_mul_rational` is representable.
+#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
+pub fn exhaustive_big_exponent_float_big_exponent_float_big_exponent_float_rational_unsigned_rounding_mode_sextuple_gen_var_2()
+-> It<(
+    BigExponentFloat,
+    BigExponentFloat,
+    BigExponentFloat,
+    Rational,
+    u64,
+    RoundingMode,
+)> {
+    Box::new(
+        reshape_5_1_to_6(Box::new(lex_pairs(
+            exhaustive_quintuples_xxxyz_custom_output(
+                exhaustive_big_exponent_floats(),
+                exhaustive_rationals(),
+                exhaustive_positive_primitive_ints::<u64>(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, z, w, p, rm)| {
+            big_exponent_float_mul_add_mul_rational_prec_round_valid(x, y, z, w, *p, *rm, true)
+        }),
+    )
+}
+
+// -- general powers --
+
+// Whether a power's exponent has an exponent of at most 2^12 in absolute value: an exponent y with
+// a large exponent e makes x^y cost about e bits of working precision (unless |x| is 1 or a power
+// of 2), so the power generators leave such exponents out.
+pub fn big_exponent_float_pow_exponent_is_moderate(y: &BigExponentFloat) -> bool {
+    y.get_exponent()
+        .is_none_or(|e| e.unsigned_abs_ref() <= &Natural::from(1u32 << 12))
+}
+
+// Whether x^y (or `powr(x, y)`, if `powr`) may be rounded to `p` bits with `rm`: y is moderate, and
+// `rm` is not `Exact` or the power is representable.
+pub fn big_exponent_float_general_pow_prec_round_valid(
+    x: &BigExponentFloat,
+    y: &BigExponentFloat,
+    p: u64,
+    rm: RoundingMode,
+    powr: bool,
+) -> bool {
+    big_exponent_float_pow_exponent_is_moderate(y)
+        && (rm != Exact || pow_prec_round_generic(x, y, powr, p, Floor).1 == Equal)
+}
+
+// Whether x^y, for a `Rational` y, may be rounded to `p` bits with `rm`.
+pub fn big_exponent_float_pow_rational_prec_round_valid(
+    x: &BigExponentFloat,
+    y: &Rational,
+    p: u64,
+    rm: RoundingMode,
+) -> bool {
+    rm != Exact || pow_rational_prec_round_generic(x, y, p, Floor).1 == Equal
+}
+
+// Whether x^y, for a `Rational` x, may be rounded to `p` bits with `rm`: y is moderate, and `rm` is
+// not `Exact` or the power is representable.
+pub fn big_exponent_float_rational_pow_prec_round_valid(
+    x: &Rational,
+    y: &BigExponentFloat,
+    p: u64,
+    rm: RoundingMode,
+) -> bool {
+    big_exponent_float_pow_exponent_is_moderate(y)
+        && (rm != Exact || rational_pow_prec_round_generic(x, y, p, Floor).1 == Equal)
+}
+
+// The unsigned is positive, the `BigExponentFloat` exponent is moderate (see
+// `big_exponent_float_pow_exponent_is_moderate`), and the rounding mode is `Exact` only if x^y is
+// representable.
+pub fn exhaustive_big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_18()
+-> It<(BigExponentFloat, BigExponentFloat, u64, RoundingMode)> {
+    Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(
+                exhaustive_pairs_from_single(exhaustive_big_exponent_floats()),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .map(|(((x, y), p), rm)| (x, y, p, rm))
+        .filter(|(x, y, p, rm)| {
+            big_exponent_float_general_pow_prec_round_valid(x, y, *p, *rm, false)
+        }),
+    )
+}
+
+// The unsigned is positive, the `BigExponentFloat` exponent is moderate (see
+// `big_exponent_float_pow_exponent_is_moderate`), and the rounding mode is `Exact` only if `powr(x,
+// y)` is representable.
+pub fn exhaustive_big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_19()
+-> It<(BigExponentFloat, BigExponentFloat, u64, RoundingMode)> {
+    Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(
+                exhaustive_pairs_from_single(exhaustive_big_exponent_floats()),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .map(|(((x, y), p), rm)| (x, y, p, rm))
+        .filter(|(x, y, p, rm)| {
+            big_exponent_float_general_pow_prec_round_valid(x, y, *p, *rm, true)
+        }),
+    )
+}
+
+// The unsigned is positive, the `BigExponentFloat` exponent is moderate (see
+// `big_exponent_float_pow_exponent_is_moderate`), and the rounding mode is `Exact` only if x^y is
+// representable.
+pub fn exhaustive_big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_21()
+-> It<(BigExponentFloat, Rational, u64, RoundingMode)> {
+    Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(
+                exhaustive_pairs(exhaustive_big_exponent_floats(), exhaustive_rationals()),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .map(|(((x, y), p), rm)| (x, y, p, rm))
+        .filter(|(x, y, p, rm)| big_exponent_float_pow_rational_prec_round_valid(x, y, *p, *rm)),
+    )
+}
+
+// The unsigned is positive, the `BigExponentFloat` exponent is moderate (see
+// `big_exponent_float_pow_exponent_is_moderate`), and the rounding mode is `Exact` only if y^x
+// (with the `Rational` as the base) is representable.
+pub fn exhaustive_big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_22()
+-> It<(BigExponentFloat, Rational, u64, RoundingMode)> {
+    Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(
+                exhaustive_pairs(exhaustive_big_exponent_floats(), exhaustive_rationals()),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .map(|(((x, y), p), rm)| (x, y, p, rm))
+        .filter(|(x, y, p, rm)| big_exponent_float_rational_pow_prec_round_valid(y, x, *p, *rm)),
     )
 }

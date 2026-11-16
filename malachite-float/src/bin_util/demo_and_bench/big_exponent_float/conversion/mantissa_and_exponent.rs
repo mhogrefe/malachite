@@ -37,6 +37,10 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_sci_mantissa_and_exponent);
     register_demo!(
         runner,
+        demo_big_exponent_float_sci_mantissa_and_exponent_primitive_float
+    );
+    register_demo!(
+        runner,
         demo_big_exponent_float_sci_mantissa_and_exponent_round
     );
 
@@ -119,9 +123,25 @@ fn demo_big_exponent_float_sci_mantissa_and_exponent(
         .filter(BigExponentFloat::is_normal)
         .take(limit)
     {
+        let (m, e): (BigExponentFloat, Integer) = (&x).sci_mantissa_and_exponent();
+        println!("({x:#x}).sci_mantissa_and_exponent() = ({m:#x}, {e})");
+    }
+}
+
+fn demo_big_exponent_float_sci_mantissa_and_exponent_primitive_float(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for x in big_exponent_float_gen()
+        .get(gm, config)
+        .filter(BigExponentFloat::is_normal)
+        .take(limit)
+    {
+        let (m, e): (f64, Integer) = (&x).sci_mantissa_and_exponent();
         println!(
-            "({x:#x}).sci_mantissa_and_exponent() = {:?}",
-            (&x).sci_mantissa_and_exponent()
+            "<f64>({x:#x}).sci_mantissa_and_exponent() = ({:?}, {e})",
+            NiceFloat(m)
         );
     }
 }
@@ -242,7 +262,11 @@ fn benchmark_big_exponent_float_sci_mantissa_and_exponent_evaluation_strategy(
                 no_out!(x.sci_mantissa_and_exponent());
             }),
             ("by reference", &mut |x| {
-                no_out!((&x).sci_mantissa_and_exponent());
+                no_out!(<&BigExponentFloat as SciMantissaAndExponent<
+                    BigExponentFloat,
+                    _,
+                    _,
+                >>::sci_mantissa_and_exponent(&x));
             }),
         ],
     );

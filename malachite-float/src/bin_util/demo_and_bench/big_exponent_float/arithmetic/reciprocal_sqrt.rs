@@ -12,6 +12,9 @@ use malachite_base::test_util::runner::Runner;
 use malachite_float::big_exponent_float::arithmetic::reciprocal_sqrt::reciprocal_sqrt_prec_round_generic;
 use malachite_float::test_util::bench::bucketers::*;
 use malachite_float::test_util::generators::*;
+use malachite_float::{BigExponentFloat, Float};
+use malachite_q::test_util::bench::bucketers::triple_1_2_rational_bit_u64_max_bucketer;
+use malachite_q::test_util::generators::rational_unsigned_pair_gen_var_3;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_reciprocal_sqrt_prec_round);
@@ -32,6 +35,22 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(
         runner,
         benchmark_big_exponent_float_reciprocal_sqrt_prec_round_float_comparison
+    );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_reciprocal_sqrt_rational_prec_round
+    );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_reciprocal_sqrt_rational_prec
+    );
+    register_bench!(
+        runner,
+        benchmark_big_exponent_float_reciprocal_sqrt_rational_prec_round_evaluation_strategy
+    );
+    register_bench!(
+        runner,
+        benchmark_big_exponent_float_reciprocal_sqrt_rational_prec_round_float_comparison
     );
 }
 
@@ -178,6 +197,99 @@ fn benchmark_big_exponent_float_reciprocal_sqrt_prec_round_float_comparison(
             }),
             ("Float", &mut |((x, prec, rm), _)| {
                 no_out!(x.reciprocal_sqrt_prec_round_ref(prec, rm));
+            }),
+        ],
+    );
+}
+
+fn demo_big_exponent_float_reciprocal_sqrt_rational_prec_round(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, prec, rm) in rational_unsigned_rounding_mode_triple_gen_var_4()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = BigExponentFloat::reciprocal_sqrt_rational_prec_round_ref(&x, prec, rm);
+        println!(
+            "BigExponentFloat::reciprocal_sqrt_rational_prec_round({x}, {prec}, {rm}) = \
+            ({z:#x}, {o:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_reciprocal_sqrt_rational_prec(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, prec) in rational_unsigned_pair_gen_var_3()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = BigExponentFloat::reciprocal_sqrt_rational_prec_ref(&x, prec);
+        println!("BigExponentFloat::reciprocal_sqrt_rational_prec({x}, {prec}) = ({z:#x}, {o:?})");
+    }
+}
+
+fn benchmark_big_exponent_float_reciprocal_sqrt_rational_prec_round_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "BigExponentFloat::reciprocal_sqrt_rational_prec_round(Rational, u64, RoundingMode)",
+        BenchmarkType::EvaluationStrategy,
+        rational_unsigned_rounding_mode_triple_gen_var_4().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &triple_1_2_rational_bit_u64_max_bucketer("x", "prec"),
+        &mut [
+            (
+                "BigExponentFloat::reciprocal_sqrt_rational_prec_round(Rational, u64, RoundingMode)",
+                &mut |(x, prec, rm)| {
+                    no_out!(BigExponentFloat::reciprocal_sqrt_rational_prec_round(
+                        x, prec, rm
+                    ));
+                },
+            ),
+            (
+                "BigExponentFloat::reciprocal_sqrt_rational_prec_round_ref(&Rational, u64, RoundingMode)",
+                &mut |(x, prec, rm)| {
+                    no_out!(BigExponentFloat::reciprocal_sqrt_rational_prec_round_ref(
+                        &x, prec, rm
+                    ));
+                },
+            ),
+        ],
+    );
+}
+
+fn benchmark_big_exponent_float_reciprocal_sqrt_rational_prec_round_float_comparison(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "BigExponentFloat::reciprocal_sqrt_rational_prec_round(&Rational, u64, RoundingMode)",
+        BenchmarkType::LibraryComparison,
+        rational_unsigned_rounding_mode_triple_gen_var_4().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &triple_1_2_rational_bit_u64_max_bucketer("x", "prec"),
+        &mut [
+            ("BigExponentFloat", &mut |(x, prec, rm)| {
+                no_out!(BigExponentFloat::reciprocal_sqrt_rational_prec_round_ref(
+                    &x, prec, rm
+                ));
+            }),
+            ("Float", &mut |(x, prec, rm)| {
+                no_out!(Float::reciprocal_sqrt_rational_prec_round_ref(&x, prec, rm));
             }),
         ],
     );

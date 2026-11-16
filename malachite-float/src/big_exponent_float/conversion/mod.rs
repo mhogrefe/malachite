@@ -183,6 +183,21 @@ pub mod is_real;
 /// let (m, e) = BigExponentFloat::from(Float::from(-6.0)).sci_mantissa_and_exponent();
 /// assert_eq!(m.to_string(), "1.5");
 /// assert_eq!(e, 2);
+///
+/// // as a primitive float
+/// use malachite_base::num::conversion::traits::FromStringBase;
+/// use malachite_base::num::float::NiceFloat;
+///
+/// let (m, e): (f64, _) =
+///     (&BigExponentFloat::from(std::f64::consts::PI)).sci_mantissa_and_exponent();
+/// assert_eq!(NiceFloat(m), NiceFloat(std::f64::consts::FRAC_PI_2));
+/// assert_eq!(e, 1);
+///
+/// // the exponent can be far outside the range of a `Float`
+/// let x = BigExponentFloat::from_string_base(16, "0x3.0E+1000000000000").unwrap();
+/// let (m, e): (f32, _) = (&x).sci_mantissa_and_exponent();
+/// assert_eq!(NiceFloat(m), NiceFloat(1.5));
+/// assert_eq!(e.to_string(), "4000000000001");
 /// ```
 ///
 /// # from_sci_mantissa_and_exponent
@@ -196,6 +211,13 @@ pub mod is_real;
 /// assert_eq!(x.to_string(), "6.0");
 /// let m = BigExponentFloat::from(Float::from(3.0));
 /// assert!(BigExponentFloat::from_sci_mantissa_and_exponent(m, Integer::from(2)).is_none());
+///
+/// // from a primitive float
+/// let from_f64 =
+///     <&BigExponentFloat as SciMantissaAndExponent<f64, _, _>>::from_sci_mantissa_and_exponent;
+/// let x = from_f64(1.5, Integer::from(4000000000001u64)).unwrap();
+/// assert_eq!(format!("{x:#x}"), "0x3.0E+1000000000000");
+/// assert!(from_f64(3.0, Integer::from(2)).is_none());
 /// ```
 pub mod mantissa_and_exponent;
 /// Functions for converting a [`BigExponentFloat`] to a

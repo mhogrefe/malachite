@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 use crate::big_exponent_float::BigExponentFloat;
 use crate::big_exponent_float::InnerBigExponentFloat::Finite;
+use crate::big_exponent_float::arithmetic::mul_rational::shift_finite;
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -396,3 +397,85 @@ impl SciMantissaAndExponent<BigExponentFloat, Integer, BigExponentFloat> for &Bi
         BigExponentFloat::from_sci_mantissa_and_exponent(sci_mantissa, sci_exponent)
     }
 }
+
+macro_rules! impl_mantissa_and_exponent {
+    ($t:ident) => {
+        impl SciMantissaAndExponent<$t, Integer, BigExponentFloat> for &BigExponentFloat {
+            /// Returns a [`BigExponentFloat`]'s scientific mantissa and exponent, taking the
+            /// [`BigExponentFloat`] by reference.
+            ///
+            /// When $x$ is finite and nonzero, we can write $|x| = 2^{e_s}m_s$, where $e_s$ is an
+            /// integer and $m_s$ is a rational number with $1 \leq m_s < 2$. We represent the
+            /// rational mantissa as a primitive float. The conversion might not be exact, so we
+            /// round to the nearest float using the `Nearest` rounding mode. To use other rounding
+            /// modes, use [`BigExponentFloat::sci_mantissa_and_exponent_round`].
+            ///
+            /// $$
+            /// f(x) \approx (\frac{|x|}{2^{\lfloor \log_2 |x| \rfloor}},
+            /// \lfloor \log_2 |x| \rfloor).
+            /// $$
+            ///
+            /// Unlike the [`Float`](crate::Float) version, the exponent is an [`Integer`] and can
+            /// have any size.
+            ///
+            /// # Worst-case complexity
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.complexity()`.
+            ///
+            /// # Panics
+            /// Panics if `self` is NaN, infinite, or zero.
+            ///
+            /// # Examples
+            /// See [here](super::mantissa_and_exponent#sci_mantissa_and_exponent).
+            #[inline]
+            fn sci_mantissa_and_exponent(self) -> ($t, Integer) {
+                let (m, e, _) = self
+                    .sci_mantissa_and_exponent_round(RoundingMode::Nearest)
+                    .unwrap();
+                (m, e)
+            }
+
+            /// Constructs a [`BigExponentFloat`] from its scientific mantissa and exponent: the
+            /// result is $m2^e$.
+            ///
+            /// If the mantissa is zero or not finite, this function panics. If it is finite but not
+            /// in the interval $[1, 2)$, `None` is returned. Unlike the [`Float`](crate::Float)
+            /// version, `None` is never returned because of the size of the exponent.
+            ///
+            /// # Worst-case complexity
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is
+            /// `sci_exponent.significant_bits()`.
+            ///
+            /// # Panics
+            /// Panics if `sci_mantissa` is zero or not finite.
+            ///
+            /// # Examples
+            /// See [here](super::mantissa_and_exponent#from_sci_mantissa_and_exponent).
+            #[allow(clippy::manual_range_contains)]
+            #[inline]
+            fn from_sci_mantissa_and_exponent(
+                sci_mantissa: $t,
+                sci_exponent: Integer,
+            ) -> Option<BigExponentFloat> {
+                assert!(sci_mantissa.is_finite());
+                assert_ne!(sci_mantissa, 0.0);
+                if sci_mantissa < 1.0 || sci_mantissa >= 2.0 {
+                    None
+                } else {
+                    Some(shift_finite(
+                        BigExponentFloat::from(sci_mantissa),
+                        &sci_exponent,
+                    ))
+                }
+            }
+        }
+    };
+}
+apply_to_primitive_floats!(impl_mantissa_and_exponent);

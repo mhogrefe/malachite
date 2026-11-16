@@ -6881,12 +6881,12 @@ impl Float {
         mul_add_mul_rational_helper(self, y, z, w, false, prec, rm)
     }
 
-    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of two more
-    /// [`Float`]s, with a single rounding, rounding the result to the specified precision and with
-    /// the specified rounding mode. The [`Float`]s on the right-hand side are all taken by value.
-    /// An [`Ordering`] is returned, indicating whether the rounded sum is less than, equal to, or
-    /// greater than the exact sum. Although `NaN`s are not comparable to any [`Float`], whenever
-    /// this function assigns a `NaN` it also returns `Equal`.
+    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of a third
+    /// [`Float`] and a [`Rational`], with a single rounding, rounding the result to the specified
+    /// precision and with the specified rounding mode. The [`Float`]s and the [`Rational`] on the
+    /// right-hand side are all taken by value. An [`Ordering`] is returned, indicating whether the
+    /// rounded sum is less than, equal to, or greater than the exact sum. Although `NaN`s are not
+    /// comparable to any [`Float`], whenever this function assigns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -6970,12 +6970,13 @@ impl Float {
         o
     }
 
-    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of two more
-    /// [`Float`]s, with a single rounding, rounding the result to the specified precision and with
-    /// the specified rounding mode. The last [`Float`] on the right-hand side is taken by reference
-    /// and the others by value. An [`Ordering`] is returned, indicating whether the rounded sum is
-    /// less than, equal to, or greater than the exact sum. Although `NaN`s are not comparable to
-    /// any [`Float`], whenever this function assigns a `NaN` it also returns `Equal`.
+    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of a third
+    /// [`Float`] and a [`Rational`], with a single rounding, rounding the result to the specified
+    /// precision and with the specified rounding mode. On the right-hand side, the [`Float`]s are
+    /// taken by value and the [`Rational`] by reference. An [`Ordering`] is returned, indicating
+    /// whether the rounded sum is less than, equal to, or greater than the exact sum. Although
+    /// `NaN`s are not comparable to any [`Float`], whenever this function assigns a `NaN` it also
+    /// returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -7077,12 +7078,13 @@ impl Float {
         o
     }
 
-    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of two more
-    /// [`Float`]s, with a single rounding, rounding the result to the specified precision and with
-    /// the specified rounding mode. The middle [`Float`] on the right-hand side is taken by
-    /// reference and the others by value. An [`Ordering`] is returned, indicating whether the
-    /// rounded sum is less than, equal to, or greater than the exact sum. Although `NaN`s are not
-    /// comparable to any [`Float`], whenever this function assigns a `NaN` it also returns `Equal`.
+    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of a third
+    /// [`Float`] and a [`Rational`], with a single rounding, rounding the result to the specified
+    /// precision and with the specified rounding mode. On the right-hand side, the first [`Float`]
+    /// and the [`Rational`] are taken by value and the second [`Float`] by reference. An
+    /// [`Ordering`] is returned, indicating whether the rounded sum is less than, equal to, or
+    /// greater than the exact sum. Although `NaN`s are not comparable to any [`Float`], whenever
+    /// this function assigns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -7184,12 +7186,13 @@ impl Float {
         o
     }
 
-    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of two more
-    /// [`Float`]s, with a single rounding, rounding the result to the specified precision and with
-    /// the specified rounding mode. The first [`Float`] on the right-hand side is taken by value
-    /// and the others by reference. An [`Ordering`] is returned, indicating whether the rounded sum
-    /// is less than, equal to, or greater than the exact sum. Although `NaN`s are not comparable to
-    /// any [`Float`], whenever this function assigns a `NaN` it also returns `Equal`.
+    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of a third
+    /// [`Float`] and a [`Rational`], with a single rounding, rounding the result to the specified
+    /// precision and with the specified rounding mode. On the right-hand side, the first [`Float`]
+    /// is taken by value and the second [`Float`] and the [`Rational`] by reference. An
+    /// [`Ordering`] is returned, indicating whether the rounded sum is less than, equal to, or
+    /// greater than the exact sum. Although `NaN`s are not comparable to any [`Float`], whenever
+    /// this function assigns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -7273,12 +7276,13 @@ impl Float {
         o
     }
 
-    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of two more
-    /// [`Float`]s, with a single rounding, rounding the result to the specified precision and with
-    /// the specified rounding mode. The first [`Float`] on the right-hand side is taken by
-    /// reference and the others by value. An [`Ordering`] is returned, indicating whether the
-    /// rounded sum is less than, equal to, or greater than the exact sum. Although `NaN`s are not
-    /// comparable to any [`Float`], whenever this function assigns a `NaN` it also returns `Equal`.
+    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of a third
+    /// [`Float`] and a [`Rational`], with a single rounding, rounding the result to the specified
+    /// precision and with the specified rounding mode. On the right-hand side, the second [`Float`]
+    /// and the [`Rational`] are taken by value and the first [`Float`] by reference. An
+    /// [`Ordering`] is returned, indicating whether the rounded sum is less than, equal to, or
+    /// greater than the exact sum. Although `NaN`s are not comparable to any [`Float`], whenever
+    /// this function assigns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -7380,12 +7384,13 @@ impl Float {
         o
     }
 
-    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of two more
-    /// [`Float`]s, with a single rounding, rounding the result to the specified precision and with
-    /// the specified rounding mode. The middle [`Float`] on the right-hand side is taken by value
-    /// and the others by reference. An [`Ordering`] is returned, indicating whether the rounded sum
-    /// is less than, equal to, or greater than the exact sum. Although `NaN`s are not comparable to
-    /// any [`Float`], whenever this function assigns a `NaN` it also returns `Equal`.
+    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of a third
+    /// [`Float`] and a [`Rational`], with a single rounding, rounding the result to the specified
+    /// precision and with the specified rounding mode. On the right-hand side, the second [`Float`]
+    /// is taken by value and the first [`Float`] and the [`Rational`] by reference. An [`Ordering`]
+    /// is returned, indicating whether the rounded sum is less than, equal to, or greater than the
+    /// exact sum. Although `NaN`s are not comparable to any [`Float`], whenever this function
+    /// assigns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -7469,12 +7474,13 @@ impl Float {
         o
     }
 
-    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of two more
-    /// [`Float`]s, with a single rounding, rounding the result to the specified precision and with
-    /// the specified rounding mode. The last [`Float`] on the right-hand side is taken by value and
-    /// the others by reference. An [`Ordering`] is returned, indicating whether the rounded sum is
-    /// less than, equal to, or greater than the exact sum. Although `NaN`s are not comparable to
-    /// any [`Float`], whenever this function assigns a `NaN` it also returns `Equal`.
+    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of a third
+    /// [`Float`] and a [`Rational`], with a single rounding, rounding the result to the specified
+    /// precision and with the specified rounding mode. On the right-hand side, the [`Rational`] is
+    /// taken by value and the [`Float`]s by reference. An [`Ordering`] is returned, indicating
+    /// whether the rounded sum is less than, equal to, or greater than the exact sum. Although
+    /// `NaN`s are not comparable to any [`Float`], whenever this function assigns a `NaN` it also
+    /// returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -7558,12 +7564,13 @@ impl Float {
         o
     }
 
-    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of two more
-    /// [`Float`]s, with a single rounding, rounding the result to the specified precision and with
-    /// the specified rounding mode. The [`Float`]s on the right-hand side are all taken by
-    /// reference. An [`Ordering`] is returned, indicating whether the rounded sum is less than,
-    /// equal to, or greater than the exact sum. Although `NaN`s are not comparable to any
-    /// [`Float`], whenever this function assigns a `NaN` it also returns `Equal`.
+    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of a third
+    /// [`Float`] and a [`Rational`], with a single rounding, rounding the result to the specified
+    /// precision and with the specified rounding mode. The [`Float`]s and the [`Rational`] on the
+    /// right-hand side are all taken by reference. An [`Ordering`] is returned, indicating whether
+    /// the rounded sum is less than, equal to, or greater than the exact sum. Although `NaN`s are
+    /// not comparable to any [`Float`], whenever this function assigns a `NaN` it also returns
+    /// `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -8507,12 +8514,12 @@ impl Float {
         self.mul_add_mul_rational_prec_round_ref_ref_ref_ref(y, z, w, prec, Nearest)
     }
 
-    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of two more
-    /// [`Float`]s, with a single rounding, rounding the result to the nearest value of the
-    /// specified precision. The [`Float`]s on the right-hand side are all taken by value. An
-    /// [`Ordering`] is returned, indicating whether the rounded sum is less than, equal to, or
-    /// greater than the exact sum. Although `NaN`s are not comparable to any [`Float`], whenever
-    /// this function assigns a `NaN` it also returns `Equal`.
+    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of a third
+    /// [`Float`] and a [`Rational`], with a single rounding, rounding the result to the nearest
+    /// value of the specified precision. The [`Float`]s and the [`Rational`] on the right-hand side
+    /// are all taken by value. An [`Ordering`] is returned, indicating whether the rounded sum is
+    /// less than, equal to, or greater than the exact sum. Although `NaN`s are not comparable to
+    /// any [`Float`], whenever this function assigns a `NaN` it also returns `Equal`.
     ///
     /// If the sum is equidistant from two [`Float`]s with the specified precision, the [`Float`]
     /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
@@ -8582,12 +8589,12 @@ impl Float {
         self.mul_add_mul_rational_prec_round_assign(y, z, w, prec, Nearest)
     }
 
-    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of two more
-    /// [`Float`]s, with a single rounding, rounding the result to the nearest value of the
-    /// specified precision. The last [`Float`] on the right-hand side is taken by reference and the
-    /// others by value. An [`Ordering`] is returned, indicating whether the rounded sum is less
-    /// than, equal to, or greater than the exact sum. Although `NaN`s are not comparable to any
-    /// [`Float`], whenever this function assigns a `NaN` it also returns `Equal`.
+    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of a third
+    /// [`Float`] and a [`Rational`], with a single rounding, rounding the result to the nearest
+    /// value of the specified precision. On the right-hand side, the [`Float`]s are taken by value
+    /// and the [`Rational`] by reference. An [`Ordering`] is returned, indicating whether the
+    /// rounded sum is less than, equal to, or greater than the exact sum. Although `NaN`s are not
+    /// comparable to any [`Float`], whenever this function assigns a `NaN` it also returns `Equal`.
     ///
     /// If the sum is equidistant from two [`Float`]s with the specified precision, the [`Float`]
     /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
@@ -8657,12 +8664,13 @@ impl Float {
         self.mul_add_mul_rational_prec_round_assign_val_val_ref(y, z, w, prec, Nearest)
     }
 
-    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of two more
-    /// [`Float`]s, with a single rounding, rounding the result to the nearest value of the
-    /// specified precision. The middle [`Float`] on the right-hand side is taken by reference and
-    /// the others by value. An [`Ordering`] is returned, indicating whether the rounded sum is less
-    /// than, equal to, or greater than the exact sum. Although `NaN`s are not comparable to any
-    /// [`Float`], whenever this function assigns a `NaN` it also returns `Equal`.
+    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of a third
+    /// [`Float`] and a [`Rational`], with a single rounding, rounding the result to the nearest
+    /// value of the specified precision. On the right-hand side, the first [`Float`] and the
+    /// [`Rational`] are taken by value and the second [`Float`] by reference. An [`Ordering`] is
+    /// returned, indicating whether the rounded sum is less than, equal to, or greater than the
+    /// exact sum. Although `NaN`s are not comparable to any [`Float`], whenever this function
+    /// assigns a `NaN` it also returns `Equal`.
     ///
     /// If the sum is equidistant from two [`Float`]s with the specified precision, the [`Float`]
     /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
@@ -8732,12 +8740,13 @@ impl Float {
         self.mul_add_mul_rational_prec_round_assign_val_ref_val(y, z, w, prec, Nearest)
     }
 
-    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of two more
-    /// [`Float`]s, with a single rounding, rounding the result to the nearest value of the
-    /// specified precision. The first [`Float`] on the right-hand side is taken by value and the
-    /// others by reference. An [`Ordering`] is returned, indicating whether the rounded sum is less
-    /// than, equal to, or greater than the exact sum. Although `NaN`s are not comparable to any
-    /// [`Float`], whenever this function assigns a `NaN` it also returns `Equal`.
+    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of a third
+    /// [`Float`] and a [`Rational`], with a single rounding, rounding the result to the nearest
+    /// value of the specified precision. On the right-hand side, the first [`Float`] is taken by
+    /// value and the second [`Float`] and the [`Rational`] by reference. An [`Ordering`] is
+    /// returned, indicating whether the rounded sum is less than, equal to, or greater than the
+    /// exact sum. Although `NaN`s are not comparable to any [`Float`], whenever this function
+    /// assigns a `NaN` it also returns `Equal`.
     ///
     /// If the sum is equidistant from two [`Float`]s with the specified precision, the [`Float`]
     /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
@@ -8807,12 +8816,13 @@ impl Float {
         self.mul_add_mul_rational_prec_round_assign_val_ref_ref(y, z, w, prec, Nearest)
     }
 
-    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of two more
-    /// [`Float`]s, with a single rounding, rounding the result to the nearest value of the
-    /// specified precision. The first [`Float`] on the right-hand side is taken by reference and
-    /// the others by value. An [`Ordering`] is returned, indicating whether the rounded sum is less
-    /// than, equal to, or greater than the exact sum. Although `NaN`s are not comparable to any
-    /// [`Float`], whenever this function assigns a `NaN` it also returns `Equal`.
+    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of a third
+    /// [`Float`] and a [`Rational`], with a single rounding, rounding the result to the nearest
+    /// value of the specified precision. On the right-hand side, the second [`Float`] and the
+    /// [`Rational`] are taken by value and the first [`Float`] by reference. An [`Ordering`] is
+    /// returned, indicating whether the rounded sum is less than, equal to, or greater than the
+    /// exact sum. Although `NaN`s are not comparable to any [`Float`], whenever this function
+    /// assigns a `NaN` it also returns `Equal`.
     ///
     /// If the sum is equidistant from two [`Float`]s with the specified precision, the [`Float`]
     /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
@@ -8882,12 +8892,13 @@ impl Float {
         self.mul_add_mul_rational_prec_round_assign_ref_val_val(y, z, w, prec, Nearest)
     }
 
-    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of two more
-    /// [`Float`]s, with a single rounding, rounding the result to the nearest value of the
-    /// specified precision. The middle [`Float`] on the right-hand side is taken by value and the
-    /// others by reference. An [`Ordering`] is returned, indicating whether the rounded sum is less
-    /// than, equal to, or greater than the exact sum. Although `NaN`s are not comparable to any
-    /// [`Float`], whenever this function assigns a `NaN` it also returns `Equal`.
+    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of a third
+    /// [`Float`] and a [`Rational`], with a single rounding, rounding the result to the nearest
+    /// value of the specified precision. On the right-hand side, the second [`Float`] is taken by
+    /// value and the first [`Float`] and the [`Rational`] by reference. An [`Ordering`] is
+    /// returned, indicating whether the rounded sum is less than, equal to, or greater than the
+    /// exact sum. Although `NaN`s are not comparable to any [`Float`], whenever this function
+    /// assigns a `NaN` it also returns `Equal`.
     ///
     /// If the sum is equidistant from two [`Float`]s with the specified precision, the [`Float`]
     /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
@@ -8957,12 +8968,12 @@ impl Float {
         self.mul_add_mul_rational_prec_round_assign_ref_val_ref(y, z, w, prec, Nearest)
     }
 
-    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of two more
-    /// [`Float`]s, with a single rounding, rounding the result to the nearest value of the
-    /// specified precision. The last [`Float`] on the right-hand side is taken by value and the
-    /// others by reference. An [`Ordering`] is returned, indicating whether the rounded sum is less
-    /// than, equal to, or greater than the exact sum. Although `NaN`s are not comparable to any
-    /// [`Float`], whenever this function assigns a `NaN` it also returns `Equal`.
+    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of a third
+    /// [`Float`] and a [`Rational`], with a single rounding, rounding the result to the nearest
+    /// value of the specified precision. On the right-hand side, the [`Rational`] is taken by value
+    /// and the [`Float`]s by reference. An [`Ordering`] is returned, indicating whether the rounded
+    /// sum is less than, equal to, or greater than the exact sum. Although `NaN`s are not
+    /// comparable to any [`Float`], whenever this function assigns a `NaN` it also returns `Equal`.
     ///
     /// If the sum is equidistant from two [`Float`]s with the specified precision, the [`Float`]
     /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
@@ -9032,12 +9043,12 @@ impl Float {
         self.mul_add_mul_rational_prec_round_assign_ref_ref_val(y, z, w, prec, Nearest)
     }
 
-    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of two more
-    /// [`Float`]s, with a single rounding, rounding the result to the nearest value of the
-    /// specified precision. The [`Float`]s on the right-hand side are all taken by reference. An
-    /// [`Ordering`] is returned, indicating whether the rounded sum is less than, equal to, or
-    /// greater than the exact sum. Although `NaN`s are not comparable to any [`Float`], whenever
-    /// this function assigns a `NaN` it also returns `Equal`.
+    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of a third
+    /// [`Float`] and a [`Rational`], with a single rounding, rounding the result to the nearest
+    /// value of the specified precision. The [`Float`]s and the [`Rational`] on the right-hand side
+    /// are all taken by reference. An [`Ordering`] is returned, indicating whether the rounded sum
+    /// is less than, equal to, or greater than the exact sum. Although `NaN`s are not comparable to
+    /// any [`Float`], whenever this function assigns a `NaN` it also returns `Equal`.
     ///
     /// If the sum is equidistant from two [`Float`]s with the specified precision, the [`Float`]
     /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
@@ -10235,12 +10246,12 @@ impl Float {
         self.mul_add_mul_rational_prec_round_ref_ref_ref_ref(y, z, w, prec, rm)
     }
 
-    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of two more
-    /// [`Float`]s, with a single rounding, rounding the result with the specified rounding mode.
-    /// The [`Float`]s on the right-hand side are all taken by value. An [`Ordering`] is returned,
-    /// indicating whether the rounded sum is less than, equal to, or greater than the exact sum.
-    /// Although `NaN`s are not comparable to any [`Float`], whenever this function assigns a `NaN`
-    /// it also returns `Equal`.
+    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of a third
+    /// [`Float`] and a [`Rational`], with a single rounding, rounding the result with the specified
+    /// rounding mode. The [`Float`]s and the [`Rational`] on the right-hand side are all taken by
+    /// value. An [`Ordering`] is returned, indicating whether the rounded sum is less than, equal
+    /// to, or greater than the exact sum. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function assigns a `NaN` it also returns `Equal`.
     ///
     /// The precision of the output is the maximum of the precisions of the inputs. See
     /// [`RoundingMode`] for a description of the possible rounding modes.
@@ -10325,12 +10336,12 @@ impl Float {
         self.mul_add_mul_rational_prec_round_assign(y, z, w, prec, rm)
     }
 
-    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of two more
-    /// [`Float`]s, with a single rounding, rounding the result with the specified rounding mode.
-    /// The last [`Float`] on the right-hand side is taken by reference and the others by value. An
-    /// [`Ordering`] is returned, indicating whether the rounded sum is less than, equal to, or
-    /// greater than the exact sum. Although `NaN`s are not comparable to any [`Float`], whenever
-    /// this function assigns a `NaN` it also returns `Equal`.
+    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of a third
+    /// [`Float`] and a [`Rational`], with a single rounding, rounding the result with the specified
+    /// rounding mode. On the right-hand side, the [`Float`]s are taken by value and the
+    /// [`Rational`] by reference. An [`Ordering`] is returned, indicating whether the rounded sum
+    /// is less than, equal to, or greater than the exact sum. Although `NaN`s are not comparable to
+    /// any [`Float`], whenever this function assigns a `NaN` it also returns `Equal`.
     ///
     /// The precision of the output is the maximum of the precisions of the inputs. See
     /// [`RoundingMode`] for a description of the possible rounding modes.
@@ -10415,12 +10426,13 @@ impl Float {
         self.mul_add_mul_rational_prec_round_assign_val_val_ref(y, z, w, prec, rm)
     }
 
-    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of two more
-    /// [`Float`]s, with a single rounding, rounding the result with the specified rounding mode.
-    /// The middle [`Float`] on the right-hand side is taken by reference and the others by value.
-    /// An [`Ordering`] is returned, indicating whether the rounded sum is less than, equal to, or
-    /// greater than the exact sum. Although `NaN`s are not comparable to any [`Float`], whenever
-    /// this function assigns a `NaN` it also returns `Equal`.
+    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of a third
+    /// [`Float`] and a [`Rational`], with a single rounding, rounding the result with the specified
+    /// rounding mode. On the right-hand side, the first [`Float`] and the [`Rational`] are taken by
+    /// value and the second [`Float`] by reference. An [`Ordering`] is returned, indicating whether
+    /// the rounded sum is less than, equal to, or greater than the exact sum. Although `NaN`s are
+    /// not comparable to any [`Float`], whenever this function assigns a `NaN` it also returns
+    /// `Equal`.
     ///
     /// The precision of the output is the maximum of the precisions of the inputs. See
     /// [`RoundingMode`] for a description of the possible rounding modes.
@@ -10505,12 +10517,13 @@ impl Float {
         self.mul_add_mul_rational_prec_round_assign_val_ref_val(y, z, w, prec, rm)
     }
 
-    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of two more
-    /// [`Float`]s, with a single rounding, rounding the result with the specified rounding mode.
-    /// The first [`Float`] on the right-hand side is taken by value and the others by reference. An
-    /// [`Ordering`] is returned, indicating whether the rounded sum is less than, equal to, or
-    /// greater than the exact sum. Although `NaN`s are not comparable to any [`Float`], whenever
-    /// this function assigns a `NaN` it also returns `Equal`.
+    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of a third
+    /// [`Float`] and a [`Rational`], with a single rounding, rounding the result with the specified
+    /// rounding mode. On the right-hand side, the first [`Float`] is taken by value and the second
+    /// [`Float`] and the [`Rational`] by reference. An [`Ordering`] is returned, indicating whether
+    /// the rounded sum is less than, equal to, or greater than the exact sum. Although `NaN`s are
+    /// not comparable to any [`Float`], whenever this function assigns a `NaN` it also returns
+    /// `Equal`.
     ///
     /// The precision of the output is the maximum of the precisions of the inputs. See
     /// [`RoundingMode`] for a description of the possible rounding modes.
@@ -10595,12 +10608,13 @@ impl Float {
         self.mul_add_mul_rational_prec_round_assign_val_ref_ref(y, z, w, prec, rm)
     }
 
-    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of two more
-    /// [`Float`]s, with a single rounding, rounding the result with the specified rounding mode.
-    /// The first [`Float`] on the right-hand side is taken by reference and the others by value. An
-    /// [`Ordering`] is returned, indicating whether the rounded sum is less than, equal to, or
-    /// greater than the exact sum. Although `NaN`s are not comparable to any [`Float`], whenever
-    /// this function assigns a `NaN` it also returns `Equal`.
+    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of a third
+    /// [`Float`] and a [`Rational`], with a single rounding, rounding the result with the specified
+    /// rounding mode. On the right-hand side, the second [`Float`] and the [`Rational`] are taken
+    /// by value and the first [`Float`] by reference. An [`Ordering`] is returned, indicating
+    /// whether the rounded sum is less than, equal to, or greater than the exact sum. Although
+    /// `NaN`s are not comparable to any [`Float`], whenever this function assigns a `NaN` it also
+    /// returns `Equal`.
     ///
     /// The precision of the output is the maximum of the precisions of the inputs. See
     /// [`RoundingMode`] for a description of the possible rounding modes.
@@ -10685,12 +10699,13 @@ impl Float {
         self.mul_add_mul_rational_prec_round_assign_ref_val_val(y, z, w, prec, rm)
     }
 
-    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of two more
-    /// [`Float`]s, with a single rounding, rounding the result with the specified rounding mode.
-    /// The middle [`Float`] on the right-hand side is taken by value and the others by reference.
-    /// An [`Ordering`] is returned, indicating whether the rounded sum is less than, equal to, or
-    /// greater than the exact sum. Although `NaN`s are not comparable to any [`Float`], whenever
-    /// this function assigns a `NaN` it also returns `Equal`.
+    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of a third
+    /// [`Float`] and a [`Rational`], with a single rounding, rounding the result with the specified
+    /// rounding mode. On the right-hand side, the second [`Float`] is taken by value and the first
+    /// [`Float`] and the [`Rational`] by reference. An [`Ordering`] is returned, indicating whether
+    /// the rounded sum is less than, equal to, or greater than the exact sum. Although `NaN`s are
+    /// not comparable to any [`Float`], whenever this function assigns a `NaN` it also returns
+    /// `Equal`.
     ///
     /// The precision of the output is the maximum of the precisions of the inputs. See
     /// [`RoundingMode`] for a description of the possible rounding modes.
@@ -10775,12 +10790,12 @@ impl Float {
         self.mul_add_mul_rational_prec_round_assign_ref_val_ref(y, z, w, prec, rm)
     }
 
-    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of two more
-    /// [`Float`]s, with a single rounding, rounding the result with the specified rounding mode.
-    /// The last [`Float`] on the right-hand side is taken by value and the others by reference. An
-    /// [`Ordering`] is returned, indicating whether the rounded sum is less than, equal to, or
-    /// greater than the exact sum. Although `NaN`s are not comparable to any [`Float`], whenever
-    /// this function assigns a `NaN` it also returns `Equal`.
+    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of a third
+    /// [`Float`] and a [`Rational`], with a single rounding, rounding the result with the specified
+    /// rounding mode. On the right-hand side, the [`Rational`] is taken by value and the [`Float`]s
+    /// by reference. An [`Ordering`] is returned, indicating whether the rounded sum is less than,
+    /// equal to, or greater than the exact sum. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function assigns a `NaN` it also returns `Equal`.
     ///
     /// The precision of the output is the maximum of the precisions of the inputs. See
     /// [`RoundingMode`] for a description of the possible rounding modes.
@@ -10865,12 +10880,12 @@ impl Float {
         self.mul_add_mul_rational_prec_round_assign_ref_ref_val(y, z, w, prec, rm)
     }
 
-    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of two more
-    /// [`Float`]s, with a single rounding, rounding the result with the specified rounding mode.
-    /// The [`Float`]s on the right-hand side are all taken by reference. An [`Ordering`] is
-    /// returned, indicating whether the rounded sum is less than, equal to, or greater than the
-    /// exact sum. Although `NaN`s are not comparable to any [`Float`], whenever this function
-    /// assigns a `NaN` it also returns `Equal`.
+    /// Multiplies a [`Float`] by another [`Float`] in place and adds the product of a third
+    /// [`Float`] and a [`Rational`], with a single rounding, rounding the result with the specified
+    /// rounding mode. The [`Float`]s and the [`Rational`] on the right-hand side are all taken by
+    /// reference. An [`Ordering`] is returned, indicating whether the rounded sum is less than,
+    /// equal to, or greater than the exact sum. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function assigns a `NaN` it also returns `Equal`.
     ///
     /// The precision of the output is the maximum of the precisions of the inputs. See
     /// [`RoundingMode`] for a description of the possible rounding modes.

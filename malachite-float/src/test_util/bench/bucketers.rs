@@ -1478,3 +1478,135 @@ pub fn quadruple_big_exponent_float_max_complexity_bucketer<'a>() -> Bucketer<
             .to_string(),
     }
 }
+
+pub fn quintuple_1_2_3_4_big_exponent_float_big_exponent_float_rational_max_complexity_bucketer<
+    'a,
+    T,
+>(
+    x_name: &'a str,
+    y_name: &'a str,
+    z_name: &'a str,
+    p_name: &'a str,
+) -> Bucketer<'a, (BigExponentFloat, BigExponentFloat, Rational, u64, T)> {
+    Bucketer {
+        bucketing_function: &|(x, y, z, p, _)| {
+            usize::exact_from(max!(
+                x.complexity(),
+                y.complexity(),
+                z.significant_bits(),
+                *p
+            ))
+        },
+        bucketing_label: format!(
+            "max({x_name}.complexity(), {y_name}.complexity(), {z_name}.significant_bits(), \
+            {p_name})"
+        ),
+    }
+}
+
+#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
+pub fn pair_2_quintuple_1_2_3_4_big_exponent_float_big_exponent_float_rational_max_complexity_bucketer<
+    'a,
+    T,
+    U,
+>(
+    x_name: &'a str,
+    y_name: &'a str,
+    z_name: &'a str,
+    p_name: &'a str,
+) -> Bucketer<'a, (U, (BigExponentFloat, BigExponentFloat, Rational, u64, T))> {
+    Bucketer {
+        bucketing_function: &|(_, (x, y, z, p, _))| {
+            usize::exact_from(max!(
+                x.complexity(),
+                y.complexity(),
+                z.significant_bits(),
+                *p
+            ))
+        },
+        bucketing_label: format!(
+            "max({x_name}.complexity(), {y_name}.complexity(), {z_name}.significant_bits(), \
+            {p_name})"
+        ),
+    }
+}
+
+#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
+pub fn sextuple_1_2_3_4_5_big_exponent_float_big_exponent_float_big_exponent_float_rational_max_complexity_bucketer<
+    'a,
+    T,
+>(
+    x_name: &'a str,
+    y_name: &'a str,
+    z_name: &'a str,
+    w_name: &'a str,
+    p_name: &'a str,
+) -> Bucketer<
+    'a,
+    (
+        BigExponentFloat,
+        BigExponentFloat,
+        BigExponentFloat,
+        Rational,
+        u64,
+        T,
+    ),
+> {
+    Bucketer {
+        bucketing_function: &|(x, y, z, w, p, _)| {
+            usize::exact_from(max!(
+                x.complexity(),
+                y.complexity(),
+                z.complexity(),
+                w.significant_bits(),
+                *p
+            ))
+        },
+        bucketing_label: format!(
+            "max({x_name}.complexity(), {y_name}.complexity(), {z_name}.complexity(), \
+            {w_name}.significant_bits(), {p_name})"
+        ),
+    }
+}
+
+#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
+pub fn pair_2_sextuple_1_2_3_4_5_big_exponent_float_big_exponent_float_big_exponent_float_rational_max_complexity_bucketer<
+    'a,
+    T,
+    U,
+>(
+    x_name: &'a str,
+    y_name: &'a str,
+    z_name: &'a str,
+    w_name: &'a str,
+    p_name: &'a str,
+) -> Bucketer<
+    'a,
+    (
+        U,
+        (
+            BigExponentFloat,
+            BigExponentFloat,
+            BigExponentFloat,
+            Rational,
+            u64,
+            T,
+        ),
+    ),
+> {
+    Bucketer {
+        bucketing_function: &|(_, (x, y, z, w, p, _))| {
+            usize::exact_from(max!(
+                x.complexity(),
+                y.complexity(),
+                z.complexity(),
+                w.significant_bits(),
+                *p
+            ))
+        },
+        bucketing_label: format!(
+            "max({x_name}.complexity(), {y_name}.complexity(), {z_name}.complexity(), \
+            {w_name}.significant_bits(), {p_name})"
+        ),
+    }
+}

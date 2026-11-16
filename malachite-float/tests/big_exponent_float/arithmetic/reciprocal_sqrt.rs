@@ -17,9 +17,12 @@ use malachite_float::test_util::big_exponent_float::{
 use malachite_float::test_util::generators::{
     big_exponent_float_unsigned_rounding_mode_triple_gen_var_5,
     float_unsigned_rounding_mode_triple_gen_var_15,
+    rational_unsigned_rounding_mode_triple_gen_var_4,
 };
 use malachite_float::{BigExponentFloat, Float};
+use malachite_q::Rational;
 use std::cmp::Ordering::{self, *};
+use std::str::FromStr;
 
 fn same(x: &BigExponentFloat, y: &BigExponentFloat) -> bool {
     ComparableBigExponentFloatRef(x) == ComparableBigExponentFloatRef(y)
@@ -204,6 +207,203 @@ fn reciprocal_sqrt_prec_round_float_agreement_properties() {
             let r = reciprocal_sqrt_prec_round_all(&float_to_big_exponent_float(&x), prec, rm);
             assert!(same(&r.0, &float_to_big_exponent_float(&f)));
             assert_eq!(r.1, fo);
+        }
+    });
+}
+
+fn reciprocal_sqrt_rational_prec_round_all(
+    x: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> (BigExponentFloat, Ordering) {
+    let r = BigExponentFloat::reciprocal_sqrt_rational_prec_round(x.clone(), prec, rm);
+    assert!(r.0.is_valid());
+    assert!(same_pair(
+        &BigExponentFloat::reciprocal_sqrt_rational_prec_round_ref(x, prec, rm),
+        &r
+    ));
+    if rm == Nearest {
+        assert!(same_pair(
+            &BigExponentFloat::reciprocal_sqrt_rational_prec(x.clone(), prec),
+            &r
+        ));
+        assert!(same_pair(
+            &BigExponentFloat::reciprocal_sqrt_rational_prec_ref(x, prec),
+            &r
+        ));
+    }
+    r
+}
+
+#[test]
+fn test_reciprocal_sqrt_rational_prec_round() {
+    let test = |x: &str, prec: u64, rm: RoundingMode, out: &str, out_hex: &str, o: Ordering| {
+        assert_eq!(parse_big_exponent_float_hex(out_hex).to_string(), out);
+        let r = reciprocal_sqrt_rational_prec_round_all(&Rational::from_str(x).unwrap(), prec, rm);
+        assert!(
+            same(&r.0, &parse_big_exponent_float_hex(out_hex)),
+            "{x} {prec} {rm}: {:?}",
+            r.0
+        );
+        assert_eq!(r.1, o, "{x} {prec} {rm}");
+    };
+    test("0", 10, Exact, "Infinity", "Infinity", Equal);
+    test("-1/3", 10, Exact, "NaN", "NaN", Equal);
+    test("4", 1, Exact, "0.50", "0x0.8", Equal);
+    test("1/16", 1, Exact, "4.0", "0x4.0", Equal);
+    test("3/5", 1, Nearest, "1.0", "0x1.0", Less);
+    test("3/5", 10, Floor, "1.289", "0x1.4a", Less);
+    test("3/5", 10, Ceiling, "1.2910", "0x1.4a8", Greater);
+    test(
+        "3/5",
+        100,
+        Nearest,
+        "1.2909944487358056283930884665946",
+        "0x1.4a7e9cb8a349120fc9aafb5aa",
+        Greater,
+    );
+    test("22/7", 1, Nearest, "0.50", "0x0.8", Less);
+    test("22/7", 10, Floor, "0.56348", "0x0.904", Less);
+    test("22/7", 10, Ceiling, "0.5645", "0x0.908", Greater);
+    test(
+        "22/7",
+        100,
+        Nearest,
+        "0.5640760748177662089151473616116",
+        "0x0.90674a25cc60febbd6cc7515c",
+        Greater,
+    );
+    test(
+        "1000000000000000000000000000001",
+        1,
+        Nearest,
+        "8.9e-16",
+        "0x4.0E-13",
+        Less,
+    );
+    test(
+        "1000000000000000000000000000001",
+        10,
+        Floor,
+        "9.99e-16",
+        "0x4.8E-13",
+        Less,
+    );
+    test(
+        "1000000000000000000000000000001",
+        10,
+        Ceiling,
+        "1.0009e-15",
+        "0x4.82E-13",
+        Greater,
+    );
+    test(
+        "1000000000000000000000000000001",
+        100,
+        Nearest,
+        "9.999999999999999999999999999990e-16",
+        "0x4.80ebe7b9d58566c87ce9b80aE-13",
+        Less,
+    );
+    test(
+        "1/100000000000000000000000",
+        1,
+        Nearest,
+        "2.7e11",
+        "0x4.0E+9",
+        Less,
+    );
+    test(
+        "1/100000000000000000000000",
+        10,
+        Floor,
+        "3.1622e11",
+        "0x4.9aE+9",
+        Less,
+    );
+    test(
+        "1/100000000000000000000000",
+        10,
+        Ceiling,
+        "3.168e11",
+        "0x4.9cE+9",
+        Greater,
+    );
+    test(
+        "1/100000000000000000000000",
+        100,
+        Nearest,
+        "316227766016.8379331998893544435",
+        "0x49a0a4c700.d682ca49c1e5803",
+        Greater,
+    );
+}
+
+#[test]
+fn test_reciprocal_sqrt_rational_prec_round_huge() {
+    // 1/sqrt(3 * 2^(-2^31)) = 2^(2^30) / sqrt(3), whose exponent is beyond `Float`'s range.
+    let x = Rational::from(3u32) >> (1u64 << 31);
+    for rm in [Floor, Ceiling, Nearest] {
+        let (y, o) = BigExponentFloat::from(3u32).reciprocal_sqrt_prec_round(20, rm);
+        let r = reciprocal_sqrt_rational_prec_round_all(&x, 20, rm);
+        assert!(same(&r.0, &(y << (1u64 << 30))));
+        assert_eq!(r.1, o);
+        assert!(*r.0.get_exponent().unwrap() > Float::MAX_EXPONENT);
+    }
+}
+
+#[test]
+#[should_panic]
+fn reciprocal_sqrt_rational_prec_round_fail_1() {
+    BigExponentFloat::reciprocal_sqrt_rational_prec_round(
+        Rational::from_unsigneds(3u8, 5),
+        0,
+        Floor,
+    );
+}
+
+#[test]
+#[should_panic]
+fn reciprocal_sqrt_rational_prec_round_fail_2() {
+    BigExponentFloat::reciprocal_sqrt_rational_prec_round(
+        Rational::from_unsigneds(3u8, 5),
+        10,
+        Exact,
+    );
+}
+
+#[test]
+fn reciprocal_sqrt_rational_prec_round_properties() {
+    rational_unsigned_rounding_mode_triple_gen_var_4().test_properties(|(x, prec, rm)| {
+        let r = reciprocal_sqrt_rational_prec_round_all(&x, prec, rm);
+        if r.0.is_nan() || r.0.is_zero() || r.0.is_infinite() {
+            assert_eq!(r.1, Equal);
+        } else {
+            assert!(r.0.get_prec().unwrap() <= prec);
+        }
+        // The reciprocal square root is the root of order -2.
+        assert!(same_pair(
+            &BigExponentFloat::root_s_rational_prec_round_ref(&x, -2, prec, rm),
+            &r
+        ));
+        // Multiplying x by 2^(-2000) multiplies the root by 2^(-1000).
+        if r.0.is_finite() && !r.0.is_zero() {
+            let (y, o) = reciprocal_sqrt_rational_prec_round_all(&(&x << 2000u32), prec, rm);
+            assert!(same(&y, &(&r.0 << -1000i32)));
+            assert_eq!(o, r.1);
+        }
+        // A dyadic x gives the root of the equal `BigExponentFloat`.
+        if let Ok(x_bef) = BigExponentFloat::try_from(&x) {
+            assert!(same_pair(&x_bef.reciprocal_sqrt_prec_round(prec, rm), &r));
+        }
+        // `Float`'s function agrees wherever its result neither overflows nor underflows (at 0,
+        // `Float` has signed zeros and infinities).
+        if x != 0u32 {
+            let (f, fo) = Float::reciprocal_sqrt_rational_prec_round_ref(&x, prec, rm);
+            if float_result_comparable(&f, fo) {
+                assert!(same(&r.0, &float_to_big_exponent_float(&f)));
+                assert_eq!(r.1, fo);
+            }
         }
     });
 }

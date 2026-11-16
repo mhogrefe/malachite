@@ -12,6 +12,8 @@ use malachite_base::test_util::runner::Runner;
 use malachite_float::big_exponent_float::arithmetic::root::root_prec_round_generic;
 use malachite_float::test_util::bench::bucketers::*;
 use malachite_float::test_util::generators::*;
+use malachite_float::{BigExponentFloat, Float};
+use malachite_q::test_util::bench::bucketers::quadruple_1_3_rational_bit_u64_max_bucketer;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_root_u_prec_round);
@@ -50,6 +52,26 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(
         runner,
         benchmark_big_exponent_float_root_s_prec_round_float_comparison
+    );
+    register_demo!(runner, demo_big_exponent_float_root_u_rational_prec_round);
+    register_demo!(runner, demo_big_exponent_float_root_u_rational_prec);
+    register_bench!(
+        runner,
+        benchmark_big_exponent_float_root_u_rational_prec_round_evaluation_strategy
+    );
+    register_bench!(
+        runner,
+        benchmark_big_exponent_float_root_u_rational_prec_round_float_comparison
+    );
+    register_demo!(runner, demo_big_exponent_float_root_s_rational_prec_round);
+    register_demo!(runner, demo_big_exponent_float_root_s_rational_prec);
+    register_bench!(
+        runner,
+        benchmark_big_exponent_float_root_s_rational_prec_round_evaluation_strategy
+    );
+    register_bench!(
+        runner,
+        benchmark_big_exponent_float_root_s_rational_prec_round_float_comparison
     );
 }
 
@@ -338,6 +360,180 @@ fn benchmark_big_exponent_float_root_s_prec_round_float_comparison(
             }),
             ("Float", &mut |((x, k, prec, rm), _)| {
                 no_out!(x.root_s_prec_round_ref(k, prec, rm));
+            }),
+        ],
+    );
+}
+
+fn demo_big_exponent_float_root_u_rational_prec_round(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, k, prec, rm) in rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_3()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = BigExponentFloat::root_u_rational_prec_round_ref(&x, k, prec, rm);
+        println!(
+            "BigExponentFloat::root_u_rational_prec_round({x}, {k}, {prec}, {rm}) = \
+            ({z:#x}, {o:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_root_u_rational_prec(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, k, prec, _) in rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_3()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = BigExponentFloat::root_u_rational_prec_ref(&x, k, prec);
+        println!("BigExponentFloat::root_u_rational_prec({x}, {k}, {prec}) = ({z:#x}, {o:?})");
+    }
+}
+
+fn benchmark_big_exponent_float_root_u_rational_prec_round_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "BigExponentFloat::root_u_rational_prec_round(Rational, u64, u64, RoundingMode)",
+        BenchmarkType::EvaluationStrategy,
+        rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_3().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &quadruple_1_3_rational_bit_u64_max_bucketer("x", "prec"),
+        &mut [
+            (
+                "BigExponentFloat::root_u_rational_prec_round(Rational, u64, u64, RoundingMode)",
+                &mut |(x, k, prec, rm)| {
+                    no_out!(BigExponentFloat::root_u_rational_prec_round(x, k, prec, rm));
+                },
+            ),
+            (
+                "BigExponentFloat::root_u_rational_prec_round_ref(&Rational, u64, u64, RoundingMode)",
+                &mut |(x, k, prec, rm)| {
+                    no_out!(BigExponentFloat::root_u_rational_prec_round_ref(
+                        &x, k, prec, rm
+                    ));
+                },
+            ),
+        ],
+    );
+}
+
+fn benchmark_big_exponent_float_root_u_rational_prec_round_float_comparison(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "BigExponentFloat::root_u_rational_prec_round(&Rational, u64, u64, RoundingMode)",
+        BenchmarkType::LibraryComparison,
+        rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_3().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &quadruple_1_3_rational_bit_u64_max_bucketer("x", "prec"),
+        &mut [
+            ("BigExponentFloat", &mut |(x, k, prec, rm)| {
+                no_out!(BigExponentFloat::root_u_rational_prec_round_ref(
+                    &x, k, prec, rm
+                ));
+            }),
+            ("Float", &mut |(x, k, prec, rm)| {
+                no_out!(Float::root_u_rational_prec_round_ref(&x, k, prec, rm));
+            }),
+        ],
+    );
+}
+
+fn demo_big_exponent_float_root_s_rational_prec_round(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, k, prec, rm) in rational_signed_unsigned_rounding_mode_quadruple_gen_var_2()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = BigExponentFloat::root_s_rational_prec_round_ref(&x, k, prec, rm);
+        println!(
+            "BigExponentFloat::root_s_rational_prec_round({x}, {k}, {prec}, {rm}) = \
+            ({z:#x}, {o:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_root_s_rational_prec(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, k, prec, _) in rational_signed_unsigned_rounding_mode_quadruple_gen_var_2()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = BigExponentFloat::root_s_rational_prec_ref(&x, k, prec);
+        println!("BigExponentFloat::root_s_rational_prec({x}, {k}, {prec}) = ({z:#x}, {o:?})");
+    }
+}
+
+fn benchmark_big_exponent_float_root_s_rational_prec_round_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "BigExponentFloat::root_s_rational_prec_round(Rational, i64, u64, RoundingMode)",
+        BenchmarkType::EvaluationStrategy,
+        rational_signed_unsigned_rounding_mode_quadruple_gen_var_2().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &quadruple_1_3_rational_bit_u64_max_bucketer("x", "prec"),
+        &mut [
+            (
+                "BigExponentFloat::root_s_rational_prec_round(Rational, i64, u64, RoundingMode)",
+                &mut |(x, k, prec, rm)| {
+                    no_out!(BigExponentFloat::root_s_rational_prec_round(x, k, prec, rm));
+                },
+            ),
+            (
+                "BigExponentFloat::root_s_rational_prec_round_ref(&Rational, i64, u64, RoundingMode)",
+                &mut |(x, k, prec, rm)| {
+                    no_out!(BigExponentFloat::root_s_rational_prec_round_ref(
+                        &x, k, prec, rm
+                    ));
+                },
+            ),
+        ],
+    );
+}
+
+fn benchmark_big_exponent_float_root_s_rational_prec_round_float_comparison(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "BigExponentFloat::root_s_rational_prec_round(&Rational, i64, u64, RoundingMode)",
+        BenchmarkType::LibraryComparison,
+        rational_signed_unsigned_rounding_mode_quadruple_gen_var_2().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &quadruple_1_3_rational_bit_u64_max_bucketer("x", "prec"),
+        &mut [
+            ("BigExponentFloat", &mut |(x, k, prec, rm)| {
+                no_out!(BigExponentFloat::root_s_rational_prec_round_ref(
+                    &x, k, prec, rm
+                ));
+            }),
+            ("Float", &mut |(x, k, prec, rm)| {
+                no_out!(Float::root_s_rational_prec_round_ref(&x, k, prec, rm));
             }),
         ],
     );

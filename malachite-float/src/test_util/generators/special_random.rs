@@ -48,7 +48,8 @@ use crate::test_util::generators::exhaustive::{
     atan_with_period_prec_round_valid, atan_with_period_rational_prec_round_valid,
     atan_with_period_round_valid, atan2_rational_prec_round_valid, atanh_rational_prec_round_valid,
     average_prec_round_valid, big_exponent_float_add_mul_prec_round_valid,
-    big_exponent_float_add_prec_round_valid, big_exponent_float_add_rational_prec_round_valid,
+    big_exponent_float_add_mul_rational_prec_round_valid, big_exponent_float_add_prec_round_valid,
+    big_exponent_float_add_rational_prec_round_valid,
     big_exponent_float_agm_big_exponent_float_rational_prec_round_valid,
     big_exponent_float_agm_prec_round_valid, big_exponent_float_average_prec_round_valid,
     big_exponent_float_cbrt_prec_round_valid, big_exponent_float_compound_prec_round_valid,
@@ -57,7 +58,8 @@ use crate::test_util::generators::exhaustive::{
     big_exponent_float_exp_rational_prec_round_valid,
     big_exponent_float_exp_x_minus_1_prec_round_valid,
     big_exponent_float_exp_x_minus_1_rational_prec_round_valid,
-    big_exponent_float_fractional_part_prec_round_valid, big_exponent_float_hypot_prec_round_valid,
+    big_exponent_float_fractional_part_prec_round_valid,
+    big_exponent_float_general_pow_prec_round_valid, big_exponent_float_hypot_prec_round_valid,
     big_exponent_float_ieee_remainder_prec_round_valid,
     big_exponent_float_ieee_remainder_rational_prec_round_valid,
     big_exponent_float_ln_1_plus_x_prec_round_valid, big_exponent_float_ln_prec_round_valid,
@@ -74,12 +76,14 @@ use crate::test_util::generators::exhaustive::{
     big_exponent_float_log_base_rational_base_1_plus_x_prec_round_valid,
     big_exponent_float_log_base_rational_base_prec_round_valid,
     big_exponent_float_log_base_rational_big_exponent_float_base_prec_round_valid,
-    big_exponent_float_mul_add_mul_prec_round_valid, big_exponent_float_mul_prec_round_valid,
-    big_exponent_float_mul_rational_prec_round_valid,
+    big_exponent_float_mul_add_mul_prec_round_valid,
+    big_exponent_float_mul_add_mul_rational_prec_round_valid,
+    big_exponent_float_mul_prec_round_valid, big_exponent_float_mul_rational_prec_round_valid,
     big_exponent_float_mul_sub_mul_prec_round_valid,
     big_exponent_float_positive_difference_prec_round_valid,
     big_exponent_float_positive_difference_rational_prec_round_valid,
-    big_exponent_float_pow_prec_round_valid, big_exponent_float_power_of_2_prec_round_valid,
+    big_exponent_float_pow_prec_round_valid, big_exponent_float_pow_rational_prec_round_valid,
+    big_exponent_float_power_of_2_prec_round_valid,
     big_exponent_float_power_of_2_rational_prec_round_valid,
     big_exponent_float_power_of_2_x_minus_1_prec_round_valid,
     big_exponent_float_power_of_2_x_minus_1_rational_prec_round_valid,
@@ -90,6 +94,7 @@ use crate::test_util::generators::exhaustive::{
     big_exponent_float_product_prec_round_valid, big_exponent_float_rational_div_prec_round_valid,
     big_exponent_float_rational_ieee_remainder_prec_round_valid,
     big_exponent_float_rational_positive_difference_prec_round_valid,
+    big_exponent_float_rational_pow_prec_round_valid,
     big_exponent_float_rational_rem_prec_round_valid,
     big_exponent_float_reciprocal_prec_round_valid,
     big_exponent_float_reciprocal_sqrt_prec_round_valid, big_exponent_float_rem_prec_round_valid,
@@ -18781,5 +18786,384 @@ pub fn special_random_big_exponent_float_to_sci_options_pair_gen_var_1(
             },
         )
         .filter(|(x, options)| big_exponent_float_to_sci_options_valid(x, *options)),
+    )
+}
+
+// -- (BigExponentFloat, BigExponentFloat, Rational, u64, RoundingMode) and (BigExponentFloat,
+// BigExponentFloat, BigExponentFloat, Rational, u64, RoundingMode) --
+
+// The unsigned is positive, and the rounding mode is `Exact` only if the result of
+// `add_mul_rational` is representable.
+#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
+pub fn special_random_big_exponent_float_big_exponent_float_rational_unsigned_rounding_mode_quintuple_gen_var_1(
+    config: &GenConfig,
+) -> It<(
+    BigExponentFloat,
+    BigExponentFloat,
+    Rational,
+    u64,
+    RoundingMode,
+)> {
+    Box::new(
+        random_quintuples_xxyzw(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_big_exponent_floats(
+                    seed,
+                    config.get_or("mean_exponent_bits_n", 8),
+                    config.get_or("mean_exponent_bits_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_special_p_n", 1),
+                    config.get_or("mean_special_p_d", 64),
+                )
+            },
+            &|seed| {
+                striped_random_rationals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 32),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(x, y, z, p, rm)| {
+            big_exponent_float_add_mul_rational_prec_round_valid(x, y, z, *p, *rm, false)
+        }),
+    )
+}
+
+// The unsigned is positive, and the rounding mode is `Exact` only if the result of
+// `sub_mul_rational` is representable.
+#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
+pub fn special_random_big_exponent_float_big_exponent_float_rational_unsigned_rounding_mode_quintuple_gen_var_2(
+    config: &GenConfig,
+) -> It<(
+    BigExponentFloat,
+    BigExponentFloat,
+    Rational,
+    u64,
+    RoundingMode,
+)> {
+    Box::new(
+        random_quintuples_xxyzw(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_big_exponent_floats(
+                    seed,
+                    config.get_or("mean_exponent_bits_n", 8),
+                    config.get_or("mean_exponent_bits_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_special_p_n", 1),
+                    config.get_or("mean_special_p_d", 64),
+                )
+            },
+            &|seed| {
+                striped_random_rationals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 32),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(x, y, z, p, rm)| {
+            big_exponent_float_add_mul_rational_prec_round_valid(x, y, z, *p, *rm, true)
+        }),
+    )
+}
+
+// The unsigned is positive, and the rounding mode is `Exact` only if the result of
+// `mul_add_mul_rational` is representable.
+#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
+pub fn special_random_big_exponent_float_big_exponent_float_big_exponent_float_rational_unsigned_rounding_mode_sextuple_gen_var_1(
+    config: &GenConfig,
+) -> It<(
+    BigExponentFloat,
+    BigExponentFloat,
+    BigExponentFloat,
+    Rational,
+    u64,
+    RoundingMode,
+)> {
+    Box::new(
+        random_sextuples_xxxyzw(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_big_exponent_floats(
+                    seed,
+                    config.get_or("mean_exponent_bits_n", 8),
+                    config.get_or("mean_exponent_bits_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_special_p_n", 1),
+                    config.get_or("mean_special_p_d", 64),
+                )
+            },
+            &|seed| {
+                striped_random_rationals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 32),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(x, y, z, w, p, rm)| {
+            big_exponent_float_mul_add_mul_rational_prec_round_valid(x, y, z, w, *p, *rm, false)
+        }),
+    )
+}
+
+// The unsigned is positive, and the rounding mode is `Exact` only if the result of
+// `mul_sub_mul_rational` is representable.
+#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
+pub fn special_random_big_exponent_float_big_exponent_float_big_exponent_float_rational_unsigned_rounding_mode_sextuple_gen_var_2(
+    config: &GenConfig,
+) -> It<(
+    BigExponentFloat,
+    BigExponentFloat,
+    BigExponentFloat,
+    Rational,
+    u64,
+    RoundingMode,
+)> {
+    Box::new(
+        random_sextuples_xxxyzw(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_big_exponent_floats(
+                    seed,
+                    config.get_or("mean_exponent_bits_n", 8),
+                    config.get_or("mean_exponent_bits_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_special_p_n", 1),
+                    config.get_or("mean_special_p_d", 64),
+                )
+            },
+            &|seed| {
+                striped_random_rationals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 32),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(x, y, z, w, p, rm)| {
+            big_exponent_float_mul_add_mul_rational_prec_round_valid(x, y, z, w, *p, *rm, true)
+        }),
+    )
+}
+
+// -- general powers --
+
+// The unsigned is positive, the `BigExponentFloat` exponent is moderate (see
+// `big_exponent_float_pow_exponent_is_moderate`), and the rounding mode is `Exact` only if x^y is
+// representable.
+#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
+pub fn special_random_big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_18(
+    config: &GenConfig,
+) -> It<(BigExponentFloat, BigExponentFloat, u64, RoundingMode)> {
+    Box::new(
+        random_quadruples_xxyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_big_exponent_floats(
+                    seed,
+                    config.get_or("mean_exponent_bits_n", 8),
+                    config.get_or("mean_exponent_bits_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_special_p_n", 1),
+                    config.get_or("mean_special_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(x, y, p, rm)| {
+            big_exponent_float_general_pow_prec_round_valid(x, y, *p, *rm, false)
+        }),
+    )
+}
+
+// The unsigned is positive, the `BigExponentFloat` exponent is moderate (see
+// `big_exponent_float_pow_exponent_is_moderate`), and the rounding mode is `Exact` only if `powr(x,
+// y)` is representable.
+#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
+pub fn special_random_big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_19(
+    config: &GenConfig,
+) -> It<(BigExponentFloat, BigExponentFloat, u64, RoundingMode)> {
+    Box::new(
+        random_quadruples_xxyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_big_exponent_floats(
+                    seed,
+                    config.get_or("mean_exponent_bits_n", 8),
+                    config.get_or("mean_exponent_bits_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_special_p_n", 1),
+                    config.get_or("mean_special_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(x, y, p, rm)| {
+            big_exponent_float_general_pow_prec_round_valid(x, y, *p, *rm, true)
+        }),
+    )
+}
+
+// The unsigned is positive, the `BigExponentFloat` exponent is moderate (see
+// `big_exponent_float_pow_exponent_is_moderate`), and the rounding mode is `Exact` only if x^y is
+// representable.
+pub fn special_random_big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_21(
+    config: &GenConfig,
+) -> It<(BigExponentFloat, Rational, u64, RoundingMode)> {
+    Box::new(
+        random_quadruples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_big_exponent_floats(
+                    seed,
+                    config.get_or("mean_exponent_bits_n", 8),
+                    config.get_or("mean_exponent_bits_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_special_p_n", 1),
+                    config.get_or("mean_special_p_d", 64),
+                )
+            },
+            &|seed| {
+                striped_random_rationals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(x, y, p, rm)| big_exponent_float_pow_rational_prec_round_valid(x, y, *p, *rm)),
+    )
+}
+
+// The unsigned is positive, the `BigExponentFloat` exponent is moderate (see
+// `big_exponent_float_pow_exponent_is_moderate`), and the rounding mode is `Exact` only if y^x
+// (with the `Rational` as the base) is representable.
+pub fn special_random_big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_22(
+    config: &GenConfig,
+) -> It<(BigExponentFloat, Rational, u64, RoundingMode)> {
+    Box::new(
+        random_quadruples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_big_exponent_floats(
+                    seed,
+                    config.get_or("mean_exponent_bits_n", 8),
+                    config.get_or("mean_exponent_bits_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_special_p_n", 1),
+                    config.get_or("mean_special_p_d", 64),
+                )
+            },
+            &|seed| {
+                striped_random_rationals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(x, y, p, rm)| big_exponent_float_rational_pow_prec_round_valid(y, x, *p, *rm)),
     )
 }

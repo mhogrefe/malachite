@@ -21,7 +21,7 @@ use crate::big_exponent_float::arithmetic::reciprocal_sqrt::{
 use crate::big_exponent_float::arithmetic::sqrt::{sqrt_helper, sqrt_prec_round_generic};
 use alloc::borrow::Cow;
 use core::cmp::Ordering::{self, *};
-use malachite_base::num::arithmetic::traits::{Abs, CheckedRoot, DivMod, Parity};
+use malachite_base::num::arithmetic::traits::{Abs, CheckedRoot, DivMod, Parity, Reciprocal};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{
     Infinity as InfinityTrait, NaN as NaNTrait, NegativeInfinity, One, Zero as ZeroTrait,
@@ -242,6 +242,53 @@ fn root_finite_generic(
         working_prec += increment;
         increment = working_prec >> 1;
     }
+}
+
+// x^(1/k) for a `Rational` x, rounded to `prec` bits with `rm`. The special cases are those of
+// `root_helper`: zero is handled as the `BigExponentFloat` zero, and a negative x with an even k
+// gives NaN.
+//
+// Otherwise x has an exponent e (with 2^(e - 1) <= |x| < 2^e), and x = x' * 2^(q|k|), where q is e
+// divided by |k| and truncated toward zero; x' has an exponent e' = e - q|k| with |e'| < |k|, so
+// x'^(1/k) lies between 2^(-2) and 4, well within `Float`'s exponent range, whatever the exponent
+// of x. Its root is computed with `Float`'s `Rational` root (or square root, reciprocal square
+// root, or cube root) function, and multiplied by 2^(q/sign(k)), which changes neither the rounding
+// nor the `Ordering`. Since |q|k|| <= |e|, x' is no larger than x.
+pub(crate) fn root_rational_helper(
+    x: &Rational,
+    k: i128,
+    prec: u64,
+    rm: RoundingMode,
+) -> (BigExponentFloat, Ordering) {
+    assert_ne!(prec, 0);
+    if *x == 0u32 {
+        return root_helper(Cow::Owned(BigExponentFloat::ZERO), k, prec, rm);
+    }
+    match k {
+        0 => return (BigExponentFloat::NAN, Equal),
+        1 => return BigExponentFloat::from_rational_prec_round_ref(x, prec, rm),
+        -1 => return BigExponentFloat::from_rational_prec_round(x.reciprocal(), prec, rm),
+        _ => {}
+    }
+    if *x < 0u32 && k.even() {
+        return (BigExponentFloat::NAN, Equal);
+    }
+    let k_abs = k.unsigned_abs();
+    let e = i128::from(x.floor_log_base_2_abs()) + 1;
+    let q = e / i128::exact_from(k_abs);
+    let x = x >> (q * i128::exact_from(k_abs));
+    let frm = float_rm(rm);
+    let result = match k {
+        2 => Float::sqrt_rational_prec_round(x, prec, frm),
+        -2 => Float::reciprocal_sqrt_rational_prec_round(x, prec, frm),
+        3 => Float::cbrt_rational_prec_round(x, prec, frm),
+        k if k > 0 => Float::root_u_rational_prec_round(x, u64::exact_from(k), prec, frm),
+        k => Float::root_s_rational_prec_round(x, i64::exact_from(k), prec, frm),
+    };
+    let shift = Integer::from(if k > 0 { q } else { -q });
+    let (y, o) = from_float_result(result, Some(&shift)).unwrap();
+    assert!(rm != Exact || o == Equal, "Inexact BigExponentFloat root");
+    (y, o)
 }
 
 impl BigExponentFloat {
@@ -1003,5 +1050,683 @@ impl BigExponentFloat {
         let (result, o) = root_helper(Cow::Owned(x), i128::from(k), prec, Nearest);
         *self = result;
         o
+    }
+}
+
+impl BigExponentFloat {
+    /// Computes the $k$th root of a [`Rational`], where $k$ is a [`u64`], returning a
+    /// [`BigExponentFloat`], rounding the result to the specified precision and with the specified
+    /// rounding mode. The [`Rational`] is taken by value. An [`Ordering`] is also returned,
+    /// indicating whether the rounded root is less than, equal to, or greater than the exact root.
+    /// Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,k,p,m) = x^{1/k}+\varepsilon.
+    /// $$
+    /// - If $x^{1/k}$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^{1/k}$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x^{1/k}|\rfloor-p+1}$.
+    /// - If $x^{1/k}$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x^{1/k}|\rfloor-p}$.
+    ///
+    /// Special cases:
+    /// - $f(x,0,p,m)=\text{NaN}$
+    /// - $f(0,k,p,m)=0$ if $k>0$
+    /// - $f(x,k,p,m)=\text{NaN}$ if $x<0$ and $k$ is even
+    ///
+    /// Unlike [its `Float` counterpart](crate::Float::root_u_rational_prec_round), this function
+    /// never overflows or underflows.
+    ///
+    /// If you know you'll be using `Nearest`, consider using
+    /// [`BigExponentFloat::root_u_rational_prec`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + m \log m \log\log m)$
+    ///
+    /// $M(n, m) = O(n \log n + m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with `prec` bits.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (root, o) = BigExponentFloat::root_u_rational_prec_round(
+    ///     Rational::from_unsigneds(3u8, 5),
+    ///     4,
+    ///     5,
+    ///     Floor,
+    /// );
+    /// assert_eq!(root.to_string(), "0.88");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (root, o) = BigExponentFloat::root_u_rational_prec_round(
+    ///     Rational::from_unsigneds(3u8, 5),
+    ///     4,
+    ///     5,
+    ///     Ceiling,
+    /// );
+    /// assert_eq!(root.to_string(), "0.906");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (root, o) = BigExponentFloat::root_u_rational_prec_round(
+    ///     Rational::from_unsigneds(3u8, 5),
+    ///     4,
+    ///     5,
+    ///     Nearest,
+    /// );
+    /// assert_eq!(root.to_string(), "0.88");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (root, o) = BigExponentFloat::root_u_rational_prec_round(
+    ///     Rational::from_unsigneds(3u8, 5),
+    ///     4,
+    ///     20,
+    ///     Floor,
+    /// );
+    /// assert_eq!(root.to_string(), "0.880112");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (root, o) = BigExponentFloat::root_u_rational_prec_round(
+    ///     Rational::from_unsigneds(3u8, 5),
+    ///     4,
+    ///     20,
+    ///     Ceiling,
+    /// );
+    /// assert_eq!(root.to_string(), "0.88011265");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (root, o) = BigExponentFloat::root_u_rational_prec_round(
+    ///     Rational::from_unsigneds(3u8, 5),
+    ///     4,
+    ///     20,
+    ///     Nearest,
+    /// );
+    /// assert_eq!(root.to_string(), "0.880112");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    #[inline]
+    pub fn root_u_rational_prec_round(
+        x: Rational,
+        k: u64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        root_rational_helper(&x, i128::from(k), prec, rm)
+    }
+
+    /// Computes the $k$th root of a [`Rational`], where $k$ is a [`u64`], returning a
+    /// [`BigExponentFloat`], rounding the result to the specified precision and with the specified
+    /// rounding mode. The [`Rational`] is taken by reference. An [`Ordering`] is also returned,
+    /// indicating whether the rounded root is less than, equal to, or greater than the exact root.
+    /// Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,k,p,m) = x^{1/k}+\varepsilon.
+    /// $$
+    /// - If $x^{1/k}$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^{1/k}$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x^{1/k}|\rfloor-p+1}$.
+    /// - If $x^{1/k}$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x^{1/k}|\rfloor-p}$.
+    ///
+    /// Special cases:
+    /// - $f(x,0,p,m)=\text{NaN}$
+    /// - $f(0,k,p,m)=0$ if $k>0$
+    /// - $f(x,k,p,m)=\text{NaN}$ if $x<0$ and $k$ is even
+    ///
+    /// Unlike [its `Float` counterpart](crate::Float::root_u_rational_prec_round), this function
+    /// never overflows or underflows.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + m \log m \log\log m)$
+    ///
+    /// $M(n, m) = O(n \log n + m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with `prec` bits.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (root, o) = BigExponentFloat::root_u_rational_prec_round_ref(
+    ///     &Rational::from_unsigneds(3u8, 5),
+    ///     4,
+    ///     5,
+    ///     Floor,
+    /// );
+    /// assert_eq!(root.to_string(), "0.88");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (root, o) = BigExponentFloat::root_u_rational_prec_round_ref(
+    ///     &Rational::from_unsigneds(3u8, 5),
+    ///     4,
+    ///     5,
+    ///     Ceiling,
+    /// );
+    /// assert_eq!(root.to_string(), "0.906");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (root, o) = BigExponentFloat::root_u_rational_prec_round_ref(
+    ///     &Rational::from_unsigneds(3u8, 5),
+    ///     4,
+    ///     5,
+    ///     Nearest,
+    /// );
+    /// assert_eq!(root.to_string(), "0.88");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (root, o) = BigExponentFloat::root_u_rational_prec_round_ref(
+    ///     &Rational::from_unsigneds(3u8, 5),
+    ///     4,
+    ///     20,
+    ///     Floor,
+    /// );
+    /// assert_eq!(root.to_string(), "0.880112");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (root, o) = BigExponentFloat::root_u_rational_prec_round_ref(
+    ///     &Rational::from_unsigneds(3u8, 5),
+    ///     4,
+    ///     20,
+    ///     Ceiling,
+    /// );
+    /// assert_eq!(root.to_string(), "0.88011265");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (root, o) = BigExponentFloat::root_u_rational_prec_round_ref(
+    ///     &Rational::from_unsigneds(3u8, 5),
+    ///     4,
+    ///     20,
+    ///     Nearest,
+    /// );
+    /// assert_eq!(root.to_string(), "0.880112");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn root_u_rational_prec_round_ref(
+        x: &Rational,
+        k: u64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        root_rational_helper(x, i128::from(k), prec, rm)
+    }
+
+    /// Computes the $k$th root of a [`Rational`], where $k$ is a [`u64`], returning a
+    /// [`BigExponentFloat`], rounding the result to the nearest value of the specified precision.
+    /// The [`Rational`] is taken by value. An [`Ordering`] is also returned, indicating whether the
+    /// rounded root is less than, equal to, or greater than the exact root. Although `NaN`s are not
+    /// comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also
+    /// returns `Equal`.
+    ///
+    /// $$
+    /// f(x,k,p) = x^{1/k}+\varepsilon.
+    /// $$
+    /// - If $x^{1/k}$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^{1/k}$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |x^{1/k}|\rfloor-p}$.
+    ///
+    /// Special cases:
+    /// - $f(x,0,p)=\text{NaN}$
+    /// - $f(0,k,p)=0$ if $k>0$
+    /// - $f(x,k,p)=\text{NaN}$ if $x<0$ and $k$ is even
+    ///
+    /// Unlike [its `Float` counterpart](crate::Float::root_u_rational_prec), this function never
+    /// overflows or underflows.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`BigExponentFloat::root_u_rational_prec_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + m \log m \log\log m)$
+    ///
+    /// $M(n, m) = O(n \log n + m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (root, o) =
+    ///     BigExponentFloat::root_u_rational_prec(Rational::from_unsigneds(3u8, 5), 4, 5);
+    /// assert_eq!(root.to_string(), "0.88");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (root, o) =
+    ///     BigExponentFloat::root_u_rational_prec(Rational::from_unsigneds(3u8, 5), 4, 20);
+    /// assert_eq!(root.to_string(), "0.880112");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    #[inline]
+    pub fn root_u_rational_prec(x: Rational, k: u64, prec: u64) -> (Self, Ordering) {
+        root_rational_helper(&x, i128::from(k), prec, Nearest)
+    }
+
+    /// Computes the $k$th root of a [`Rational`], where $k$ is a [`u64`], returning a
+    /// [`BigExponentFloat`], rounding the result to the nearest value of the specified precision.
+    /// The [`Rational`] is taken by reference. An [`Ordering`] is also returned, indicating whether
+    /// the rounded root is less than, equal to, or greater than the exact root. Although `NaN`s are
+    /// not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also
+    /// returns `Equal`.
+    ///
+    /// $$
+    /// f(x,k,p) = x^{1/k}+\varepsilon.
+    /// $$
+    /// - If $x^{1/k}$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^{1/k}$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |x^{1/k}|\rfloor-p}$.
+    ///
+    /// Special cases:
+    /// - $f(x,0,p)=\text{NaN}$
+    /// - $f(0,k,p)=0$ if $k>0$
+    /// - $f(x,k,p)=\text{NaN}$ if $x<0$ and $k$ is even
+    ///
+    /// Unlike [its `Float` counterpart](crate::Float::root_u_rational_prec), this function never
+    /// overflows or underflows.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + m \log m \log\log m)$
+    ///
+    /// $M(n, m) = O(n \log n + m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (root, o) =
+    ///     BigExponentFloat::root_u_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 4, 5);
+    /// assert_eq!(root.to_string(), "0.88");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (root, o) =
+    ///     BigExponentFloat::root_u_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 4, 20);
+    /// assert_eq!(root.to_string(), "0.880112");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn root_u_rational_prec_ref(x: &Rational, k: u64, prec: u64) -> (Self, Ordering) {
+        root_rational_helper(x, i128::from(k), prec, Nearest)
+    }
+
+    /// Computes the $k$th root of a [`Rational`], where $k$ is a [`i64`], returning a
+    /// [`BigExponentFloat`], rounding the result to the specified precision and with the specified
+    /// rounding mode. The [`Rational`] is taken by value. An [`Ordering`] is also returned,
+    /// indicating whether the rounded root is less than, equal to, or greater than the exact root.
+    /// Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,k,p,m) = x^{1/k}+\varepsilon.
+    /// $$
+    /// - If $x^{1/k}$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^{1/k}$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x^{1/k}|\rfloor-p+1}$.
+    /// - If $x^{1/k}$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x^{1/k}|\rfloor-p}$.
+    ///
+    /// Special cases:
+    /// - $f(x,0,p,m)=\text{NaN}$
+    /// - $f(0,k,p,m)=0$ if $k>0$
+    /// - $f(0,k,p,m)=\infty$ if $k<0$ and $k$ is even
+    /// - $f(0,k,p,m)=\text{NaN}$ if $k<0$ and $k$ is odd
+    /// - $f(x,k,p,m)=\text{NaN}$ if $x<0$ and $k$ is even
+    ///
+    /// Unlike [its `Float` counterpart](crate::Float::root_s_rational_prec_round), this function
+    /// never overflows or underflows.
+    ///
+    /// If you know you'll be using `Nearest`, consider using
+    /// [`BigExponentFloat::root_s_rational_prec`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + m \log m \log\log m)$
+    ///
+    /// $M(n, m) = O(n \log n + m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with `prec` bits.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (root, o) = BigExponentFloat::root_s_rational_prec_round(
+    ///     Rational::from_unsigneds(3u8, 5),
+    ///     -3,
+    ///     5,
+    ///     Floor,
+    /// );
+    /// assert_eq!(root.to_string(), "1.12");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (root, o) = BigExponentFloat::root_s_rational_prec_round(
+    ///     Rational::from_unsigneds(3u8, 5),
+    ///     -3,
+    ///     5,
+    ///     Ceiling,
+    /// );
+    /// assert_eq!(root.to_string(), "1.19");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (root, o) = BigExponentFloat::root_s_rational_prec_round(
+    ///     Rational::from_unsigneds(3u8, 5),
+    ///     -3,
+    ///     5,
+    ///     Nearest,
+    /// );
+    /// assert_eq!(root.to_string(), "1.19");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (root, o) = BigExponentFloat::root_s_rational_prec_round(
+    ///     Rational::from_unsigneds(3u8, 5),
+    ///     -3,
+    ///     20,
+    ///     Floor,
+    /// );
+    /// assert_eq!(root.to_string(), "1.185631");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (root, o) = BigExponentFloat::root_s_rational_prec_round(
+    ///     Rational::from_unsigneds(3u8, 5),
+    ///     -3,
+    ///     20,
+    ///     Ceiling,
+    /// );
+    /// assert_eq!(root.to_string(), "1.1856327");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (root, o) = BigExponentFloat::root_s_rational_prec_round(
+    ///     Rational::from_unsigneds(3u8, 5),
+    ///     -3,
+    ///     20,
+    ///     Nearest,
+    /// );
+    /// assert_eq!(root.to_string(), "1.185631");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    #[inline]
+    pub fn root_s_rational_prec_round(
+        x: Rational,
+        k: i64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        root_rational_helper(&x, i128::from(k), prec, rm)
+    }
+
+    /// Computes the $k$th root of a [`Rational`], where $k$ is a [`i64`], returning a
+    /// [`BigExponentFloat`], rounding the result to the specified precision and with the specified
+    /// rounding mode. The [`Rational`] is taken by reference. An [`Ordering`] is also returned,
+    /// indicating whether the rounded root is less than, equal to, or greater than the exact root.
+    /// Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,k,p,m) = x^{1/k}+\varepsilon.
+    /// $$
+    /// - If $x^{1/k}$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^{1/k}$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x^{1/k}|\rfloor-p+1}$.
+    /// - If $x^{1/k}$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x^{1/k}|\rfloor-p}$.
+    ///
+    /// Special cases:
+    /// - $f(x,0,p,m)=\text{NaN}$
+    /// - $f(0,k,p,m)=0$ if $k>0$
+    /// - $f(0,k,p,m)=\infty$ if $k<0$ and $k$ is even
+    /// - $f(0,k,p,m)=\text{NaN}$ if $k<0$ and $k$ is odd
+    /// - $f(x,k,p,m)=\text{NaN}$ if $x<0$ and $k$ is even
+    ///
+    /// Unlike [its `Float` counterpart](crate::Float::root_s_rational_prec_round), this function
+    /// never overflows or underflows.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + m \log m \log\log m)$
+    ///
+    /// $M(n, m) = O(n \log n + m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with `prec` bits.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (root, o) = BigExponentFloat::root_s_rational_prec_round_ref(
+    ///     &Rational::from_unsigneds(3u8, 5),
+    ///     -3,
+    ///     5,
+    ///     Floor,
+    /// );
+    /// assert_eq!(root.to_string(), "1.12");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (root, o) = BigExponentFloat::root_s_rational_prec_round_ref(
+    ///     &Rational::from_unsigneds(3u8, 5),
+    ///     -3,
+    ///     5,
+    ///     Ceiling,
+    /// );
+    /// assert_eq!(root.to_string(), "1.19");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (root, o) = BigExponentFloat::root_s_rational_prec_round_ref(
+    ///     &Rational::from_unsigneds(3u8, 5),
+    ///     -3,
+    ///     5,
+    ///     Nearest,
+    /// );
+    /// assert_eq!(root.to_string(), "1.19");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (root, o) = BigExponentFloat::root_s_rational_prec_round_ref(
+    ///     &Rational::from_unsigneds(3u8, 5),
+    ///     -3,
+    ///     20,
+    ///     Floor,
+    /// );
+    /// assert_eq!(root.to_string(), "1.185631");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (root, o) = BigExponentFloat::root_s_rational_prec_round_ref(
+    ///     &Rational::from_unsigneds(3u8, 5),
+    ///     -3,
+    ///     20,
+    ///     Ceiling,
+    /// );
+    /// assert_eq!(root.to_string(), "1.1856327");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (root, o) = BigExponentFloat::root_s_rational_prec_round_ref(
+    ///     &Rational::from_unsigneds(3u8, 5),
+    ///     -3,
+    ///     20,
+    ///     Nearest,
+    /// );
+    /// assert_eq!(root.to_string(), "1.185631");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn root_s_rational_prec_round_ref(
+        x: &Rational,
+        k: i64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        root_rational_helper(x, i128::from(k), prec, rm)
+    }
+
+    /// Computes the $k$th root of a [`Rational`], where $k$ is a [`i64`], returning a
+    /// [`BigExponentFloat`], rounding the result to the nearest value of the specified precision.
+    /// The [`Rational`] is taken by value. An [`Ordering`] is also returned, indicating whether the
+    /// rounded root is less than, equal to, or greater than the exact root. Although `NaN`s are not
+    /// comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also
+    /// returns `Equal`.
+    ///
+    /// $$
+    /// f(x,k,p) = x^{1/k}+\varepsilon.
+    /// $$
+    /// - If $x^{1/k}$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^{1/k}$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |x^{1/k}|\rfloor-p}$.
+    ///
+    /// Special cases:
+    /// - $f(x,0,p)=\text{NaN}$
+    /// - $f(0,k,p)=0$ if $k>0$
+    /// - $f(0,k,p)=\infty$ if $k<0$ and $k$ is even
+    /// - $f(0,k,p)=\text{NaN}$ if $k<0$ and $k$ is odd
+    /// - $f(x,k,p)=\text{NaN}$ if $x<0$ and $k$ is even
+    ///
+    /// Unlike [its `Float` counterpart](crate::Float::root_s_rational_prec), this function never
+    /// overflows or underflows.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`BigExponentFloat::root_s_rational_prec_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + m \log m \log\log m)$
+    ///
+    /// $M(n, m) = O(n \log n + m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (root, o) =
+    ///     BigExponentFloat::root_s_rational_prec(Rational::from_unsigneds(3u8, 5), -3, 5);
+    /// assert_eq!(root.to_string(), "1.19");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (root, o) =
+    ///     BigExponentFloat::root_s_rational_prec(Rational::from_unsigneds(3u8, 5), -3, 20);
+    /// assert_eq!(root.to_string(), "1.185631");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    #[inline]
+    pub fn root_s_rational_prec(x: Rational, k: i64, prec: u64) -> (Self, Ordering) {
+        root_rational_helper(&x, i128::from(k), prec, Nearest)
+    }
+
+    /// Computes the $k$th root of a [`Rational`], where $k$ is a [`i64`], returning a
+    /// [`BigExponentFloat`], rounding the result to the nearest value of the specified precision.
+    /// The [`Rational`] is taken by reference. An [`Ordering`] is also returned, indicating whether
+    /// the rounded root is less than, equal to, or greater than the exact root. Although `NaN`s are
+    /// not comparable to any [`BigExponentFloat`], whenever this function returns a `NaN` it also
+    /// returns `Equal`.
+    ///
+    /// $$
+    /// f(x,k,p) = x^{1/k}+\varepsilon.
+    /// $$
+    /// - If $x^{1/k}$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^{1/k}$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |x^{1/k}|\rfloor-p}$.
+    ///
+    /// Special cases:
+    /// - $f(x,0,p)=\text{NaN}$
+    /// - $f(0,k,p)=0$ if $k>0$
+    /// - $f(0,k,p)=\infty$ if $k<0$ and $k$ is even
+    /// - $f(0,k,p)=\text{NaN}$ if $k<0$ and $k$ is odd
+    /// - $f(x,k,p)=\text{NaN}$ if $x<0$ and $k$ is even
+    ///
+    /// Unlike [its `Float` counterpart](crate::Float::root_s_rational_prec), this function never
+    /// overflows or underflows.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + m \log m \log\log m)$
+    ///
+    /// $M(n, m) = O(n \log n + m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (root, o) =
+    ///     BigExponentFloat::root_s_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), -3, 5);
+    /// assert_eq!(root.to_string(), "1.19");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (root, o) =
+    ///     BigExponentFloat::root_s_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), -3, 20);
+    /// assert_eq!(root.to_string(), "1.185631");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn root_s_rational_prec_ref(x: &Rational, k: i64, prec: u64) -> (Self, Ordering) {
+        root_rational_helper(x, i128::from(k), prec, Nearest)
     }
 }

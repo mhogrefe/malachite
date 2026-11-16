@@ -1016,3 +1016,81 @@ pub fn big_exponent_float_vec_pair_unsigned_rounding_mode_quadruple_float(
         Some(((fs, gs, p, rm), (xs, ys, p, rm)))
     }))
 }
+
+// The `Float`s equal to the `BigExponentFloat`s of each tuple, paired with the tuple; tuples with a
+// `BigExponentFloat` outside `Float`'s range, or with `Exact`, are skipped.
+pub fn big_exponent_float_big_exponent_float_rational_unsigned_rounding_mode_quintuple_float(
+    xs: It<(
+        BigExponentFloat,
+        BigExponentFloat,
+        Rational,
+        u64,
+        RoundingMode,
+    )>,
+) -> It<(
+    (Float, Float, Rational, u64, RoundingMode),
+    (
+        BigExponentFloat,
+        BigExponentFloat,
+        Rational,
+        u64,
+        RoundingMode,
+    ),
+)> {
+    Box::new(xs.filter_map(|(x, y, z, p, rm)| {
+        if rm == Exact {
+            return None;
+        }
+        Some((
+            (
+                big_exponent_float_to_float(&x)?,
+                big_exponent_float_to_float(&y)?,
+                z.clone(),
+                p,
+                rm,
+            ),
+            (x, y, z, p, rm),
+        ))
+    }))
+}
+
+// The `Float`s equal to the `BigExponentFloat`s of each tuple, paired with the tuple; tuples with a
+// `BigExponentFloat` outside `Float`'s range, or with `Exact`, are skipped.
+#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
+pub fn big_exponent_float_big_exponent_float_big_exponent_float_rational_unsigned_rounding_mode_sextuple_float(
+    xs: It<(
+        BigExponentFloat,
+        BigExponentFloat,
+        BigExponentFloat,
+        Rational,
+        u64,
+        RoundingMode,
+    )>,
+) -> It<(
+    (Float, Float, Float, Rational, u64, RoundingMode),
+    (
+        BigExponentFloat,
+        BigExponentFloat,
+        BigExponentFloat,
+        Rational,
+        u64,
+        RoundingMode,
+    ),
+)> {
+    Box::new(xs.filter_map(|(x, y, z, w, p, rm)| {
+        if rm == Exact {
+            return None;
+        }
+        Some((
+            (
+                big_exponent_float_to_float(&x)?,
+                big_exponent_float_to_float(&y)?,
+                big_exponent_float_to_float(&z)?,
+                w.clone(),
+                p,
+                rm,
+            ),
+            (x, y, z, w, p, rm),
+        ))
+    }))
+}

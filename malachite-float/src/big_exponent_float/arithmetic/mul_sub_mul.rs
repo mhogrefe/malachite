@@ -7,12 +7,15 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::big_exponent_float::BigExponentFloat;
+use crate::big_exponent_float::arithmetic::add_mul::add_mul_rational_helper;
+use crate::big_exponent_float::arithmetic::mul::mul_helper;
 use crate::big_exponent_float::arithmetic::mul_add_mul::mul_add_mul_helper;
 use alloc::borrow::Cow;
 use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::{MulSubMul, MulSubMulAssign};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
+use malachite_q::Rational;
 
 impl BigExponentFloat {
     /// Subtracts the product of two [`BigExponentFloat`]s from the product of two other
@@ -4560,5 +4563,3788 @@ impl MulSubMulAssign<&Self, &Self, &Self> for BigExponentFloat {
             None,
         )
         .0;
+    }
+}
+
+impl BigExponentFloat {
+    /// Subtracts the product of a [`BigExponentFloat`] and a [`Rational`] from the product of two
+    /// [`BigExponentFloat`]s, rounding the result to the specified precision and with the specified
+    /// rounding mode. The [`BigExponentFloat`]s and the [`Rational`] are all taken by value. An
+    /// [`Ordering`] is also returned, indicating whether the rounded result is less than, equal to,
+    /// or greater than the exact result. Although `NaN`s are not comparable to any
+    /// [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The products are computed exactly, so only one rounding occurs.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,y,z,w,p,m) = xy-zw+\varepsilon.
+    /// $$
+    /// - If $xy-zw$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy-zw$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |xy-zw|\rfloor-p+1}$.
+    /// - If $xy-zw$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |xy-zw|\rfloor-p}$.
+    ///
+    /// Special cases:
+    /// - $f(x,y,z,w,p,m)=\text{NaN}$ if any of $x$, $y$, and $z$ is NaN, if $xy$ multiplies an
+    ///   infinity by zero, if $z$ is infinite and $w=0$, or if $xy$ and $zw$ are infinities of the
+    ///   same sign
+    /// - $f(x,y,z,w,p,m)=\infty$ if $xy$ is $\infty$ or $zw$ is $-\infty$, and the other is not the
+    ///   same infinity
+    /// - $f(x,y,z,w,p,m)=-\infty$ if $xy$ is $-\infty$ or $zw$ is $\infty$, and the other is not
+    ///   the same infinity
+    /// - $f(x,y,z,w,p,m)=0$ if $xy=zw$ and both are finite
+    ///
+    /// If you know you'll be using `Nearest`, consider using
+    /// [`BigExponentFloat::mul_sub_mul_rational_prec`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum of `prec` and the sum of
+    /// the significant bits of the inputs.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with `prec` bits.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::f64::consts::{E, PI, SQRT_2};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI).mul_sub_mul_rational_prec_round(
+    ///     BigExponentFloat::from(E),
+    ///     BigExponentFloat::from(SQRT_2),
+    ///     Rational::from_signeds(1, 3),
+    ///     5,
+    ///     Floor,
+    /// );
+    /// assert_eq!(result.to_string(), "8.0");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI).mul_sub_mul_rational_prec_round(
+    ///     BigExponentFloat::from(E),
+    ///     BigExponentFloat::from(SQRT_2),
+    ///     Rational::from_signeds(1, 3),
+    ///     5,
+    ///     Ceiling,
+    /// );
+    /// assert_eq!(result.to_string(), "8.50");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI).mul_sub_mul_rational_prec_round(
+    ///     BigExponentFloat::from(E),
+    ///     BigExponentFloat::from(SQRT_2),
+    ///     Rational::from_signeds(1, 3),
+    ///     5,
+    ///     Nearest,
+    /// );
+    /// assert_eq!(result.to_string(), "8.0");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI).mul_sub_mul_rational_prec_round(
+    ///     BigExponentFloat::from(E),
+    ///     BigExponentFloat::from(SQRT_2),
+    ///     Rational::from_signeds(1, 3),
+    ///     20,
+    ///     Floor,
+    /// );
+    /// assert_eq!(result.to_string(), "8.068329");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI).mul_sub_mul_rational_prec_round(
+    ///     BigExponentFloat::from(E),
+    ///     BigExponentFloat::from(SQRT_2),
+    ///     Rational::from_signeds(1, 3),
+    ///     20,
+    ///     Ceiling,
+    /// );
+    /// assert_eq!(result.to_string(), "8.0683441");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI).mul_sub_mul_rational_prec_round(
+    ///     BigExponentFloat::from(E),
+    ///     BigExponentFloat::from(SQRT_2),
+    ///     Rational::from_signeds(1, 3),
+    ///     20,
+    ///     Nearest,
+    /// );
+    /// assert_eq!(result.to_string(), "8.068329");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    #[inline]
+    pub fn mul_sub_mul_rational_prec_round(
+        self,
+        y: Self,
+        z: Self,
+        w: Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        add_mul_rational_helper(
+            Cow::Owned(mul_helper(Cow::Owned(self), Cow::Owned(y), None).0),
+            &z,
+            &w,
+            true,
+            prec,
+            rm,
+            true,
+        )
+    }
+
+    /// Subtracts the product of a [`BigExponentFloat`] and a [`Rational`] from the product of two
+    /// [`BigExponentFloat`]s, rounding the result to the specified precision and with the specified
+    /// rounding mode. The [`BigExponentFloat`]s are taken by value and the [`Rational`] by
+    /// reference. An [`Ordering`] is also returned, indicating whether the rounded result is less
+    /// than, equal to, or greater than the exact result. Although `NaN`s are not comparable to any
+    /// [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The products are computed exactly, so only one rounding occurs.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,y,z,w,p,m) = xy-zw+\varepsilon.
+    /// $$
+    /// - If $xy-zw$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy-zw$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |xy-zw|\rfloor-p+1}$.
+    /// - If $xy-zw$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |xy-zw|\rfloor-p}$.
+    ///
+    /// Special cases:
+    /// - $f(x,y,z,w,p,m)=\text{NaN}$ if any of $x$, $y$, and $z$ is NaN, if $xy$ multiplies an
+    ///   infinity by zero, if $z$ is infinite and $w=0$, or if $xy$ and $zw$ are infinities of the
+    ///   same sign
+    /// - $f(x,y,z,w,p,m)=\infty$ if $xy$ is $\infty$ or $zw$ is $-\infty$, and the other is not the
+    ///   same infinity
+    /// - $f(x,y,z,w,p,m)=-\infty$ if $xy$ is $-\infty$ or $zw$ is $\infty$, and the other is not
+    ///   the same infinity
+    /// - $f(x,y,z,w,p,m)=0$ if $xy=zw$ and both are finite
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum of `prec` and the sum of
+    /// the significant bits of the inputs.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with `prec` bits.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::f64::consts::{E, PI, SQRT_2};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI)
+    ///     .mul_sub_mul_rational_prec_round_val_val_val_ref(
+    ///         BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Floor,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.0");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI)
+    ///     .mul_sub_mul_rational_prec_round_val_val_val_ref(
+    ///         BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Ceiling,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.50");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI)
+    ///     .mul_sub_mul_rational_prec_round_val_val_val_ref(
+    ///         BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Nearest,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.0");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI)
+    ///     .mul_sub_mul_rational_prec_round_val_val_val_ref(
+    ///         BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Floor,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.068329");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI)
+    ///     .mul_sub_mul_rational_prec_round_val_val_val_ref(
+    ///         BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Ceiling,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.0683441");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI)
+    ///     .mul_sub_mul_rational_prec_round_val_val_val_ref(
+    ///         BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Nearest,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.068329");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    #[inline]
+    pub fn mul_sub_mul_rational_prec_round_val_val_val_ref(
+        self,
+        y: Self,
+        z: Self,
+        w: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        add_mul_rational_helper(
+            Cow::Owned(mul_helper(Cow::Owned(self), Cow::Owned(y), None).0),
+            &z,
+            w,
+            true,
+            prec,
+            rm,
+            true,
+        )
+    }
+
+    /// Subtracts the product of a [`BigExponentFloat`] and a [`Rational`] from the product of two
+    /// [`BigExponentFloat`]s, rounding the result to the specified precision and with the specified
+    /// rounding mode. The first and second [`BigExponentFloat`]s and the [`Rational`] are taken by
+    /// value and the third [`BigExponentFloat`] by reference. An [`Ordering`] is also returned,
+    /// indicating whether the rounded result is less than, equal to, or greater than the exact
+    /// result. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The products are computed exactly, so only one rounding occurs.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,y,z,w,p,m) = xy-zw+\varepsilon.
+    /// $$
+    /// - If $xy-zw$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy-zw$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |xy-zw|\rfloor-p+1}$.
+    /// - If $xy-zw$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |xy-zw|\rfloor-p}$.
+    ///
+    /// Special cases:
+    /// - $f(x,y,z,w,p,m)=\text{NaN}$ if any of $x$, $y$, and $z$ is NaN, if $xy$ multiplies an
+    ///   infinity by zero, if $z$ is infinite and $w=0$, or if $xy$ and $zw$ are infinities of the
+    ///   same sign
+    /// - $f(x,y,z,w,p,m)=\infty$ if $xy$ is $\infty$ or $zw$ is $-\infty$, and the other is not the
+    ///   same infinity
+    /// - $f(x,y,z,w,p,m)=-\infty$ if $xy$ is $-\infty$ or $zw$ is $\infty$, and the other is not
+    ///   the same infinity
+    /// - $f(x,y,z,w,p,m)=0$ if $xy=zw$ and both are finite
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum of `prec` and the sum of
+    /// the significant bits of the inputs.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with `prec` bits.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::f64::consts::{E, PI, SQRT_2};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI)
+    ///     .mul_sub_mul_rational_prec_round_val_val_ref_val(
+    ///         BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Floor,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.0");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI)
+    ///     .mul_sub_mul_rational_prec_round_val_val_ref_val(
+    ///         BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Ceiling,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.50");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI)
+    ///     .mul_sub_mul_rational_prec_round_val_val_ref_val(
+    ///         BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Nearest,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.0");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI)
+    ///     .mul_sub_mul_rational_prec_round_val_val_ref_val(
+    ///         BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Floor,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.068329");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI)
+    ///     .mul_sub_mul_rational_prec_round_val_val_ref_val(
+    ///         BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Ceiling,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.0683441");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI)
+    ///     .mul_sub_mul_rational_prec_round_val_val_ref_val(
+    ///         BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Nearest,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.068329");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    #[inline]
+    pub fn mul_sub_mul_rational_prec_round_val_val_ref_val(
+        self,
+        y: Self,
+        z: &Self,
+        w: Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        add_mul_rational_helper(
+            Cow::Owned(mul_helper(Cow::Owned(self), Cow::Owned(y), None).0),
+            z,
+            &w,
+            true,
+            prec,
+            rm,
+            true,
+        )
+    }
+
+    /// Subtracts the product of a [`BigExponentFloat`] and a [`Rational`] from the product of two
+    /// [`BigExponentFloat`]s, rounding the result to the specified precision and with the specified
+    /// rounding mode. The first and second [`BigExponentFloat`]s are taken by value and the third
+    /// [`BigExponentFloat`] and the [`Rational`] by reference. An [`Ordering`] is also returned,
+    /// indicating whether the rounded result is less than, equal to, or greater than the exact
+    /// result. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The products are computed exactly, so only one rounding occurs.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,y,z,w,p,m) = xy-zw+\varepsilon.
+    /// $$
+    /// - If $xy-zw$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy-zw$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |xy-zw|\rfloor-p+1}$.
+    /// - If $xy-zw$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |xy-zw|\rfloor-p}$.
+    ///
+    /// Special cases:
+    /// - $f(x,y,z,w,p,m)=\text{NaN}$ if any of $x$, $y$, and $z$ is NaN, if $xy$ multiplies an
+    ///   infinity by zero, if $z$ is infinite and $w=0$, or if $xy$ and $zw$ are infinities of the
+    ///   same sign
+    /// - $f(x,y,z,w,p,m)=\infty$ if $xy$ is $\infty$ or $zw$ is $-\infty$, and the other is not the
+    ///   same infinity
+    /// - $f(x,y,z,w,p,m)=-\infty$ if $xy$ is $-\infty$ or $zw$ is $\infty$, and the other is not
+    ///   the same infinity
+    /// - $f(x,y,z,w,p,m)=0$ if $xy=zw$ and both are finite
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum of `prec` and the sum of
+    /// the significant bits of the inputs.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with `prec` bits.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::f64::consts::{E, PI, SQRT_2};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI)
+    ///     .mul_sub_mul_rational_prec_round_val_val_ref_ref(
+    ///         BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Floor,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.0");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI)
+    ///     .mul_sub_mul_rational_prec_round_val_val_ref_ref(
+    ///         BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Ceiling,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.50");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI)
+    ///     .mul_sub_mul_rational_prec_round_val_val_ref_ref(
+    ///         BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Nearest,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.0");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI)
+    ///     .mul_sub_mul_rational_prec_round_val_val_ref_ref(
+    ///         BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Floor,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.068329");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI)
+    ///     .mul_sub_mul_rational_prec_round_val_val_ref_ref(
+    ///         BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Ceiling,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.0683441");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI)
+    ///     .mul_sub_mul_rational_prec_round_val_val_ref_ref(
+    ///         BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Nearest,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.068329");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn mul_sub_mul_rational_prec_round_val_val_ref_ref(
+        self,
+        y: Self,
+        z: &Self,
+        w: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        add_mul_rational_helper(
+            Cow::Owned(mul_helper(Cow::Owned(self), Cow::Owned(y), None).0),
+            z,
+            w,
+            true,
+            prec,
+            rm,
+            true,
+        )
+    }
+
+    /// Subtracts the product of a [`BigExponentFloat`] and a [`Rational`] from the product of two
+    /// [`BigExponentFloat`]s, rounding the result to the specified precision and with the specified
+    /// rounding mode. The first and third [`BigExponentFloat`]s and the [`Rational`] are taken by
+    /// value and the second [`BigExponentFloat`] by reference. An [`Ordering`] is also returned,
+    /// indicating whether the rounded result is less than, equal to, or greater than the exact
+    /// result. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The products are computed exactly, so only one rounding occurs.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,y,z,w,p,m) = xy-zw+\varepsilon.
+    /// $$
+    /// - If $xy-zw$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy-zw$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |xy-zw|\rfloor-p+1}$.
+    /// - If $xy-zw$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |xy-zw|\rfloor-p}$.
+    ///
+    /// Special cases:
+    /// - $f(x,y,z,w,p,m)=\text{NaN}$ if any of $x$, $y$, and $z$ is NaN, if $xy$ multiplies an
+    ///   infinity by zero, if $z$ is infinite and $w=0$, or if $xy$ and $zw$ are infinities of the
+    ///   same sign
+    /// - $f(x,y,z,w,p,m)=\infty$ if $xy$ is $\infty$ or $zw$ is $-\infty$, and the other is not the
+    ///   same infinity
+    /// - $f(x,y,z,w,p,m)=-\infty$ if $xy$ is $-\infty$ or $zw$ is $\infty$, and the other is not
+    ///   the same infinity
+    /// - $f(x,y,z,w,p,m)=0$ if $xy=zw$ and both are finite
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum of `prec` and the sum of
+    /// the significant bits of the inputs.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with `prec` bits.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::f64::consts::{E, PI, SQRT_2};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI)
+    ///     .mul_sub_mul_rational_prec_round_val_ref_val_val(
+    ///         &BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Floor,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.0");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI)
+    ///     .mul_sub_mul_rational_prec_round_val_ref_val_val(
+    ///         &BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Ceiling,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.50");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI)
+    ///     .mul_sub_mul_rational_prec_round_val_ref_val_val(
+    ///         &BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Nearest,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.0");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI)
+    ///     .mul_sub_mul_rational_prec_round_val_ref_val_val(
+    ///         &BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Floor,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.068329");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI)
+    ///     .mul_sub_mul_rational_prec_round_val_ref_val_val(
+    ///         &BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Ceiling,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.0683441");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI)
+    ///     .mul_sub_mul_rational_prec_round_val_ref_val_val(
+    ///         &BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Nearest,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.068329");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    #[inline]
+    pub fn mul_sub_mul_rational_prec_round_val_ref_val_val(
+        self,
+        y: &Self,
+        z: Self,
+        w: Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        add_mul_rational_helper(
+            Cow::Owned(mul_helper(Cow::Owned(self), Cow::Borrowed(y), None).0),
+            &z,
+            &w,
+            true,
+            prec,
+            rm,
+            true,
+        )
+    }
+
+    /// Subtracts the product of a [`BigExponentFloat`] and a [`Rational`] from the product of two
+    /// [`BigExponentFloat`]s, rounding the result to the specified precision and with the specified
+    /// rounding mode. The first and third [`BigExponentFloat`]s are taken by value and the second
+    /// [`BigExponentFloat`] and the [`Rational`] by reference. An [`Ordering`] is also returned,
+    /// indicating whether the rounded result is less than, equal to, or greater than the exact
+    /// result. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The products are computed exactly, so only one rounding occurs.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,y,z,w,p,m) = xy-zw+\varepsilon.
+    /// $$
+    /// - If $xy-zw$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy-zw$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |xy-zw|\rfloor-p+1}$.
+    /// - If $xy-zw$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |xy-zw|\rfloor-p}$.
+    ///
+    /// Special cases:
+    /// - $f(x,y,z,w,p,m)=\text{NaN}$ if any of $x$, $y$, and $z$ is NaN, if $xy$ multiplies an
+    ///   infinity by zero, if $z$ is infinite and $w=0$, or if $xy$ and $zw$ are infinities of the
+    ///   same sign
+    /// - $f(x,y,z,w,p,m)=\infty$ if $xy$ is $\infty$ or $zw$ is $-\infty$, and the other is not the
+    ///   same infinity
+    /// - $f(x,y,z,w,p,m)=-\infty$ if $xy$ is $-\infty$ or $zw$ is $\infty$, and the other is not
+    ///   the same infinity
+    /// - $f(x,y,z,w,p,m)=0$ if $xy=zw$ and both are finite
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum of `prec` and the sum of
+    /// the significant bits of the inputs.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with `prec` bits.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::f64::consts::{E, PI, SQRT_2};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI)
+    ///     .mul_sub_mul_rational_prec_round_val_ref_val_ref(
+    ///         &BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Floor,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.0");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI)
+    ///     .mul_sub_mul_rational_prec_round_val_ref_val_ref(
+    ///         &BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Ceiling,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.50");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI)
+    ///     .mul_sub_mul_rational_prec_round_val_ref_val_ref(
+    ///         &BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Nearest,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.0");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI)
+    ///     .mul_sub_mul_rational_prec_round_val_ref_val_ref(
+    ///         &BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Floor,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.068329");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI)
+    ///     .mul_sub_mul_rational_prec_round_val_ref_val_ref(
+    ///         &BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Ceiling,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.0683441");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI)
+    ///     .mul_sub_mul_rational_prec_round_val_ref_val_ref(
+    ///         &BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Nearest,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.068329");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    #[inline]
+    pub fn mul_sub_mul_rational_prec_round_val_ref_val_ref(
+        self,
+        y: &Self,
+        z: Self,
+        w: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        add_mul_rational_helper(
+            Cow::Owned(mul_helper(Cow::Owned(self), Cow::Borrowed(y), None).0),
+            &z,
+            w,
+            true,
+            prec,
+            rm,
+            true,
+        )
+    }
+
+    /// Subtracts the product of a [`BigExponentFloat`] and a [`Rational`] from the product of two
+    /// [`BigExponentFloat`]s, rounding the result to the specified precision and with the specified
+    /// rounding mode. The first [`BigExponentFloat`] and the [`Rational`] are taken by value and
+    /// the second and third [`BigExponentFloat`]s by reference. An [`Ordering`] is also returned,
+    /// indicating whether the rounded result is less than, equal to, or greater than the exact
+    /// result. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The products are computed exactly, so only one rounding occurs.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,y,z,w,p,m) = xy-zw+\varepsilon.
+    /// $$
+    /// - If $xy-zw$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy-zw$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |xy-zw|\rfloor-p+1}$.
+    /// - If $xy-zw$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |xy-zw|\rfloor-p}$.
+    ///
+    /// Special cases:
+    /// - $f(x,y,z,w,p,m)=\text{NaN}$ if any of $x$, $y$, and $z$ is NaN, if $xy$ multiplies an
+    ///   infinity by zero, if $z$ is infinite and $w=0$, or if $xy$ and $zw$ are infinities of the
+    ///   same sign
+    /// - $f(x,y,z,w,p,m)=\infty$ if $xy$ is $\infty$ or $zw$ is $-\infty$, and the other is not the
+    ///   same infinity
+    /// - $f(x,y,z,w,p,m)=-\infty$ if $xy$ is $-\infty$ or $zw$ is $\infty$, and the other is not
+    ///   the same infinity
+    /// - $f(x,y,z,w,p,m)=0$ if $xy=zw$ and both are finite
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum of `prec` and the sum of
+    /// the significant bits of the inputs.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with `prec` bits.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::f64::consts::{E, PI, SQRT_2};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI)
+    ///     .mul_sub_mul_rational_prec_round_val_ref_ref_val(
+    ///         &BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Floor,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.0");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI)
+    ///     .mul_sub_mul_rational_prec_round_val_ref_ref_val(
+    ///         &BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Ceiling,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.50");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI)
+    ///     .mul_sub_mul_rational_prec_round_val_ref_ref_val(
+    ///         &BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Nearest,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.0");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI)
+    ///     .mul_sub_mul_rational_prec_round_val_ref_ref_val(
+    ///         &BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Floor,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.068329");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI)
+    ///     .mul_sub_mul_rational_prec_round_val_ref_ref_val(
+    ///         &BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Ceiling,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.0683441");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI)
+    ///     .mul_sub_mul_rational_prec_round_val_ref_ref_val(
+    ///         &BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Nearest,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.068329");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    #[inline]
+    pub fn mul_sub_mul_rational_prec_round_val_ref_ref_val(
+        self,
+        y: &Self,
+        z: &Self,
+        w: Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        add_mul_rational_helper(
+            Cow::Owned(mul_helper(Cow::Owned(self), Cow::Borrowed(y), None).0),
+            z,
+            &w,
+            true,
+            prec,
+            rm,
+            true,
+        )
+    }
+
+    /// Subtracts the product of a [`BigExponentFloat`] and a [`Rational`] from the product of two
+    /// [`BigExponentFloat`]s, rounding the result to the specified precision and with the specified
+    /// rounding mode. The first [`BigExponentFloat`] is taken by value and the second and third
+    /// [`BigExponentFloat`]s and the [`Rational`] by reference. An [`Ordering`] is also returned,
+    /// indicating whether the rounded result is less than, equal to, or greater than the exact
+    /// result. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The products are computed exactly, so only one rounding occurs.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,y,z,w,p,m) = xy-zw+\varepsilon.
+    /// $$
+    /// - If $xy-zw$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy-zw$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |xy-zw|\rfloor-p+1}$.
+    /// - If $xy-zw$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |xy-zw|\rfloor-p}$.
+    ///
+    /// Special cases:
+    /// - $f(x,y,z,w,p,m)=\text{NaN}$ if any of $x$, $y$, and $z$ is NaN, if $xy$ multiplies an
+    ///   infinity by zero, if $z$ is infinite and $w=0$, or if $xy$ and $zw$ are infinities of the
+    ///   same sign
+    /// - $f(x,y,z,w,p,m)=\infty$ if $xy$ is $\infty$ or $zw$ is $-\infty$, and the other is not the
+    ///   same infinity
+    /// - $f(x,y,z,w,p,m)=-\infty$ if $xy$ is $-\infty$ or $zw$ is $\infty$, and the other is not
+    ///   the same infinity
+    /// - $f(x,y,z,w,p,m)=0$ if $xy=zw$ and both are finite
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum of `prec` and the sum of
+    /// the significant bits of the inputs.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with `prec` bits.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::f64::consts::{E, PI, SQRT_2};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI)
+    ///     .mul_sub_mul_rational_prec_round_val_ref_ref_ref(
+    ///         &BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Floor,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.0");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI)
+    ///     .mul_sub_mul_rational_prec_round_val_ref_ref_ref(
+    ///         &BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Ceiling,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.50");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI)
+    ///     .mul_sub_mul_rational_prec_round_val_ref_ref_ref(
+    ///         &BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Nearest,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.0");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI)
+    ///     .mul_sub_mul_rational_prec_round_val_ref_ref_ref(
+    ///         &BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Floor,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.068329");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI)
+    ///     .mul_sub_mul_rational_prec_round_val_ref_ref_ref(
+    ///         &BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Ceiling,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.0683441");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI)
+    ///     .mul_sub_mul_rational_prec_round_val_ref_ref_ref(
+    ///         &BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Nearest,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.068329");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn mul_sub_mul_rational_prec_round_val_ref_ref_ref(
+        self,
+        y: &Self,
+        z: &Self,
+        w: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        add_mul_rational_helper(
+            Cow::Owned(mul_helper(Cow::Owned(self), Cow::Borrowed(y), None).0),
+            z,
+            w,
+            true,
+            prec,
+            rm,
+            true,
+        )
+    }
+
+    /// Subtracts the product of a [`BigExponentFloat`] and a [`Rational`] from the product of two
+    /// [`BigExponentFloat`]s, rounding the result to the specified precision and with the specified
+    /// rounding mode. The [`BigExponentFloat`]s and the [`Rational`] are all taken by reference. An
+    /// [`Ordering`] is also returned, indicating whether the rounded result is less than, equal to,
+    /// or greater than the exact result. Although `NaN`s are not comparable to any
+    /// [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The products are computed exactly, so only one rounding occurs.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,y,z,w,p,m) = xy-zw+\varepsilon.
+    /// $$
+    /// - If $xy-zw$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy-zw$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |xy-zw|\rfloor-p+1}$.
+    /// - If $xy-zw$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |xy-zw|\rfloor-p}$.
+    ///
+    /// Special cases:
+    /// - $f(x,y,z,w,p,m)=\text{NaN}$ if any of $x$, $y$, and $z$ is NaN, if $xy$ multiplies an
+    ///   infinity by zero, if $z$ is infinite and $w=0$, or if $xy$ and $zw$ are infinities of the
+    ///   same sign
+    /// - $f(x,y,z,w,p,m)=\infty$ if $xy$ is $\infty$ or $zw$ is $-\infty$, and the other is not the
+    ///   same infinity
+    /// - $f(x,y,z,w,p,m)=-\infty$ if $xy$ is $-\infty$ or $zw$ is $\infty$, and the other is not
+    ///   the same infinity
+    /// - $f(x,y,z,w,p,m)=0$ if $xy=zw$ and both are finite
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum of `prec` and the sum of
+    /// the significant bits of the inputs.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with `prec` bits.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::f64::consts::{E, PI, SQRT_2};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (result, o) = (&BigExponentFloat::from(PI))
+    ///     .mul_sub_mul_rational_prec_round_ref_ref_ref_ref(
+    ///         &BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Floor,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.0");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (result, o) = (&BigExponentFloat::from(PI))
+    ///     .mul_sub_mul_rational_prec_round_ref_ref_ref_ref(
+    ///         &BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Ceiling,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.50");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (result, o) = (&BigExponentFloat::from(PI))
+    ///     .mul_sub_mul_rational_prec_round_ref_ref_ref_ref(
+    ///         &BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Nearest,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.0");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (result, o) = (&BigExponentFloat::from(PI))
+    ///     .mul_sub_mul_rational_prec_round_ref_ref_ref_ref(
+    ///         &BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Floor,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.068329");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (result, o) = (&BigExponentFloat::from(PI))
+    ///     .mul_sub_mul_rational_prec_round_ref_ref_ref_ref(
+    ///         &BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Ceiling,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.0683441");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (result, o) = (&BigExponentFloat::from(PI))
+    ///     .mul_sub_mul_rational_prec_round_ref_ref_ref_ref(
+    ///         &BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Nearest,
+    ///     );
+    /// assert_eq!(result.to_string(), "8.068329");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn mul_sub_mul_rational_prec_round_ref_ref_ref_ref(
+        &self,
+        y: &Self,
+        z: &Self,
+        w: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        add_mul_rational_helper(
+            Cow::Owned(mul_helper(Cow::Borrowed(self), Cow::Borrowed(y), None).0),
+            z,
+            w,
+            true,
+            prec,
+            rm,
+            true,
+        )
+    }
+
+    /// Multiplies a [`BigExponentFloat`] by another [`BigExponentFloat`] in place and subtracts the
+    /// product of a third [`BigExponentFloat`] and a [`Rational`], rounding the result to the
+    /// specified precision and with the specified rounding mode. The [`BigExponentFloat`]s and the
+    /// [`Rational`] on the right-hand side are all taken by value. An [`Ordering`] is returned,
+    /// indicating whether the rounded result is less than, equal to, or greater than the exact
+    /// result. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this
+    /// function sets the [`BigExponentFloat`] to `NaN` it also returns `Equal`.
+    ///
+    /// The products are computed exactly, so only one rounding occurs.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// x \gets xy-zw+\varepsilon.
+    /// $$
+    /// - If $xy-zw$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy-zw$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |xy-zw|\rfloor-p+1}$.
+    /// - If $xy-zw$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |xy-zw|\rfloor-p}$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum of `prec` and the sum of
+    /// the significant bits of the inputs.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with `prec` bits.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::f64::consts::{E, PI, SQRT_2};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign(
+    ///         BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Floor
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.0");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign(
+    ///         BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Ceiling
+    ///     ),
+    ///     Greater
+    /// );
+    /// assert_eq!(x.to_string(), "8.50");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign(
+    ///         BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Nearest
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.0");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign(
+    ///         BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Floor
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.068329");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign(
+    ///         BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Ceiling
+    ///     ),
+    ///     Greater
+    /// );
+    /// assert_eq!(x.to_string(), "8.0683441");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign(
+    ///         BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Nearest
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.068329");
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    #[inline]
+    pub fn mul_sub_mul_rational_prec_round_assign(
+        &mut self,
+        y: Self,
+        z: Self,
+        w: Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> Ordering {
+        let x = core::mem::replace(self, Self::ZERO);
+        let (result, o) = add_mul_rational_helper(
+            Cow::Owned(mul_helper(Cow::Owned(x), Cow::Owned(y), None).0),
+            &z,
+            &w,
+            true,
+            prec,
+            rm,
+            true,
+        );
+        *self = result;
+        o
+    }
+
+    /// Multiplies a [`BigExponentFloat`] by another [`BigExponentFloat`] in place and subtracts the
+    /// product of a third [`BigExponentFloat`] and a [`Rational`], rounding the result to the
+    /// specified precision and with the specified rounding mode. On the right-hand side, the
+    /// [`BigExponentFloat`]s are taken by value and the [`Rational`] by reference. An [`Ordering`]
+    /// is returned, indicating whether the rounded result is less than, equal to, or greater than
+    /// the exact result. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever
+    /// this function sets the [`BigExponentFloat`] to `NaN` it also returns `Equal`.
+    ///
+    /// The products are computed exactly, so only one rounding occurs.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// x \gets xy-zw+\varepsilon.
+    /// $$
+    /// - If $xy-zw$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy-zw$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |xy-zw|\rfloor-p+1}$.
+    /// - If $xy-zw$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |xy-zw|\rfloor-p}$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum of `prec` and the sum of
+    /// the significant bits of the inputs.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with `prec` bits.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::f64::consts::{E, PI, SQRT_2};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign_val_val_ref(
+    ///         BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Floor
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.0");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign_val_val_ref(
+    ///         BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Ceiling
+    ///     ),
+    ///     Greater
+    /// );
+    /// assert_eq!(x.to_string(), "8.50");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign_val_val_ref(
+    ///         BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Nearest
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.0");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign_val_val_ref(
+    ///         BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Floor
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.068329");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign_val_val_ref(
+    ///         BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Ceiling
+    ///     ),
+    ///     Greater
+    /// );
+    /// assert_eq!(x.to_string(), "8.0683441");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign_val_val_ref(
+    ///         BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Nearest
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.068329");
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    #[inline]
+    pub fn mul_sub_mul_rational_prec_round_assign_val_val_ref(
+        &mut self,
+        y: Self,
+        z: Self,
+        w: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> Ordering {
+        let x = core::mem::replace(self, Self::ZERO);
+        let (result, o) = add_mul_rational_helper(
+            Cow::Owned(mul_helper(Cow::Owned(x), Cow::Owned(y), None).0),
+            &z,
+            w,
+            true,
+            prec,
+            rm,
+            true,
+        );
+        *self = result;
+        o
+    }
+
+    /// Multiplies a [`BigExponentFloat`] by another [`BigExponentFloat`] in place and subtracts the
+    /// product of a third [`BigExponentFloat`] and a [`Rational`], rounding the result to the
+    /// specified precision and with the specified rounding mode. On the right-hand side, the first
+    /// [`BigExponentFloat`] and the [`Rational`] are taken by value and the second
+    /// [`BigExponentFloat`] by reference. An [`Ordering`] is returned, indicating whether the
+    /// rounded result is less than, equal to, or greater than the exact result. Although `NaN`s are
+    /// not comparable to any [`BigExponentFloat`], whenever this function sets the
+    /// [`BigExponentFloat`] to `NaN` it also returns `Equal`.
+    ///
+    /// The products are computed exactly, so only one rounding occurs.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// x \gets xy-zw+\varepsilon.
+    /// $$
+    /// - If $xy-zw$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy-zw$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |xy-zw|\rfloor-p+1}$.
+    /// - If $xy-zw$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |xy-zw|\rfloor-p}$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum of `prec` and the sum of
+    /// the significant bits of the inputs.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with `prec` bits.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::f64::consts::{E, PI, SQRT_2};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign_val_ref_val(
+    ///         BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Floor
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.0");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign_val_ref_val(
+    ///         BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Ceiling
+    ///     ),
+    ///     Greater
+    /// );
+    /// assert_eq!(x.to_string(), "8.50");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign_val_ref_val(
+    ///         BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Nearest
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.0");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign_val_ref_val(
+    ///         BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Floor
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.068329");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign_val_ref_val(
+    ///         BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Ceiling
+    ///     ),
+    ///     Greater
+    /// );
+    /// assert_eq!(x.to_string(), "8.0683441");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign_val_ref_val(
+    ///         BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Nearest
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.068329");
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    #[inline]
+    pub fn mul_sub_mul_rational_prec_round_assign_val_ref_val(
+        &mut self,
+        y: Self,
+        z: &Self,
+        w: Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> Ordering {
+        let x = core::mem::replace(self, Self::ZERO);
+        let (result, o) = add_mul_rational_helper(
+            Cow::Owned(mul_helper(Cow::Owned(x), Cow::Owned(y), None).0),
+            z,
+            &w,
+            true,
+            prec,
+            rm,
+            true,
+        );
+        *self = result;
+        o
+    }
+
+    /// Multiplies a [`BigExponentFloat`] by another [`BigExponentFloat`] in place and subtracts the
+    /// product of a third [`BigExponentFloat`] and a [`Rational`], rounding the result to the
+    /// specified precision and with the specified rounding mode. On the right-hand side, the first
+    /// [`BigExponentFloat`] is taken by value and the second [`BigExponentFloat`] and the
+    /// [`Rational`] by reference. An [`Ordering`] is returned, indicating whether the rounded
+    /// result is less than, equal to, or greater than the exact result. Although `NaN`s are not
+    /// comparable to any [`BigExponentFloat`], whenever this function sets the [`BigExponentFloat`]
+    /// to `NaN` it also returns `Equal`.
+    ///
+    /// The products are computed exactly, so only one rounding occurs.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// x \gets xy-zw+\varepsilon.
+    /// $$
+    /// - If $xy-zw$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy-zw$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |xy-zw|\rfloor-p+1}$.
+    /// - If $xy-zw$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |xy-zw|\rfloor-p}$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum of `prec` and the sum of
+    /// the significant bits of the inputs.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with `prec` bits.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::f64::consts::{E, PI, SQRT_2};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign_val_ref_ref(
+    ///         BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Floor
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.0");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign_val_ref_ref(
+    ///         BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Ceiling
+    ///     ),
+    ///     Greater
+    /// );
+    /// assert_eq!(x.to_string(), "8.50");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign_val_ref_ref(
+    ///         BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Nearest
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.0");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign_val_ref_ref(
+    ///         BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Floor
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.068329");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign_val_ref_ref(
+    ///         BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Ceiling
+    ///     ),
+    ///     Greater
+    /// );
+    /// assert_eq!(x.to_string(), "8.0683441");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign_val_ref_ref(
+    ///         BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Nearest
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.068329");
+    /// ```
+    #[inline]
+    pub fn mul_sub_mul_rational_prec_round_assign_val_ref_ref(
+        &mut self,
+        y: Self,
+        z: &Self,
+        w: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> Ordering {
+        let x = core::mem::replace(self, Self::ZERO);
+        let (result, o) = add_mul_rational_helper(
+            Cow::Owned(mul_helper(Cow::Owned(x), Cow::Owned(y), None).0),
+            z,
+            w,
+            true,
+            prec,
+            rm,
+            true,
+        );
+        *self = result;
+        o
+    }
+
+    /// Multiplies a [`BigExponentFloat`] by another [`BigExponentFloat`] in place and subtracts the
+    /// product of a third [`BigExponentFloat`] and a [`Rational`], rounding the result to the
+    /// specified precision and with the specified rounding mode. On the right-hand side, the second
+    /// [`BigExponentFloat`] and the [`Rational`] are taken by value and the first
+    /// [`BigExponentFloat`] by reference. An [`Ordering`] is returned, indicating whether the
+    /// rounded result is less than, equal to, or greater than the exact result. Although `NaN`s are
+    /// not comparable to any [`BigExponentFloat`], whenever this function sets the
+    /// [`BigExponentFloat`] to `NaN` it also returns `Equal`.
+    ///
+    /// The products are computed exactly, so only one rounding occurs.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// x \gets xy-zw+\varepsilon.
+    /// $$
+    /// - If $xy-zw$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy-zw$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |xy-zw|\rfloor-p+1}$.
+    /// - If $xy-zw$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |xy-zw|\rfloor-p}$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum of `prec` and the sum of
+    /// the significant bits of the inputs.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with `prec` bits.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::f64::consts::{E, PI, SQRT_2};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign_ref_val_val(
+    ///         &BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Floor
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.0");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign_ref_val_val(
+    ///         &BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Ceiling
+    ///     ),
+    ///     Greater
+    /// );
+    /// assert_eq!(x.to_string(), "8.50");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign_ref_val_val(
+    ///         &BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Nearest
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.0");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign_ref_val_val(
+    ///         &BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Floor
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.068329");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign_ref_val_val(
+    ///         &BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Ceiling
+    ///     ),
+    ///     Greater
+    /// );
+    /// assert_eq!(x.to_string(), "8.0683441");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign_ref_val_val(
+    ///         &BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Nearest
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.068329");
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    #[inline]
+    pub fn mul_sub_mul_rational_prec_round_assign_ref_val_val(
+        &mut self,
+        y: &Self,
+        z: Self,
+        w: Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> Ordering {
+        let x = core::mem::replace(self, Self::ZERO);
+        let (result, o) = add_mul_rational_helper(
+            Cow::Owned(mul_helper(Cow::Owned(x), Cow::Borrowed(y), None).0),
+            &z,
+            &w,
+            true,
+            prec,
+            rm,
+            true,
+        );
+        *self = result;
+        o
+    }
+
+    /// Multiplies a [`BigExponentFloat`] by another [`BigExponentFloat`] in place and subtracts the
+    /// product of a third [`BigExponentFloat`] and a [`Rational`], rounding the result to the
+    /// specified precision and with the specified rounding mode. On the right-hand side, the second
+    /// [`BigExponentFloat`] is taken by value and the first [`BigExponentFloat`] and the
+    /// [`Rational`] by reference. An [`Ordering`] is returned, indicating whether the rounded
+    /// result is less than, equal to, or greater than the exact result. Although `NaN`s are not
+    /// comparable to any [`BigExponentFloat`], whenever this function sets the [`BigExponentFloat`]
+    /// to `NaN` it also returns `Equal`.
+    ///
+    /// The products are computed exactly, so only one rounding occurs.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// x \gets xy-zw+\varepsilon.
+    /// $$
+    /// - If $xy-zw$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy-zw$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |xy-zw|\rfloor-p+1}$.
+    /// - If $xy-zw$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |xy-zw|\rfloor-p}$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum of `prec` and the sum of
+    /// the significant bits of the inputs.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with `prec` bits.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::f64::consts::{E, PI, SQRT_2};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign_ref_val_ref(
+    ///         &BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Floor
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.0");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign_ref_val_ref(
+    ///         &BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Ceiling
+    ///     ),
+    ///     Greater
+    /// );
+    /// assert_eq!(x.to_string(), "8.50");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign_ref_val_ref(
+    ///         &BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Nearest
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.0");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign_ref_val_ref(
+    ///         &BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Floor
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.068329");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign_ref_val_ref(
+    ///         &BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Ceiling
+    ///     ),
+    ///     Greater
+    /// );
+    /// assert_eq!(x.to_string(), "8.0683441");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign_ref_val_ref(
+    ///         &BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Nearest
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.068329");
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    #[inline]
+    pub fn mul_sub_mul_rational_prec_round_assign_ref_val_ref(
+        &mut self,
+        y: &Self,
+        z: Self,
+        w: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> Ordering {
+        let x = core::mem::replace(self, Self::ZERO);
+        let (result, o) = add_mul_rational_helper(
+            Cow::Owned(mul_helper(Cow::Owned(x), Cow::Borrowed(y), None).0),
+            &z,
+            w,
+            true,
+            prec,
+            rm,
+            true,
+        );
+        *self = result;
+        o
+    }
+
+    /// Multiplies a [`BigExponentFloat`] by another [`BigExponentFloat`] in place and subtracts the
+    /// product of a third [`BigExponentFloat`] and a [`Rational`], rounding the result to the
+    /// specified precision and with the specified rounding mode. On the right-hand side, the
+    /// [`Rational`] is taken by value and the [`BigExponentFloat`]s by reference. An [`Ordering`]
+    /// is returned, indicating whether the rounded result is less than, equal to, or greater than
+    /// the exact result. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever
+    /// this function sets the [`BigExponentFloat`] to `NaN` it also returns `Equal`.
+    ///
+    /// The products are computed exactly, so only one rounding occurs.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// x \gets xy-zw+\varepsilon.
+    /// $$
+    /// - If $xy-zw$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy-zw$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |xy-zw|\rfloor-p+1}$.
+    /// - If $xy-zw$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |xy-zw|\rfloor-p}$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum of `prec` and the sum of
+    /// the significant bits of the inputs.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with `prec` bits.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::f64::consts::{E, PI, SQRT_2};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign_ref_ref_val(
+    ///         &BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Floor
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.0");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign_ref_ref_val(
+    ///         &BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Ceiling
+    ///     ),
+    ///     Greater
+    /// );
+    /// assert_eq!(x.to_string(), "8.50");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign_ref_ref_val(
+    ///         &BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Nearest
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.0");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign_ref_ref_val(
+    ///         &BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Floor
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.068329");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign_ref_ref_val(
+    ///         &BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Ceiling
+    ///     ),
+    ///     Greater
+    /// );
+    /// assert_eq!(x.to_string(), "8.0683441");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign_ref_ref_val(
+    ///         &BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Nearest
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.068329");
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    #[inline]
+    pub fn mul_sub_mul_rational_prec_round_assign_ref_ref_val(
+        &mut self,
+        y: &Self,
+        z: &Self,
+        w: Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> Ordering {
+        let x = core::mem::replace(self, Self::ZERO);
+        let (result, o) = add_mul_rational_helper(
+            Cow::Owned(mul_helper(Cow::Owned(x), Cow::Borrowed(y), None).0),
+            z,
+            &w,
+            true,
+            prec,
+            rm,
+            true,
+        );
+        *self = result;
+        o
+    }
+
+    /// Multiplies a [`BigExponentFloat`] by another [`BigExponentFloat`] in place and subtracts the
+    /// product of a third [`BigExponentFloat`] and a [`Rational`], rounding the result to the
+    /// specified precision and with the specified rounding mode. The [`BigExponentFloat`]s and the
+    /// [`Rational`] on the right-hand side are all taken by reference. An [`Ordering`] is returned,
+    /// indicating whether the rounded result is less than, equal to, or greater than the exact
+    /// result. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this
+    /// function sets the [`BigExponentFloat`] to `NaN` it also returns `Equal`.
+    ///
+    /// The products are computed exactly, so only one rounding occurs.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// x \gets xy-zw+\varepsilon.
+    /// $$
+    /// - If $xy-zw$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy-zw$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |xy-zw|\rfloor-p+1}$.
+    /// - If $xy-zw$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |xy-zw|\rfloor-p}$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum of `prec` and the sum of
+    /// the significant bits of the inputs.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with `prec` bits.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::f64::consts::{E, PI, SQRT_2};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign_ref_ref_ref(
+    ///         &BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Floor
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.0");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign_ref_ref_ref(
+    ///         &BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Ceiling
+    ///     ),
+    ///     Greater
+    /// );
+    /// assert_eq!(x.to_string(), "8.50");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign_ref_ref_ref(
+    ///         &BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         5,
+    ///         Nearest
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.0");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign_ref_ref_ref(
+    ///         &BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Floor
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.068329");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign_ref_ref_ref(
+    ///         &BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Ceiling
+    ///     ),
+    ///     Greater
+    /// );
+    /// assert_eq!(x.to_string(), "8.0683441");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_round_assign_ref_ref_ref(
+    ///         &BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         20,
+    ///         Nearest
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.068329");
+    /// ```
+    #[inline]
+    pub fn mul_sub_mul_rational_prec_round_assign_ref_ref_ref(
+        &mut self,
+        y: &Self,
+        z: &Self,
+        w: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> Ordering {
+        let x = core::mem::replace(self, Self::ZERO);
+        let (result, o) = add_mul_rational_helper(
+            Cow::Owned(mul_helper(Cow::Owned(x), Cow::Borrowed(y), None).0),
+            z,
+            w,
+            true,
+            prec,
+            rm,
+            true,
+        );
+        *self = result;
+        o
+    }
+
+    /// Subtracts the product of a [`BigExponentFloat`] and a [`Rational`] from the product of two
+    /// [`BigExponentFloat`]s, rounding the result to the nearest value of the specified precision.
+    /// The [`BigExponentFloat`]s and the [`Rational`] are all taken by value. An [`Ordering`] is
+    /// also returned, indicating whether the rounded result is less than, equal to, or greater than
+    /// the exact result. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever
+    /// this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The products are computed exactly, so only one rounding occurs.
+    ///
+    /// $$
+    /// f(x,y,z,w,p) = xy-zw+\varepsilon.
+    /// $$
+    /// - If $xy-zw$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy-zw$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |xy-zw|\rfloor-p}$.
+    ///
+    /// Special cases:
+    /// - $f(x,y,z,w,p)=\text{NaN}$ if any of $x$, $y$, and $z$ is NaN, if $xy$ multiplies an
+    ///   infinity by zero, if $z$ is infinite and $w=0$, or if $xy$ and $zw$ are infinities of the
+    ///   same sign
+    /// - $f(x,y,z,w,p)=\infty$ if $xy$ is $\infty$ or $zw$ is $-\infty$, and the other is not the
+    ///   same infinity
+    /// - $f(x,y,z,w,p)=-\infty$ if $xy$ is $-\infty$ or $zw$ is $\infty$, and the other is not the
+    ///   same infinity
+    /// - $f(x,y,z,w,p)=0$ if $xy=zw$ and both are finite
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`BigExponentFloat::mul_sub_mul_rational_prec_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum of `prec` and the sum of
+    /// the significant bits of the inputs.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::f64::consts::{E, PI, SQRT_2};
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI).mul_sub_mul_rational_prec(
+    ///     BigExponentFloat::from(E),
+    ///     BigExponentFloat::from(SQRT_2),
+    ///     Rational::from_signeds(1, 3),
+    ///     5,
+    /// );
+    /// assert_eq!(result.to_string(), "8.0");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI).mul_sub_mul_rational_prec(
+    ///     BigExponentFloat::from(E),
+    ///     BigExponentFloat::from(SQRT_2),
+    ///     Rational::from_signeds(1, 3),
+    ///     20,
+    /// );
+    /// assert_eq!(result.to_string(), "8.068329");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    #[inline]
+    pub fn mul_sub_mul_rational_prec(
+        self,
+        y: Self,
+        z: Self,
+        w: Rational,
+        prec: u64,
+    ) -> (Self, Ordering) {
+        add_mul_rational_helper(
+            Cow::Owned(mul_helper(Cow::Owned(self), Cow::Owned(y), None).0),
+            &z,
+            &w,
+            true,
+            prec,
+            Nearest,
+            true,
+        )
+    }
+
+    /// Subtracts the product of a [`BigExponentFloat`] and a [`Rational`] from the product of two
+    /// [`BigExponentFloat`]s, rounding the result to the nearest value of the specified precision.
+    /// The [`BigExponentFloat`]s are taken by value and the [`Rational`] by reference. An
+    /// [`Ordering`] is also returned, indicating whether the rounded result is less than, equal to,
+    /// or greater than the exact result. Although `NaN`s are not comparable to any
+    /// [`BigExponentFloat`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The products are computed exactly, so only one rounding occurs.
+    ///
+    /// $$
+    /// f(x,y,z,w,p) = xy-zw+\varepsilon.
+    /// $$
+    /// - If $xy-zw$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy-zw$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |xy-zw|\rfloor-p}$.
+    ///
+    /// Special cases:
+    /// - $f(x,y,z,w,p)=\text{NaN}$ if any of $x$, $y$, and $z$ is NaN, if $xy$ multiplies an
+    ///   infinity by zero, if $z$ is infinite and $w=0$, or if $xy$ and $zw$ are infinities of the
+    ///   same sign
+    /// - $f(x,y,z,w,p)=\infty$ if $xy$ is $\infty$ or $zw$ is $-\infty$, and the other is not the
+    ///   same infinity
+    /// - $f(x,y,z,w,p)=-\infty$ if $xy$ is $-\infty$ or $zw$ is $\infty$, and the other is not the
+    ///   same infinity
+    /// - $f(x,y,z,w,p)=0$ if $xy=zw$ and both are finite
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum of `prec` and the sum of
+    /// the significant bits of the inputs.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::f64::consts::{E, PI, SQRT_2};
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI).mul_sub_mul_rational_prec_val_val_val_ref(
+    ///     BigExponentFloat::from(E),
+    ///     BigExponentFloat::from(SQRT_2),
+    ///     &Rational::from_signeds(1, 3),
+    ///     5,
+    /// );
+    /// assert_eq!(result.to_string(), "8.0");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI).mul_sub_mul_rational_prec_val_val_val_ref(
+    ///     BigExponentFloat::from(E),
+    ///     BigExponentFloat::from(SQRT_2),
+    ///     &Rational::from_signeds(1, 3),
+    ///     20,
+    /// );
+    /// assert_eq!(result.to_string(), "8.068329");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    #[inline]
+    pub fn mul_sub_mul_rational_prec_val_val_val_ref(
+        self,
+        y: Self,
+        z: Self,
+        w: &Rational,
+        prec: u64,
+    ) -> (Self, Ordering) {
+        add_mul_rational_helper(
+            Cow::Owned(mul_helper(Cow::Owned(self), Cow::Owned(y), None).0),
+            &z,
+            w,
+            true,
+            prec,
+            Nearest,
+            true,
+        )
+    }
+
+    /// Subtracts the product of a [`BigExponentFloat`] and a [`Rational`] from the product of two
+    /// [`BigExponentFloat`]s, rounding the result to the nearest value of the specified precision.
+    /// The first and second [`BigExponentFloat`]s and the [`Rational`] are taken by value and the
+    /// third [`BigExponentFloat`] by reference. An [`Ordering`] is also returned, indicating
+    /// whether the rounded result is less than, equal to, or greater than the exact result.
+    /// Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
+    ///
+    /// The products are computed exactly, so only one rounding occurs.
+    ///
+    /// $$
+    /// f(x,y,z,w,p) = xy-zw+\varepsilon.
+    /// $$
+    /// - If $xy-zw$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy-zw$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |xy-zw|\rfloor-p}$.
+    ///
+    /// Special cases:
+    /// - $f(x,y,z,w,p)=\text{NaN}$ if any of $x$, $y$, and $z$ is NaN, if $xy$ multiplies an
+    ///   infinity by zero, if $z$ is infinite and $w=0$, or if $xy$ and $zw$ are infinities of the
+    ///   same sign
+    /// - $f(x,y,z,w,p)=\infty$ if $xy$ is $\infty$ or $zw$ is $-\infty$, and the other is not the
+    ///   same infinity
+    /// - $f(x,y,z,w,p)=-\infty$ if $xy$ is $-\infty$ or $zw$ is $\infty$, and the other is not the
+    ///   same infinity
+    /// - $f(x,y,z,w,p)=0$ if $xy=zw$ and both are finite
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum of `prec` and the sum of
+    /// the significant bits of the inputs.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::f64::consts::{E, PI, SQRT_2};
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI).mul_sub_mul_rational_prec_val_val_ref_val(
+    ///     BigExponentFloat::from(E),
+    ///     &BigExponentFloat::from(SQRT_2),
+    ///     Rational::from_signeds(1, 3),
+    ///     5,
+    /// );
+    /// assert_eq!(result.to_string(), "8.0");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI).mul_sub_mul_rational_prec_val_val_ref_val(
+    ///     BigExponentFloat::from(E),
+    ///     &BigExponentFloat::from(SQRT_2),
+    ///     Rational::from_signeds(1, 3),
+    ///     20,
+    /// );
+    /// assert_eq!(result.to_string(), "8.068329");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    #[inline]
+    pub fn mul_sub_mul_rational_prec_val_val_ref_val(
+        self,
+        y: Self,
+        z: &Self,
+        w: Rational,
+        prec: u64,
+    ) -> (Self, Ordering) {
+        add_mul_rational_helper(
+            Cow::Owned(mul_helper(Cow::Owned(self), Cow::Owned(y), None).0),
+            z,
+            &w,
+            true,
+            prec,
+            Nearest,
+            true,
+        )
+    }
+
+    /// Subtracts the product of a [`BigExponentFloat`] and a [`Rational`] from the product of two
+    /// [`BigExponentFloat`]s, rounding the result to the nearest value of the specified precision.
+    /// The first and second [`BigExponentFloat`]s are taken by value and the third
+    /// [`BigExponentFloat`] and the [`Rational`] by reference. An [`Ordering`] is also returned,
+    /// indicating whether the rounded result is less than, equal to, or greater than the exact
+    /// result. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The products are computed exactly, so only one rounding occurs.
+    ///
+    /// $$
+    /// f(x,y,z,w,p) = xy-zw+\varepsilon.
+    /// $$
+    /// - If $xy-zw$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy-zw$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |xy-zw|\rfloor-p}$.
+    ///
+    /// Special cases:
+    /// - $f(x,y,z,w,p)=\text{NaN}$ if any of $x$, $y$, and $z$ is NaN, if $xy$ multiplies an
+    ///   infinity by zero, if $z$ is infinite and $w=0$, or if $xy$ and $zw$ are infinities of the
+    ///   same sign
+    /// - $f(x,y,z,w,p)=\infty$ if $xy$ is $\infty$ or $zw$ is $-\infty$, and the other is not the
+    ///   same infinity
+    /// - $f(x,y,z,w,p)=-\infty$ if $xy$ is $-\infty$ or $zw$ is $\infty$, and the other is not the
+    ///   same infinity
+    /// - $f(x,y,z,w,p)=0$ if $xy=zw$ and both are finite
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum of `prec` and the sum of
+    /// the significant bits of the inputs.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::f64::consts::{E, PI, SQRT_2};
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI).mul_sub_mul_rational_prec_val_val_ref_ref(
+    ///     BigExponentFloat::from(E),
+    ///     &BigExponentFloat::from(SQRT_2),
+    ///     &Rational::from_signeds(1, 3),
+    ///     5,
+    /// );
+    /// assert_eq!(result.to_string(), "8.0");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI).mul_sub_mul_rational_prec_val_val_ref_ref(
+    ///     BigExponentFloat::from(E),
+    ///     &BigExponentFloat::from(SQRT_2),
+    ///     &Rational::from_signeds(1, 3),
+    ///     20,
+    /// );
+    /// assert_eq!(result.to_string(), "8.068329");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn mul_sub_mul_rational_prec_val_val_ref_ref(
+        self,
+        y: Self,
+        z: &Self,
+        w: &Rational,
+        prec: u64,
+    ) -> (Self, Ordering) {
+        add_mul_rational_helper(
+            Cow::Owned(mul_helper(Cow::Owned(self), Cow::Owned(y), None).0),
+            z,
+            w,
+            true,
+            prec,
+            Nearest,
+            true,
+        )
+    }
+
+    /// Subtracts the product of a [`BigExponentFloat`] and a [`Rational`] from the product of two
+    /// [`BigExponentFloat`]s, rounding the result to the nearest value of the specified precision.
+    /// The first and third [`BigExponentFloat`]s and the [`Rational`] are taken by value and the
+    /// second [`BigExponentFloat`] by reference. An [`Ordering`] is also returned, indicating
+    /// whether the rounded result is less than, equal to, or greater than the exact result.
+    /// Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
+    ///
+    /// The products are computed exactly, so only one rounding occurs.
+    ///
+    /// $$
+    /// f(x,y,z,w,p) = xy-zw+\varepsilon.
+    /// $$
+    /// - If $xy-zw$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy-zw$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |xy-zw|\rfloor-p}$.
+    ///
+    /// Special cases:
+    /// - $f(x,y,z,w,p)=\text{NaN}$ if any of $x$, $y$, and $z$ is NaN, if $xy$ multiplies an
+    ///   infinity by zero, if $z$ is infinite and $w=0$, or if $xy$ and $zw$ are infinities of the
+    ///   same sign
+    /// - $f(x,y,z,w,p)=\infty$ if $xy$ is $\infty$ or $zw$ is $-\infty$, and the other is not the
+    ///   same infinity
+    /// - $f(x,y,z,w,p)=-\infty$ if $xy$ is $-\infty$ or $zw$ is $\infty$, and the other is not the
+    ///   same infinity
+    /// - $f(x,y,z,w,p)=0$ if $xy=zw$ and both are finite
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum of `prec` and the sum of
+    /// the significant bits of the inputs.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::f64::consts::{E, PI, SQRT_2};
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI).mul_sub_mul_rational_prec_val_ref_val_val(
+    ///     &BigExponentFloat::from(E),
+    ///     BigExponentFloat::from(SQRT_2),
+    ///     Rational::from_signeds(1, 3),
+    ///     5,
+    /// );
+    /// assert_eq!(result.to_string(), "8.0");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI).mul_sub_mul_rational_prec_val_ref_val_val(
+    ///     &BigExponentFloat::from(E),
+    ///     BigExponentFloat::from(SQRT_2),
+    ///     Rational::from_signeds(1, 3),
+    ///     20,
+    /// );
+    /// assert_eq!(result.to_string(), "8.068329");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    #[inline]
+    pub fn mul_sub_mul_rational_prec_val_ref_val_val(
+        self,
+        y: &Self,
+        z: Self,
+        w: Rational,
+        prec: u64,
+    ) -> (Self, Ordering) {
+        add_mul_rational_helper(
+            Cow::Owned(mul_helper(Cow::Owned(self), Cow::Borrowed(y), None).0),
+            &z,
+            &w,
+            true,
+            prec,
+            Nearest,
+            true,
+        )
+    }
+
+    /// Subtracts the product of a [`BigExponentFloat`] and a [`Rational`] from the product of two
+    /// [`BigExponentFloat`]s, rounding the result to the nearest value of the specified precision.
+    /// The first and third [`BigExponentFloat`]s are taken by value and the second
+    /// [`BigExponentFloat`] and the [`Rational`] by reference. An [`Ordering`] is also returned,
+    /// indicating whether the rounded result is less than, equal to, or greater than the exact
+    /// result. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The products are computed exactly, so only one rounding occurs.
+    ///
+    /// $$
+    /// f(x,y,z,w,p) = xy-zw+\varepsilon.
+    /// $$
+    /// - If $xy-zw$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy-zw$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |xy-zw|\rfloor-p}$.
+    ///
+    /// Special cases:
+    /// - $f(x,y,z,w,p)=\text{NaN}$ if any of $x$, $y$, and $z$ is NaN, if $xy$ multiplies an
+    ///   infinity by zero, if $z$ is infinite and $w=0$, or if $xy$ and $zw$ are infinities of the
+    ///   same sign
+    /// - $f(x,y,z,w,p)=\infty$ if $xy$ is $\infty$ or $zw$ is $-\infty$, and the other is not the
+    ///   same infinity
+    /// - $f(x,y,z,w,p)=-\infty$ if $xy$ is $-\infty$ or $zw$ is $\infty$, and the other is not the
+    ///   same infinity
+    /// - $f(x,y,z,w,p)=0$ if $xy=zw$ and both are finite
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum of `prec` and the sum of
+    /// the significant bits of the inputs.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::f64::consts::{E, PI, SQRT_2};
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI).mul_sub_mul_rational_prec_val_ref_val_ref(
+    ///     &BigExponentFloat::from(E),
+    ///     BigExponentFloat::from(SQRT_2),
+    ///     &Rational::from_signeds(1, 3),
+    ///     5,
+    /// );
+    /// assert_eq!(result.to_string(), "8.0");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI).mul_sub_mul_rational_prec_val_ref_val_ref(
+    ///     &BigExponentFloat::from(E),
+    ///     BigExponentFloat::from(SQRT_2),
+    ///     &Rational::from_signeds(1, 3),
+    ///     20,
+    /// );
+    /// assert_eq!(result.to_string(), "8.068329");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    #[inline]
+    pub fn mul_sub_mul_rational_prec_val_ref_val_ref(
+        self,
+        y: &Self,
+        z: Self,
+        w: &Rational,
+        prec: u64,
+    ) -> (Self, Ordering) {
+        add_mul_rational_helper(
+            Cow::Owned(mul_helper(Cow::Owned(self), Cow::Borrowed(y), None).0),
+            &z,
+            w,
+            true,
+            prec,
+            Nearest,
+            true,
+        )
+    }
+
+    /// Subtracts the product of a [`BigExponentFloat`] and a [`Rational`] from the product of two
+    /// [`BigExponentFloat`]s, rounding the result to the nearest value of the specified precision.
+    /// The first [`BigExponentFloat`] and the [`Rational`] are taken by value and the second and
+    /// third [`BigExponentFloat`]s by reference. An [`Ordering`] is also returned, indicating
+    /// whether the rounded result is less than, equal to, or greater than the exact result.
+    /// Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
+    ///
+    /// The products are computed exactly, so only one rounding occurs.
+    ///
+    /// $$
+    /// f(x,y,z,w,p) = xy-zw+\varepsilon.
+    /// $$
+    /// - If $xy-zw$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy-zw$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |xy-zw|\rfloor-p}$.
+    ///
+    /// Special cases:
+    /// - $f(x,y,z,w,p)=\text{NaN}$ if any of $x$, $y$, and $z$ is NaN, if $xy$ multiplies an
+    ///   infinity by zero, if $z$ is infinite and $w=0$, or if $xy$ and $zw$ are infinities of the
+    ///   same sign
+    /// - $f(x,y,z,w,p)=\infty$ if $xy$ is $\infty$ or $zw$ is $-\infty$, and the other is not the
+    ///   same infinity
+    /// - $f(x,y,z,w,p)=-\infty$ if $xy$ is $-\infty$ or $zw$ is $\infty$, and the other is not the
+    ///   same infinity
+    /// - $f(x,y,z,w,p)=0$ if $xy=zw$ and both are finite
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum of `prec` and the sum of
+    /// the significant bits of the inputs.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::f64::consts::{E, PI, SQRT_2};
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI).mul_sub_mul_rational_prec_val_ref_ref_val(
+    ///     &BigExponentFloat::from(E),
+    ///     &BigExponentFloat::from(SQRT_2),
+    ///     Rational::from_signeds(1, 3),
+    ///     5,
+    /// );
+    /// assert_eq!(result.to_string(), "8.0");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI).mul_sub_mul_rational_prec_val_ref_ref_val(
+    ///     &BigExponentFloat::from(E),
+    ///     &BigExponentFloat::from(SQRT_2),
+    ///     Rational::from_signeds(1, 3),
+    ///     20,
+    /// );
+    /// assert_eq!(result.to_string(), "8.068329");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    #[inline]
+    pub fn mul_sub_mul_rational_prec_val_ref_ref_val(
+        self,
+        y: &Self,
+        z: &Self,
+        w: Rational,
+        prec: u64,
+    ) -> (Self, Ordering) {
+        add_mul_rational_helper(
+            Cow::Owned(mul_helper(Cow::Owned(self), Cow::Borrowed(y), None).0),
+            z,
+            &w,
+            true,
+            prec,
+            Nearest,
+            true,
+        )
+    }
+
+    /// Subtracts the product of a [`BigExponentFloat`] and a [`Rational`] from the product of two
+    /// [`BigExponentFloat`]s, rounding the result to the nearest value of the specified precision.
+    /// The first [`BigExponentFloat`] is taken by value and the second and third
+    /// [`BigExponentFloat`]s and the [`Rational`] by reference. An [`Ordering`] is also returned,
+    /// indicating whether the rounded result is less than, equal to, or greater than the exact
+    /// result. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The products are computed exactly, so only one rounding occurs.
+    ///
+    /// $$
+    /// f(x,y,z,w,p) = xy-zw+\varepsilon.
+    /// $$
+    /// - If $xy-zw$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy-zw$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |xy-zw|\rfloor-p}$.
+    ///
+    /// Special cases:
+    /// - $f(x,y,z,w,p)=\text{NaN}$ if any of $x$, $y$, and $z$ is NaN, if $xy$ multiplies an
+    ///   infinity by zero, if $z$ is infinite and $w=0$, or if $xy$ and $zw$ are infinities of the
+    ///   same sign
+    /// - $f(x,y,z,w,p)=\infty$ if $xy$ is $\infty$ or $zw$ is $-\infty$, and the other is not the
+    ///   same infinity
+    /// - $f(x,y,z,w,p)=-\infty$ if $xy$ is $-\infty$ or $zw$ is $\infty$, and the other is not the
+    ///   same infinity
+    /// - $f(x,y,z,w,p)=0$ if $xy=zw$ and both are finite
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum of `prec` and the sum of
+    /// the significant bits of the inputs.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::f64::consts::{E, PI, SQRT_2};
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI).mul_sub_mul_rational_prec_val_ref_ref_ref(
+    ///     &BigExponentFloat::from(E),
+    ///     &BigExponentFloat::from(SQRT_2),
+    ///     &Rational::from_signeds(1, 3),
+    ///     5,
+    /// );
+    /// assert_eq!(result.to_string(), "8.0");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (result, o) = BigExponentFloat::from(PI).mul_sub_mul_rational_prec_val_ref_ref_ref(
+    ///     &BigExponentFloat::from(E),
+    ///     &BigExponentFloat::from(SQRT_2),
+    ///     &Rational::from_signeds(1, 3),
+    ///     20,
+    /// );
+    /// assert_eq!(result.to_string(), "8.068329");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn mul_sub_mul_rational_prec_val_ref_ref_ref(
+        self,
+        y: &Self,
+        z: &Self,
+        w: &Rational,
+        prec: u64,
+    ) -> (Self, Ordering) {
+        add_mul_rational_helper(
+            Cow::Owned(mul_helper(Cow::Owned(self), Cow::Borrowed(y), None).0),
+            z,
+            w,
+            true,
+            prec,
+            Nearest,
+            true,
+        )
+    }
+
+    /// Subtracts the product of a [`BigExponentFloat`] and a [`Rational`] from the product of two
+    /// [`BigExponentFloat`]s, rounding the result to the nearest value of the specified precision.
+    /// The [`BigExponentFloat`]s and the [`Rational`] are all taken by reference. An [`Ordering`]
+    /// is also returned, indicating whether the rounded result is less than, equal to, or greater
+    /// than the exact result. Although `NaN`s are not comparable to any [`BigExponentFloat`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The products are computed exactly, so only one rounding occurs.
+    ///
+    /// $$
+    /// f(x,y,z,w,p) = xy-zw+\varepsilon.
+    /// $$
+    /// - If $xy-zw$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy-zw$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |xy-zw|\rfloor-p}$.
+    ///
+    /// Special cases:
+    /// - $f(x,y,z,w,p)=\text{NaN}$ if any of $x$, $y$, and $z$ is NaN, if $xy$ multiplies an
+    ///   infinity by zero, if $z$ is infinite and $w=0$, or if $xy$ and $zw$ are infinities of the
+    ///   same sign
+    /// - $f(x,y,z,w,p)=\infty$ if $xy$ is $\infty$ or $zw$ is $-\infty$, and the other is not the
+    ///   same infinity
+    /// - $f(x,y,z,w,p)=-\infty$ if $xy$ is $-\infty$ or $zw$ is $\infty$, and the other is not the
+    ///   same infinity
+    /// - $f(x,y,z,w,p)=0$ if $xy=zw$ and both are finite
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum of `prec` and the sum of
+    /// the significant bits of the inputs.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::f64::consts::{E, PI, SQRT_2};
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (result, o) = (&BigExponentFloat::from(PI)).mul_sub_mul_rational_prec_ref_ref_ref_ref(
+    ///     &BigExponentFloat::from(E),
+    ///     &BigExponentFloat::from(SQRT_2),
+    ///     &Rational::from_signeds(1, 3),
+    ///     5,
+    /// );
+    /// assert_eq!(result.to_string(), "8.0");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (result, o) = (&BigExponentFloat::from(PI)).mul_sub_mul_rational_prec_ref_ref_ref_ref(
+    ///     &BigExponentFloat::from(E),
+    ///     &BigExponentFloat::from(SQRT_2),
+    ///     &Rational::from_signeds(1, 3),
+    ///     20,
+    /// );
+    /// assert_eq!(result.to_string(), "8.068329");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn mul_sub_mul_rational_prec_ref_ref_ref_ref(
+        &self,
+        y: &Self,
+        z: &Self,
+        w: &Rational,
+        prec: u64,
+    ) -> (Self, Ordering) {
+        add_mul_rational_helper(
+            Cow::Owned(mul_helper(Cow::Borrowed(self), Cow::Borrowed(y), None).0),
+            z,
+            w,
+            true,
+            prec,
+            Nearest,
+            true,
+        )
+    }
+
+    /// Multiplies a [`BigExponentFloat`] by another [`BigExponentFloat`] in place and subtracts the
+    /// product of a third [`BigExponentFloat`] and a [`Rational`], rounding the result to the
+    /// nearest value of the specified precision. The [`BigExponentFloat`]s and the [`Rational`] on
+    /// the right-hand side are all taken by value. An [`Ordering`] is returned, indicating whether
+    /// the rounded result is less than, equal to, or greater than the exact result. Although `NaN`s
+    /// are not comparable to any [`BigExponentFloat`], whenever this function sets the
+    /// [`BigExponentFloat`] to `NaN` it also returns `Equal`.
+    ///
+    /// The products are computed exactly, so only one rounding occurs.
+    ///
+    /// $$
+    /// x \gets xy-zw+\varepsilon.
+    /// $$
+    /// - If $xy-zw$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy-zw$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |xy-zw|\rfloor-p}$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum of `prec` and the sum of
+    /// the significant bits of the inputs.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::f64::consts::{E, PI, SQRT_2};
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_assign(
+    ///         BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         5
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.0");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_assign(
+    ///         BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         20
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.068329");
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    #[inline]
+    pub fn mul_sub_mul_rational_prec_assign(
+        &mut self,
+        y: Self,
+        z: Self,
+        w: Rational,
+        prec: u64,
+    ) -> Ordering {
+        let x = core::mem::replace(self, Self::ZERO);
+        let (result, o) = add_mul_rational_helper(
+            Cow::Owned(mul_helper(Cow::Owned(x), Cow::Owned(y), None).0),
+            &z,
+            &w,
+            true,
+            prec,
+            Nearest,
+            true,
+        );
+        *self = result;
+        o
+    }
+
+    /// Multiplies a [`BigExponentFloat`] by another [`BigExponentFloat`] in place and subtracts the
+    /// product of a third [`BigExponentFloat`] and a [`Rational`], rounding the result to the
+    /// nearest value of the specified precision. On the right-hand side, the [`BigExponentFloat`]s
+    /// are taken by value and the [`Rational`] by reference. An [`Ordering`] is returned,
+    /// indicating whether the rounded result is less than, equal to, or greater than the exact
+    /// result. Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this
+    /// function sets the [`BigExponentFloat`] to `NaN` it also returns `Equal`.
+    ///
+    /// The products are computed exactly, so only one rounding occurs.
+    ///
+    /// $$
+    /// x \gets xy-zw+\varepsilon.
+    /// $$
+    /// - If $xy-zw$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy-zw$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |xy-zw|\rfloor-p}$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum of `prec` and the sum of
+    /// the significant bits of the inputs.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::f64::consts::{E, PI, SQRT_2};
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_assign_val_val_ref(
+    ///         BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         5
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.0");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_assign_val_val_ref(
+    ///         BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         20
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.068329");
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    #[inline]
+    pub fn mul_sub_mul_rational_prec_assign_val_val_ref(
+        &mut self,
+        y: Self,
+        z: Self,
+        w: &Rational,
+        prec: u64,
+    ) -> Ordering {
+        let x = core::mem::replace(self, Self::ZERO);
+        let (result, o) = add_mul_rational_helper(
+            Cow::Owned(mul_helper(Cow::Owned(x), Cow::Owned(y), None).0),
+            &z,
+            w,
+            true,
+            prec,
+            Nearest,
+            true,
+        );
+        *self = result;
+        o
+    }
+
+    /// Multiplies a [`BigExponentFloat`] by another [`BigExponentFloat`] in place and subtracts the
+    /// product of a third [`BigExponentFloat`] and a [`Rational`], rounding the result to the
+    /// nearest value of the specified precision. On the right-hand side, the first
+    /// [`BigExponentFloat`] and the [`Rational`] are taken by value and the second
+    /// [`BigExponentFloat`] by reference. An [`Ordering`] is returned, indicating whether the
+    /// rounded result is less than, equal to, or greater than the exact result. Although `NaN`s are
+    /// not comparable to any [`BigExponentFloat`], whenever this function sets the
+    /// [`BigExponentFloat`] to `NaN` it also returns `Equal`.
+    ///
+    /// The products are computed exactly, so only one rounding occurs.
+    ///
+    /// $$
+    /// x \gets xy-zw+\varepsilon.
+    /// $$
+    /// - If $xy-zw$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy-zw$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |xy-zw|\rfloor-p}$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum of `prec` and the sum of
+    /// the significant bits of the inputs.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::f64::consts::{E, PI, SQRT_2};
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_assign_val_ref_val(
+    ///         BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         5
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.0");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_assign_val_ref_val(
+    ///         BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         20
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.068329");
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    #[inline]
+    pub fn mul_sub_mul_rational_prec_assign_val_ref_val(
+        &mut self,
+        y: Self,
+        z: &Self,
+        w: Rational,
+        prec: u64,
+    ) -> Ordering {
+        let x = core::mem::replace(self, Self::ZERO);
+        let (result, o) = add_mul_rational_helper(
+            Cow::Owned(mul_helper(Cow::Owned(x), Cow::Owned(y), None).0),
+            z,
+            &w,
+            true,
+            prec,
+            Nearest,
+            true,
+        );
+        *self = result;
+        o
+    }
+
+    /// Multiplies a [`BigExponentFloat`] by another [`BigExponentFloat`] in place and subtracts the
+    /// product of a third [`BigExponentFloat`] and a [`Rational`], rounding the result to the
+    /// nearest value of the specified precision. On the right-hand side, the first
+    /// [`BigExponentFloat`] is taken by value and the second [`BigExponentFloat`] and the
+    /// [`Rational`] by reference. An [`Ordering`] is returned, indicating whether the rounded
+    /// result is less than, equal to, or greater than the exact result. Although `NaN`s are not
+    /// comparable to any [`BigExponentFloat`], whenever this function sets the [`BigExponentFloat`]
+    /// to `NaN` it also returns `Equal`.
+    ///
+    /// The products are computed exactly, so only one rounding occurs.
+    ///
+    /// $$
+    /// x \gets xy-zw+\varepsilon.
+    /// $$
+    /// - If $xy-zw$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy-zw$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |xy-zw|\rfloor-p}$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum of `prec` and the sum of
+    /// the significant bits of the inputs.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::f64::consts::{E, PI, SQRT_2};
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_assign_val_ref_ref(
+    ///         BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         5
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.0");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_assign_val_ref_ref(
+    ///         BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         20
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.068329");
+    /// ```
+    #[inline]
+    pub fn mul_sub_mul_rational_prec_assign_val_ref_ref(
+        &mut self,
+        y: Self,
+        z: &Self,
+        w: &Rational,
+        prec: u64,
+    ) -> Ordering {
+        let x = core::mem::replace(self, Self::ZERO);
+        let (result, o) = add_mul_rational_helper(
+            Cow::Owned(mul_helper(Cow::Owned(x), Cow::Owned(y), None).0),
+            z,
+            w,
+            true,
+            prec,
+            Nearest,
+            true,
+        );
+        *self = result;
+        o
+    }
+
+    /// Multiplies a [`BigExponentFloat`] by another [`BigExponentFloat`] in place and subtracts the
+    /// product of a third [`BigExponentFloat`] and a [`Rational`], rounding the result to the
+    /// nearest value of the specified precision. On the right-hand side, the second
+    /// [`BigExponentFloat`] and the [`Rational`] are taken by value and the first
+    /// [`BigExponentFloat`] by reference. An [`Ordering`] is returned, indicating whether the
+    /// rounded result is less than, equal to, or greater than the exact result. Although `NaN`s are
+    /// not comparable to any [`BigExponentFloat`], whenever this function sets the
+    /// [`BigExponentFloat`] to `NaN` it also returns `Equal`.
+    ///
+    /// The products are computed exactly, so only one rounding occurs.
+    ///
+    /// $$
+    /// x \gets xy-zw+\varepsilon.
+    /// $$
+    /// - If $xy-zw$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy-zw$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |xy-zw|\rfloor-p}$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum of `prec` and the sum of
+    /// the significant bits of the inputs.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::f64::consts::{E, PI, SQRT_2};
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_assign_ref_val_val(
+    ///         &BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         5
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.0");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_assign_ref_val_val(
+    ///         &BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         20
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.068329");
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    #[inline]
+    pub fn mul_sub_mul_rational_prec_assign_ref_val_val(
+        &mut self,
+        y: &Self,
+        z: Self,
+        w: Rational,
+        prec: u64,
+    ) -> Ordering {
+        let x = core::mem::replace(self, Self::ZERO);
+        let (result, o) = add_mul_rational_helper(
+            Cow::Owned(mul_helper(Cow::Owned(x), Cow::Borrowed(y), None).0),
+            &z,
+            &w,
+            true,
+            prec,
+            Nearest,
+            true,
+        );
+        *self = result;
+        o
+    }
+
+    /// Multiplies a [`BigExponentFloat`] by another [`BigExponentFloat`] in place and subtracts the
+    /// product of a third [`BigExponentFloat`] and a [`Rational`], rounding the result to the
+    /// nearest value of the specified precision. On the right-hand side, the second
+    /// [`BigExponentFloat`] is taken by value and the first [`BigExponentFloat`] and the
+    /// [`Rational`] by reference. An [`Ordering`] is returned, indicating whether the rounded
+    /// result is less than, equal to, or greater than the exact result. Although `NaN`s are not
+    /// comparable to any [`BigExponentFloat`], whenever this function sets the [`BigExponentFloat`]
+    /// to `NaN` it also returns `Equal`.
+    ///
+    /// The products are computed exactly, so only one rounding occurs.
+    ///
+    /// $$
+    /// x \gets xy-zw+\varepsilon.
+    /// $$
+    /// - If $xy-zw$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy-zw$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |xy-zw|\rfloor-p}$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum of `prec` and the sum of
+    /// the significant bits of the inputs.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::f64::consts::{E, PI, SQRT_2};
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_assign_ref_val_ref(
+    ///         &BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         5
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.0");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_assign_ref_val_ref(
+    ///         &BigExponentFloat::from(E),
+    ///         BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         20
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.068329");
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    #[inline]
+    pub fn mul_sub_mul_rational_prec_assign_ref_val_ref(
+        &mut self,
+        y: &Self,
+        z: Self,
+        w: &Rational,
+        prec: u64,
+    ) -> Ordering {
+        let x = core::mem::replace(self, Self::ZERO);
+        let (result, o) = add_mul_rational_helper(
+            Cow::Owned(mul_helper(Cow::Owned(x), Cow::Borrowed(y), None).0),
+            &z,
+            w,
+            true,
+            prec,
+            Nearest,
+            true,
+        );
+        *self = result;
+        o
+    }
+
+    /// Multiplies a [`BigExponentFloat`] by another [`BigExponentFloat`] in place and subtracts the
+    /// product of a third [`BigExponentFloat`] and a [`Rational`], rounding the result to the
+    /// nearest value of the specified precision. On the right-hand side, the [`Rational`] is taken
+    /// by value and the [`BigExponentFloat`]s by reference. An [`Ordering`] is returned, indicating
+    /// whether the rounded result is less than, equal to, or greater than the exact result.
+    /// Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function sets
+    /// the [`BigExponentFloat`] to `NaN` it also returns `Equal`.
+    ///
+    /// The products are computed exactly, so only one rounding occurs.
+    ///
+    /// $$
+    /// x \gets xy-zw+\varepsilon.
+    /// $$
+    /// - If $xy-zw$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy-zw$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |xy-zw|\rfloor-p}$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum of `prec` and the sum of
+    /// the significant bits of the inputs.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::f64::consts::{E, PI, SQRT_2};
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_assign_ref_ref_val(
+    ///         &BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         5
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.0");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_assign_ref_ref_val(
+    ///         &BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         Rational::from_signeds(1, 3),
+    ///         20
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.068329");
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    #[inline]
+    pub fn mul_sub_mul_rational_prec_assign_ref_ref_val(
+        &mut self,
+        y: &Self,
+        z: &Self,
+        w: Rational,
+        prec: u64,
+    ) -> Ordering {
+        let x = core::mem::replace(self, Self::ZERO);
+        let (result, o) = add_mul_rational_helper(
+            Cow::Owned(mul_helper(Cow::Owned(x), Cow::Borrowed(y), None).0),
+            z,
+            &w,
+            true,
+            prec,
+            Nearest,
+            true,
+        );
+        *self = result;
+        o
+    }
+
+    /// Multiplies a [`BigExponentFloat`] by another [`BigExponentFloat`] in place and subtracts the
+    /// product of a third [`BigExponentFloat`] and a [`Rational`], rounding the result to the
+    /// nearest value of the specified precision. The [`BigExponentFloat`]s and the [`Rational`] on
+    /// the right-hand side are all taken by reference. An [`Ordering`] is returned, indicating
+    /// whether the rounded result is less than, equal to, or greater than the exact result.
+    /// Although `NaN`s are not comparable to any [`BigExponentFloat`], whenever this function sets
+    /// the [`BigExponentFloat`] to `NaN` it also returns `Equal`.
+    ///
+    /// The products are computed exactly, so only one rounding occurs.
+    ///
+    /// $$
+    /// x \gets xy-zw+\varepsilon.
+    /// $$
+    /// - If $xy-zw$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $xy-zw$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |xy-zw|\rfloor-p}$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum of `prec` and the sum of
+    /// the significant bits of the inputs.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::f64::consts::{E, PI, SQRT_2};
+    /// use malachite_float::BigExponentFloat;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_assign_ref_ref_ref(
+    ///         &BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         5
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.0");
+    ///
+    /// let mut x = BigExponentFloat::from(PI);
+    /// assert_eq!(
+    ///     x.mul_sub_mul_rational_prec_assign_ref_ref_ref(
+    ///         &BigExponentFloat::from(E),
+    ///         &BigExponentFloat::from(SQRT_2),
+    ///         &Rational::from_signeds(1, 3),
+    ///         20
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "8.068329");
+    /// ```
+    #[inline]
+    pub fn mul_sub_mul_rational_prec_assign_ref_ref_ref(
+        &mut self,
+        y: &Self,
+        z: &Self,
+        w: &Rational,
+        prec: u64,
+    ) -> Ordering {
+        let x = core::mem::replace(self, Self::ZERO);
+        let (result, o) = add_mul_rational_helper(
+            Cow::Owned(mul_helper(Cow::Owned(x), Cow::Borrowed(y), None).0),
+            z,
+            w,
+            true,
+            prec,
+            Nearest,
+            true,
+        );
+        *self = result;
+        o
     }
 }

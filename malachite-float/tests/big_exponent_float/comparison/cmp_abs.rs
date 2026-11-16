@@ -10,7 +10,7 @@ use core::str::FromStr;
 use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeOne, One, OneHalf, Zero,
 };
-use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
+use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs, PartialOrdAbsDouble};
 use malachite_float::BigExponentFloat;
 use malachite_float::big_exponent_float::{
     ComparableBigExponentFloat, ComparableBigExponentFloatRef,
@@ -123,5 +123,71 @@ fn partial_cmp_abs_properties() {
         } else if cx.gt_abs(&cy) && cy.gt_abs(&cz) {
             assert!(cx.gt_abs(&cz));
         }
+    });
+}
+
+#[test]
+fn test_partial_cmp_abs_double() {
+    let test = |s, t, out: Option<Ordering>| {
+        let x = parse_big_exponent_float_hex(s);
+        let y = parse_big_exponent_float_hex(t);
+        assert_eq!(x.partial_cmp_abs_double(&y), out);
+    };
+    test("NaN", "NaN", None);
+    test("NaN", "0x1.0", None);
+    test("0x1.0", "NaN", None);
+    // - doubling leaves infinities and zero alone
+    test("Infinity", "-Infinity", Some(Equal));
+    test("0x0.0", "0x0.0", Some(Equal));
+    test("Infinity", "0x1.0", Some(Greater));
+    test("0x1.0", "Infinity", Some(Less));
+    test("0x1.0", "0x0.0", Some(Greater));
+    test("0x0.0", "0x1.0", Some(Less));
+    // - ordinary values
+    test("0x1.0", "0x0.8", Some(Equal));
+    test("0x0.8", "0x1.0", Some(Less));
+    test("0x4.0", "0x1.0", Some(Greater));
+    test("0x1.8", "0x0.c", Some(Equal));
+    test("0x1.8", "0x0.c00000000000000000001", Some(Less));
+    // - only magnitudes matter
+    test("-0x1.0", "0x0.8", Some(Equal));
+    test("0x1.0", "-0x0.8", Some(Equal));
+    // - exponents beyond any `Float`'s
+    test(
+        "0x2.0E+25000000000000000000",
+        "0x1.0E+25000000000000000000",
+        Some(Equal),
+    );
+    test(
+        "0x1.0E-25000000000000000000",
+        "0x1.0E-25000000000000000000",
+        Some(Less),
+    );
+}
+
+#[test]
+fn partial_cmp_abs_double_properties() {
+    big_exponent_float_pair_gen().test_properties(|(x, y)| {
+        let c = x.partial_cmp_abs_double(&y);
+        // sign changes are invisible
+        assert_eq!(
+            big_exponent_float_negate(x.clone()).partial_cmp_abs_double(&y),
+            c
+        );
+        assert_eq!(
+            x.partial_cmp_abs_double(&big_exponent_float_negate(y.clone())),
+            c
+        );
+        // doubling is exact, so the comparison agrees with comparing |x| and 2|y|
+        assert_eq!(x.partial_cmp_abs(&(&y << 1u32)), c);
+    });
+
+    float_pair_gen().test_properties(|(x, y)| {
+        // `Float`'s version agrees
+        assert_eq!(
+            float_to_big_exponent_float(&x)
+                .partial_cmp_abs_double(&float_to_big_exponent_float(&y)),
+            x.partial_cmp_abs_double(&y)
+        );
     });
 }

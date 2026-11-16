@@ -6,13 +6,14 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::Parity;
+use malachite_base::num::arithmetic::traits::{Abs, Parity};
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::{
     IntegerMantissaAndExponent, RawMantissaAndExponent, SciMantissaAndExponent,
 };
 use malachite_base::num::float::NiceFloat;
 use malachite_base::rounding_modes::RoundingMode::*;
+use malachite_float::big_exponent_float::ComparableBigExponentFloatRef;
 use malachite_float::test_util::big_exponent_float::{
     big_exponent_float_negate, big_exponent_float_power_of_2, big_exponent_float_to_float,
 };
@@ -23,13 +24,17 @@ use malachite_float::{BigExponentFloat, Float};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 
+fn from_f64_sci_mantissa_and_exponent(m: f64, e: Integer) -> Option<BigExponentFloat> {
+    <&BigExponentFloat as SciMantissaAndExponent<f64, _, _>>::from_sci_mantissa_and_exponent(m, e)
+}
+
 #[test]
 fn test_mantissa_and_exponent() {
     let x = big_exponent_float_power_of_2(Integer::from(1u64 << 40));
     let (m, e) = (&x).integer_mantissa_and_exponent();
     assert_eq!(m, 1u32);
     assert_eq!(e, Integer::from(1u64 << 40));
-    let (m, e) = (&x).sci_mantissa_and_exponent();
+    let (m, e): (BigExponentFloat, Integer) = (&x).sci_mantissa_and_exponent();
     assert_eq!(m.to_string(), "1.0");
     assert_eq!(format!("{m:#x}"), "0x1.0");
     assert_eq!(e, Integer::from(1u64 << 40));
@@ -92,7 +97,7 @@ fn mantissa_and_exponent_properties() {
         assert!(y.is_valid());
         assert_eq!(y.get_prec(), x.get_prec());
 
-        let (m, e) = (&x).sci_mantissa_and_exponent();
+        let (m, e): (BigExponentFloat, Integer) = (&x).sci_mantissa_and_exponent();
         assert_eq!(
             format!("{m:#x}"),
             format!("{:#x}", x.clone().sci_mantissa_and_exponent().0)
@@ -111,6 +116,19 @@ fn mantissa_and_exponent_properties() {
             );
             let _ = o;
         }
+        // the primitive-float form is the `Nearest` rounding, and an exact mantissa round-trips
+        let (m, e): (f64, Integer) = (&x).sci_mantissa_and_exponent();
+        let (m_n, e_n, _) = x.sci_mantissa_and_exponent_round::<f64>(Nearest).unwrap();
+        assert_eq!(NiceFloat(m), NiceFloat(m_n));
+        assert_eq!(e, e_n);
+        if x.sci_mantissa_and_exponent_round::<f64>(Exact).is_some() {
+            let y = from_f64_sci_mantissa_and_exponent(m, e).unwrap();
+            assert!(y.is_valid());
+            assert_eq!(
+                ComparableBigExponentFloatRef(&y),
+                ComparableBigExponentFloatRef(&(&x).abs())
+            );
+        }
     });
 
     big_exponent_float_gen_var_1().test_properties(|x| {
@@ -127,7 +145,18 @@ fn mantissa_and_exponent_properties() {
         assert_eq!(m, m_f);
         assert_eq!(e, e_f);
         let e_f = <&Float as SciMantissaAndExponent<Float, i32, Float>>::sci_exponent(&f);
-        assert_eq!((&x).sci_mantissa_and_exponent().1, e_f);
+        let e =
+            <&BigExponentFloat as SciMantissaAndExponent<BigExponentFloat, _, _>>::sci_exponent(&x);
+        assert_eq!(e, e_f);
+        // the primitive-float mantissas agree with `Float`'s
+        let (m, e): (f64, Integer) = (&x).sci_mantissa_and_exponent();
+        let (m_f, e_f): (f64, i32) = (&f).sci_mantissa_and_exponent();
+        assert_eq!(NiceFloat(m), NiceFloat(m_f));
+        assert_eq!(e, e_f);
+        let (m, e): (f32, Integer) = (&x).sci_mantissa_and_exponent();
+        let (m_f, e_f): (f32, i32) = (&f).sci_mantissa_and_exponent();
+        assert_eq!(NiceFloat(m), NiceFloat(m_f));
+        assert_eq!(e, e_f);
         for rm in [Floor, Ceiling, Down, Up, Nearest, Exact] {
             assert_eq!(
                 x.sci_mantissa_and_exponent_round::<f32>(rm)

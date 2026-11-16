@@ -11,7 +11,9 @@ use crate::big_exponent_float::{
     BigExponentFloat, ComparableBigExponentFloat, ComparableBigExponentFloatRef,
 };
 use core::cmp::Ordering::{self, *};
-use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
+use malachite_base::num::basic::traits::One;
+use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs, PartialOrdAbsDouble};
+use malachite_nz::integer::Integer;
 
 impl PartialOrdAbs for BigExponentFloat {
     /// Compares the absolute values of two [`BigExponentFloat`]s.
@@ -67,6 +69,85 @@ impl PartialOrdAbs for BigExponentFloat {
                     ..
                 }),
             ) => Some(e_x.cmp(e_y).then_with(|| x.cmp_normalized_no_shift(y))),
+        }
+    }
+}
+
+impl PartialOrdAbsDouble for BigExponentFloat {
+    /// Compares the absolute value of a [`BigExponentFloat`] with twice the absolute value of
+    /// another [`BigExponentFloat`].
+    ///
+    /// The doubled value is never formed: the exponent of `self` is compared with that of `other`
+    /// plus 1, and then the significands are compared.
+    ///
+    /// This implementation follows the IEEE 754 standard. NaN is not comparable to anything, not
+    /// even itself.
+    ///
+    /// $$
+    /// f(x, y) = \operatorname{cmp}(|x|, 2|y|).
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.complexity())`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{Infinity, NaN, NegativeOne, One, OneHalf, Zero};
+    /// use malachite_base::num::comparison::traits::PartialOrdAbsDouble;
+    /// use malachite_float::BigExponentFloat;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// assert_eq!(
+    ///     BigExponentFloat::NAN.partial_cmp_abs_double(&BigExponentFloat::ONE),
+    ///     None
+    /// );
+    /// assert_eq!(
+    ///     BigExponentFloat::ONE.partial_cmp_abs_double(&BigExponentFloat::ONE_HALF),
+    ///     Some(Equal)
+    /// );
+    /// assert_eq!(
+    ///     BigExponentFloat::ONE_HALF.partial_cmp_abs_double(&BigExponentFloat::NEGATIVE_ONE),
+    ///     Some(Less)
+    /// );
+    /// assert_eq!(
+    ///     BigExponentFloat::INFINITY.partial_cmp_abs_double(&BigExponentFloat::ONE),
+    ///     Some(Greater)
+    /// );
+    /// assert_eq!(
+    ///     BigExponentFloat::ZERO.partial_cmp_abs_double(&BigExponentFloat::ZERO),
+    ///     Some(Equal)
+    /// );
+    /// ```
+    fn partial_cmp_abs_double(&self, other: &Self) -> Option<Ordering> {
+        match (self, other) {
+            (Self(NaN), _) | (_, Self(NaN)) => None,
+            // doubling leaves an infinity and zero alone
+            (Self(Infinity { .. }), Self(Infinity { .. })) | (Self(Zero), Self(Zero)) => {
+                Some(Equal)
+            }
+            (Self(Infinity { .. }), _) | (_, Self(Zero)) => Some(Greater),
+            (_, Self(Infinity { .. })) | (Self(Zero), _) => Some(Less),
+            (
+                Self(Finite {
+                    exponent: e_x,
+                    significand: x,
+                    ..
+                }),
+                Self(Finite {
+                    exponent: e_y,
+                    significand: y,
+                    ..
+                }),
+            ) => Some(
+                (e_x - Integer::ONE)
+                    .cmp(e_y)
+                    .then_with(|| x.cmp_normalized_no_shift(y)),
+            ),
         }
     }
 }

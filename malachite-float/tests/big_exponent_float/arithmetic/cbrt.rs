@@ -17,10 +17,12 @@ use malachite_float::test_util::big_exponent_float::{
 };
 use malachite_float::test_util::generators::{
     big_exponent_float_gen_var_3, big_exponent_float_unsigned_rounding_mode_triple_gen_var_6,
-    float_unsigned_pair_gen_var_1,
+    float_unsigned_pair_gen_var_1, rational_unsigned_rounding_mode_triple_gen_var_10,
 };
 use malachite_float::{BigExponentFloat, Float};
+use malachite_q::Rational;
 use std::cmp::Ordering::{self, *};
+use std::str::FromStr;
 
 fn same(x: &BigExponentFloat, y: &BigExponentFloat) -> bool {
     ComparableBigExponentFloatRef(x) == ComparableBigExponentFloatRef(y)
@@ -236,6 +238,192 @@ fn cbrt_prec_round_float_agreement_properties() {
             let (f, fo) = x.cbrt_prec_round_ref(prec, rm);
             if float_result_comparable(&f, fo) {
                 let r = cbrt_prec_round_all(&float_to_big_exponent_float(&x), prec, rm);
+                assert!(same(&r.0, &float_to_big_exponent_float(&f)));
+                assert_eq!(r.1, fo);
+            }
+        }
+    });
+}
+
+fn cbrt_rational_prec_round_all(
+    x: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> (BigExponentFloat, Ordering) {
+    let r = BigExponentFloat::cbrt_rational_prec_round(x.clone(), prec, rm);
+    assert!(r.0.is_valid());
+    assert!(same_pair(
+        &BigExponentFloat::cbrt_rational_prec_round_ref(x, prec, rm),
+        &r
+    ));
+    if rm == Nearest {
+        assert!(same_pair(
+            &BigExponentFloat::cbrt_rational_prec(x.clone(), prec),
+            &r
+        ));
+        assert!(same_pair(
+            &BigExponentFloat::cbrt_rational_prec_ref(x, prec),
+            &r
+        ));
+    }
+    r
+}
+
+#[test]
+fn test_cbrt_rational_prec_round() {
+    let test = |x: &str, prec: u64, rm: RoundingMode, out: &str, out_hex: &str, o: Ordering| {
+        assert_eq!(parse_big_exponent_float_hex(out_hex).to_string(), out);
+        let r = cbrt_rational_prec_round_all(&Rational::from_str(x).unwrap(), prec, rm);
+        assert!(
+            same(&r.0, &parse_big_exponent_float_hex(out_hex)),
+            "{x} {prec} {rm}: {:?}",
+            r.0
+        );
+        assert_eq!(r.1, o, "{x} {prec} {rm}");
+    };
+    test("0", 10, Exact, "0.0", "0x0.0", Equal);
+    test("-27/8", 2, Exact, "-1.5", "-0x1.8", Equal);
+    test("1/8", 1, Exact, "0.50", "0x0.8", Equal);
+    test("3/5", 1, Nearest, "1.0", "0x1.0", Greater);
+    test("3/5", 10, Floor, "0.84277", "0x0.d7c", Less);
+    test("3/5", 10, Ceiling, "0.844", "0x0.d8", Greater);
+    test(
+        "3/5",
+        100,
+        Nearest,
+        "0.84343266530174924284570975140620",
+        "0x0.d7eb3401d9606294a5fc0e3b5",
+        Greater,
+    );
+    test("22/7", 1, Nearest, "1.0", "0x1.0", Less);
+    test("22/7", 10, Floor, "1.4629", "0x1.768", Less);
+    test("22/7", 10, Ceiling, "1.465", "0x1.77", Greater);
+    test(
+        "22/7",
+        100,
+        Nearest,
+        "1.4647883603394576039568974119",
+        "0x1.76fc5eb7382cd16400e76a9",
+        Less,
+    );
+    test(
+        "1000000000000000000000000000001",
+        1,
+        Nearest,
+        "8.6e9",
+        "0x2.0E+8",
+        Less,
+    );
+    test(
+        "1000000000000000000000000000001",
+        10,
+        Floor,
+        "9.999e9",
+        "0x2.54E+8",
+        Less,
+    );
+    test(
+        "1000000000000000000000000000001",
+        10,
+        Ceiling,
+        "1.0016e10",
+        "0x2.55E+8",
+        Greater,
+    );
+    test(
+        "1000000000000000000000000000001",
+        100,
+        Nearest,
+        "1.00000000e10",
+        "0x2.540be4E+8",
+        Less,
+    );
+    test(
+        "1/100000000000000000000000",
+        1,
+        Nearest,
+        "1.5e-8",
+        "0x4.0E-7",
+        Less,
+    );
+    test(
+        "1/100000000000000000000000",
+        10,
+        Floor,
+        "2.154e-8",
+        "0x5.c8E-7",
+        Less,
+    );
+    test(
+        "1/100000000000000000000000",
+        10,
+        Ceiling,
+        "2.1566e-8",
+        "0x5.caE-7",
+        Greater,
+    );
+    test(
+        "1/100000000000000000000000",
+        100,
+        Nearest,
+        "2.1544346900318837217592935665193e-8",
+        "0x5.c88428ac16635cca1122f46b8E-7",
+        Less,
+    );
+    test("-22/7", 1, Nearest, "-1.0", "-0x1.0", Greater);
+    test("-22/7", 10, Floor, "-1.465", "-0x1.77", Less);
+    test("-22/7", 10, Ceiling, "-1.4629", "-0x1.768", Greater);
+    test(
+        "-22/7",
+        100,
+        Nearest,
+        "-1.4647883603394576039568974119",
+        "-0x1.76fc5eb7382cd16400e76a9",
+        Greater,
+    );
+}
+
+#[test]
+#[should_panic]
+fn cbrt_rational_prec_round_fail_1() {
+    BigExponentFloat::cbrt_rational_prec_round(Rational::from_unsigneds(3u8, 5), 0, Floor);
+}
+
+#[test]
+#[should_panic]
+fn cbrt_rational_prec_round_fail_2() {
+    BigExponentFloat::cbrt_rational_prec_round(Rational::from_unsigneds(3u8, 5), 10, Exact);
+}
+
+#[test]
+fn cbrt_rational_prec_round_properties() {
+    rational_unsigned_rounding_mode_triple_gen_var_10().test_properties(|(x, prec, rm)| {
+        let r = cbrt_rational_prec_round_all(&x, prec, rm);
+        if r.0.is_nan() || r.0.is_zero() || r.0.is_infinite() {
+            assert_eq!(r.1, Equal);
+        } else {
+            assert!(r.0.get_prec().unwrap() <= prec);
+        }
+        // The cube root is the root of order 3.
+        assert!(same_pair(
+            &BigExponentFloat::root_u_rational_prec_round_ref(&x, 3, prec, rm),
+            &r
+        ));
+        // Multiplying x by 2^(3000) multiplies the root by 2^(1000).
+        if r.0.is_finite() && !r.0.is_zero() {
+            let (y, o) = cbrt_rational_prec_round_all(&(&x << 3000u32), prec, rm);
+            assert!(same(&y, &(&r.0 << 1000u32)));
+            assert_eq!(o, r.1);
+        }
+        // A dyadic x gives the root of the equal `BigExponentFloat`.
+        if let Ok(x_bef) = BigExponentFloat::try_from(&x) {
+            assert!(same_pair(&x_bef.cbrt_prec_round(prec, rm), &r));
+        }
+        // `Float`'s function agrees wherever its result neither overflows nor underflows (at 0,
+        // `Float` has signed zeros and infinities).
+        if x != 0u32 {
+            let (f, fo) = Float::cbrt_rational_prec_round_ref(&x, prec, rm);
+            if float_result_comparable(&f, fo) {
                 assert!(same(&r.0, &float_to_big_exponent_float(&f)));
                 assert_eq!(r.1, fo);
             }

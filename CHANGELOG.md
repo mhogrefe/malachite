@@ -1216,6 +1216,13 @@ documented by git history.
   to a Lean formalization of the proof, instead of saying that its irrationality is unproven.
 - Corrected the rendering of $\pm$ and $\infty$ in the special cases documented for
   `Float::cot_with_period_prec_round` and its other forms.
+- The documentation of the `_assign` forms of `Float::mul_add_mul_rational_prec_round`,
+  `mul_add_mul_rational_prec`, and `mul_add_mul_rational_round`, and of their `mul_sub_mul_rational`
+  counterparts, now describes the operation correctly (the second product is of a `Float` and a
+  `Rational`, not of two `Float`s) and says correctly which arguments are taken by value and which
+  by reference.
+- The special cases documented for `Float::powr_prec_round` and its other forms now state that
+  $\operatorname{powr}(1, \text{NaN}) = 1$, as the functions (and MPFR's `mpfr_powr`) compute.
 
 ## 0.14.0 — 2026-10-13
 

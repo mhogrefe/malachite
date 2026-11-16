@@ -8,6 +8,7 @@
 
 use malachite_base::num::arithmetic::traits::{Abs, Pow};
 use malachite_base::num::basic::traits::{One, Two};
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_float::big_exponent_float::ComparableBigExponentFloatRef;
 use malachite_float::big_exponent_float::arithmetic::root::root_prec_round_generic;
@@ -21,9 +22,13 @@ use malachite_float::test_util::generators::{
     big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_1,
     float_signed_unsigned_rounding_mode_quadruple_gen_var_13,
     float_unsigned_unsigned_rounding_mode_quadruple_gen_var_13,
+    rational_signed_unsigned_rounding_mode_quadruple_gen_var_2,
+    rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_3,
 };
 use malachite_float::{BigExponentFloat, Float};
+use malachite_q::Rational;
 use std::cmp::Ordering::{self, *};
+use std::str::FromStr;
 
 fn same(x: &BigExponentFloat, y: &BigExponentFloat) -> bool {
     ComparableBigExponentFloatRef(x) == ComparableBigExponentFloatRef(y)
@@ -600,6 +605,407 @@ fn root_prec_round_float_agreement_properties() {
                 let r = root_s_prec_round_all(&float_to_big_exponent_float(&x), k, prec, rm);
                 assert!(same(&r.0, &float_to_big_exponent_float(&f)));
                 assert_eq!(r.1, fo);
+            }
+        },
+    );
+}
+
+fn root_u_rational_prec_round_all(
+    x: &Rational,
+    k: u64,
+    prec: u64,
+    rm: RoundingMode,
+) -> (BigExponentFloat, Ordering) {
+    let r = BigExponentFloat::root_u_rational_prec_round(x.clone(), k, prec, rm);
+    assert!(r.0.is_valid());
+    assert!(same_pair(
+        &BigExponentFloat::root_u_rational_prec_round_ref(x, k, prec, rm),
+        &r
+    ));
+    if rm == Nearest {
+        assert!(same_pair(
+            &BigExponentFloat::root_u_rational_prec(x.clone(), k, prec),
+            &r
+        ));
+        assert!(same_pair(
+            &BigExponentFloat::root_u_rational_prec_ref(x, k, prec),
+            &r
+        ));
+    }
+    r
+}
+
+#[test]
+fn test_root_u_rational_prec_round() {
+    let test =
+        |x: &str, k: u64, prec: u64, rm: RoundingMode, out: &str, out_hex: &str, o: Ordering| {
+            assert_eq!(parse_big_exponent_float_hex(out_hex).to_string(), out);
+            let r = root_u_rational_prec_round_all(&Rational::from_str(x).unwrap(), k, prec, rm);
+            assert!(
+                same(&r.0, &parse_big_exponent_float_hex(out_hex)),
+                "{x} {prec} {rm}: {:?}",
+                r.0
+            );
+            assert_eq!(r.1, o, "{x} {prec} {rm}");
+        };
+    test("3/5", 0, 10, Exact, "NaN", "NaN", Equal);
+    test("0", 4, 10, Exact, "0.0", "0x0.0", Equal);
+    test("-3/5", 4, 10, Exact, "NaN", "NaN", Equal);
+    test("-27/8", 3, 2, Exact, "-1.5", "-0x1.8", Equal);
+    test("81/16", 4, 2, Exact, "1.5", "0x1.8", Equal);
+    test("3/5", 4, 1, Nearest, "1.0", "0x1.0", Greater);
+    test("3/5", 4, 10, Floor, "0.87988", "0x0.e14", Less);
+    test("3/5", 4, 10, Ceiling, "0.8809", "0x0.e18", Greater);
+    test(
+        "3/5",
+        4,
+        100,
+        Nearest,
+        "0.8801117367933933972710824055660",
+        "0x0.e14f00b65a7768edc51e3d8cc",
+        Greater,
+    );
+    test("22/7", 5, 1, Nearest, "1.0", "0x1.0", Less);
+    test("22/7", 5, 10, Floor, "1.2559", "0x1.418", Less);
+    test("22/7", 5, 10, Ceiling, "1.258", "0x1.42", Greater);
+    test(
+        "22/7",
+        5,
+        100,
+        Nearest,
+        "1.2573753098024454738217199273498",
+        "0x1.41e3592a663d36701d8541336",
+        Greater,
+    );
+    test("-22/7", 5, 1, Nearest, "-1.0", "-0x1.0", Greater);
+    test("-22/7", 5, 10, Floor, "-1.258", "-0x1.42", Less);
+    test("-22/7", 5, 10, Ceiling, "-1.2559", "-0x1.418", Greater);
+    test(
+        "-22/7",
+        5,
+        100,
+        Nearest,
+        "-1.2573753098024454738217199273498",
+        "-0x1.41e3592a663d36701d8541336",
+        Less,
+    );
+    test(
+        "1/100000000000000000000000",
+        7,
+        1,
+        Nearest,
+        "0.00049",
+        "0x0.002",
+        Less,
+    );
+    test(
+        "1/100000000000000000000000",
+        7,
+        10,
+        Floor,
+        "0.00051785",
+        "0x0.0021f",
+        Less,
+    );
+    test(
+        "1/100000000000000000000000",
+        7,
+        10,
+        Ceiling,
+        "0.000519",
+        "0x0.0022",
+        Greater,
+    );
+    test(
+        "1/100000000000000000000000",
+        7,
+        100,
+        Nearest,
+        "0.00051794746792312111347551746779597",
+        "0x0.0021f1b76f8f00f67b8752c98acc",
+        Less,
+    );
+    test("3/5", 1, 1, Nearest, "0.50", "0x0.8", Less);
+    test("3/5", 1, 10, Floor, "0.5996", "0x0.998", Less);
+    test("3/5", 1, 10, Ceiling, "0.60059", "0x0.99c", Greater);
+    test(
+        "3/5",
+        1,
+        100,
+        Nearest,
+        "0.6000000000000000000000000000003",
+        "0x0.999999999999999999999999a",
+        Greater,
+    );
+    test("3/5", 1000000, 1, Nearest, "1.0", "0x1.0", Greater);
+    test("3/5", 1000000, 10, Floor, "0.99902", "0x0.ffc", Less);
+    test("3/5", 1000000, 10, Ceiling, "1.0", "0x1.0", Greater);
+    test(
+        "3/5",
+        1000000,
+        100,
+        Nearest,
+        "0.99999948917450670539604870776903",
+        "0x0.fffff76e056e2bf4019a8a763",
+        Less,
+    );
+}
+
+#[test]
+#[should_panic]
+fn root_u_rational_prec_round_fail_1() {
+    BigExponentFloat::root_u_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, 0, Floor);
+}
+
+#[test]
+#[should_panic]
+fn root_u_rational_prec_round_fail_2() {
+    BigExponentFloat::root_u_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, 10, Exact);
+}
+
+#[test]
+fn root_u_rational_prec_round_properties() {
+    rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_3().test_properties(
+        |(x, k, prec, rm)| {
+            let r = root_u_rational_prec_round_all(&x, k, prec, rm);
+            if r.0.is_nan() || r.0.is_zero() || r.0.is_infinite() {
+                assert_eq!(r.1, Equal);
+            } else {
+                assert!(r.0.get_prec().unwrap() <= prec);
+            }
+            // Multiplying x by 2^(1000k) multiplies the root by 2^(1000 sign(k)).
+            if r.0.is_finite() && !r.0.is_zero() && k <= 1000 {
+                let s = 1000 * i64::exact_from(k);
+                let (y, o) = root_u_rational_prec_round_all(&(&x << s), k, prec, rm);
+                assert!(same(&y, &(&r.0 << 1000)));
+                assert_eq!(o, r.1);
+            }
+            // A dyadic x gives the root of the equal `BigExponentFloat`.
+            if let Ok(x_bef) = BigExponentFloat::try_from(&x) {
+                assert!(same_pair(&x_bef.root_u_prec_round(k, prec, rm), &r));
+            }
+            // `Float`'s function agrees wherever its result neither overflows nor underflows (at 0,
+            // `Float` has signed zeros and infinities).
+            if x != 0u32 {
+                let (f, fo) = Float::root_u_rational_prec_round_ref(&x, k, prec, rm);
+                if float_result_comparable(&f, fo) {
+                    assert!(same(&r.0, &float_to_big_exponent_float(&f)));
+                    assert_eq!(r.1, fo);
+                }
+            }
+        },
+    );
+}
+
+fn root_s_rational_prec_round_all(
+    x: &Rational,
+    k: i64,
+    prec: u64,
+    rm: RoundingMode,
+) -> (BigExponentFloat, Ordering) {
+    let r = BigExponentFloat::root_s_rational_prec_round(x.clone(), k, prec, rm);
+    assert!(r.0.is_valid());
+    assert!(same_pair(
+        &BigExponentFloat::root_s_rational_prec_round_ref(x, k, prec, rm),
+        &r
+    ));
+    if rm == Nearest {
+        assert!(same_pair(
+            &BigExponentFloat::root_s_rational_prec(x.clone(), k, prec),
+            &r
+        ));
+        assert!(same_pair(
+            &BigExponentFloat::root_s_rational_prec_ref(x, k, prec),
+            &r
+        ));
+    }
+    r
+}
+
+#[test]
+fn test_root_s_rational_prec_round() {
+    let test =
+        |x: &str, k: i64, prec: u64, rm: RoundingMode, out: &str, out_hex: &str, o: Ordering| {
+            assert_eq!(parse_big_exponent_float_hex(out_hex).to_string(), out);
+            let r = root_s_rational_prec_round_all(&Rational::from_str(x).unwrap(), k, prec, rm);
+            assert!(
+                same(&r.0, &parse_big_exponent_float_hex(out_hex)),
+                "{x} {prec} {rm}: {:?}",
+                r.0
+            );
+            assert_eq!(r.1, o, "{x} {prec} {rm}");
+        };
+    test("3/5", 0, 10, Exact, "NaN", "NaN", Equal);
+    test("0", 3, 10, Exact, "0.0", "0x0.0", Equal);
+    test("0", -2, 10, Exact, "Infinity", "Infinity", Equal);
+    test("0", -3, 10, Exact, "NaN", "NaN", Equal);
+    test("-3/5", -4, 10, Exact, "NaN", "NaN", Equal);
+    test("16/81", -4, 2, Exact, "1.5", "0x1.8", Equal);
+    test("3/5", -3, 1, Nearest, "1.0", "0x1.0", Less);
+    test("3/5", -3, 10, Floor, "1.1855", "0x1.2f8", Less);
+    test("3/5", -3, 10, Ceiling, "1.19", "0x1.3", Greater);
+    test(
+        "3/5",
+        -3,
+        100,
+        Nearest,
+        "1.1856311014966876020020515407464",
+        "0x1.2f8585160c79901b6927b11de",
+        Greater,
+    );
+    test("22/7", -5, 1, Nearest, "1.0", "0x1.0", Greater);
+    test("22/7", -5, 10, Floor, "0.7949", "0x0.cb8", Less);
+    test("22/7", -5, 10, Ceiling, "0.79590", "0x0.cbc", Greater);
+    test(
+        "22/7",
+        -5,
+        100,
+        Nearest,
+        "0.7953074887060702616288572906089",
+        "0x0.cb99458641a76fc7a6e7edcda",
+        Greater,
+    );
+    test("-22/7", -5, 1, Nearest, "-1.0", "-0x1.0", Less);
+    test("-22/7", -5, 10, Floor, "-0.79590", "-0x0.cbc", Less);
+    test("-22/7", -5, 10, Ceiling, "-0.7949", "-0x0.cb8", Greater);
+    test(
+        "-22/7",
+        -5,
+        100,
+        Nearest,
+        "-0.7953074887060702616288572906089",
+        "-0x0.cb99458641a76fc7a6e7edcda",
+        Less,
+    );
+    test(
+        "1/100000000000000000000000",
+        -7,
+        1,
+        Nearest,
+        "2.0e3",
+        "0x8.0E+2",
+        Greater,
+    );
+    test(
+        "1/100000000000000000000000",
+        -7,
+        10,
+        Floor,
+        "1930.0",
+        "0x78a.0",
+        Less,
+    );
+    test(
+        "1/100000000000000000000000",
+        -7,
+        10,
+        Ceiling,
+        "1932.0",
+        "0x78c.0",
+        Greater,
+    );
+    test(
+        "1/100000000000000000000000",
+        -7,
+        100,
+        Nearest,
+        "1930.6977288832501670070747998403",
+        "0x78a.b29e5c2f08b8c70ea8412a8",
+        Greater,
+    );
+    test("3/5", -1, 1, Nearest, "2.0", "0x2.0", Greater);
+    test("3/5", -1, 10, Floor, "1.6660", "0x1.aa8", Less);
+    test("3/5", -1, 10, Ceiling, "1.668", "0x1.ab", Greater);
+    test(
+        "3/5",
+        -1,
+        100,
+        Nearest,
+        "1.6666666666666666666666666666661",
+        "0x1.aaaaaaaaaaaaaaaaaaaaaaaaa",
+        Less,
+    );
+    test("3/5", 1, 1, Nearest, "0.50", "0x0.8", Less);
+    test("3/5", 1, 10, Floor, "0.5996", "0x0.998", Less);
+    test("3/5", 1, 10, Ceiling, "0.60059", "0x0.99c", Greater);
+    test(
+        "3/5",
+        1,
+        100,
+        Nearest,
+        "0.6000000000000000000000000000003",
+        "0x0.999999999999999999999999a",
+        Greater,
+    );
+    test("3/5", -1000000, 1, Nearest, "1.0", "0x1.0", Less);
+    test("3/5", -1000000, 10, Floor, "1.0", "0x1.0", Less);
+    test("3/5", -1000000, 10, Ceiling, "1.0020", "0x1.008", Greater);
+    test(
+        "3/5",
+        -1000000,
+        100,
+        Nearest,
+        "1.0000005108257542374218472113698",
+        "0x1.00000891fadb46f55f92d587e",
+        Less,
+    );
+}
+
+#[test]
+fn test_root_s_rational_prec_round_huge() {
+    // (3 * 2^(-2^30 - 5))^(1/-1) = 2^(2^30 + 5) / 3, whose exponent is beyond `Float`'s range.
+    let x = Rational::from(3u32) >> ((1u64 << 30) + 5);
+    for rm in [Floor, Ceiling, Nearest] {
+        let (y, o) =
+            BigExponentFloat::from_rational_prec_round(Rational::from_unsigneds(1u8, 3), 20, rm);
+        let r = root_s_rational_prec_round_all(&x, -1, 20, rm);
+        assert!(same(&r.0, &(y << ((1u64 << 30) + 5))));
+        assert_eq!(r.1, o);
+        assert!(*r.0.get_exponent().unwrap() > Float::MAX_EXPONENT);
+    }
+}
+
+#[test]
+#[should_panic]
+fn root_s_rational_prec_round_fail_1() {
+    BigExponentFloat::root_s_rational_prec_round(Rational::from_unsigneds(3u8, 5), -5, 0, Floor);
+}
+
+#[test]
+#[should_panic]
+fn root_s_rational_prec_round_fail_2() {
+    BigExponentFloat::root_s_rational_prec_round(Rational::from_unsigneds(3u8, 5), -5, 10, Exact);
+}
+
+#[test]
+fn root_s_rational_prec_round_properties() {
+    rational_signed_unsigned_rounding_mode_quadruple_gen_var_2().test_properties(
+        |(x, k, prec, rm)| {
+            let r = root_s_rational_prec_round_all(&x, k, prec, rm);
+            if r.0.is_nan() || r.0.is_zero() || r.0.is_infinite() {
+                assert_eq!(r.1, Equal);
+            } else {
+                assert!(r.0.get_prec().unwrap() <= prec);
+            }
+            // Multiplying x by 2^(1000k) multiplies the root by 2^(1000 sign(k)).
+            if r.0.is_finite() && !r.0.is_zero() && k.unsigned_abs() <= 1000 {
+                let s = 1000 * i64::exact_from(k.unsigned_abs());
+                let (y, o) = root_s_rational_prec_round_all(&(&x << s), k, prec, rm);
+                assert!(same(&y, &(&r.0 << if k > 0 { 1000 } else { -1000 })));
+                assert_eq!(o, r.1);
+            }
+            // A dyadic x gives the root of the equal `BigExponentFloat`.
+            if let Ok(x_bef) = BigExponentFloat::try_from(&x) {
+                assert!(same_pair(&x_bef.root_s_prec_round(k, prec, rm), &r));
+            }
+            // `Float`'s function agrees wherever its result neither overflows nor underflows (at 0,
+            // `Float` has signed zeros and infinities).
+            if x != 0u32 {
+                let (f, fo) = Float::root_s_rational_prec_round_ref(&x, k, prec, rm);
+                if float_result_comparable(&f, fo) {
+                    assert!(same(&r.0, &float_to_big_exponent_float(&f)));
+                    assert_eq!(r.1, fo);
+                }
             }
         },
     );
