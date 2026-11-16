@@ -12,10 +12,11 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::BigExponentFloat;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::float::basic::extended::ExtendedFloat;
+use crate::big_exponent_float::exponential::exp::finite_can_round;
 use crate::float::exponential::ln::{SliverOfOne, sliver_of_one};
-use crate::float::exponential::log_base_2::extended_log_base_2_of_rational;
+use crate::float::exponential::log_base_2::big_exponent_log_base_2_of_rational;
 use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn};
 use alloc::vec::Vec;
 use core::cmp::Ordering::{self, *};
@@ -417,21 +418,14 @@ fn log_base_rational_prec_round_helper(
     loop {
         // log_2(x) in the extended exponent range: for x within a sliver of 1 the ordinary Float
         // form would flush to zero or clamp, and the rounding test below could never resolve it.
-        let num = extended_log_base_2_of_rational(x, working_prec);
-        let den = ExtendedFloat::from(base_float.log_base_2_prec_ref(working_prec).0);
+        let num = big_exponent_log_base_2_of_rational(x, working_prec);
+        let den = BigExponentFloat::from(base_float.log_base_2_prec_ref(working_prec).0);
         let quotient = num.div_prec_val_ref(&den, working_prec).0;
         // log_2(x) is within 2 ulps, log_2(base) within 1/2, and the division adds 1/2 more, so
         // working_prec - 6 correct bits comfortably suffice.
-        if float_can_round(
-            quotient.x.significand_ref().unwrap(),
-            working_prec - 6,
-            prec,
-            rm,
-        ) {
-            let (rounded, o) = Float::from_float_prec_round(quotient.x, prec, rm);
-            let mut result = ExtendedFloat::from(rounded);
-            result.exp = result.exp.checked_add(quotient.exp).unwrap();
-            return result.into_float_helper(prec, rm, o);
+        if finite_can_round(&quotient, working_prec - 6, working_prec, prec, rm) {
+            // Round once to prec, clamping to the Float range as the rounding mode dictates.
+            return Float::from_big_exponent_float_prec_round(quotient, prec, rm);
         }
         // Increase the precision.
         working_prec += increment;

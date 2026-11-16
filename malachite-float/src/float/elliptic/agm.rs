@@ -12,8 +12,11 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::BigExponentFloat;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::float::basic::extended::{ExtendedFloat, agm_prec_round_normal_extended};
+use crate::big_exponent_float::conversion::float_from_big_exponent_float::*;
+use crate::big_exponent_float::conversion::from_rational::rational_floor_and_ceiling;
+use crate::big_exponent_float::exponential::exp::finite_can_round;
 use crate::{
     Float, emulate_float_float_to_float_fn, emulate_rational_rational_to_float_fn,
     floor_and_ceiling, test_overflow, test_underflow,
@@ -25,7 +28,7 @@ use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{ShrRoundAssign, Sign, Sqrt, SqrtAssign};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Zero as ZeroTrait;
+use malachite_base::num::basic::traits::{NaN as _, Zero as ZeroTrait};
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom, SaturatingFrom};
 use malachite_base::num::elliptic::traits::{Agm, AgmAssign};
 use malachite_base::num::exponential::traits::CeilingLogBase2;
@@ -35,6 +38,113 @@ use malachite_nz::natural::arithmetic::float::round::float_can_round;
 use malachite_nz::natural::arithmetic::float::sub::exponent_shift_compare;
 use malachite_nz::platform::Limb;
 use malachite_q::Rational;
+
+// This is mpfr_cmp2 from cmp2.c, MPFR 4.3.0, for finite nonzero `BigExponentFloat`s: it compares
+// |b| with |c|, and sets `cancel` to the number of leading bits that cancel in |b| - |c|.
+// `exponent_shift_compare` takes `i64` exponents, so both are rebased to make c's exponent 0; if
+// the difference does not fit in an `i64`, no bits cancel and the exponents decide.
+fn cmp2_helper_big_exponent(
+    b: &BigExponentFloat,
+    c: &BigExponentFloat,
+    cancel: &mut u64,
+) -> Ordering {
+    let (e_b, e_c) = (b.get_exponent().unwrap(), c.get_exponent().unwrap());
+    let Ok(diff) = i64::try_from(&(e_b - e_c)) else {
+        *cancel = 0;
+        return e_b.cmp(e_c);
+    };
+    let xs = b.significand_ref().unwrap();
+    let ys = c.significand_ref().unwrap();
+    let (o, c) = exponent_shift_compare(
+        xs.as_limbs_asc(),
+        diff,
+        xs.limb_count() << Limb::LOG_WIDTH,
+        ys.as_limbs_asc(),
+        0,
+        ys.limb_count() << Limb::LOG_WIDTH,
+    );
+    *cancel = c;
+    o
+}
+
+// This is mpfr_agm from agm.c, MPFR 4.3.0 (as in `agm_prec_round_normal`), on `BigExponentFloat`s,
+// whose unbounded exponents allow arguments outside `Float`'s exponent range. Every operation keeps
+// the precision it has in `agm_prec_round_normal`. The result is rounded to `prec` bits with `rm`,
+// but may lie outside `Float`'s exponent range; `float_from_rounded_big_exponent_float` converts
+// it.
+crate_test_fn! {agm_prec_round_normal_big_exponent<'a>(
+    mut a: &'a BigExponentFloat,
+    mut b: &'a BigExponentFloat,
+    prec: u64,
+    rm: RoundingMode,
+) -> (BigExponentFloat, Ordering) {
+    if *a < 0u32 || *b < 0u32 {
+        return (BigExponentFloat::NAN, Equal);
+    }
+    let q = prec;
+    let mut working_prec = q + q.ceiling_log_base_2() + 15;
+    // b (op2) and a (op1) are the 2 operands but we want b >= a
+    match a.partial_cmp(b).unwrap() {
+        Equal => return a.round_to_prec_round_ref(prec, rm),
+        Greater => swap(&mut a, &mut b),
+        _ => {}
+    }
+    let mut increment = Limb::WIDTH;
+    let mut v;
+    loop {
+        let mut err: u64 = 0;
+        let mut u = a
+            .mul_prec_ref_ref(b, working_prec)
+            .0
+            .sqrt_prec(working_prec)
+            .0;
+        v = a.add_prec_ref_ref(b, working_prec).0 >> 1u32;
+        let mut n: u64 = 1;
+        let mut eq = 0;
+        while cmp2_helper_big_exponent(&u, &v, &mut eq) != Equal && eq <= working_prec - 2 {
+            let mut vf = u.add_prec_ref_ref(&v, working_prec).0 >> 1u32;
+            // See proof in algorithms.tex
+            if eq > working_prec >> 2 {
+                // vf = V(k)
+                let low_p = (working_prec + 1) >> 1;
+                // e = V(k-1)-U(k-1)
+                let mut w = v.sub_prec_ref_ref(&u, low_p).0;
+                // e = e^2
+                w.square_prec_assign(low_p);
+                // e*= (1/2)^2*1/4
+                w >>= 4u32;
+                // 1/4*e^2/V(k)
+                w.div_prec_assign_ref(&vf, low_p);
+                let vf_exp = vf.get_exponent().unwrap().clone();
+                v = vf.sub_prec(w, working_prec).0;
+                // 0 or 1
+                err = u64::exact_from(&(vf_exp - v.get_exponent().unwrap()));
+                break;
+            }
+            u = u
+                .mul_prec_ref_ref(&v, working_prec)
+                .0
+                .sqrt_prec(working_prec)
+                .0;
+            swap(&mut v, &mut vf);
+            n += 1;
+        }
+        // the error on v is bounded by (18n+51) ulps, or twice if there was an exponent loss in the
+        // final subtraction
+        //
+        // 18n+51 should not overflow since n is about log(p)
+        err += (18 * n + 51).ceiling_log_base_2();
+        // we should have n+2 <= 2^(p/4) [see algorithms.tex]
+        if (n + 2).ceiling_log_base_2() <= working_prec >> 2
+            && finite_can_round(&v, working_prec - err, working_prec, q, rm)
+        {
+            break;
+        }
+        working_prec += increment;
+        increment = working_prec >> 1;
+    }
+    v.round_to_prec_round(prec, rm)
+}}
 
 // This is mpfr_cmp2 from cmp2.c, MPFR 4.3.0.
 fn cmp2_helper(b: &Float, c: &Float, cancel: &mut u64) -> Ordering {
@@ -421,7 +531,11 @@ fn agm_rational_helper(
     }
 }
 
-fn agm_rational_helper_extended(
+// The AGM of the positive `Rational`s x and y, rounded to `prec` bits with `rm`, when x or y lies
+// outside `Float`'s exponent range. The AGM is increasing in each argument, so it lies between the
+// AGMs of the floors and of the ceilings of x and y at the working precision, which are computed as
+// `BigExponentFloat`s; once both round to the same value, so does the AGM of x and y.
+fn agm_rational_helper_big_exponent(
     x: &Rational,
     y: &Rational,
     prec: u64,
@@ -430,16 +544,13 @@ fn agm_rational_helper_extended(
     let mut working_prec = prec + 10;
     let mut increment = Limb::WIDTH;
     loop {
-        let (x_lo, x_o) = ExtendedFloat::from_rational_prec_round_ref(x, working_prec, Floor);
-        let (y_lo, y_o) = ExtendedFloat::from_rational_prec_round_ref(y, working_prec, Floor);
-        if x_o == Equal && y_o == Equal {
-            let (agm, o) = agm_prec_round_normal_extended(x_lo, y_lo, prec, rm);
-            return agm.into_float_helper(prec, rm, o);
+        let (x_lo, x_hi, x_exact) = rational_floor_and_ceiling(x, working_prec);
+        let (y_lo, y_hi, y_exact) = rational_floor_and_ceiling(y, working_prec);
+        let (agm_lo, mut o_lo) = agm_prec_round_normal_big_exponent(&x_lo, &y_lo, prec, rm);
+        if x_exact && y_exact {
+            return float_from_rounded_big_exponent_float(agm_lo, o_lo, prec, rm);
         }
-        let (x_lo, x_hi) = crate::float::basic::extended::floor_and_ceiling((x_lo, x_o));
-        let (y_lo, y_hi) = crate::float::basic::extended::floor_and_ceiling((y_lo, y_o));
-        let (agm_lo, mut o_lo) = agm_prec_round_normal_extended(x_lo, y_lo, prec, rm);
-        let (agm_hi, mut o_hi) = agm_prec_round_normal_extended(x_hi, y_hi, prec, rm);
+        let (agm_hi, mut o_hi) = agm_prec_round_normal_big_exponent(&x_hi, &y_hi, prec, rm);
         if o_lo == Equal {
             o_lo = o_hi;
         }
@@ -447,7 +558,7 @@ fn agm_rational_helper_extended(
             o_hi = o_lo;
         }
         if o_lo == o_hi && agm_lo == agm_hi {
-            return agm_lo.into_float_helper(prec, rm, o_lo);
+            return float_from_rounded_big_exponent_float(agm_lo, o_lo, prec, rm);
         }
         working_prec += increment;
         increment = working_prec >> 1;
@@ -486,7 +597,10 @@ fn agm_float_rational_helper(
     }
 }
 
-fn agm_float_rational_helper_extended(
+// The AGM of the finite positive `Float` x and the positive `Rational` q, rounded to `prec` bits
+// with `rm`, when q lies outside `Float`'s exponent range; as in
+// `agm_rational_helper_big_exponent`, q is bracketed by `BigExponentFloat`s.
+fn agm_float_rational_helper_big_exponent(
     x: &Float,
     q: &Rational,
     prec: u64,
@@ -494,16 +608,14 @@ fn agm_float_rational_helper_extended(
 ) -> (Float, Ordering) {
     let mut working_prec = prec + 10;
     let mut increment = Limb::WIDTH;
-    let x = ExtendedFloat::from(x.clone());
+    let x = BigExponentFloat::from(x);
     loop {
-        let (q_lo, q_o) = ExtendedFloat::from_rational_prec_round_ref(q, working_prec, Floor);
-        if q_o == Equal {
-            let (agm, o) = agm_prec_round_normal_extended(x.clone(), q_lo, prec, rm);
-            return agm.into_float_helper(prec, rm, o);
+        let (q_lo, q_hi, q_exact) = rational_floor_and_ceiling(q, working_prec);
+        let (agm_lo, mut o_lo) = agm_prec_round_normal_big_exponent(&x, &q_lo, prec, rm);
+        if q_exact {
+            return float_from_rounded_big_exponent_float(agm_lo, o_lo, prec, rm);
         }
-        let (q_lo, q_hi) = crate::float::basic::extended::floor_and_ceiling((q_lo, q_o));
-        let (agm_lo, mut o_lo) = agm_prec_round_normal_extended(x.clone(), q_lo, prec, rm);
-        let (agm_hi, mut o_hi) = agm_prec_round_normal_extended(x.clone(), q_hi, prec, rm);
+        let (agm_hi, mut o_hi) = agm_prec_round_normal_big_exponent(&x, &q_hi, prec, rm);
         if o_lo == Equal {
             o_lo = o_hi;
         }
@@ -511,7 +623,7 @@ fn agm_float_rational_helper_extended(
             o_hi = o_lo;
         }
         if o_lo == o_hi && agm_lo == agm_hi {
-            return agm_lo.into_float_helper(prec, rm, o_lo);
+            return float_from_rounded_big_exponent_float(agm_lo, o_lo, prec, rm);
         }
         working_prec += increment;
         increment = working_prec >> 1;
@@ -543,7 +655,7 @@ fn agm_float_rational_prec_round_ref_ref(
     if (Float::MIN_EXPONENT..Float::MAX_EXPONENT).contains(&q_exp) {
         agm_float_rational_helper(x, q, prec, rm)
     } else {
-        agm_float_rational_helper_extended(x, q, prec, rm)
+        agm_float_rational_helper_big_exponent(x, q, prec, rm)
     }
 }
 
@@ -2129,7 +2241,7 @@ impl Float {
             {
                 agm_rational_helper(&x, y, prec, rm)
             }
-            _ => agm_rational_helper_extended(&x, y, prec, rm),
+            _ => agm_rational_helper_big_exponent(&x, y, prec, rm),
         }
     }
 
@@ -2258,7 +2370,7 @@ impl Float {
             {
                 agm_rational_helper(x, &y, prec, rm)
             }
-            _ => agm_rational_helper_extended(x, &y, prec, rm),
+            _ => agm_rational_helper_big_exponent(x, &y, prec, rm),
         }
     }
 
@@ -2387,7 +2499,7 @@ impl Float {
             {
                 agm_rational_helper(x, y, prec, rm)
             }
-            _ => agm_rational_helper_extended(x, y, prec, rm),
+            _ => agm_rational_helper_big_exponent(x, y, prec, rm),
         }
     }
 

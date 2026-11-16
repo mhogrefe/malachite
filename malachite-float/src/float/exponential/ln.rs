@@ -12,8 +12,10 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::BigExponentFloat;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::float::basic::extended::ExtendedFloat;
+use crate::big_exponent_float::arithmetic::mul_rational::shift_finite;
+use crate::big_exponent_float::conversion::from_rational::rational_floor_and_ceiling;
 use crate::{
     Float, emulate_float_to_float_fn, emulate_rational_to_float_fn, floor_and_ceiling,
     significand_bits,
@@ -255,35 +257,34 @@ fn ln_prec_round_normal(mut x: Float, prec: u64, rm: RoundingMode) -> (Float, Or
     }
 }
 
-pub(crate) fn ln_prec_round_normal_extended(
-    x: ExtendedFloat,
+// The natural logarithm of the positive finite `x`, rounded to `prec` bits with `rm`, by the method
+// of `ln_prec_round_normal`. `x` is a `BigExponentFloat`, so its exponent may lie outside `Float`'s
+// range; the argument is scaled by 2^m into the range, and m ln 2 is subtracted afterward, so the
+// result (whose absolute value is at most about |EXP(x)| ln 2) is always a `Float`.
+pub(crate) fn ln_prec_round_normal_big_exponent(
+    x: BigExponentFloat,
     prec: u64,
     rm: RoundingMode,
 ) -> (Float, Ordering) {
-    if x.exp == 1 && x.x.is_power_of_2() {
+    let x_exp = x.get_exponent().unwrap().clone();
+    if x_exp == 1u32 && x.is_power_of_2() {
         return (Float::ZERO, Equal);
     }
     assert_ne!(rm, Exact, "Inexact ln");
-    let x_exp = x.exp;
     // use initial precision about q + 2 * lg(q) + cte
     let mut working_prec = prec + (prec.ceiling_log_base_2() << 1) + 10;
     let mut increment = Limb::WIDTH;
-    let mut m = i64::exact_from((working_prec + 3) >> 1)
-        .checked_sub(x.exp)
-        .unwrap();
-    let mut previous_m = m;
-    let mut x = Float::exact_from(x << m);
+    let mut m = Integer::from((working_prec + 3) >> 1) - &x_exp;
+    let mut x = Float::exact_from(shift_finite(x, &m));
     let mut first = true;
     loop {
         if first {
             first = false;
         } else {
             // Calculus of m (depends on p)
-            m = i64::exact_from((working_prec + 3) >> 1)
-                .checked_sub(x_exp)
-                .unwrap();
-            x <<= m - previous_m;
-            previous_m = m;
+            let new_m = Integer::from((working_prec + 3) >> 1) - &x_exp;
+            x <<= i64::exact_from(&(&new_m - &m));
+            m = new_m;
         }
         assert!(x.is_normal());
         let tmp2 = Float::pi_prec(working_prec).0
@@ -296,7 +297,7 @@ pub(crate) fn ln_prec_round_normal_extended(
         let tmp1 = tmp2
             - Float::ln_2_prec(working_prec)
                 .0
-                .mul_prec(Float::from(m), working_prec)
+                .mul_prec(Float::exact_from(&m), working_prec)
                 .0;
         if let (Some(exp1), Some(exp2)) = (tmp1.get_exponent(), exp2) {
             let cancel = u64::saturating_from(exp2 - exp1);
@@ -400,17 +401,20 @@ fn ln_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Orde
     }
 }
 
-fn ln_rational_helper_extended(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+// The natural logarithm of the positive `Rational` x, rounded to `prec` bits with `rm`, when x lies
+// outside `Float`'s exponent range. The logarithm is increasing, so it lies between the logarithms
+// of the floor and of the ceiling of x at the working precision, which are computed as
+// `BigExponentFloat`s; once both round to the same value, so does the logarithm of x.
+fn ln_rational_helper_big_exponent(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
     let mut working_prec = prec + 10;
     let mut increment = Limb::WIDTH;
     loop {
-        let (x_lo, x_o) = ExtendedFloat::from_rational_prec_round_ref(x, working_prec, Floor);
-        if x_o == Equal {
-            return ln_prec_round_normal_extended(x_lo, prec, rm);
+        let (x_lo, x_hi, x_exact) = rational_floor_and_ceiling(x, working_prec);
+        if x_exact {
+            return ln_prec_round_normal_big_exponent(x_lo, prec, rm);
         }
-        let (x_lo, x_hi) = crate::float::basic::extended::floor_and_ceiling((x_lo, x_o));
-        let (ln_lo, mut o_lo) = ln_prec_round_normal_extended(x_lo, prec, rm);
-        let (ln_hi, mut o_hi) = ln_prec_round_normal_extended(x_hi, prec, rm);
+        let (ln_lo, mut o_lo) = ln_prec_round_normal_big_exponent(x_lo, prec, rm);
+        let (ln_hi, mut o_hi) = ln_prec_round_normal_big_exponent(x_hi, prec, rm);
         if o_lo == Equal {
             o_lo = o_hi;
         }
@@ -1372,7 +1376,7 @@ impl Float {
         }
         let x_exp = i32::saturating_from(x.floor_log_base_2_abs()).saturating_add(1);
         if x_exp >= const { Self::MAX_EXPONENT - 1 } || x_exp <= const { Self::MIN_EXPONENT + 1 } {
-            ln_rational_helper_extended(x, prec, rm)
+            ln_rational_helper_big_exponent(x, prec, rm)
         } else {
             ln_rational_helper(x, prec, rm)
         }

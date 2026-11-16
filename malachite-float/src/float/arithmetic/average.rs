@@ -6,8 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::Float;
-use crate::float::basic::extended::ExtendedFloat;
+use crate::{BigExponentFloat, Float};
 use core::cmp::Ordering::{self, *};
 use core::cmp::max;
 use malachite_base::num::arithmetic::traits::{Average, AverageAssign};
@@ -56,20 +55,15 @@ fn average_prec_round_helper(x: Float, y: Float, prec: u64, rm: RoundingMode) ->
             // not in the lowest binade, since `gap` is positive, so halving it is exact.
             (big >> 1u32).add_prec_round(small, prec, rm)
         } else {
-            // The exact sum spans few enough bits to be affordable. Rebasing both exponents keeps
-            // the arithmetic inside `ExtendedFloat` small, and there the halving is a free
-            // adjustment of the extended exponent, so the final conversion is the only rounding.
-            let w = gap + p + 1;
-            let mut a = ExtendedFloat::from(big);
-            let mut b = ExtendedFloat::from(small);
-            let base = b.exp;
-            a.exp -= base;
-            b.exp -= base;
-            let s = a.add_prec_ref_ref(&b, w).0;
-            if s.x == 0u32 {
-                // The inputs cancel exactly. `Rational` has no signed zero, so the sign follows the
-                // rule the addition uses: an exactly zero sum is negative only when rounding toward
-                // negative infinity.
+            // The exact sum spans few enough bits to be affordable. As `BigExponentFloat`s, whose
+            // exponents are unbounded, both the sum and the halving are exact, so the final
+            // conversion, which handles a result outside `Float`'s exponent range, is the only
+            // rounding.
+            let s = BigExponentFloat::from(big) + BigExponentFloat::from(small);
+            if s == 0u32 {
+                // The inputs cancel exactly. `BigExponentFloat` has no signed zero, so the sign
+                // follows the rule the addition uses: an exactly zero sum is negative only when
+                // rounding toward negative infinity.
                 return (
                     if rm == Floor {
                         Float::NEGATIVE_ZERO
@@ -79,14 +73,7 @@ fn average_prec_round_helper(x: Float, y: Float, prec: u64, rm: RoundingMode) ->
                     Equal,
                 );
             }
-            // Round to the target precision while the exponent is still small, which is equivalent
-            // to rounding afterward because rounding to a precision is scale- invariant, and keeps
-            // the intermediate rational small. Only then is the rebasing undone, together with the
-            // halving; the conversion back applies that shift and handles a result that falls
-            // outside `Float`'s exponent range, composing the two orderings.
-            let (mut t, o) = ExtendedFloat::from_extended_float_prec_round_ref(&s, prec, rm);
-            t.exp += base - 1;
-            t.into_float_helper(prec, rm, o)
+            Float::from_big_exponent_float_prec_round(s >> 1u32, prec, rm)
         }
     }
 }

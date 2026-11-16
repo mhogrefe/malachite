@@ -24,7 +24,7 @@ use malachite_float::test_util::common::{
     to_hex_string,
 };
 use malachite_float::test_util::float::elliptic::agm::{
-    agm_prec_round_extended, rug_agm, rug_agm_prec, rug_agm_prec_round, rug_agm_round,
+    agm_prec_round_big_exponent, rug_agm, rug_agm_prec, rug_agm_prec_round, rug_agm_round,
 };
 use malachite_float::test_util::generators::{
     float_float_rounding_mode_triple_gen_var_33, float_float_rounding_mode_triple_gen_var_34,
@@ -96,7 +96,7 @@ fn test_agm() {
         );
 
         let prec = max(x.significant_bits(), y.significant_bits());
-        let agm_alt = agm_prec_round_extended(x, y, prec, Nearest).0;
+        let agm_alt = agm_prec_round_big_exponent(x, y, prec, Nearest).0;
         assert_eq!(ComparableFloat(agm_alt), ComparableFloat(agm));
     };
     test("NaN", "NaN", "NaN", "NaN", "NaN", "NaN");
@@ -338,7 +338,7 @@ fn test_agm_prec() {
         );
         assert_eq!(rug_o, o);
 
-        let (agm_alt, o_alt) = agm_prec_round_extended(x, y, prec, Nearest);
+        let (agm_alt, o_alt) = agm_prec_round_big_exponent(x, y, prec, Nearest);
         assert_eq!(ComparableFloat(agm_alt), ComparableFloat(agm));
         assert_eq!(o_alt, o);
     };
@@ -871,7 +871,7 @@ fn test_agm_round() {
         }
 
         let prec = max(x.significant_bits(), y.significant_bits());
-        let (agm_alt, o_alt) = agm_prec_round_extended(x, y, prec, rm);
+        let (agm_alt, o_alt) = agm_prec_round_big_exponent(x, y, prec, rm);
         assert_eq!(ComparableFloat(agm_alt), ComparableFloat(agm));
         assert_eq!(o_alt, o);
     };
@@ -2385,7 +2385,7 @@ fn test_agm_prec_round() {
             assert_eq!(rug_o, o);
         }
 
-        let (agm_alt, o_alt) = agm_prec_round_extended(x, y, prec, rm);
+        let (agm_alt, o_alt) = agm_prec_round_big_exponent(x, y, prec, rm);
         assert_eq!(ComparableFloat(agm_alt), ComparableFloat(agm));
         assert_eq!(o_alt, o);
     };
@@ -5119,7 +5119,7 @@ fn agm_prec_round_properties_helper(
     }
 
     if !extreme {
-        let (agm_alt, o_alt) = agm_prec_round_extended(x.clone(), y.clone(), prec, rm);
+        let (agm_alt, o_alt) = agm_prec_round_big_exponent(x.clone(), y.clone(), prec, rm);
         assert_eq!(ComparableFloatRef(&agm_alt), ComparableFloatRef(&agm));
         assert_eq!(o_alt, o);
     }
@@ -5278,7 +5278,7 @@ fn agm_prec_properties_helper(x: Float, y: Float, prec: u64, extreme: bool) {
     assert_eq!(rug_o, o);
 
     if !extreme {
-        let (agm_alt, o_alt) = agm_prec_round_extended(x.clone(), y.clone(), prec, Nearest);
+        let (agm_alt, o_alt) = agm_prec_round_big_exponent(x.clone(), y.clone(), prec, Nearest);
         assert_eq!(ComparableFloatRef(&agm_alt), ComparableFloatRef(&agm));
         assert_eq!(o_alt, o);
     }
@@ -5458,7 +5458,7 @@ fn agm_round_properties_helper(x: Float, y: Float, rm: RoundingMode, extreme: bo
 
     if !extreme {
         let prec = max(x.significant_bits(), y.significant_bits());
-        let (agm_alt, o_alt) = agm_prec_round_extended(x.clone(), y.clone(), prec, rm);
+        let (agm_alt, o_alt) = agm_prec_round_big_exponent(x.clone(), y.clone(), prec, rm);
         assert_eq!(ComparableFloatRef(&agm_alt), ComparableFloatRef(&agm));
         assert_eq!(o_alt, o);
     }
@@ -5591,7 +5591,7 @@ fn agm_properties_helper(x: Float, y: Float, extreme: bool) {
 
     if !extreme {
         let prec = max(x.significant_bits(), y.significant_bits());
-        let agm_alt = agm_prec_round_extended(x.clone(), y.clone(), prec, Nearest).0;
+        let agm_alt = agm_prec_round_big_exponent(x.clone(), y.clone(), prec, Nearest).0;
         assert_eq!(ComparableFloatRef(&agm_alt), ComparableFloatRef(&agm));
     }
 

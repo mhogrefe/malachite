@@ -41,6 +41,27 @@ fn exact_float(x: &BigExponentFloat) -> Result<Float, bool> {
     }
 }
 
+// The `Float` for `y`, the result of rounding some exact value z to `prec` bits with `rm`, where
+// `o` says how `y` compares with z: `y` itself if its exponent is in `Float`'s range, and otherwise
+// the overflow or underflow result of rounding z with `rm`. The returned `Ordering` compares the
+// result with z. Taking `o` into account makes the conversion a continuation of the rounding that
+// produced `y`, rather than a second, independent rounding (which could round an underflowing z
+// that lies just above half the smallest positive `Float`, but that `y` rounded down to exactly
+// that half, the wrong way with `Nearest`).
+crate_test_fn! {float_from_rounded_big_exponent_float(
+    y: BigExponentFloat,
+    o: Ordering,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    match &y {
+        BigExponentFloat(Finite { sign, .. }) => {
+            Float::from_rounded_big_exponent_float(&y, o, *sign, prec, rm)
+        }
+        _ => (Float::try_from(y).unwrap(), o),
+    }
+}}
+
 impl TryFrom<&BigExponentFloat> for Float {
     type Error = FloatConversionError;
 

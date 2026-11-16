@@ -30,7 +30,7 @@ use malachite_float::test_util::common::{
     to_hex_string,
 };
 use malachite_float::test_util::float::exponential::ln::{
-    ln_prec_round_extended, rug_ln, rug_ln_prec, rug_ln_prec_round, rug_ln_round,
+    ln_prec_round_big_exponent, rug_ln, rug_ln_prec, rug_ln_prec_round, rug_ln_round,
 };
 use malachite_float::test_util::generators::{
     float_gen, float_gen_var_12, float_rounding_mode_pair_gen_var_34,
@@ -99,7 +99,7 @@ fn test_ln() {
         assert_eq!(
             ComparableFloatRef(&ln),
             ComparableFloatRef(
-                &ln_prec_round_extended(x.clone(), x.get_prec().unwrap_or(1), Nearest).0
+                &ln_prec_round_big_exponent(x.clone(), x.get_prec().unwrap_or(1), Nearest).0
             )
         );
 
@@ -182,7 +182,7 @@ fn test_ln_prec() {
         assert_eq!(ComparableFloatRef(&ln), ComparableFloatRef(&ln_alt));
         assert_eq!(o_alt, o_out);
 
-        let (ln_alt, o_alt) = ln_prec_round_extended(x.clone(), prec, Nearest);
+        let (ln_alt, o_alt) = ln_prec_round_big_exponent(x.clone(), prec, Nearest);
         assert!(ln_alt.is_valid());
         assert_eq!(ComparableFloatRef(&ln), ComparableFloatRef(&ln_alt));
         assert_eq!(o_alt, o_out);
@@ -372,7 +372,7 @@ fn test_ln_round() {
         assert_eq!(ComparableFloatRef(&ln), ComparableFloatRef(&ln_alt));
         assert_eq!(o_alt, o_out);
 
-        let (ln_alt, o_alt) = ln_prec_round_extended(x.clone(), x.get_prec().unwrap_or(1), rm);
+        let (ln_alt, o_alt) = ln_prec_round_big_exponent(x.clone(), x.get_prec().unwrap_or(1), rm);
         assert!(ln_alt.is_valid());
         assert_eq!(ComparableFloatRef(&ln), ComparableFloatRef(&ln_alt));
         assert_eq!(o_alt, o_out);
@@ -822,7 +822,7 @@ fn test_ln_prec_round() {
         assert_eq!(ComparableFloatRef(&ln), ComparableFloatRef(&ln_alt));
         assert_eq!(o_alt, o_out);
 
-        let (ln_alt, o_alt) = ln_prec_round_extended(x.clone(), prec, rm);
+        let (ln_alt, o_alt) = ln_prec_round_big_exponent(x.clone(), prec, rm);
         assert!(ln_alt.is_valid());
         assert_eq!(ComparableFloatRef(&ln), ComparableFloatRef(&ln_alt));
         assert_eq!(o_alt, o_out);
@@ -2873,7 +2873,7 @@ fn ln_prec_round_properties_helper(x: Float, prec: u64, rm: RoundingMode) {
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&ln));
     assert_eq!(o_alt, o);
 
-    let (ln_alt, o_alt) = ln_prec_round_extended(x.clone(), prec, rm);
+    let (ln_alt, o_alt) = ln_prec_round_big_exponent(x.clone(), prec, rm);
     assert!(ln_alt.is_valid());
     assert_eq!(ComparableFloatRef(&ln), ComparableFloatRef(&ln_alt));
     assert_eq!(o_alt, o);
@@ -2972,7 +2972,7 @@ fn ln_prec_properties_helper(x: Float, prec: u64) {
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&ln));
     assert_eq!(o_alt, o);
 
-    let (ln_alt, o_alt) = ln_prec_round_extended(x.clone(), prec, Nearest);
+    let (ln_alt, o_alt) = ln_prec_round_big_exponent(x.clone(), prec, Nearest);
     assert!(ln_alt.is_valid());
     assert_eq!(ComparableFloatRef(&ln), ComparableFloatRef(&ln_alt));
     assert_eq!(o_alt, o);
@@ -3076,7 +3076,7 @@ fn ln_round_properties_helper(x: Float, rm: RoundingMode) {
         }
     }
 
-    let (ln_alt, o_alt) = ln_prec_round_extended(x.clone(), x.get_prec().unwrap_or(1), rm);
+    let (ln_alt, o_alt) = ln_prec_round_big_exponent(x.clone(), x.get_prec().unwrap_or(1), rm);
     assert!(ln_alt.is_valid());
     assert_eq!(ComparableFloatRef(&ln), ComparableFloatRef(&ln_alt));
     assert_eq!(o_alt, o);
@@ -3163,7 +3163,7 @@ fn ln_properties_helper(x: Float) {
         assert!(ln < x);
     }
 
-    let ln_alt = ln_prec_round_extended(x.clone(), x.get_prec().unwrap_or(1), Nearest).0;
+    let ln_alt = ln_prec_round_big_exponent(x.clone(), x.get_prec().unwrap_or(1), Nearest).0;
     assert!(ln_alt.is_valid());
     assert_eq!(ComparableFloatRef(&ln_alt), ComparableFloatRef(&ln));
 

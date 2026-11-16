@@ -6,10 +6,11 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::Float;
 use crate::InnerFloat::{Infinity, NaN, Zero};
-use crate::float::basic::extended::{ExtendedFloat, agm_prec_round_normal_ref_ref_extended};
+use crate::big_exponent_float::conversion::float_from_big_exponent_float::*;
+use crate::float::elliptic::agm::agm_prec_round_normal_big_exponent;
 use crate::test_util::common::rug_float_significant_bits;
+use crate::{BigExponentFloat, Float};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode;
 use rug::float::Round;
@@ -53,7 +54,7 @@ pub fn rug_agm(x: &rug::Float, y: &rug::Float) -> rug::Float {
     .0
 }
 
-pub fn agm_prec_round_extended(
+pub fn agm_prec_round_big_exponent(
     x: Float,
     y: Float,
     prec: u64,
@@ -66,13 +67,13 @@ pub fn agm_prec_round_extended(
         (float_either_infinity!(), _) | (_, float_either_infinity!()) => (float_nan!(), Equal),
         (float_either_zero!(), _) | (_, float_either_zero!()) => (float_zero!(), Equal),
         _ => {
-            let (x, o) = agm_prec_round_normal_ref_ref_extended(
-                &ExtendedFloat::from(x),
-                &ExtendedFloat::from(y),
+            let (x, o) = agm_prec_round_normal_big_exponent(
+                &BigExponentFloat::from(x),
+                &BigExponentFloat::from(y),
                 prec,
                 rm,
             );
-            x.into_float_helper(prec, rm, o)
+            float_from_rounded_big_exponent_float(x, o, prec, rm)
         }
     }
 }

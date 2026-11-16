@@ -17,10 +17,10 @@ use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::primitive_float_pair_gen;
 use malachite_base::test_util::runner::Runner;
-use malachite_float::float::basic::extended::{
-    ExtendedFloat, agm_prec_round_normal_ref_ref_extended,
+use malachite_float::BigExponentFloat;
+use malachite_float::float::elliptic::agm::{
+    agm_prec_round_normal_big_exponent, primitive_float_agm, primitive_float_agm_rational,
 };
-use malachite_float::float::elliptic::agm::{primitive_float_agm, primitive_float_agm_rational};
 use malachite_float::test_util::bench::bucketers::{
     pair_2_pair_float_max_complexity_bucketer,
     pair_2_quadruple_1_2_3_float_float_primitive_int_max_complexity_bucketer,
@@ -1457,11 +1457,11 @@ fn benchmark_float_agm_algorithms(gm: GenMode, config: &GenConfig, limit: usize,
         &pair_float_max_complexity_bucketer("x", "y"),
         &mut [
             ("default", &mut |(x, y)| no_out!(x.agm(y))),
-            ("extended", &mut |(x, y)| {
+            ("big exponent", &mut |(x, y)| {
                 let prec = max(x.significant_bits(), y.significant_bits());
-                agm_prec_round_normal_ref_ref_extended(
-                    &ExtendedFloat::from(x.clone()),
-                    &ExtendedFloat::from(y.clone()),
+                agm_prec_round_normal_big_exponent(
+                    &BigExponentFloat::from(&x),
+                    &BigExponentFloat::from(&y),
                     prec,
                     Nearest,
                 );
@@ -1570,10 +1570,10 @@ fn benchmark_float_agm_prec_algorithms(
             ("default", &mut |(x, y, prec)| {
                 no_out!(x.agm_prec(y, prec));
             }),
-            ("extended", &mut |(x, y, prec)| {
-                agm_prec_round_normal_ref_ref_extended(
-                    &ExtendedFloat::from(x.clone()),
-                    &ExtendedFloat::from(y.clone()),
+            ("big exponent", &mut |(x, y, prec)| {
+                agm_prec_round_normal_big_exponent(
+                    &BigExponentFloat::from(&x),
+                    &BigExponentFloat::from(&y),
                     prec,
                     Nearest,
                 );
@@ -1689,11 +1689,11 @@ fn benchmark_float_agm_round_algorithms(
             ("default", &mut |(x, y, rm)| {
                 no_out!(x.agm_round(y, rm));
             }),
-            ("extended", &mut |(x, y, rm)| {
+            ("big exponent", &mut |(x, y, rm)| {
                 let prec = max(x.significant_bits(), y.significant_bits());
-                agm_prec_round_normal_ref_ref_extended(
-                    &ExtendedFloat::from(x.clone()),
-                    &ExtendedFloat::from(y.clone()),
+                agm_prec_round_normal_big_exponent(
+                    &BigExponentFloat::from(&x),
+                    &BigExponentFloat::from(&y),
                     prec,
                     rm,
                 );
@@ -1807,10 +1807,10 @@ fn benchmark_float_agm_prec_round_algorithms(
             ("default", &mut |(x, y, prec, rm)| {
                 no_out!(x.agm_prec_round(y, prec, rm));
             }),
-            ("extended", &mut |(x, y, prec, rm)| {
-                agm_prec_round_normal_ref_ref_extended(
-                    &ExtendedFloat::from(x.clone()),
-                    &ExtendedFloat::from(y.clone()),
+            ("big exponent", &mut |(x, y, prec, rm)| {
+                agm_prec_round_normal_big_exponent(
+                    &BigExponentFloat::from(&x),
+                    &BigExponentFloat::from(&y),
                     prec,
                     rm,
                 );

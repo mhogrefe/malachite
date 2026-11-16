@@ -16,6 +16,23 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_q::Rational;
 
+// The floor and the ceiling of the positive `x` at `prec` bits, and whether `x` is exactly
+// representable with `prec` bits (in which case the floor and ceiling are both `x`). When `x` is
+// not representable, its ceiling is the successor of its floor among the values with `prec` bits,
+// so the pair brackets `x` as tightly as `prec` bits allow.
+pub(crate) fn rational_floor_and_ceiling(
+    x: &Rational,
+    prec: u64,
+) -> (BigExponentFloat, BigExponentFloat, bool) {
+    let (floor, o) = BigExponentFloat::from_rational_prec_round_ref(x, prec, Floor);
+    if o == Equal {
+        (floor.clone(), floor, true)
+    } else {
+        let ceiling = BigExponentFloat::from_rational_prec_round_ref(x, prec, Ceiling).0;
+        (floor, ceiling, false)
+    }
+}
+
 /// The error that results when converting a non-dyadic [`Rational`] (one whose denominator is not a
 /// power of 2) to a [`BigExponentFloat`] exactly.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]

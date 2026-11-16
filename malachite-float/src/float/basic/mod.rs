@@ -16,9 +16,8 @@ pub mod complexity;
 /// which accept a precision.
 #[macro_use]
 pub mod constants;
-/// Floating-point numbers with a greater exponent range; for internal use only.
-pub mod extended;
-/// Getting and setting the components of a [`Float`](super::Float).
+/// Floating-point numbers with a greater exponent range; for internal use only. Getting and setting
+/// the components of a [`Float`](super::Float).
 pub mod get_and_set;
 /// Getting [`Float`](super::Float)'s ulp (unit in the last place).
 pub mod subnormalize;

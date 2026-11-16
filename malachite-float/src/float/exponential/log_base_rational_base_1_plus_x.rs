@@ -6,10 +6,11 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::BigExponentFloat;
 use crate::InnerFloat::{Infinity, NaN, Zero};
-use crate::float::basic::extended::ExtendedFloat;
+use crate::big_exponent_float::exponential::exp::finite_can_round;
 use crate::float::exponential::log_base::{dyadic_1p_log_of_root, rational_root_parts};
-use crate::float::exponential::log_base_2::extended_log_base_2_of_rational;
+use crate::float::exponential::log_base_2::big_exponent_log_base_2_of_rational;
 use crate::{Float, emulate_float_to_float_fn};
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::IsPowerOf2;
@@ -23,7 +24,6 @@ use malachite_base::num::exponential::traits::{
 use malachite_base::num::factorization::traits::ExpressAsPower;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
-use malachite_nz::natural::arithmetic::float::round::float_can_round;
 use malachite_nz::platform::Limb;
 use malachite_q::Rational;
 
@@ -76,14 +76,14 @@ pub(crate) fn rational_log_base_rational_base_1_plus_x(
 //
 // Routing through `log_base_2_1_plus_x` (rather than forming `1 + x` and taking its log) preserves
 // accuracy for x near 0. `log_2(base)` is computed in the extended exponent range (see
-// `extended_log_base_2_of_rational`) so that a base near 1 -- where `log_2(base)` is tiny and would
-// otherwise underflow an ordinary `Float`, losing the operand -- is represented faithfully. The
-// quotient is also kept extended, and the single conversion back to a `Float`, via
-// `ExtendedFloat::into_float_helper`, performs the one correctly-rounded clamp. Unlike an integer
-// base, a `Rational` base allows both overflow (base near 1, so `log_2(base)` is tiny and the
-// quotient is huge) and underflow (a large base dividing a tiny `log_2(1 + x)` for x near 0); both
-// are handled by that clamp. (`log_2(1 + x)` itself never underflows: x is a `Float`, so `|x|` is
-// at least the smallest positive `Float`, keeping `|log_2(1 + x)|` representable.)
+// `big_exponent_log_base_2_of_rational`) so that a base near 1 -- where `log_2(base)` is tiny and
+// would otherwise underflow an ordinary `Float`, losing the operand -- is represented faithfully.
+// The quotient is also kept extended, and the single conversion back to a `Float`, via
+// `Float::from_big_exponent_float_prec_round`, performs the one correctly-rounded clamp. Unlike an
+// integer base, a `Rational` base allows both overflow (base near 1, so `log_2(base)` is tiny and
+// the quotient is huge) and underflow (a large base dividing a tiny `log_2(1 + x)` for x near 0);
+// both are handled by that clamp. (`log_2(1 + x)` itself never underflows: x is a `Float`, so `|x|`
+// is at least the smallest positive `Float`, keeping `|log_2(1 + x)|` representable.)
 fn log_base_rational_base_1_plus_x_prec_round_normal(
     x: &Float,
     base: &Rational,
@@ -117,27 +117,18 @@ fn log_base_rational_base_1_plus_x_prec_round_normal(
     let mut increment = Limb::WIDTH;
     loop {
         // log_2(1 + x), correctly rounded to working_prec; nonzero (x is not 0) and never
-        // underflowing, so the ordinary log wrapped as an ExtendedFloat suffices.
-        let num = ExtendedFloat::from(x.log_base_2_1_plus_x_prec_ref(working_prec).0);
+        // underflowing, so the ordinary log wrapped as a BigExponentFloat suffices.
+        let num = BigExponentFloat::from(x.log_base_2_1_plus_x_prec_ref(working_prec).0);
         // log_2(base) > 0, extended (may be tiny for a base near 1).
-        let den = extended_log_base_2_of_rational(base, working_prec);
+        let den = big_exponent_log_base_2_of_rational(base, working_prec);
         // log_2(1 + x) / log_2(base) in the extended range; cannot overflow or underflow here.
         let quotient = num.div_prec_val_ref(&den, working_prec).0;
         // log_2(1 + x) is correctly rounded (<= 1/2 ulp), log_2(base) is within 2 ulps, and the
         // division adds at most 1 more, for at most 4 ulps total; working_prec - 6 correct bits
         // comfortably suffice for the rounding test.
-        if float_can_round(
-            quotient.x.significand_ref().unwrap(),
-            working_prec - 6,
-            prec,
-            rm,
-        ) {
-            // Round the mantissa to prec, then place the extended exponent, clamping once to the
-            // Float range as the rounding mode dictates.
-            let (rounded, o) = Float::from_float_prec_round(quotient.x, prec, rm);
-            let mut result = ExtendedFloat::from(rounded);
-            result.exp = result.exp.checked_add(quotient.exp).unwrap();
-            return result.into_float_helper(prec, rm, o);
+        if finite_can_round(&quotient, working_prec - 6, working_prec, prec, rm) {
+            // Round once to prec, clamping to the Float range as the rounding mode dictates.
+            return Float::from_big_exponent_float_prec_round(quotient, prec, rm);
         }
         // Increase the precision.
         working_prec += increment;
