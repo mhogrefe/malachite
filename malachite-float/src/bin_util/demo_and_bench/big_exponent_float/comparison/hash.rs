@@ -18,7 +18,9 @@ use malachite_float::test_util::generators::big_exponent_float_gen;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_comparable_big_exponent_float_hash);
+    register_demo!(runner, demo_comparable_big_exponent_float_hash_debug);
     register_demo!(runner, demo_comparable_big_exponent_float_ref_hash);
+    register_demo!(runner, demo_comparable_big_exponent_float_ref_hash_debug);
 
     register_bench!(
         runner,
@@ -29,11 +31,29 @@ pub(crate) fn register(runner: &mut Runner) {
 fn demo_comparable_big_exponent_float_hash(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in big_exponent_float_gen().get(gm, config).take(limit) {
         let x = ComparableBigExponentFloat(x);
+        println!("hash({}) = {}", x.0, hash(&x));
+    }
+}
+
+fn demo_comparable_big_exponent_float_hash_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in big_exponent_float_gen().get(gm, config).take(limit) {
+        let x = ComparableBigExponentFloat(x);
         println!("hash({x:#x}) = {}", hash(&x));
     }
 }
 
 fn demo_comparable_big_exponent_float_ref_hash(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in big_exponent_float_gen().get(gm, config).take(limit) {
+        let x = ComparableBigExponentFloatRef(&x);
+        println!("hash({}) = {}", x.0, hash(&x));
+    }
+}
+
+fn demo_comparable_big_exponent_float_ref_hash_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
     for x in big_exponent_float_gen().get(gm, config).take(limit) {
         let x = ComparableBigExponentFloatRef(&x);
         println!("hash({x:#x}) = {}", hash(&x));

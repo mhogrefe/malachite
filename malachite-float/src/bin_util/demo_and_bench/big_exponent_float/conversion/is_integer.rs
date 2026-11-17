@@ -15,8 +15,11 @@ use malachite_float::test_util::generators::big_exponent_float_gen;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_is_integer);
+    register_demo!(runner, demo_big_exponent_float_is_integer_debug);
     register_demo!(runner, demo_big_exponent_float_is_real);
+    register_demo!(runner, demo_big_exponent_float_is_real_debug);
     register_demo!(runner, demo_big_exponent_float_is_gaussian_integer);
+    register_demo!(runner, demo_big_exponent_float_is_gaussian_integer_debug);
 
     register_bench!(runner, benchmark_big_exponent_float_is_integer);
     register_bench!(runner, benchmark_big_exponent_float_is_real);
@@ -25,17 +28,39 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_big_exponent_float_is_integer(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in big_exponent_float_gen().get(gm, config).take(limit) {
+        println!("({x}).is_integer() = {}", x.is_integer());
+    }
+}
+
+fn demo_big_exponent_float_is_integer_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in big_exponent_float_gen().get(gm, config).take(limit) {
         println!("({x:#x}).is_integer() = {}", x.is_integer());
     }
 }
 
 fn demo_big_exponent_float_is_real(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in big_exponent_float_gen().get(gm, config).take(limit) {
+        println!("({x}).is_real() = {}", x.is_real());
+    }
+}
+
+fn demo_big_exponent_float_is_real_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in big_exponent_float_gen().get(gm, config).take(limit) {
         println!("({x:#x}).is_real() = {}", x.is_real());
     }
 }
 
 fn demo_big_exponent_float_is_gaussian_integer(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in big_exponent_float_gen().get(gm, config).take(limit) {
+        println!("({x}).is_gaussian_integer() = {}", x.is_gaussian_integer());
+    }
+}
+
+fn demo_big_exponent_float_is_gaussian_integer_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
     for x in big_exponent_float_gen().get(gm, config).take(limit) {
         println!(
             "({x:#x}).is_gaussian_integer() = {}",

@@ -14,13 +14,27 @@ use malachite_float::test_util::generators::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_fractional_part_prec_round);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_fractional_part_prec_round_debug
+    );
     register_demo!(runner, demo_big_exponent_float_fractional_part_prec);
+    register_demo!(runner, demo_big_exponent_float_fractional_part_prec_debug);
     register_demo!(runner, demo_big_exponent_float_fractional_part);
+    register_demo!(runner, demo_big_exponent_float_fractional_part_debug);
     register_demo!(
         runner,
         demo_big_exponent_float_integer_and_fractional_parts_prec_round
     );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_integer_and_fractional_parts_prec_round_debug
+    );
     register_demo!(runner, demo_big_exponent_float_integer_and_fractional_parts);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_integer_and_fractional_parts_debug
+    );
 
     register_bench!(
         runner,
@@ -42,7 +56,21 @@ fn demo_big_exponent_float_fractional_part_prec_round(
         .take(limit)
     {
         let (z, o) = x.fractional_part_prec_round_ref(prec, rm);
-        println!("{x:#x}.fractional_part_prec_round({prec}, {rm}) = ({z:#x}, {o:?})");
+        println!("({x}).fractional_part_prec_round({prec}, {rm}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_fractional_part_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, prec, rm) in big_exponent_float_unsigned_rounding_mode_triple_gen_var_8()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = x.fractional_part_prec_round_ref(prec, rm);
+        println!("({x:#x}).fractional_part_prec_round({prec}, {rm}) = ({z:#x}, {o:?})");
     }
 }
 
@@ -52,13 +80,36 @@ fn demo_big_exponent_float_fractional_part_prec(gm: GenMode, config: &GenConfig,
         .take(limit)
     {
         let (z, o) = x.fractional_part_prec_ref(prec);
-        println!("{x:#x}.fractional_part_prec({prec}) = ({z:#x}, {o:?})");
+        println!("({x}).fractional_part_prec({prec}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_fractional_part_prec_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, prec) in big_exponent_float_unsigned_pair_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = x.fractional_part_prec_ref(prec);
+        println!("({x:#x}).fractional_part_prec({prec}) = ({z:#x}, {o:?})");
     }
 }
 
 fn demo_big_exponent_float_fractional_part(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in big_exponent_float_gen().get(gm, config).take(limit) {
-        println!("{x:#x}.fractional_part() = {:#x}", x.fractional_part_ref());
+        println!("({x}).fractional_part() = {}", x.fractional_part_ref());
+    }
+}
+
+fn demo_big_exponent_float_fractional_part_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in big_exponent_float_gen().get(gm, config).take(limit) {
+        println!(
+            "({x:#x}).fractional_part() = {:#x}",
+            x.fractional_part_ref()
+        );
     }
 }
 
@@ -73,7 +124,23 @@ fn demo_big_exponent_float_integer_and_fractional_parts_prec_round(
     {
         let ((i, io), (f, fo)) = x.integer_and_fractional_parts_prec_round_ref(prec, prec, rm);
         println!(
-            "{x:#x}.integer_and_fractional_parts_prec_round({prec}, {prec}, {rm}) = (({i:#x}, {io:?}), ({f:#x}, {fo:?}))"
+            "({x}).integer_and_fractional_parts_prec_round({prec}, {prec}, {rm}) = (({i}, {io:?}), ({f}, {fo:?}))"
+        );
+    }
+}
+
+fn demo_big_exponent_float_integer_and_fractional_parts_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, prec, rm) in big_exponent_float_unsigned_rounding_mode_triple_gen_var_7()
+        .get(gm, config)
+        .take(limit)
+    {
+        let ((i, io), (f, fo)) = x.integer_and_fractional_parts_prec_round_ref(prec, prec, rm);
+        println!(
+            "({x:#x}).integer_and_fractional_parts_prec_round({prec}, {prec}, {rm}) = (({i:#x}, {io:?}), ({f:#x}, {fo:?}))"
         );
     }
 }
@@ -85,7 +152,18 @@ fn demo_big_exponent_float_integer_and_fractional_parts(
 ) {
     for x in big_exponent_float_gen().get(gm, config).take(limit) {
         let (i, f) = x.integer_and_fractional_parts_ref();
-        println!("{x:#x}.integer_and_fractional_parts() = ({i:#x}, {f:#x})");
+        println!("({x}).integer_and_fractional_parts() = ({i}, {f})");
+    }
+}
+
+fn demo_big_exponent_float_integer_and_fractional_parts_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for x in big_exponent_float_gen().get(gm, config).take(limit) {
+        let (i, f) = x.integer_and_fractional_parts_ref();
+        println!("({x:#x}).integer_and_fractional_parts() = ({i:#x}, {f:#x})");
     }
 }
 

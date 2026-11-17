@@ -25,8 +25,11 @@ use malachite_float::test_util::generators::{
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_square);
+    register_demo!(runner, demo_big_exponent_float_square_debug);
     register_demo!(runner, demo_big_exponent_float_square_prec_round);
+    register_demo!(runner, demo_big_exponent_float_square_prec_round_debug);
     register_demo!(runner, demo_big_exponent_float_square_prec);
+    register_demo!(runner, demo_big_exponent_float_square_prec_debug);
 
     register_bench!(
         runner,
@@ -52,7 +55,13 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_big_exponent_float_square(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in big_exponent_float_gen().get(gm, config).take(limit) {
-        println!("{x:#x}.square() = {:#x}", (&x).square());
+        println!("({x}).square() = {}", (&x).square());
+    }
+}
+
+fn demo_big_exponent_float_square_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in big_exponent_float_gen().get(gm, config).take(limit) {
+        println!("({x:#x}).square() = {:#x}", (&x).square());
     }
 }
 
@@ -62,7 +71,17 @@ fn demo_big_exponent_float_square_prec_round(gm: GenMode, config: &GenConfig, li
         .take(limit)
     {
         let (z, o) = x.square_prec_round_ref(prec, rm);
-        println!("{x:#x}.square_prec_round({prec}, {rm}) = ({z:#x}, {o:?})");
+        println!("({x}).square_prec_round({prec}, {rm}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_square_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec, rm) in big_exponent_float_unsigned_rounding_mode_triple_gen_var_2()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = x.square_prec_round_ref(prec, rm);
+        println!("({x:#x}).square_prec_round({prec}, {rm}) = ({z:#x}, {o:?})");
     }
 }
 
@@ -72,7 +91,17 @@ fn demo_big_exponent_float_square_prec(gm: GenMode, config: &GenConfig, limit: u
         .take(limit)
     {
         let (z, o) = x.square_prec_ref(prec);
-        println!("{x:#x}.square_prec({prec}) = ({z:#x}, {o:?})");
+        println!("({x}).square_prec({prec}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_square_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec) in big_exponent_float_unsigned_pair_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = x.square_prec_ref(prec);
+        println!("({x:#x}).square_prec({prec}) = ({z:#x}, {o:?})");
     }
 }
 

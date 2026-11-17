@@ -17,6 +17,7 @@ use malachite_float::test_util::generators::{
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_is_power_of_2);
+    register_demo!(runner, demo_big_exponent_float_is_power_of_2_debug);
 
     register_bench!(
         runner,
@@ -25,6 +26,16 @@ pub(crate) fn register(runner: &mut Runner) {
 }
 
 fn demo_big_exponent_float_is_power_of_2(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in big_exponent_float_gen().get(gm, config).take(limit) {
+        if x.is_power_of_2() {
+            println!("{x} is a power of 2");
+        } else {
+            println!("{x} is not a power of 2");
+        }
+    }
+}
+
+fn demo_big_exponent_float_is_power_of_2_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in big_exponent_float_gen().get(gm, config).take(limit) {
         if x.is_power_of_2() {
             println!("{x:#x} is a power of 2");

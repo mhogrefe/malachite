@@ -14,10 +14,21 @@ use malachite_float::BigExponentFloat;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_power_of_2_u64);
+    register_demo!(runner, demo_big_exponent_float_power_of_2_u64_debug);
     register_demo!(runner, demo_big_exponent_float_power_of_2_i64);
+    register_demo!(runner, demo_big_exponent_float_power_of_2_i64_debug);
 }
 
 fn demo_big_exponent_float_power_of_2_u64(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in unsigned_gen::<u64>().get(gm, config).take(limit) {
+        println!(
+            "BigExponentFloat::power_of_2({x}) = {}",
+            BigExponentFloat::power_of_2(x)
+        );
+    }
+}
+
+fn demo_big_exponent_float_power_of_2_u64_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in unsigned_gen::<u64>().get(gm, config).take(limit) {
         println!(
             "BigExponentFloat::power_of_2({x}) = {:#x}",
@@ -27,6 +38,15 @@ fn demo_big_exponent_float_power_of_2_u64(gm: GenMode, config: &GenConfig, limit
 }
 
 fn demo_big_exponent_float_power_of_2_i64(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in signed_gen::<i64>().get(gm, config).take(limit) {
+        println!(
+            "BigExponentFloat::power_of_2({x}) = {}",
+            BigExponentFloat::power_of_2(x)
+        );
+    }
+}
+
+fn demo_big_exponent_float_power_of_2_i64_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in signed_gen::<i64>().get(gm, config).take(limit) {
         println!(
             "BigExponentFloat::power_of_2({x}) = {:#x}",

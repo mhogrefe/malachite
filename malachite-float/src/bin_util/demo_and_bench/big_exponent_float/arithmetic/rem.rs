@@ -15,17 +15,35 @@ use malachite_float::{BigExponentFloat, Float};
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_rem_prec_round);
+    register_demo!(runner, demo_big_exponent_float_rem_prec_round_debug);
     register_demo!(runner, demo_big_exponent_float_rem_prec);
+    register_demo!(runner, demo_big_exponent_float_rem_prec_debug);
     register_demo!(runner, demo_big_exponent_float_ieee_remainder_prec_round);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_ieee_remainder_prec_round_debug
+    );
     register_demo!(runner, demo_big_exponent_float_ieee_remainder_prec);
+    register_demo!(runner, demo_big_exponent_float_ieee_remainder_prec_debug);
     register_demo!(
         runner,
         demo_big_exponent_float_rem_and_quotient_bits_prec_round
     );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_rem_and_quotient_bits_prec_round_debug
+    );
     register_demo!(runner, demo_big_exponent_float_rem_and_quotient_bits_prec);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_rem_and_quotient_bits_prec_debug
+    );
     register_demo!(runner, demo_big_exponent_float_rem);
+    register_demo!(runner, demo_big_exponent_float_rem_debug);
     register_demo!(runner, demo_big_exponent_float_ieee_remainder);
+    register_demo!(runner, demo_big_exponent_float_ieee_remainder_debug);
     register_demo!(runner, demo_big_exponent_float_rem_and_quotient_bits);
+    register_demo!(runner, demo_big_exponent_float_rem_and_quotient_bits_debug);
 
     register_bench!(
         runner,
@@ -53,15 +71,32 @@ pub(crate) fn register(runner: &mut Runner) {
     );
     register_bench!(runner, benchmark_big_exponent_float_rem_evaluation_strategy);
     register_demo!(runner, demo_big_exponent_float_rem_rational_prec_round);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_rem_rational_prec_round_debug
+    );
     register_demo!(runner, demo_big_exponent_float_rem_rational_prec);
+    register_demo!(runner, demo_big_exponent_float_rem_rational_prec_debug);
     register_demo!(
         runner,
         demo_big_exponent_float_ieee_remainder_rational_prec_round
     );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_ieee_remainder_rational_prec_round_debug
+    );
     register_demo!(runner, demo_big_exponent_float_ieee_remainder_rational_prec);
     register_demo!(
         runner,
+        demo_big_exponent_float_ieee_remainder_rational_prec_debug
+    );
+    register_demo!(
+        runner,
         demo_big_exponent_float_rem_rational_and_quotient_bits_prec_round
+    );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_rem_rational_and_quotient_bits_prec_round_debug
     );
     register_demo!(
         runner,
@@ -69,7 +104,15 @@ pub(crate) fn register(runner: &mut Runner) {
     );
     register_demo!(
         runner,
+        demo_big_exponent_float_rem_rational_and_quotient_bits_prec_debug
+    );
+    register_demo!(
+        runner,
         demo_big_exponent_float_ieee_remainder_rational_and_quotient_bits_prec_round
+    );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_ieee_remainder_rational_and_quotient_bits_prec_round_debug
     );
     register_demo!(
         runner,
@@ -77,7 +120,15 @@ pub(crate) fn register(runner: &mut Runner) {
     );
     register_demo!(
         runner,
+        demo_big_exponent_float_ieee_remainder_rational_and_quotient_bits_prec_debug
+    );
+    register_demo!(
+        runner,
         demo_big_exponent_float_rational_rem_big_exponent_float_prec_round
+    );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_rational_rem_big_exponent_float_prec_round_debug
     );
     register_demo!(
         runner,
@@ -85,7 +136,15 @@ pub(crate) fn register(runner: &mut Runner) {
     );
     register_demo!(
         runner,
+        demo_big_exponent_float_rational_rem_big_exponent_float_prec_debug
+    );
+    register_demo!(
+        runner,
         demo_big_exponent_float_rational_ieee_remainder_big_exponent_float_prec_round
+    );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_rational_ieee_remainder_big_exponent_float_prec_round_debug
     );
     register_demo!(
         runner,
@@ -93,23 +152,56 @@ pub(crate) fn register(runner: &mut Runner) {
     );
     register_demo!(
         runner,
+        demo_big_exponent_float_rational_ieee_remainder_big_exponent_float_prec_debug
+    );
+    register_demo!(
+        runner,
         demo_big_exponent_float_rational_rem_big_exponent_float_and_quotient_bits_prec_round
+    );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_rational_rem_big_exponent_float_and_quotient_bits_prec_round_debug
     );
     register_demo!(
         runner,
         demo_big_exponent_float_rational_rem_big_exponent_float_and_quotient_bits_prec
     );
-    register_demo!(runner, demo_big_exponent_float_rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_rational_rem_big_exponent_float_and_quotient_bits_prec_debug
+    );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round
+    );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_debug
+    );
     register_demo!(
         runner,
         demo_big_exponent_float_rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec
     );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_debug
+    );
     register_demo!(runner, demo_big_exponent_float_rem_unsigned_prec_round);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_rem_unsigned_prec_round_debug
+    );
     register_demo!(runner, demo_big_exponent_float_rem_unsigned_prec);
+    register_demo!(runner, demo_big_exponent_float_rem_unsigned_prec_debug);
     register_demo!(runner, demo_big_exponent_float_rem_unsigned);
+    register_demo!(runner, demo_big_exponent_float_rem_unsigned_debug);
     register_demo!(
         runner,
         demo_big_exponent_float_ieee_remainder_and_quotient_bits_prec_round
+    );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_ieee_remainder_and_quotient_bits_prec_round_debug
     );
     register_demo!(
         runner,
@@ -117,7 +209,15 @@ pub(crate) fn register(runner: &mut Runner) {
     );
     register_demo!(
         runner,
+        demo_big_exponent_float_ieee_remainder_and_quotient_bits_prec_debug
+    );
+    register_demo!(
+        runner,
         demo_big_exponent_float_ieee_remainder_and_quotient_bits
+    );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_ieee_remainder_and_quotient_bits_debug
     );
     register_bench!(
         runner,
@@ -180,7 +280,18 @@ fn demo_big_exponent_float_rem_prec_round(gm: GenMode, config: &GenConfig, limit
             .take(limit)
     {
         let (z, o) = x.rem_prec_round_ref_ref(&y, prec, rm);
-        println!("{x:#x}.rem_prec_round({y:#x}, {prec}, {rm}) = ({z:#x}, {o:?})");
+        println!("({x}).rem_prec_round({y}, {prec}, {rm}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_rem_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec, rm) in
+        big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_9()
+            .get(gm, config)
+            .take(limit)
+    {
+        let (z, o) = x.rem_prec_round_ref_ref(&y, prec, rm);
+        println!("({x:#x}).rem_prec_round({y:#x}, {prec}, {rm}) = ({z:#x}, {o:?})");
     }
 }
 
@@ -190,7 +301,17 @@ fn demo_big_exponent_float_rem_prec(gm: GenMode, config: &GenConfig, limit: usiz
         .take(limit)
     {
         let (z, o) = x.rem_prec_ref_ref(&y, prec);
-        println!("{x:#x}.rem_prec({y:#x}, {prec}) = ({z:#x}, {o:?})");
+        println!("({x}).rem_prec({y}, {prec}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_rem_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in big_exponent_float_big_exponent_float_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = x.rem_prec_ref_ref(&y, prec);
+        println!("({x:#x}).rem_prec({y:#x}, {prec}) = ({z:#x}, {o:?})");
     }
 }
 
@@ -287,7 +408,22 @@ fn demo_big_exponent_float_ieee_remainder_prec_round(
             .take(limit)
     {
         let (z, o) = x.ieee_remainder_prec_round_ref_ref(&y, prec, rm);
-        println!("{x:#x}.ieee_remainder_prec_round({y:#x}, {prec}, {rm}) = ({z:#x}, {o:?})");
+        println!("({x}).ieee_remainder_prec_round({y}, {prec}, {rm}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_ieee_remainder_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, prec, rm) in
+        big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_10()
+            .get(gm, config)
+            .take(limit)
+    {
+        let (z, o) = x.ieee_remainder_prec_round_ref_ref(&y, prec, rm);
+        println!("({x:#x}).ieee_remainder_prec_round({y:#x}, {prec}, {rm}) = ({z:#x}, {o:?})");
     }
 }
 
@@ -297,7 +433,21 @@ fn demo_big_exponent_float_ieee_remainder_prec(gm: GenMode, config: &GenConfig, 
         .take(limit)
     {
         let (z, o) = x.ieee_remainder_prec_ref_ref(&y, prec);
-        println!("{x:#x}.ieee_remainder_prec({y:#x}, {prec}) = ({z:#x}, {o:?})");
+        println!("({x}).ieee_remainder_prec({y}, {prec}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_ieee_remainder_prec_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, prec) in big_exponent_float_big_exponent_float_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = x.ieee_remainder_prec_ref_ref(&y, prec);
+        println!("({x:#x}).ieee_remainder_prec({y:#x}, {prec}) = ({z:#x}, {o:?})");
     }
 }
 
@@ -394,8 +544,23 @@ fn demo_big_exponent_float_rem_and_quotient_bits_prec_round(
             .take(limit)
     {
         let (z, o, q) = x.rem_and_quotient_bits_prec_round_ref_ref(&y, prec, rm);
+        println!("({x}).rem_and_quotient_bits_prec_round({y}, {prec}, {rm}) = ({z}, {o:?}, {q})");
+    }
+}
+
+fn demo_big_exponent_float_rem_and_quotient_bits_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, prec, rm) in
+        big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_9()
+            .get(gm, config)
+            .take(limit)
+    {
+        let (z, o, q) = x.rem_and_quotient_bits_prec_round_ref_ref(&y, prec, rm);
         println!(
-            "{x:#x}.rem_and_quotient_bits_prec_round({y:#x}, {prec}, {rm}) = ({z:#x}, {o:?}, {q})"
+            "({x:#x}).rem_and_quotient_bits_prec_round({y:#x}, {prec}, {rm}) = ({z:#x}, {o:?}, {q})"
         );
     }
 }
@@ -410,7 +575,21 @@ fn demo_big_exponent_float_rem_and_quotient_bits_prec(
         .take(limit)
     {
         let (z, o, q) = x.rem_and_quotient_bits_prec_ref_ref(&y, prec);
-        println!("{x:#x}.rem_and_quotient_bits_prec({y:#x}, {prec}) = ({z:#x}, {o:?}, {q})");
+        println!("({x}).rem_and_quotient_bits_prec({y}, {prec}) = ({z}, {o:?}, {q})");
+    }
+}
+
+fn demo_big_exponent_float_rem_and_quotient_bits_prec_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, prec) in big_exponent_float_big_exponent_float_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o, q) = x.rem_and_quotient_bits_prec_ref_ref(&y, prec);
+        println!("({x:#x}).rem_and_quotient_bits_prec({y:#x}, {prec}) = ({z:#x}, {o:?}, {q})");
     }
 }
 
@@ -486,6 +665,12 @@ fn benchmark_big_exponent_float_rem_and_quotient_bits_prec_round_float_compariso
 
 fn demo_big_exponent_float_rem(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y) in big_exponent_float_pair_gen().get(gm, config).take(limit) {
+        println!("{x} % {y} = {}", &x % &y);
+    }
+}
+
+fn demo_big_exponent_float_rem_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in big_exponent_float_pair_gen().get(gm, config).take(limit) {
         println!("{x:#x} % {y:#x} = {:#x}", &x % &y);
     }
 }
@@ -493,7 +678,16 @@ fn demo_big_exponent_float_rem(gm: GenMode, config: &GenConfig, limit: usize) {
 fn demo_big_exponent_float_ieee_remainder(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y) in big_exponent_float_pair_gen().get(gm, config).take(limit) {
         println!(
-            "{x:#x}.ieee_remainder({y:#x}) = {:#x}",
+            "({x}).ieee_remainder({y}) = {}",
+            x.ieee_remainder_ref_ref(&y)
+        );
+    }
+}
+
+fn demo_big_exponent_float_ieee_remainder_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in big_exponent_float_pair_gen().get(gm, config).take(limit) {
+        println!(
+            "({x:#x}).ieee_remainder({y:#x}) = {:#x}",
             x.ieee_remainder_ref_ref(&y)
         );
     }
@@ -502,7 +696,18 @@ fn demo_big_exponent_float_ieee_remainder(gm: GenMode, config: &GenConfig, limit
 fn demo_big_exponent_float_rem_and_quotient_bits(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y) in big_exponent_float_pair_gen().get(gm, config).take(limit) {
         let (r, q) = x.rem_and_quotient_bits_ref_ref(&y);
-        println!("{x:#x}.rem_and_quotient_bits({y:#x}) = ({r:#x}, {q})");
+        println!("({x}).rem_and_quotient_bits({y}) = ({r}, {q})");
+    }
+}
+
+fn demo_big_exponent_float_rem_and_quotient_bits_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y) in big_exponent_float_pair_gen().get(gm, config).take(limit) {
+        let (r, q) = x.rem_and_quotient_bits_ref_ref(&y);
+        println!("({x:#x}).rem_and_quotient_bits({y:#x}) = ({r:#x}, {q})");
     }
 }
 
@@ -543,7 +748,21 @@ fn demo_big_exponent_float_rem_rational_prec_round(gm: GenMode, config: &GenConf
         .take(limit)
     {
         let (z, o) = x.rem_rational_prec_round_ref_ref(&y, prec, rm);
-        println!("{x:#x}.rem_rational_prec_round({y}, {prec}, {rm}) = ({z:#x}, {o:?})");
+        println!("({x}).rem_rational_prec_round({y}, {prec}, {rm}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_rem_rational_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, prec, rm) in big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_9()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = x.rem_rational_prec_round_ref_ref(&y, prec, rm);
+        println!("({x:#x}).rem_rational_prec_round({y}, {prec}, {rm}) = ({z:#x}, {o:?})");
     }
 }
 
@@ -553,7 +772,17 @@ fn demo_big_exponent_float_rem_rational_prec(gm: GenMode, config: &GenConfig, li
         .take(limit)
     {
         let (z, o) = x.rem_rational_prec_ref_ref(&y, prec);
-        println!("{x:#x}.rem_rational_prec({y}, {prec}) = ({z:#x}, {o:?})");
+        println!("({x}).rem_rational_prec({y}, {prec}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_rem_rational_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in big_exponent_float_rational_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = x.rem_rational_prec_ref_ref(&y, prec);
+        println!("({x:#x}).rem_rational_prec({y}, {prec}) = ({z:#x}, {o:?})");
     }
 }
 
@@ -651,7 +880,24 @@ fn demo_big_exponent_float_ieee_remainder_rational_prec_round(
             .take(limit)
     {
         let (z, o) = x.ieee_remainder_rational_prec_round_ref_ref(&y, prec, rm);
-        println!("{x:#x}.ieee_remainder_rational_prec_round({y}, {prec}, {rm}) = ({z:#x}, {o:?})");
+        println!("({x}).ieee_remainder_rational_prec_round({y}, {prec}, {rm}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_ieee_remainder_rational_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, prec, rm) in
+        big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_10()
+            .get(gm, config)
+            .take(limit)
+    {
+        let (z, o) = x.ieee_remainder_rational_prec_round_ref_ref(&y, prec, rm);
+        println!(
+            "({x:#x}).ieee_remainder_rational_prec_round({y}, {prec}, {rm}) = ({z:#x}, {o:?})"
+        );
     }
 }
 
@@ -665,7 +911,21 @@ fn demo_big_exponent_float_ieee_remainder_rational_prec(
         .take(limit)
     {
         let (z, o) = x.ieee_remainder_rational_prec_ref_ref(&y, prec);
-        println!("{x:#x}.ieee_remainder_rational_prec({y}, {prec}) = ({z:#x}, {o:?})");
+        println!("({x}).ieee_remainder_rational_prec({y}, {prec}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_ieee_remainder_rational_prec_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, prec) in big_exponent_float_rational_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = x.ieee_remainder_rational_prec_ref_ref(&y, prec);
+        println!("({x:#x}).ieee_remainder_rational_prec({y}, {prec}) = ({z:#x}, {o:?})");
     }
 }
 
@@ -763,7 +1023,23 @@ fn demo_big_exponent_float_rem_rational_and_quotient_bits_prec_round(
     {
         let (z, o, q) = x.rem_rational_and_quotient_bits_prec_round_ref_ref(&y, prec, rm);
         println!(
-            "{x:#x}.rem_rational_and_quotient_bits_prec_round({y}, {prec}, {rm}) = ({z:#x}, {o:?}, {q})"
+            "({x}).rem_rational_and_quotient_bits_prec_round({y}, {prec}, {rm}) = ({z}, {o:?}, {q})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_rem_rational_and_quotient_bits_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, prec, rm) in big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_9()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o, q) = x.rem_rational_and_quotient_bits_prec_round_ref_ref(&y, prec, rm);
+        println!(
+            "({x:#x}).rem_rational_and_quotient_bits_prec_round({y}, {prec}, {rm}) = ({z:#x}, {o:?}, {q})"
         );
     }
 }
@@ -778,7 +1054,23 @@ fn demo_big_exponent_float_rem_rational_and_quotient_bits_prec(
         .take(limit)
     {
         let (z, o, q) = x.rem_rational_and_quotient_bits_prec_ref_ref(&y, prec);
-        println!("{x:#x}.rem_rational_and_quotient_bits_prec({y}, {prec}) = ({z:#x}, {o:?}, {q})");
+        println!("({x}).rem_rational_and_quotient_bits_prec({y}, {prec}) = ({z}, {o:?}, {q})");
+    }
+}
+
+fn demo_big_exponent_float_rem_rational_and_quotient_bits_prec_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, prec) in big_exponent_float_rational_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o, q) = x.rem_rational_and_quotient_bits_prec_ref_ref(&y, prec);
+        println!(
+            "({x:#x}).rem_rational_and_quotient_bits_prec({y}, {prec}) = ({z:#x}, {o:?}, {q})"
+        );
     }
 }
 
@@ -866,7 +1158,25 @@ fn demo_big_exponent_float_ieee_remainder_rational_and_quotient_bits_prec_round(
         let (z, o, q) =
             x.ieee_remainder_rational_and_quotient_bits_prec_round_ref_ref(&y, prec, rm);
         println!(
-            "{x:#x}.ieee_remainder_rational_and_quotient_bits_prec_round({y}, {prec}, {rm}) = ({z:#x}, {o:?}, {q})"
+            "({x}).ieee_remainder_rational_and_quotient_bits_prec_round({y}, {prec}, {rm}) = ({z}, {o:?}, {q})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_ieee_remainder_rational_and_quotient_bits_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, prec, rm) in
+        big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_10()
+            .get(gm, config)
+            .take(limit)
+    {
+        let (z, o, q) =
+            x.ieee_remainder_rational_and_quotient_bits_prec_round_ref_ref(&y, prec, rm);
+        println!(
+            "({x:#x}).ieee_remainder_rational_and_quotient_bits_prec_round({y}, {prec}, {rm}) = ({z:#x}, {o:?}, {q})"
         );
     }
 }
@@ -882,7 +1192,23 @@ fn demo_big_exponent_float_ieee_remainder_rational_and_quotient_bits_prec(
     {
         let (z, o, q) = x.ieee_remainder_rational_and_quotient_bits_prec_ref_ref(&y, prec);
         println!(
-            "{x:#x}.ieee_remainder_rational_and_quotient_bits_prec({y}, {prec}) = ({z:#x}, {o:?}, {q})"
+            "({x}).ieee_remainder_rational_and_quotient_bits_prec({y}, {prec}) = ({z}, {o:?}, {q})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_ieee_remainder_rational_and_quotient_bits_prec_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, prec) in big_exponent_float_rational_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o, q) = x.ieee_remainder_rational_and_quotient_bits_prec_ref_ref(&y, prec);
+        println!(
+            "({x:#x}).ieee_remainder_rational_and_quotient_bits_prec({y}, {prec}) = ({z:#x}, {o:?}, {q})"
         );
     }
 }
@@ -985,12 +1311,46 @@ fn demo_big_exponent_float_rational_rem_big_exponent_float_prec_round(
         let (z, o) =
             BigExponentFloat::rational_rem_big_exponent_float_prec_round_ref_ref(&x, &y, prec, rm);
         println!(
+            "BigExponentFloat::rational_rem_big_exponent_float_prec_round({x}, {y}, {prec}, {rm}) = ({z}, {o:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_rational_rem_big_exponent_float_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (y, x, prec, rm) in
+        big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_11()
+            .get(gm, config)
+            .take(limit)
+    {
+        let (z, o) =
+            BigExponentFloat::rational_rem_big_exponent_float_prec_round_ref_ref(&x, &y, prec, rm);
+        println!(
             "BigExponentFloat::rational_rem_big_exponent_float_prec_round({x}, {y:#x}, {prec}, {rm}) = ({z:#x}, {o:?})"
         );
     }
 }
 
 fn demo_big_exponent_float_rational_rem_big_exponent_float_prec(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (y, x, prec) in big_exponent_float_rational_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = BigExponentFloat::rational_rem_big_exponent_float_prec_ref_ref(&x, &y, prec);
+        println!(
+            "BigExponentFloat::rational_rem_big_exponent_float_prec({x}, {y}, {prec}) = ({z}, {o:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_rational_rem_big_exponent_float_prec_debug(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -1114,12 +1474,49 @@ fn demo_big_exponent_float_rational_ieee_remainder_big_exponent_float_prec_round
                 &x, &y, prec, rm,
             );
         println!(
+            "BigExponentFloat::rational_ieee_remainder_big_exponent_float_prec_round({x}, {y}, {prec}, {rm}) = ({z}, {o:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_rational_ieee_remainder_big_exponent_float_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (y, x, prec, rm) in
+        big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_12()
+            .get(gm, config)
+            .take(limit)
+    {
+        let (z, o) =
+            BigExponentFloat::rational_ieee_remainder_big_exponent_float_prec_round_ref_ref(
+                &x, &y, prec, rm,
+            );
+        println!(
             "BigExponentFloat::rational_ieee_remainder_big_exponent_float_prec_round({x}, {y:#x}, {prec}, {rm}) = ({z:#x}, {o:?})"
         );
     }
 }
 
 fn demo_big_exponent_float_rational_ieee_remainder_big_exponent_float_prec(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (y, x, prec) in big_exponent_float_rational_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) =
+            BigExponentFloat::rational_ieee_remainder_big_exponent_float_prec_ref_ref(&x, &y, prec);
+        println!(
+            "BigExponentFloat::rational_ieee_remainder_big_exponent_float_prec({x}, {y}, {prec}) = ({z}, {o:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_rational_ieee_remainder_big_exponent_float_prec_debug(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -1232,12 +1629,51 @@ fn demo_big_exponent_float_rational_rem_big_exponent_float_and_quotient_bits_pre
                 &x, &y, prec, rm,
             );
         println!(
+            "BigExponentFloat::rational_rem_big_exponent_float_and_quotient_bits_prec_round({x}, {y}, {prec}, {rm}) = ({z}, {o:?}, {q})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_rational_rem_big_exponent_float_and_quotient_bits_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (y, x, prec, rm) in
+        big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_11()
+            .get(gm, config)
+            .take(limit)
+    {
+        let (z, o, q) =
+            BigExponentFloat::rational_rem_big_exponent_float_and_quotient_bits_prec_round_ref_ref(
+                &x, &y, prec, rm,
+            );
+        println!(
             "BigExponentFloat::rational_rem_big_exponent_float_and_quotient_bits_prec_round({x}, {y:#x}, {prec}, {rm}) = ({z:#x}, {o:?}, {q})"
         );
     }
 }
 
 fn demo_big_exponent_float_rational_rem_big_exponent_float_and_quotient_bits_prec(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (y, x, prec) in big_exponent_float_rational_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o, q) =
+            BigExponentFloat::rational_rem_big_exponent_float_and_quotient_bits_prec_ref_ref(
+                &x, &y, prec,
+            );
+        println!(
+            "BigExponentFloat::rational_rem_big_exponent_float_and_quotient_bits_prec({x}, {y}, {prec}) = ({z}, {o:?}, {q})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_rational_rem_big_exponent_float_and_quotient_bits_prec_debug(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -1343,12 +1779,45 @@ fn demo_big_exponent_float_rational_ieee_remainder_big_exponent_float_and_quotie
     {
         let (z, o, q) = BigExponentFloat::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_ref_ref(&x, &y, prec, rm);
         println!(
+            "BigExponentFloat::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round({x}, {y}, {prec}, {rm}) = ({z}, {o:?}, {q})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (y, x, prec, rm) in
+        big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_12()
+            .get(gm, config)
+            .take(limit)
+    {
+        let (z, o, q) = BigExponentFloat::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round_ref_ref(&x, &y, prec, rm);
+        println!(
             "BigExponentFloat::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_round({x}, {y:#x}, {prec}, {rm}) = ({z:#x}, {o:?}, {q})"
         );
     }
 }
 
 fn demo_big_exponent_float_rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (y, x, prec) in big_exponent_float_rational_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o, q) = BigExponentFloat::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_ref_ref(&x, &y, prec);
+        println!(
+            "BigExponentFloat::rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec({x}, {y}, {prec}) = ({z}, {o:?}, {q})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_rational_ieee_remainder_big_exponent_float_and_quotient_bits_prec_debug(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -1445,7 +1914,21 @@ fn demo_big_exponent_float_rem_unsigned_prec_round(gm: GenMode, config: &GenConf
         .take(limit)
     {
         let (z, o) = x.rem_unsigned_prec_round_ref(n, prec, rm);
-        println!("{x:#x}.rem_unsigned_prec_round({n}, {prec}, {rm}) = ({z:#x}, {o:?})");
+        println!("({x}).rem_unsigned_prec_round({n}, {prec}, {rm}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_rem_unsigned_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, n, prec, rm) in big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_3()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = x.rem_unsigned_prec_round_ref(n, prec, rm);
+        println!("({x:#x}).rem_unsigned_prec_round({n}, {prec}, {rm}) = ({z:#x}, {o:?})");
     }
 }
 
@@ -1455,7 +1938,17 @@ fn demo_big_exponent_float_rem_unsigned_prec(gm: GenMode, config: &GenConfig, li
         .take(limit)
     {
         let (z, o) = x.rem_unsigned_prec_ref(n, prec);
-        println!("{x:#x}.rem_unsigned_prec({n}, {prec}) = ({z:#x}, {o:?})");
+        println!("({x}).rem_unsigned_prec({n}, {prec}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_rem_unsigned_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, n, prec) in big_exponent_float_unsigned_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = x.rem_unsigned_prec_ref(n, prec);
+        println!("({x:#x}).rem_unsigned_prec({n}, {prec}) = ({z:#x}, {o:?})");
     }
 }
 
@@ -1464,7 +1957,16 @@ fn demo_big_exponent_float_rem_unsigned(gm: GenMode, config: &GenConfig, limit: 
         .get(gm, config)
         .take(limit)
     {
-        println!("{x:#x}.rem_unsigned({n}) = {:#x}", x.rem_unsigned_ref(n));
+        println!("({x}).rem_unsigned({n}) = {}", x.rem_unsigned_ref(n));
+    }
+}
+
+fn demo_big_exponent_float_rem_unsigned_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, n) in big_exponent_float_unsigned_pair_gen::<u64>()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!("({x:#x}).rem_unsigned({n}) = {:#x}", x.rem_unsigned_ref(n));
     }
 }
 
@@ -1537,7 +2039,25 @@ fn demo_big_exponent_float_ieee_remainder_and_quotient_bits_prec_round(
     {
         let (z, o, q) = x.ieee_remainder_and_quotient_bits_prec_round_ref_ref(&y, prec, rm);
         println!(
-            "{x:#x}.ieee_remainder_and_quotient_bits_prec_round({y:#x}, {prec}, {rm}) = \
+            "({x}).ieee_remainder_and_quotient_bits_prec_round({y}, {prec}, {rm}) = \
+            ({z}, {o:?}, {q})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_ieee_remainder_and_quotient_bits_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, prec, rm) in
+        big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_10()
+            .get(gm, config)
+            .take(limit)
+    {
+        let (z, o, q) = x.ieee_remainder_and_quotient_bits_prec_round_ref_ref(&y, prec, rm);
+        println!(
+            "({x:#x}).ieee_remainder_and_quotient_bits_prec_round({y:#x}, {prec}, {rm}) = \
             ({z:#x}, {o:?}, {q})"
         );
     }
@@ -1553,8 +2073,22 @@ fn demo_big_exponent_float_ieee_remainder_and_quotient_bits_prec(
         .take(limit)
     {
         let (z, o, q) = x.ieee_remainder_and_quotient_bits_prec_ref_ref(&y, prec);
+        println!("({x}).ieee_remainder_and_quotient_bits_prec({y}, {prec}) = ({z}, {o:?}, {q})");
+    }
+}
+
+fn demo_big_exponent_float_ieee_remainder_and_quotient_bits_prec_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, prec) in big_exponent_float_big_exponent_float_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o, q) = x.ieee_remainder_and_quotient_bits_prec_ref_ref(&y, prec);
         println!(
-            "{x:#x}.ieee_remainder_and_quotient_bits_prec({y:#x}, {prec}) = ({z:#x}, {o:?}, {q})"
+            "({x:#x}).ieee_remainder_and_quotient_bits_prec({y:#x}, {prec}) = ({z:#x}, {o:?}, {q})"
         );
     }
 }
@@ -1566,7 +2100,18 @@ fn demo_big_exponent_float_ieee_remainder_and_quotient_bits(
 ) {
     for (x, y) in big_exponent_float_pair_gen().get(gm, config).take(limit) {
         let (r, q) = x.ieee_remainder_and_quotient_bits_ref_ref(&y);
-        println!("{x:#x}.ieee_remainder_and_quotient_bits({y:#x}) = ({r:#x}, {q})");
+        println!("({x}).ieee_remainder_and_quotient_bits({y}) = ({r}, {q})");
+    }
+}
+
+fn demo_big_exponent_float_ieee_remainder_and_quotient_bits_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y) in big_exponent_float_pair_gen().get(gm, config).take(limit) {
+        let (r, q) = x.ieee_remainder_and_quotient_bits_ref_ref(&y);
+        println!("({x:#x}).ieee_remainder_and_quotient_bits({y:#x}) = ({r:#x}, {q})");
     }
 }
 

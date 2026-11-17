@@ -28,20 +28,44 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_raw_mantissa_and_exponent);
     register_demo!(
         runner,
+        demo_big_exponent_float_raw_mantissa_and_exponent_debug
+    );
+    register_demo!(
+        runner,
         demo_big_exponent_float_integer_mantissa_and_exponent
+    );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_integer_mantissa_and_exponent_debug
     );
     register_demo!(
         runner,
         demo_big_exponent_float_from_integer_mantissa_and_exponent
     );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_from_integer_mantissa_and_exponent_debug
+    );
     register_demo!(runner, demo_big_exponent_float_sci_mantissa_and_exponent);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_sci_mantissa_and_exponent_debug
+    );
     register_demo!(
         runner,
         demo_big_exponent_float_sci_mantissa_and_exponent_primitive_float
     );
     register_demo!(
         runner,
+        demo_big_exponent_float_sci_mantissa_and_exponent_primitive_float_debug
+    );
+    register_demo!(
+        runner,
         demo_big_exponent_float_sci_mantissa_and_exponent_round
+    );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_sci_mantissa_and_exponent_round_debug
     );
 
     register_bench!(
@@ -77,6 +101,23 @@ fn demo_big_exponent_float_raw_mantissa_and_exponent(
         .take(limit)
     {
         println!(
+            "({x}).raw_mantissa_and_exponent() = {:?}",
+            (&x).raw_mantissa_and_exponent()
+        );
+    }
+}
+
+fn demo_big_exponent_float_raw_mantissa_and_exponent_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for x in big_exponent_float_gen()
+        .get(gm, config)
+        .filter(BigExponentFloat::is_normal)
+        .take(limit)
+    {
+        println!(
             "({x:#x}).raw_mantissa_and_exponent() = {:?}",
             (&x).raw_mantissa_and_exponent()
         );
@@ -84,6 +125,23 @@ fn demo_big_exponent_float_raw_mantissa_and_exponent(
 }
 
 fn demo_big_exponent_float_integer_mantissa_and_exponent(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for x in big_exponent_float_gen()
+        .get(gm, config)
+        .filter(BigExponentFloat::is_normal)
+        .take(limit)
+    {
+        println!(
+            "({x}).integer_mantissa_and_exponent() = {:?}",
+            (&x).integer_mantissa_and_exponent()
+        );
+    }
+}
+
+fn demo_big_exponent_float_integer_mantissa_and_exponent_debug(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -106,6 +164,25 @@ fn demo_big_exponent_float_from_integer_mantissa_and_exponent(
     limit: usize,
 ) {
     for (m, e) in natural_signed_pair_gen::<i64>().get(gm, config).take(limit) {
+        match BigExponentFloat::from_integer_mantissa_and_exponent(m.clone(), Integer::from(e)) {
+            Some(x) => {
+                println!(
+                    "BigExponentFloat::from_integer_mantissa_and_exponent({m}, {e}) = Some({x})"
+                );
+            }
+            None => {
+                println!("BigExponentFloat::from_integer_mantissa_and_exponent({m}, {e}) = None");
+            }
+        }
+    }
+}
+
+fn demo_big_exponent_float_from_integer_mantissa_and_exponent_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (m, e) in natural_signed_pair_gen::<i64>().get(gm, config).take(limit) {
         println!(
             "BigExponentFloat::from_integer_mantissa_and_exponent({m}, {e}) = {:?}",
             BigExponentFloat::from_integer_mantissa_and_exponent(m.clone(), Integer::from(e))
@@ -114,6 +191,21 @@ fn demo_big_exponent_float_from_integer_mantissa_and_exponent(
 }
 
 fn demo_big_exponent_float_sci_mantissa_and_exponent(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for x in big_exponent_float_gen()
+        .get(gm, config)
+        .filter(BigExponentFloat::is_normal)
+        .take(limit)
+    {
+        let (m, e): (BigExponentFloat, Integer) = (&x).sci_mantissa_and_exponent();
+        println!("({x}).sci_mantissa_and_exponent() = ({m}, {e})");
+    }
+}
+
+fn demo_big_exponent_float_sci_mantissa_and_exponent_debug(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -140,6 +232,24 @@ fn demo_big_exponent_float_sci_mantissa_and_exponent_primitive_float(
     {
         let (m, e): (f64, Integer) = (&x).sci_mantissa_and_exponent();
         println!(
+            "<f64>({x}).sci_mantissa_and_exponent() = ({:?}, {e})",
+            NiceFloat(m)
+        );
+    }
+}
+
+fn demo_big_exponent_float_sci_mantissa_and_exponent_primitive_float_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for x in big_exponent_float_gen()
+        .get(gm, config)
+        .filter(BigExponentFloat::is_normal)
+        .take(limit)
+    {
+        let (m, e): (f64, Integer) = (&x).sci_mantissa_and_exponent();
+        println!(
             "<f64>({x:#x}).sci_mantissa_and_exponent() = ({:?}, {e})",
             NiceFloat(m)
         );
@@ -147,6 +257,24 @@ fn demo_big_exponent_float_sci_mantissa_and_exponent_primitive_float(
 }
 
 fn demo_big_exponent_float_sci_mantissa_and_exponent_round(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, rm) in big_exponent_float_rounding_mode_pair_gen_var_1()
+        .get(gm, config)
+        .filter(|(x, _)| x.is_normal())
+        .take(limit)
+    {
+        println!(
+            "({x}).sci_mantissa_and_exponent_round::<f64>({rm}) = {:?}",
+            x.sci_mantissa_and_exponent_round::<f64>(rm)
+                .map(|(m, e, o)| (NiceFloat(m), e, o))
+        );
+    }
+}
+
+fn demo_big_exponent_float_sci_mantissa_and_exponent_round_debug(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,

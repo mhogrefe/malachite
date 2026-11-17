@@ -21,13 +21,29 @@ pub(crate) fn register(runner: &mut Runner) {
     );
     register_demo!(
         runner,
+        demo_big_exponent_float_power_of_2_of_big_exponent_float_prec_round_debug
+    );
+    register_demo!(
+        runner,
         demo_big_exponent_float_power_of_2_of_big_exponent_float_prec
+    );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_power_of_2_of_big_exponent_float_prec_debug
     );
     register_demo!(
         runner,
         demo_big_exponent_float_power_of_2_rational_prec_round
     );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_power_of_2_rational_prec_round_debug
+    );
     register_demo!(runner, demo_big_exponent_float_power_of_2_rational_prec);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_power_of_2_rational_prec_debug
+    );
 
     register_bench!(runner, benchmark_big_exponent_float_power_of_2_of_big_exponent_float_prec_round_evaluation_strategy);
     register_bench!(
@@ -60,12 +76,45 @@ fn demo_big_exponent_float_power_of_2_of_big_exponent_float_prec_round(
         let (z, o) =
             BigExponentFloat::power_of_2_of_big_exponent_float_prec_round_ref(&x, prec, rm);
         println!(
+            "BigExponentFloat::power_of_2_of_big_exponent_float_prec_round({x}, {prec}, {rm}) = ({z}, {o:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_power_of_2_of_big_exponent_float_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, prec, rm) in big_exponent_float_unsigned_rounding_mode_triple_gen_var_11()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) =
+            BigExponentFloat::power_of_2_of_big_exponent_float_prec_round_ref(&x, prec, rm);
+        println!(
             "BigExponentFloat::power_of_2_of_big_exponent_float_prec_round({x:#x}, {prec}, {rm}) = ({z:#x}, {o:?})"
         );
     }
 }
 
 fn demo_big_exponent_float_power_of_2_of_big_exponent_float_prec(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, prec, _) in big_exponent_float_unsigned_rounding_mode_triple_gen_var_11()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = BigExponentFloat::power_of_2_of_big_exponent_float_prec_ref(&x, prec);
+        println!(
+            "BigExponentFloat::power_of_2_of_big_exponent_float_prec({x}, {prec}) = ({z}, {o:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_power_of_2_of_big_exponent_float_prec_debug(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -92,12 +141,42 @@ fn demo_big_exponent_float_power_of_2_rational_prec_round(
     {
         let (z, o) = BigExponentFloat::power_of_2_rational_prec_round_ref(&x, prec, rm);
         println!(
+            "BigExponentFloat::power_of_2_rational_prec_round({x}, {prec}, {rm}) = ({z}, {o:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_power_of_2_rational_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, prec, rm) in rational_unsigned_rounding_mode_triple_gen_var_21()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = BigExponentFloat::power_of_2_rational_prec_round_ref(&x, prec, rm);
+        println!(
             "BigExponentFloat::power_of_2_rational_prec_round({x}, {prec}, {rm}) = ({z:#x}, {o:?})"
         );
     }
 }
 
 fn demo_big_exponent_float_power_of_2_rational_prec(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec, _) in rational_unsigned_rounding_mode_triple_gen_var_21()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = BigExponentFloat::power_of_2_rational_prec_ref(&x, prec);
+        println!("BigExponentFloat::power_of_2_rational_prec({x}, {prec}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_power_of_2_rational_prec_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
     for (x, prec, _) in rational_unsigned_rounding_mode_triple_gen_var_21()
         .get(gm, config)
         .take(limit)

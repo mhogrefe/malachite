@@ -13,6 +13,10 @@ use malachite_float::test_util::generators::big_exponent_float_gen;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_canonicalize_gaussian_unit);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_canonicalize_gaussian_unit_debug
+    );
 }
 
 fn demo_big_exponent_float_canonicalize_gaussian_unit(
@@ -22,7 +26,20 @@ fn demo_big_exponent_float_canonicalize_gaussian_unit(
 ) {
     for x in big_exponent_float_gen().get(gm, config).take(limit) {
         println!(
-            "{x:#x}.canonicalize_gaussian_unit() = {:#x}",
+            "({x}).canonicalize_gaussian_unit() = {}",
+            (&x).canonicalize_gaussian_unit()
+        );
+    }
+}
+
+fn demo_big_exponent_float_canonicalize_gaussian_unit_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for x in big_exponent_float_gen().get(gm, config).take(limit) {
+        println!(
+            "({x:#x}).canonicalize_gaussian_unit() = {:#x}",
             (&x).canonicalize_gaussian_unit()
         );
     }

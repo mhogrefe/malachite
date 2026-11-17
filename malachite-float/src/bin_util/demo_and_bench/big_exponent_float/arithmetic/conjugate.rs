@@ -13,10 +13,17 @@ use malachite_float::test_util::generators::big_exponent_float_gen;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_conjugate);
+    register_demo!(runner, demo_big_exponent_float_conjugate_debug);
 }
 
 fn demo_big_exponent_float_conjugate(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in big_exponent_float_gen().get(gm, config).take(limit) {
-        println!("{x:#x}.conjugate() = {:#x}", (&x).conjugate());
+        println!("({x}).conjugate() = {}", (&x).conjugate());
+    }
+}
+
+fn demo_big_exponent_float_conjugate_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in big_exponent_float_gen().get(gm, config).take(limit) {
+        println!("({x:#x}).conjugate() = {:#x}", (&x).conjugate());
     }
 }

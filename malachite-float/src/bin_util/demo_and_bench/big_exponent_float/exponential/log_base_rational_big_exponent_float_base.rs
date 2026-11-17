@@ -20,11 +20,23 @@ pub(crate) fn register(runner: &mut Runner) {
     );
     register_demo!(
         runner,
+        demo_big_exponent_float_log_base_rational_big_exponent_float_base_prec_round_debug
+    );
+    register_demo!(
+        runner,
         demo_big_exponent_float_log_base_rational_big_exponent_float_base_prec
     );
     register_demo!(
         runner,
+        demo_big_exponent_float_log_base_rational_big_exponent_float_base_prec_debug
+    );
+    register_demo!(
+        runner,
         demo_big_exponent_float_log_base_rational_big_exponent_float_base_prec_round_in_domain
+    );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_log_base_rational_big_exponent_float_base_prec_round_in_domain_debug
     );
 
     register_bench!(runner, benchmark_big_exponent_float_log_base_rational_big_exponent_float_base_prec_round_evaluation_strategy);
@@ -32,6 +44,25 @@ pub(crate) fn register(runner: &mut Runner) {
 }
 
 fn demo_big_exponent_float_log_base_rational_big_exponent_float_base_prec_round(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (b, x, prec, rm) in
+        big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_15()
+            .get(gm, config)
+            .take(limit)
+    {
+        let (z, o) = BigExponentFloat::log_base_rational_big_exponent_float_base_prec_round_ref(
+            &x, &b, prec, rm,
+        );
+        println!(
+            "BigExponentFloat::log_base_rational_big_exponent_float_base_prec_round({x}, {b}, {prec}, {rm}) = ({z}, {o:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_log_base_rational_big_exponent_float_base_prec_round_debug(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -62,12 +93,48 @@ fn demo_big_exponent_float_log_base_rational_big_exponent_float_base_prec(
         let (z, o) =
             BigExponentFloat::log_base_rational_big_exponent_float_base_prec_ref(&x, &b, prec);
         println!(
+            "BigExponentFloat::log_base_rational_big_exponent_float_base_prec({x}, {b}, {prec}) = ({z}, {o:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_log_base_rational_big_exponent_float_base_prec_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (b, x, prec, _) in big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_15()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) =
+            BigExponentFloat::log_base_rational_big_exponent_float_base_prec_ref(&x, &b, prec);
+        println!(
             "BigExponentFloat::log_base_rational_big_exponent_float_base_prec({x}, {b:#x}, {prec}) = ({z:#x}, {o:?})"
         );
     }
 }
 
 fn demo_big_exponent_float_log_base_rational_big_exponent_float_base_prec_round_in_domain(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (b, x, prec, rm) in
+        big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_18()
+            .get(gm, config)
+            .take(limit)
+    {
+        let (z, o) = BigExponentFloat::log_base_rational_big_exponent_float_base_prec_round_ref(
+            &x, &b, prec, rm,
+        );
+        println!(
+            "BigExponentFloat::log_base_rational_big_exponent_float_base_prec_round({x}, {b}, {prec}, {rm}) = ({z}, {o:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_log_base_rational_big_exponent_float_base_prec_round_in_domain_debug(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,

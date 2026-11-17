@@ -17,11 +17,22 @@ use malachite_float::test_util::generators::{
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_eq_abs);
+    register_demo!(runner, demo_big_exponent_float_eq_abs_debug);
 
     register_bench!(runner, benchmark_big_exponent_float_eq_abs_float_comparison);
 }
 
 fn demo_big_exponent_float_eq_abs(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in big_exponent_float_pair_gen().get(gm, config).take(limit) {
+        if x.eq_abs(&y) {
+            println!("|{x}| = |{y}|");
+        } else {
+            println!("|{x}| ≠ |{y}|");
+        }
+    }
+}
+
+fn demo_big_exponent_float_eq_abs_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y) in big_exponent_float_pair_gen().get(gm, config).take(limit) {
         if x.eq_abs(&y) {
             println!("|{x:#x}| = |{y:#x}|");

@@ -20,7 +20,15 @@ pub(crate) fn register(runner: &mut Runner) {
         runner,
         demo_big_exponent_float_ramanujans_constant_prec_round
     );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_ramanujans_constant_prec_round_debug
+    );
     register_demo!(runner, demo_big_exponent_float_ramanujans_constant_prec);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_ramanujans_constant_prec_debug
+    );
 
     register_bench!(
         runner,
@@ -33,6 +41,20 @@ pub(crate) fn register(runner: &mut Runner) {
 }
 
 fn demo_big_exponent_float_ramanujans_constant_prec_round(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (p, rm) in unsigned_rounding_mode_pair_gen_var_4()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (x, o) = BigExponentFloat::ramanujans_constant_prec_round(p, rm);
+        println!("BigExponentFloat::ramanujans_constant_prec_round({p}, {rm}) = ({x}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_ramanujans_constant_prec_round_debug(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -72,6 +94,17 @@ fn benchmark_big_exponent_float_ramanujans_constant_prec_round_float_comparison(
 }
 
 fn demo_big_exponent_float_ramanujans_constant_prec(gm: GenMode, config: &GenConfig, limit: usize) {
+    for p in unsigned_gen_var_11().get(gm, config).take(limit) {
+        let (x, o) = BigExponentFloat::ramanujans_constant_prec(p);
+        println!("BigExponentFloat::ramanujans_constant_prec({p}) = ({x}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_ramanujans_constant_prec_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
     for p in unsigned_gen_var_11().get(gm, config).take(limit) {
         let (x, o) = BigExponentFloat::ramanujans_constant_prec(p);
         println!("BigExponentFloat::ramanujans_constant_prec({p}) = ({x:#x}, {o:?})");

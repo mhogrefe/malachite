@@ -17,7 +17,15 @@ pub(crate) fn register(runner: &mut Runner) {
         runner,
         demo_big_exponent_float_log_base_10_1_plus_x_prec_round
     );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_log_base_10_1_plus_x_prec_round_debug
+    );
     register_demo!(runner, demo_big_exponent_float_log_base_10_1_plus_x_prec);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_log_base_10_1_plus_x_prec_debug
+    );
 
     register_bench!(
         runner,
@@ -43,7 +51,21 @@ fn demo_big_exponent_float_log_base_10_1_plus_x_prec_round(
         .take(limit)
     {
         let (z, o) = x.log_base_10_1_plus_x_prec_round_ref(prec, rm);
-        println!("{x:#x}.log_base_10_1_plus_x_prec_round({prec}, {rm}) = ({z:#x}, {o:?})");
+        println!("({x}).log_base_10_1_plus_x_prec_round({prec}, {rm}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_log_base_10_1_plus_x_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, prec, rm) in big_exponent_float_unsigned_rounding_mode_triple_gen_var_20()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = x.log_base_10_1_plus_x_prec_round_ref(prec, rm);
+        println!("({x:#x}).log_base_10_1_plus_x_prec_round({prec}, {rm}) = ({z:#x}, {o:?})");
     }
 }
 
@@ -57,7 +79,21 @@ fn demo_big_exponent_float_log_base_10_1_plus_x_prec(
         .take(limit)
     {
         let (z, o) = x.log_base_10_1_plus_x_prec_ref(prec);
-        println!("{x:#x}.log_base_10_1_plus_x_prec({prec}) = ({z:#x}, {o:?})");
+        println!("({x}).log_base_10_1_plus_x_prec({prec}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_log_base_10_1_plus_x_prec_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, prec, _) in big_exponent_float_unsigned_rounding_mode_triple_gen_var_20()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = x.log_base_10_1_plus_x_prec_ref(prec);
+        println!("({x:#x}).log_base_10_1_plus_x_prec({prec}) = ({z:#x}, {o:?})");
     }
 }
 

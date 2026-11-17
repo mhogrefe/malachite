@@ -15,21 +15,44 @@ use malachite_float::test_util::generators::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_round_to_integer_prec_round);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_round_to_integer_prec_round_debug
+    );
     register_demo!(runner, demo_big_exponent_float_round_to_integer_prec);
+    register_demo!(runner, demo_big_exponent_float_round_to_integer_prec_debug);
     register_demo!(
         runner,
         demo_big_exponent_float_round_to_integer_ties_away_prec
     );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_round_to_integer_ties_away_prec_debug
+    );
     register_demo!(runner, demo_big_exponent_float_round_to_integer_round);
+    register_demo!(runner, demo_big_exponent_float_round_to_integer_round_debug);
     register_demo!(runner, demo_big_exponent_float_round_to_integer);
+    register_demo!(runner, demo_big_exponent_float_round_to_integer_debug);
     register_demo!(runner, demo_big_exponent_float_round_to_integer_ties_away);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_round_to_integer_ties_away_debug
+    );
     register_demo!(
         runner,
         demo_big_exponent_float_round_to_integer_then_prec_round
     );
     register_demo!(
         runner,
+        demo_big_exponent_float_round_to_integer_then_prec_round_debug
+    );
+    register_demo!(
+        runner,
         demo_big_exponent_float_round_to_integer_ties_away_then_prec_round
+    );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_round_to_integer_ties_away_then_prec_round_debug
     );
 
     register_bench!(
@@ -52,7 +75,21 @@ fn demo_big_exponent_float_round_to_integer_prec_round(
         .take(limit)
     {
         let (z, o, i) = x.round_to_integer_prec_round_ref(prec, rm);
-        println!("{x:#x}.round_to_integer_prec_round({prec}, {rm}) = ({z:#x}, {o:?}, {i})");
+        println!("({x}).round_to_integer_prec_round({prec}, {rm}) = ({z}, {o:?}, {i})");
+    }
+}
+
+fn demo_big_exponent_float_round_to_integer_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, prec, rm) in big_exponent_float_unsigned_rounding_mode_triple_gen_var_7()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o, i) = x.round_to_integer_prec_round_ref(prec, rm);
+        println!("({x:#x}).round_to_integer_prec_round({prec}, {rm}) = ({z:#x}, {o:?}, {i})");
     }
 }
 
@@ -62,7 +99,21 @@ fn demo_big_exponent_float_round_to_integer_prec(gm: GenMode, config: &GenConfig
         .take(limit)
     {
         let (z, o, i) = x.round_to_integer_prec_ref(prec);
-        println!("{x:#x}.round_to_integer_prec({prec}) = ({z:#x}, {o:?}, {i})");
+        println!("({x}).round_to_integer_prec({prec}) = ({z}, {o:?}, {i})");
+    }
+}
+
+fn demo_big_exponent_float_round_to_integer_prec_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, prec) in big_exponent_float_unsigned_pair_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o, i) = x.round_to_integer_prec_ref(prec);
+        println!("({x:#x}).round_to_integer_prec({prec}) = ({z:#x}, {o:?}, {i})");
     }
 }
 
@@ -76,7 +127,21 @@ fn demo_big_exponent_float_round_to_integer_ties_away_prec(
         .take(limit)
     {
         let (z, o, i) = x.round_to_integer_ties_away_prec_ref(prec);
-        println!("{x:#x}.round_to_integer_ties_away_prec({prec}) = ({z:#x}, {o:?}, {i})");
+        println!("({x}).round_to_integer_ties_away_prec({prec}) = ({z}, {o:?}, {i})");
+    }
+}
+
+fn demo_big_exponent_float_round_to_integer_ties_away_prec_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, prec) in big_exponent_float_unsigned_pair_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o, i) = x.round_to_integer_ties_away_prec_ref(prec);
+        println!("({x:#x}).round_to_integer_ties_away_prec({prec}) = ({z:#x}, {o:?}, {i})");
     }
 }
 
@@ -86,14 +151,35 @@ fn demo_big_exponent_float_round_to_integer_round(gm: GenMode, config: &GenConfi
         .take(limit)
     {
         let (z, o, i) = x.round_to_integer_round_ref(rm);
-        println!("{x:#x}.round_to_integer_round({rm}) = ({z:#x}, {o:?}, {i})");
+        println!("({x}).round_to_integer_round({rm}) = ({z}, {o:?}, {i})");
+    }
+}
+
+fn demo_big_exponent_float_round_to_integer_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, _, rm) in big_exponent_float_unsigned_rounding_mode_triple_gen_var_7()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o, i) = x.round_to_integer_round_ref(rm);
+        println!("({x:#x}).round_to_integer_round({rm}) = ({z:#x}, {o:?}, {i})");
     }
 }
 
 fn demo_big_exponent_float_round_to_integer(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in big_exponent_float_gen().get(gm, config).take(limit) {
         let (z, o, i) = x.round_to_integer_ref();
-        println!("{x:#x}.round_to_integer() = ({z:#x}, {o:?}, {i})");
+        println!("({x}).round_to_integer() = ({z}, {o:?}, {i})");
+    }
+}
+
+fn demo_big_exponent_float_round_to_integer_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in big_exponent_float_gen().get(gm, config).take(limit) {
+        let (z, o, i) = x.round_to_integer_ref();
+        println!("({x:#x}).round_to_integer() = ({z:#x}, {o:?}, {i})");
     }
 }
 
@@ -104,7 +190,18 @@ fn demo_big_exponent_float_round_to_integer_ties_away(
 ) {
     for x in big_exponent_float_gen().get(gm, config).take(limit) {
         let (z, o, i) = x.round_to_integer_ties_away_ref();
-        println!("{x:#x}.round_to_integer_ties_away() = ({z:#x}, {o:?}, {i})");
+        println!("({x}).round_to_integer_ties_away() = ({z}, {o:?}, {i})");
+    }
+}
+
+fn demo_big_exponent_float_round_to_integer_ties_away_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for x in big_exponent_float_gen().get(gm, config).take(limit) {
+        let (z, o, i) = x.round_to_integer_ties_away_ref();
+        println!("({x:#x}).round_to_integer_ties_away() = ({z:#x}, {o:?}, {i})");
     }
 }
 
@@ -121,7 +218,26 @@ fn demo_big_exponent_float_round_to_integer_then_prec_round(
     {
         let irm = irms[i % irms.len()];
         let (z, o) = x.round_to_integer_then_prec_round_ref(irm, prec, rm);
-        println!("{x:#x}.round_to_integer_then_prec_round({irm}, {prec}, {rm}) = ({z:#x}, {o:?})");
+        println!("({x}).round_to_integer_then_prec_round({irm}, {prec}, {rm}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_round_to_integer_then_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    let irms = [Floor, Ceiling, Down, Up, Nearest];
+    for (i, (x, prec, rm)) in big_exponent_float_unsigned_rounding_mode_triple_gen_var_7()
+        .get(gm, config)
+        .take(limit)
+        .enumerate()
+    {
+        let irm = irms[i % irms.len()];
+        let (z, o) = x.round_to_integer_then_prec_round_ref(irm, prec, rm);
+        println!(
+            "({x:#x}).round_to_integer_then_prec_round({irm}, {prec}, {rm}) = ({z:#x}, {o:?})"
+        );
     }
 }
 
@@ -135,8 +251,22 @@ fn demo_big_exponent_float_round_to_integer_ties_away_then_prec_round(
         .take(limit)
     {
         let (z, o) = x.round_to_integer_ties_away_then_prec_round_ref(prec, rm);
+        println!("({x}).round_to_integer_ties_away_then_prec_round({prec}, {rm}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_round_to_integer_ties_away_then_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, prec, rm) in big_exponent_float_unsigned_rounding_mode_triple_gen_var_7()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = x.round_to_integer_ties_away_then_prec_round_ref(prec, rm);
         println!(
-            "{x:#x}.round_to_integer_ties_away_then_prec_round({prec}, {rm}) = ({z:#x}, {o:?})"
+            "({x:#x}).round_to_integer_ties_away_then_prec_round({prec}, {rm}) = ({z:#x}, {o:?})"
         );
     }
 }

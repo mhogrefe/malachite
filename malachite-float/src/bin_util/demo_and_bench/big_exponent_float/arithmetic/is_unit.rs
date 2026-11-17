@@ -13,10 +13,17 @@ use malachite_float::test_util::generators::big_exponent_float_gen;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_is_unit);
+    register_demo!(runner, demo_big_exponent_float_is_unit_debug);
 }
 
 fn demo_big_exponent_float_is_unit(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in big_exponent_float_gen().get(gm, config).take(limit) {
-        println!("{x:#x}.is_unit() = {}", x.is_unit());
+        println!("({x}).is_unit() = {}", x.is_unit());
+    }
+}
+
+fn demo_big_exponent_float_is_unit_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in big_exponent_float_gen().get(gm, config).take(limit) {
+        println!("({x:#x}).is_unit() = {}", x.is_unit());
     }
 }

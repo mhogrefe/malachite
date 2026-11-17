@@ -17,7 +17,9 @@ use malachite_float::{BigExponentFloat, Float};
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_phi_prec_round);
+    register_demo!(runner, demo_big_exponent_float_phi_prec_round_debug);
     register_demo!(runner, demo_big_exponent_float_phi_prec);
+    register_demo!(runner, demo_big_exponent_float_phi_prec_debug);
 
     register_bench!(
         runner,
@@ -30,6 +32,16 @@ pub(crate) fn register(runner: &mut Runner) {
 }
 
 fn demo_big_exponent_float_phi_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (p, rm) in unsigned_rounding_mode_pair_gen_var_4()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (x, o) = BigExponentFloat::phi_prec_round(p, rm);
+        println!("BigExponentFloat::phi_prec_round({p}, {rm}) = ({x}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_phi_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for (p, rm) in unsigned_rounding_mode_pair_gen_var_4()
         .get(gm, config)
         .take(limit)
@@ -65,6 +77,13 @@ fn benchmark_big_exponent_float_phi_prec_round_float_comparison(
 }
 
 fn demo_big_exponent_float_phi_prec(gm: GenMode, config: &GenConfig, limit: usize) {
+    for p in unsigned_gen_var_11().get(gm, config).take(limit) {
+        let (x, o) = BigExponentFloat::phi_prec(p);
+        println!("BigExponentFloat::phi_prec({p}) = ({x}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_phi_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for p in unsigned_gen_var_11().get(gm, config).take(limit) {
         let (x, o) = BigExponentFloat::phi_prec(p);
         println!("BigExponentFloat::phi_prec({p}) = ({x:#x}, {o:?})");

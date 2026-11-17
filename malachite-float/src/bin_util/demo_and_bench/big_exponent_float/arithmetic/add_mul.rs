@@ -29,8 +29,11 @@ use malachite_float::test_util::generators::{
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_add_mul);
+    register_demo!(runner, demo_big_exponent_float_add_mul_debug);
     register_demo!(runner, demo_big_exponent_float_add_mul_prec_round);
+    register_demo!(runner, demo_big_exponent_float_add_mul_prec_round_debug);
     register_demo!(runner, demo_big_exponent_float_add_mul_prec);
+    register_demo!(runner, demo_big_exponent_float_add_mul_prec_debug);
 
     register_bench!(
         runner,
@@ -53,7 +56,12 @@ pub(crate) fn register(runner: &mut Runner) {
         benchmark_big_exponent_float_add_mul_prec_round_float_comparison
     );
     register_demo!(runner, demo_big_exponent_float_add_mul_rational_prec_round);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_add_mul_rational_prec_round_debug
+    );
     register_demo!(runner, demo_big_exponent_float_add_mul_rational_prec);
+    register_demo!(runner, demo_big_exponent_float_add_mul_rational_prec_debug);
     register_bench!(
         runner,
         benchmark_big_exponent_float_add_mul_rational_prec_round_evaluation_strategy
@@ -77,8 +85,17 @@ fn demo_big_exponent_float_add_mul(gm: GenMode, config: &GenConfig, limit: usize
         .get(gm, config)
         .take(limit)
     {
+        println!("({x}).add_mul({y}, {z}) = {}", (&x).add_mul(&y, &z));
+    }
+}
+
+fn demo_big_exponent_float_add_mul_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z) in big_exponent_float_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
         println!(
-            "{x:#x}.add_mul({y:#x}, {z:#x}) = {:#x}",
+            "({x:#x}).add_mul({y:#x}, {z:#x}) = {:#x}",
             (&x).add_mul(&y, &z)
         );
     }
@@ -87,14 +104,28 @@ fn demo_big_exponent_float_add_mul(gm: GenMode, config: &GenConfig, limit: usize
 fn demo_big_exponent_float_add_mul_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, z, prec, rm) in quintuple_gen_var_1().get(gm, config).take(limit) {
         let (r, o) = x.add_mul_prec_round_ref_ref_ref(&y, &z, prec, rm);
-        println!("{x:#x}.add_mul_prec_round({y:#x}, {z:#x}, {prec}, {rm}) = ({r:#x}, {o:?})");
+        println!("({x}).add_mul_prec_round({y}, {z}, {prec}, {rm}) = ({r}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_add_mul_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z, prec, rm) in quintuple_gen_var_1().get(gm, config).take(limit) {
+        let (r, o) = x.add_mul_prec_round_ref_ref_ref(&y, &z, prec, rm);
+        println!("({x:#x}).add_mul_prec_round({y:#x}, {z:#x}, {prec}, {rm}) = ({r:#x}, {o:?})");
     }
 }
 
 fn demo_big_exponent_float_add_mul_prec(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, z, prec) in quadruple_gen_var_1().get(gm, config).take(limit) {
         let (r, o) = x.add_mul_prec_ref_ref_ref(&y, &z, prec);
-        println!("{x:#x}.add_mul_prec({y:#x}, {z:#x}, {prec}) = ({r:#x}, {o:?})");
+        println!("({x}).add_mul_prec({y}, {z}, {prec}) = ({r}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_add_mul_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z, prec) in quadruple_gen_var_1().get(gm, config).take(limit) {
+        let (r, o) = x.add_mul_prec_ref_ref_ref(&y, &z, prec);
+        println!("({x:#x}).add_mul_prec({y:#x}, {z:#x}, {prec}) = ({r:#x}, {o:?})");
     }
 }
 
@@ -453,14 +484,38 @@ fn demo_big_exponent_float_add_mul_rational_prec_round(
 ) {
     for (x, y, z, prec, rm) in rational_quintuple_gen().get(gm, config).take(limit) {
         let (r, o) = x.add_mul_rational_prec_round_ref_ref_ref(&y, &z, prec, rm);
-        println!("{x:#x}.add_mul_rational_prec_round({y:#x}, {z}, {prec}, {rm}) = ({r:#x}, {o:?})");
+        println!("({x}).add_mul_rational_prec_round({y}, {z}, {prec}, {rm}) = ({r}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_add_mul_rational_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec, rm) in rational_quintuple_gen().get(gm, config).take(limit) {
+        let (r, o) = x.add_mul_rational_prec_round_ref_ref_ref(&y, &z, prec, rm);
+        println!(
+            "({x:#x}).add_mul_rational_prec_round({y:#x}, {z}, {prec}, {rm}) = ({r:#x}, {o:?})"
+        );
     }
 }
 
 fn demo_big_exponent_float_add_mul_rational_prec(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, z, prec, _) in rational_quintuple_gen().get(gm, config).take(limit) {
         let (r, o) = x.add_mul_rational_prec_ref_ref_ref(&y, &z, prec);
-        println!("{x:#x}.add_mul_rational_prec({y:#x}, {z}, {prec}) = ({r:#x}, {o:?})");
+        println!("({x}).add_mul_rational_prec({y}, {z}, {prec}) = ({r}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_add_mul_rational_prec_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec, _) in rational_quintuple_gen().get(gm, config).take(limit) {
+        let (r, o) = x.add_mul_rational_prec_ref_ref_ref(&y, &z, prec);
+        println!("({x:#x}).add_mul_rational_prec({y:#x}, {z}, {prec}) = ({r:#x}, {o:?})");
     }
 }
 

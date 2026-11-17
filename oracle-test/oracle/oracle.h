@@ -128,6 +128,8 @@ int run__fmpz_vec_content_chained(const char * arg);
 int run__fmpz_vec_lcm(const char * arg);
 int arf_parse_base(const char * s, int log_base, arf_t x);
 int arf_parse_exact(const char * s, arf_t x);
+char * arf_split_receiver(char * line, char ** receiver);
+int arf_for_each_line(const char * path, int (* handler)(char * line, int line_number));
 int run_arf_classification(const char * arg);
 int run_arf_set_fmpz(const char * arg);
 int run_arf_set_d(const char * arg);

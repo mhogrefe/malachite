@@ -15,7 +15,9 @@ use malachite_float::test_util::generators::big_exponent_float_gen;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_complexity);
+    register_demo!(runner, demo_big_exponent_float_complexity_debug);
     register_demo!(runner, demo_big_exponent_float_significant_bits);
+    register_demo!(runner, demo_big_exponent_float_significant_bits_debug);
 
     register_bench!(runner, benchmark_big_exponent_float_complexity);
     register_bench!(runner, benchmark_big_exponent_float_significant_bits);
@@ -23,13 +25,25 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_big_exponent_float_complexity(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in big_exponent_float_gen().get(gm, config).take(limit) {
-        println!("{x:#x}.complexity() = {}", x.complexity());
+        println!("({x}).complexity() = {}", x.complexity());
+    }
+}
+
+fn demo_big_exponent_float_complexity_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in big_exponent_float_gen().get(gm, config).take(limit) {
+        println!("({x:#x}).complexity() = {}", x.complexity());
     }
 }
 
 fn demo_big_exponent_float_significant_bits(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in big_exponent_float_gen().get(gm, config).take(limit) {
-        println!("{x:#x}.significant_bits() = {}", x.significant_bits());
+        println!("({x}).significant_bits() = {}", x.significant_bits());
+    }
+}
+
+fn demo_big_exponent_float_significant_bits_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in big_exponent_float_gen().get(gm, config).take(limit) {
+        println!("({x:#x}).significant_bits() = {}", x.significant_bits());
     }
 }
 

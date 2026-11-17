@@ -20,29 +20,62 @@ use malachite_q::test_util::generators::rational_unsigned_pair_gen_var_3;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_sin_cos_prec_round);
+    register_demo!(runner, demo_big_exponent_float_sin_cos_prec_round_debug);
     register_demo!(runner, demo_big_exponent_float_sin_cos_prec);
+    register_demo!(runner, demo_big_exponent_float_sin_cos_prec_debug);
     register_demo!(runner, demo_big_exponent_float_sin_cos_rational_prec_round);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_sin_cos_rational_prec_round_debug
+    );
     register_demo!(runner, demo_big_exponent_float_sin_cos_rational_prec);
+    register_demo!(runner, demo_big_exponent_float_sin_cos_rational_prec_debug);
     register_demo!(
         runner,
         demo_big_exponent_float_sin_cos_with_period_prec_round
     );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_sin_cos_with_period_prec_round_debug
+    );
     register_demo!(runner, demo_big_exponent_float_sin_cos_with_period_prec);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_sin_cos_with_period_prec_debug
+    );
     register_demo!(
         runner,
         demo_big_exponent_float_sin_cos_with_period_rational_prec_round
     );
     register_demo!(
         runner,
+        demo_big_exponent_float_sin_cos_with_period_rational_prec_round_debug
+    );
+    register_demo!(
+        runner,
         demo_big_exponent_float_sin_cos_with_period_rational_prec
     );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_sin_cos_with_period_rational_prec_debug
+    );
     register_demo!(runner, demo_big_exponent_float_sin_cos_pi_prec_round);
+    register_demo!(runner, demo_big_exponent_float_sin_cos_pi_prec_round_debug);
     register_demo!(runner, demo_big_exponent_float_sin_cos_pi_prec);
+    register_demo!(runner, demo_big_exponent_float_sin_cos_pi_prec_debug);
     register_demo!(
         runner,
         demo_big_exponent_float_sin_cos_pi_rational_prec_round
     );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_sin_cos_pi_rational_prec_round_debug
+    );
     register_demo!(runner, demo_big_exponent_float_sin_cos_pi_rational_prec);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_sin_cos_pi_rational_prec_debug
+    );
 
     register_bench!(
         runner,
@@ -104,7 +137,17 @@ fn demo_big_exponent_float_sin_cos_prec_round(gm: GenMode, config: &GenConfig, l
         .take(limit)
     {
         let (s, c, o_s, o_c) = x.sin_cos_prec_round_ref(prec, rm);
-        println!("{x:#x}.sin_cos_prec_round({prec}, {rm}) = ({s:#x}, {c:#x}, {o_s:?}, {o_c:?})");
+        println!("({x}).sin_cos_prec_round({prec}, {rm}) = ({s}, {c}, {o_s:?}, {o_c:?})");
+    }
+}
+
+fn demo_big_exponent_float_sin_cos_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec, rm) in big_exponent_float_unsigned_rounding_mode_triple_gen_var_21()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (s, c, o_s, o_c) = x.sin_cos_prec_round_ref(prec, rm);
+        println!("({x:#x}).sin_cos_prec_round({prec}, {rm}) = ({s:#x}, {c:#x}, {o_s:?}, {o_c:?})");
     }
 }
 
@@ -114,11 +157,38 @@ fn demo_big_exponent_float_sin_cos_prec(gm: GenMode, config: &GenConfig, limit: 
         .take(limit)
     {
         let (s, c, o_s, o_c) = x.sin_cos_prec_ref(prec);
-        println!("{x:#x}.sin_cos_prec({prec}) = ({s:#x}, {c:#x}, {o_s:?}, {o_c:?})");
+        println!("({x}).sin_cos_prec({prec}) = ({s}, {c}, {o_s:?}, {o_c:?})");
+    }
+}
+
+fn demo_big_exponent_float_sin_cos_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec) in big_exponent_float_unsigned_pair_gen_var_3()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (s, c, o_s, o_c) = x.sin_cos_prec_ref(prec);
+        println!("({x:#x}).sin_cos_prec({prec}) = ({s:#x}, {c:#x}, {o_s:?}, {o_c:?})");
     }
 }
 
 fn demo_big_exponent_float_sin_cos_rational_prec_round(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, prec, rm) in rational_unsigned_rounding_mode_triple_gen_var_10()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (s, c, o_s, o_c) = BigExponentFloat::sin_cos_rational_prec_round_ref(&x, prec, rm);
+        println!(
+            "BigExponentFloat::sin_cos_rational_prec_round({x}, {prec}, {rm}) = \
+            ({s}, {c}, {o_s:?}, {o_c:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_sin_cos_rational_prec_round_debug(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -143,6 +213,23 @@ fn demo_big_exponent_float_sin_cos_rational_prec(gm: GenMode, config: &GenConfig
         let (s, c, o_s, o_c) = BigExponentFloat::sin_cos_rational_prec_ref(&x, prec);
         println!(
             "BigExponentFloat::sin_cos_rational_prec({x}, {prec}) = \
+            ({s}, {c}, {o_s:?}, {o_c:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_sin_cos_rational_prec_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, prec) in rational_unsigned_pair_gen_var_3()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (s, c, o_s, o_c) = BigExponentFloat::sin_cos_rational_prec_ref(&x, prec);
+        println!(
+            "BigExponentFloat::sin_cos_rational_prec({x}, {prec}) = \
             ({s:#x}, {c:#x}, {o_s:?}, {o_c:?})"
         );
     }
@@ -159,7 +246,24 @@ fn demo_big_exponent_float_sin_cos_with_period_prec_round(
     {
         let (s, c, o_s, o_c) = x.sin_cos_with_period_prec_round_ref(u, prec, rm);
         println!(
-            "{x:#x}.sin_cos_with_period_prec_round({u}, {prec}, {rm}) = \
+            "({x}).sin_cos_with_period_prec_round({u}, {prec}, {rm}) = \
+            ({s}, {c}, {o_s:?}, {o_c:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_sin_cos_with_period_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, u, prec, rm) in big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_8()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (s, c, o_s, o_c) = x.sin_cos_with_period_prec_round_ref(u, prec, rm);
+        println!(
+            "({x:#x}).sin_cos_with_period_prec_round({u}, {prec}, {rm}) = \
             ({s:#x}, {c:#x}, {o_s:?}, {o_c:?})"
         );
     }
@@ -172,13 +276,48 @@ fn demo_big_exponent_float_sin_cos_with_period_prec(gm: GenMode, config: &GenCon
     {
         let (s, c, o_s, o_c) = x.sin_cos_with_period_prec_ref(u, prec);
         println!(
-            "{x:#x}.sin_cos_with_period_prec({u}, {prec}) = \
+            "({x}).sin_cos_with_period_prec({u}, {prec}) = \
+            ({s}, {c}, {o_s:?}, {o_c:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_sin_cos_with_period_prec_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, u, prec) in big_exponent_float_unsigned_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (s, c, o_s, o_c) = x.sin_cos_with_period_prec_ref(u, prec);
+        println!(
+            "({x:#x}).sin_cos_with_period_prec({u}, {prec}) = \
             ({s:#x}, {c:#x}, {o_s:?}, {o_c:?})"
         );
     }
 }
 
 fn demo_big_exponent_float_sin_cos_with_period_rational_prec_round(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, u, prec, rm) in rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_13()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (s, c, o_s, o_c) =
+            BigExponentFloat::sin_cos_with_period_rational_prec_round_ref(&x, u, prec, rm);
+        println!(
+            "BigExponentFloat::sin_cos_with_period_rational_prec_round({x}, {u}, {prec}, {rm}) = \
+            ({s}, {c}, {o_s:?}, {o_c:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_sin_cos_with_period_rational_prec_round_debug(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -208,6 +347,23 @@ fn demo_big_exponent_float_sin_cos_with_period_rational_prec(
         let (s, c, o_s, o_c) = BigExponentFloat::sin_cos_with_period_rational_prec_ref(&x, u, prec);
         println!(
             "BigExponentFloat::sin_cos_with_period_rational_prec({x}, {u}, {prec}) = \
+            ({s}, {c}, {o_s:?}, {o_c:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_sin_cos_with_period_rational_prec_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, u, prec, _) in rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_13()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (s, c, o_s, o_c) = BigExponentFloat::sin_cos_with_period_rational_prec_ref(&x, u, prec);
+        println!(
+            "BigExponentFloat::sin_cos_with_period_rational_prec({x}, {u}, {prec}) = \
             ({s:#x}, {c:#x}, {o_s:?}, {o_c:?})"
         );
     }
@@ -220,7 +376,24 @@ fn demo_big_exponent_float_sin_cos_pi_prec_round(gm: GenMode, config: &GenConfig
     {
         let (s, c, o_s, o_c) = x.sin_cos_pi_prec_round_ref(prec, rm);
         println!(
-            "{x:#x}.sin_cos_pi_prec_round({prec}, {rm}) = \
+            "({x}).sin_cos_pi_prec_round({prec}, {rm}) = \
+            ({s}, {c}, {o_s:?}, {o_c:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_sin_cos_pi_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, prec, rm) in big_exponent_float_unsigned_rounding_mode_triple_gen_var_22()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (s, c, o_s, o_c) = x.sin_cos_pi_prec_round_ref(prec, rm);
+        println!(
+            "({x:#x}).sin_cos_pi_prec_round({prec}, {rm}) = \
             ({s:#x}, {c:#x}, {o_s:?}, {o_c:?})"
         );
     }
@@ -232,11 +405,38 @@ fn demo_big_exponent_float_sin_cos_pi_prec(gm: GenMode, config: &GenConfig, limi
         .take(limit)
     {
         let (s, c, o_s, o_c) = x.sin_cos_pi_prec_ref(prec);
-        println!("{x:#x}.sin_cos_pi_prec({prec}) = ({s:#x}, {c:#x}, {o_s:?}, {o_c:?})");
+        println!("({x}).sin_cos_pi_prec({prec}) = ({s}, {c}, {o_s:?}, {o_c:?})");
+    }
+}
+
+fn demo_big_exponent_float_sin_cos_pi_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec) in big_exponent_float_unsigned_pair_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (s, c, o_s, o_c) = x.sin_cos_pi_prec_ref(prec);
+        println!("({x:#x}).sin_cos_pi_prec({prec}) = ({s:#x}, {c:#x}, {o_s:?}, {o_c:?})");
     }
 }
 
 fn demo_big_exponent_float_sin_cos_pi_rational_prec_round(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, prec, rm) in rational_unsigned_rounding_mode_triple_gen_var_10()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (s, c, o_s, o_c) = BigExponentFloat::sin_cos_pi_rational_prec_round_ref(&x, prec, rm);
+        println!(
+            "BigExponentFloat::sin_cos_pi_rational_prec_round({x}, {prec}, {rm}) = \
+            ({s}, {c}, {o_s:?}, {o_c:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_sin_cos_pi_rational_prec_round_debug(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -254,6 +454,23 @@ fn demo_big_exponent_float_sin_cos_pi_rational_prec_round(
 }
 
 fn demo_big_exponent_float_sin_cos_pi_rational_prec(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec) in rational_unsigned_pair_gen_var_3()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (s, c, o_s, o_c) = BigExponentFloat::sin_cos_pi_rational_prec_ref(&x, prec);
+        println!(
+            "BigExponentFloat::sin_cos_pi_rational_prec({x}, {prec}) = \
+            ({s}, {c}, {o_s:?}, {o_c:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_sin_cos_pi_rational_prec_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
     for (x, prec) in rational_unsigned_pair_gen_var_3()
         .get(gm, config)
         .take(limit)

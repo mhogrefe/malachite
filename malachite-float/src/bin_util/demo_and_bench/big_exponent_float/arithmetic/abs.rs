@@ -15,12 +15,19 @@ use malachite_float::test_util::generators::big_exponent_float_gen;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_abs);
+    register_demo!(runner, demo_big_exponent_float_abs_debug);
     register_bench!(runner, benchmark_big_exponent_float_abs_evaluation_strategy);
 }
 
 fn demo_big_exponent_float_abs(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in big_exponent_float_gen().get(gm, config).take(limit) {
-        println!("{x:#x}.abs() = {:#x}", (&x).abs());
+        println!("({x}).abs() = {}", (&x).abs());
+    }
+}
+
+fn demo_big_exponent_float_abs_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in big_exponent_float_gen().get(gm, config).take(limit) {
+        println!("({x:#x}).abs() = {:#x}", (&x).abs());
     }
 }
 

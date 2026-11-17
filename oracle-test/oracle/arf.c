@@ -207,6 +207,66 @@ split(char * line, const char * sep)
     return p + strlen(sep);
 }
 
+/* Splits a method call's receiver off the front of `line`, in place: the receiver of `(X).rest` or
+   `(&X).rest`, or of a bare `X.rest`, where X ends at the last '.' before the first '(' (a
+   BigExponentFloat's hexadecimal digits may contain a '.', but a method name never does). Sets
+   `*receiver` to X and returns `rest`, or returns NULL when `line` is not a method call. */
+char *
+arf_split_receiver(char * line, char ** receiver)
+{
+    if (line[0] == '(')
+    {
+        char * x = line + 1;
+        if (*x == '&')
+            x++;
+        char * rest = split(x, ").");
+        if (rest == NULL)
+            return NULL;
+        *receiver = x;
+        return rest;
+    }
+    char * paren = strchr(line, '(');
+    if (paren == NULL)
+        return NULL;
+    char * dot = NULL;
+    for (char * p = line; p < paren; p++)
+        if (*p == '.')
+            dot = p;
+    if (dot == NULL || dot == line)
+        return NULL;
+    *dot = '\0';
+    *receiver = line;
+    return dot + 1;
+}
+
+/* Malachite's BigExponentFloat demos print a method call's receiver in parentheses, `(X).f(...)`,
+   as its Float demos do. The arf parsers read the bare form `X.f(...)`, so `arf_for_each_line` runs
+   `handler` on each line of `path` with the parentheses around a leading receiver removed. A
+   receiver containing parentheses itself, or a `_ref` receiver `(&X)`, is left alone. */
+static int (* line_handler)(char * line, int line_number);
+
+static int
+unparenthesized_handler(char * line, int line_number)
+{
+    if (line[0] == '(' && line[1] != '&')
+    {
+        char * close = strchr(line, ')');
+        if (close != NULL && close[1] == '.' && memchr(line + 1, '(', close - line - 1) == NULL)
+        {
+            memmove(close, close + 1, strlen(close + 1) + 1);
+            memmove(line, line + 1, strlen(line + 1) + 1);
+        }
+    }
+    return line_handler(line, line_number);
+}
+
+int
+arf_for_each_line(const char * path, int (* handler)(char * line, int line_number))
+{
+    line_handler = handler;
+    return for_each_line(path, unparenthesized_handler);
+}
+
 static int
 check_bool(int line_number, const char * expected, int actual)
 {
@@ -437,14 +497,11 @@ check_set_round(char * line, int line_number)
     }
     else
     {
-        /* `(X).method(args) = (Y, O)`, with `&X` for the `_ref` forms */
-        if (line[0] != '(')
+        /* `X.method(args) = (Y, O)`, with `(&X)` for the `_ref` forms */
+        method = arf_split_receiver(line, &x_str);
+        if (method == NULL)
             return report(line_number, "unrecognized line");
-        x_str = line + 1;
-        if (*x_str == '&')
-            x_str++;
-        method = split(x_str, ").");
-        args = method == NULL ? NULL : split(method, "(");
+        args = split(method, "(");
         y_str = args == NULL ? NULL : split(args, ") = (");
         o_str = y_str == NULL ? NULL : strrchr(y_str, ',');
         if (o_str != NULL)
@@ -583,7 +640,7 @@ run(const char * arg, const char * name, arf_kind k)
     checked = 0;
     kind = k;
     mode_name = name;
-    int result = for_each_line(arg, check_line);
+    int result = arf_for_each_line(arg, check_line);
     return result != 0 ? result : require_some_lines(name, checked);
 }
 

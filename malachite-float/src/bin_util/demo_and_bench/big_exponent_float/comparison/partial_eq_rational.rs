@@ -14,12 +14,27 @@ use malachite_float::test_util::generators::big_exponent_float_rational_pair_gen
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_eq_rational);
+    register_demo!(runner, demo_big_exponent_float_eq_rational_debug);
     register_demo!(runner, demo_rational_eq_big_exponent_float);
+    register_demo!(runner, demo_rational_eq_big_exponent_float_debug);
 
     register_bench!(runner, benchmark_big_exponent_float_eq_rational);
 }
 
 fn demo_big_exponent_float_eq_rational(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in big_exponent_float_rational_pair_gen()
+        .get(gm, config)
+        .take(limit)
+    {
+        if x == y {
+            println!("{x} = {y}");
+        } else {
+            println!("{x} ≠ {y}");
+        }
+    }
+}
+
+fn demo_big_exponent_float_eq_rational_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y) in big_exponent_float_rational_pair_gen()
         .get(gm, config)
         .take(limit)
@@ -33,6 +48,19 @@ fn demo_big_exponent_float_eq_rational(gm: GenMode, config: &GenConfig, limit: u
 }
 
 fn demo_rational_eq_big_exponent_float(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in big_exponent_float_rational_pair_gen()
+        .get(gm, config)
+        .take(limit)
+    {
+        if y == x {
+            println!("{y} = {x}");
+        } else {
+            println!("{y} ≠ {x}");
+        }
+    }
+}
+
+fn demo_rational_eq_big_exponent_float_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y) in big_exponent_float_rational_pair_gen()
         .get(gm, config)
         .take(limit)

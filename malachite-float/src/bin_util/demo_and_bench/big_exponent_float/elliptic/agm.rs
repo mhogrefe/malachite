@@ -21,13 +21,28 @@ use malachite_q::test_util::generators::rational_rational_unsigned_triple_gen_va
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_agm_prec_round);
+    register_demo!(runner, demo_big_exponent_float_agm_prec_round_debug);
     register_demo!(runner, demo_big_exponent_float_agm_prec_round_in_domain);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_agm_prec_round_in_domain_debug
+    );
     register_demo!(runner, demo_big_exponent_float_agm_prec);
+    register_demo!(runner, demo_big_exponent_float_agm_prec_debug);
     register_demo!(runner, demo_big_exponent_float_agm_rational_prec_round);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_agm_rational_prec_round_debug
+    );
     register_demo!(runner, demo_big_exponent_float_agm_rational_prec);
+    register_demo!(runner, demo_big_exponent_float_agm_rational_prec_debug);
     register_demo!(
         runner,
         demo_big_exponent_float_agm_big_exponent_float_rational_prec_round
+    );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_agm_big_exponent_float_rational_prec_round_debug
     );
     register_demo!(
         runner,
@@ -35,7 +50,15 @@ pub(crate) fn register(runner: &mut Runner) {
     );
     register_demo!(
         runner,
+        demo_big_exponent_float_agm_big_exponent_float_rational_prec_round_in_domain_debug
+    );
+    register_demo!(
+        runner,
         demo_big_exponent_float_agm_big_exponent_float_rational_prec
+    );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_agm_big_exponent_float_rational_prec_debug
     );
 
     register_bench!(
@@ -87,7 +110,18 @@ fn demo_big_exponent_float_agm_prec_round(gm: GenMode, config: &GenConfig, limit
             .take(limit)
     {
         let (z, o) = x.agm_prec_round_ref_ref(&y, prec, rm);
-        println!("{x:#x}.agm_prec_round({y:#x}, {prec}, {rm}) = ({z:#x}, {o:?})");
+        println!("({x}).agm_prec_round({y}, {prec}, {rm}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_agm_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec, rm) in
+        big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_15()
+            .get(gm, config)
+            .take(limit)
+    {
+        let (z, o) = x.agm_prec_round_ref_ref(&y, prec, rm);
+        println!("({x:#x}).agm_prec_round({y:#x}, {prec}, {rm}) = ({z:#x}, {o:?})");
     }
 }
 
@@ -98,7 +132,22 @@ fn demo_big_exponent_float_agm_prec_round_in_domain(gm: GenMode, config: &GenCon
             .take(limit)
     {
         let (z, o) = x.agm_prec_round_ref_ref(&y, prec, rm);
-        println!("{x:#x}.agm_prec_round({y:#x}, {prec}, {rm}) = ({z:#x}, {o:?})");
+        println!("({x}).agm_prec_round({y}, {prec}, {rm}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_agm_prec_round_in_domain_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, prec, rm) in
+        big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_16()
+            .get(gm, config)
+            .take(limit)
+    {
+        let (z, o) = x.agm_prec_round_ref_ref(&y, prec, rm);
+        println!("({x:#x}).agm_prec_round({y:#x}, {prec}, {rm}) = ({z:#x}, {o:?})");
     }
 }
 
@@ -108,11 +157,37 @@ fn demo_big_exponent_float_agm_prec(gm: GenMode, config: &GenConfig, limit: usiz
         .take(limit)
     {
         let (z, o) = x.agm_prec_ref_ref(&y, prec);
-        println!("{x:#x}.agm_prec({y:#x}, {prec}) = ({z:#x}, {o:?})");
+        println!("({x}).agm_prec({y}, {prec}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_agm_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in big_exponent_float_big_exponent_float_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = x.agm_prec_ref_ref(&y, prec);
+        println!("({x:#x}).agm_prec({y:#x}, {prec}) = ({z:#x}, {o:?})");
     }
 }
 
 fn demo_big_exponent_float_agm_rational_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec, rm) in rational_rational_unsigned_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = BigExponentFloat::agm_rational_prec_round_ref_ref(&x, &y, prec, rm);
+        println!(
+            "BigExponentFloat::agm_rational_prec_round({x}, {y}, {prec}, {rm}) = ({z}, {o:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_agm_rational_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
     for (x, y, prec, rm) in rational_rational_unsigned_rounding_mode_quadruple_gen_var_1()
         .get(gm, config)
         .take(limit)
@@ -125,6 +200,16 @@ fn demo_big_exponent_float_agm_rational_prec_round(gm: GenMode, config: &GenConf
 }
 
 fn demo_big_exponent_float_agm_rational_prec(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in rational_rational_unsigned_triple_gen_var_2()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = BigExponentFloat::agm_rational_prec_ref_ref(&x, &y, prec);
+        println!("BigExponentFloat::agm_rational_prec({x}, {y}, {prec}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_agm_rational_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, prec) in rational_rational_unsigned_triple_gen_var_2()
         .get(gm, config)
         .take(limit)
@@ -146,7 +231,25 @@ fn demo_big_exponent_float_agm_big_exponent_float_rational_prec_round(
     {
         let (z, o) = x.agm_big_exponent_float_rational_prec_round_ref_ref(&y, prec, rm);
         println!(
-            "{x:#x}.agm_big_exponent_float_rational_prec_round({y}, {prec}, {rm}) = ({z:#x}, \
+            "({x}).agm_big_exponent_float_rational_prec_round({y}, {prec}, {rm}) = ({z}, \
+            {o:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_agm_big_exponent_float_rational_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, prec, rm) in
+        big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_19()
+            .get(gm, config)
+            .take(limit)
+    {
+        let (z, o) = x.agm_big_exponent_float_rational_prec_round_ref_ref(&y, prec, rm);
+        println!(
+            "({x:#x}).agm_big_exponent_float_rational_prec_round({y}, {prec}, {rm}) = ({z:#x}, \
             {o:?})"
         );
     }
@@ -164,7 +267,25 @@ fn demo_big_exponent_float_agm_big_exponent_float_rational_prec_round_in_domain(
     {
         let (z, o) = x.agm_big_exponent_float_rational_prec_round_ref_ref(&y, prec, rm);
         println!(
-            "{x:#x}.agm_big_exponent_float_rational_prec_round({y}, {prec}, {rm}) = ({z:#x}, \
+            "({x}).agm_big_exponent_float_rational_prec_round({y}, {prec}, {rm}) = ({z}, \
+            {o:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_agm_big_exponent_float_rational_prec_round_in_domain_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, prec, rm) in
+        big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_20()
+            .get(gm, config)
+            .take(limit)
+    {
+        let (z, o) = x.agm_big_exponent_float_rational_prec_round_ref_ref(&y, prec, rm);
+        println!(
+            "({x:#x}).agm_big_exponent_float_rational_prec_round({y}, {prec}, {rm}) = ({z:#x}, \
             {o:?})"
         );
     }
@@ -180,7 +301,21 @@ fn demo_big_exponent_float_agm_big_exponent_float_rational_prec(
         .take(limit)
     {
         let (z, o) = x.agm_big_exponent_float_rational_prec_ref_ref(&y, prec);
-        println!("{x:#x}.agm_big_exponent_float_rational_prec({y}, {prec}) = ({z:#x}, {o:?})");
+        println!("({x}).agm_big_exponent_float_rational_prec({y}, {prec}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_agm_big_exponent_float_rational_prec_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, prec) in big_exponent_float_rational_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = x.agm_big_exponent_float_rational_prec_ref_ref(&y, prec);
+        println!("({x:#x}).agm_big_exponent_float_rational_prec({y}, {prec}) = ({z:#x}, {o:?})");
     }
 }
 

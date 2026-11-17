@@ -20,15 +20,39 @@ use std::cmp::Ordering::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_demos!(runner, demo_big_exponent_float_partial_cmp_unsigned);
+    register_unsigned_demos!(runner, demo_big_exponent_float_partial_cmp_unsigned_debug);
     register_unsigned_demos!(runner, demo_unsigned_partial_cmp_big_exponent_float);
+    register_unsigned_demos!(runner, demo_unsigned_partial_cmp_big_exponent_float_debug);
     register_signed_demos!(runner, demo_big_exponent_float_partial_cmp_signed);
+    register_signed_demos!(runner, demo_big_exponent_float_partial_cmp_signed_debug);
     register_signed_demos!(runner, demo_signed_partial_cmp_big_exponent_float);
+    register_signed_demos!(runner, demo_signed_partial_cmp_big_exponent_float_debug);
 
     register_unsigned_benches!(runner, benchmark_big_exponent_float_partial_cmp_unsigned);
     register_signed_benches!(runner, benchmark_big_exponent_float_partial_cmp_signed);
 }
 
 fn demo_big_exponent_float_partial_cmp_unsigned<T: PrimitiveUnsigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    BigExponentFloat: PartialOrd<T>,
+{
+    for (x, y) in big_exponent_float_unsigned_pair_gen::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
+        match x.partial_cmp(&y) {
+            None => println!("{x} and {y} are incomparable"),
+            Some(Less) => println!("{x} < {y}"),
+            Some(Equal) => println!("{x} = {y}"),
+            Some(Greater) => println!("{x} > {y}"),
+        }
+    }
+}
+
+fn demo_big_exponent_float_partial_cmp_unsigned_debug<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -49,6 +73,26 @@ fn demo_big_exponent_float_partial_cmp_unsigned<T: PrimitiveUnsigned>(
 }
 
 fn demo_unsigned_partial_cmp_big_exponent_float<
+    T: PrimitiveUnsigned + PartialOrd<BigExponentFloat>,
+>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y) in big_exponent_float_unsigned_pair_gen::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
+        match y.partial_cmp(&x) {
+            None => println!("{y} and {x} are incomparable"),
+            Some(Less) => println!("{y} < {x}"),
+            Some(Equal) => println!("{y} = {x}"),
+            Some(Greater) => println!("{y} > {x}"),
+        }
+    }
+}
+
+fn demo_unsigned_partial_cmp_big_exponent_float_debug<
     T: PrimitiveUnsigned + PartialOrd<BigExponentFloat>,
 >(
     gm: GenMode,
@@ -102,6 +146,26 @@ fn demo_big_exponent_float_partial_cmp_signed<T: PrimitiveSigned>(
         .take(limit)
     {
         match x.partial_cmp(&y) {
+            None => println!("{x} and {y} are incomparable"),
+            Some(Less) => println!("{x} < {y}"),
+            Some(Equal) => println!("{x} = {y}"),
+            Some(Greater) => println!("{x} > {y}"),
+        }
+    }
+}
+
+fn demo_big_exponent_float_partial_cmp_signed_debug<T: PrimitiveSigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    BigExponentFloat: PartialOrd<T>,
+{
+    for (x, y) in big_exponent_float_signed_pair_gen::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
+        match x.partial_cmp(&y) {
             None => println!("{x:#x} and {y} are incomparable"),
             Some(Less) => println!("{x:#x} < {y}"),
             Some(Equal) => println!("{x:#x} = {y}"),
@@ -111,6 +175,26 @@ fn demo_big_exponent_float_partial_cmp_signed<T: PrimitiveSigned>(
 }
 
 fn demo_signed_partial_cmp_big_exponent_float<T: PrimitiveSigned + PartialOrd<BigExponentFloat>>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y) in big_exponent_float_signed_pair_gen::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
+        match y.partial_cmp(&x) {
+            None => println!("{y} and {x} are incomparable"),
+            Some(Less) => println!("{y} < {x}"),
+            Some(Equal) => println!("{y} = {x}"),
+            Some(Greater) => println!("{y} > {x}"),
+        }
+    }
+}
+
+fn demo_signed_partial_cmp_big_exponent_float_debug<
+    T: PrimitiveSigned + PartialOrd<BigExponentFloat>,
+>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,

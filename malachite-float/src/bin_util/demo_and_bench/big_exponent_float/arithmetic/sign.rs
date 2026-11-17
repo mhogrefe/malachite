@@ -15,12 +15,19 @@ use malachite_float::test_util::generators::big_exponent_float_gen_var_3;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_sign);
+    register_demo!(runner, demo_big_exponent_float_sign_debug);
     register_bench!(runner, benchmark_big_exponent_float_sign);
 }
 
 fn demo_big_exponent_float_sign(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in big_exponent_float_gen_var_3().get(gm, config).take(limit) {
-        println!("{x:#x}.sign() = {:?}", x.sign());
+        println!("({x}).sign() = {:?}", x.sign());
+    }
+}
+
+fn demo_big_exponent_float_sign_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in big_exponent_float_gen_var_3().get(gm, config).take(limit) {
+        println!("({x:#x}).sign() = {:?}", x.sign());
     }
 }
 

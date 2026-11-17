@@ -15,10 +15,17 @@ use malachite_float::test_util::generators::big_exponent_float_gen;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_neg);
+    register_demo!(runner, demo_big_exponent_float_neg_debug);
     register_bench!(runner, benchmark_big_exponent_float_neg_evaluation_strategy);
 }
 
 fn demo_big_exponent_float_neg(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in big_exponent_float_gen().get(gm, config).take(limit) {
+        println!("-{x} = {}", -&x);
+    }
+}
+
+fn demo_big_exponent_float_neg_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in big_exponent_float_gen().get(gm, config).take(limit) {
         println!("-{x:#x} = {:#x}", -&x);
     }

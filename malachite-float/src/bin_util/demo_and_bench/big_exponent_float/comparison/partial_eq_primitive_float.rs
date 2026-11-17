@@ -17,12 +17,34 @@ use malachite_float::test_util::generators::big_exponent_float_primitive_float_p
 
 pub(crate) fn register(runner: &mut Runner) {
     register_primitive_float_demos!(runner, demo_big_exponent_float_eq_primitive_float);
+    register_primitive_float_demos!(runner, demo_big_exponent_float_eq_primitive_float_debug);
     register_primitive_float_demos!(runner, demo_primitive_float_eq_big_exponent_float);
+    register_primitive_float_demos!(runner, demo_primitive_float_eq_big_exponent_float_debug);
 
     register_primitive_float_benches!(runner, benchmark_big_exponent_float_eq_primitive_float);
 }
 
 fn demo_big_exponent_float_eq_primitive_float<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    BigExponentFloat: PartialEq<T>,
+{
+    for (x, y) in big_exponent_float_primitive_float_pair_gen::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
+        let ny = NiceFloat(y);
+        if x == y {
+            println!("{x} = {ny}");
+        } else {
+            println!("{x} ≠ {ny}");
+        }
+    }
+}
+
+fn demo_big_exponent_float_eq_primitive_float_debug<T: PrimitiveFloat>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -43,6 +65,26 @@ fn demo_big_exponent_float_eq_primitive_float<T: PrimitiveFloat>(
 }
 
 fn demo_primitive_float_eq_big_exponent_float<T: PrimitiveFloat + PartialEq<BigExponentFloat>>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y) in big_exponent_float_primitive_float_pair_gen::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
+        let ny = NiceFloat(y);
+        if y == x {
+            println!("{ny} = {x}");
+        } else {
+            println!("{ny} ≠ {x}");
+        }
+    }
+}
+
+fn demo_primitive_float_eq_big_exponent_float_debug<
+    T: PrimitiveFloat + PartialEq<BigExponentFloat>,
+>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,

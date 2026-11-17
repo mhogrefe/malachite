@@ -17,12 +17,22 @@ use malachite_q::test_util::bench::bucketers::triple_1_2_rational_bit_u64_max_bu
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_sinh_cosh_prec_round);
+    register_demo!(runner, demo_big_exponent_float_sinh_cosh_prec_round_debug);
     register_demo!(runner, demo_big_exponent_float_sinh_cosh_prec);
+    register_demo!(runner, demo_big_exponent_float_sinh_cosh_prec_debug);
     register_demo!(
         runner,
         demo_big_exponent_float_sinh_cosh_rational_prec_round
     );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_sinh_cosh_rational_prec_round_debug
+    );
     register_demo!(runner, demo_big_exponent_float_sinh_cosh_rational_prec);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_sinh_cosh_rational_prec_debug
+    );
 
     register_bench!(
         runner,
@@ -53,7 +63,24 @@ fn demo_big_exponent_float_sinh_cosh_prec_round(gm: GenMode, config: &GenConfig,
     {
         let (s, c, o_s, o_c) = x.sinh_cosh_prec_round_ref(prec, rm);
         println!(
-            "{x:#x}.sinh_cosh_prec_round({prec}, {rm}) = \
+            "({x}).sinh_cosh_prec_round({prec}, {rm}) = \
+            ({s}, {c}, {o_s:?}, {o_c:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_sinh_cosh_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, prec, rm) in big_exponent_float_unsigned_rounding_mode_triple_gen_var_9()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (s, c, o_s, o_c) = x.sinh_cosh_prec_round_ref(prec, rm);
+        println!(
+            "({x:#x}).sinh_cosh_prec_round({prec}, {rm}) = \
             ({s:#x}, {c:#x}, {o_s:?}, {o_c:?})"
         );
     }
@@ -65,11 +92,38 @@ fn demo_big_exponent_float_sinh_cosh_prec(gm: GenMode, config: &GenConfig, limit
         .take(limit)
     {
         let (s, c, o_s, o_c) = x.sinh_cosh_prec_ref(prec);
-        println!("{x:#x}.sinh_cosh_prec({prec}) = ({s:#x}, {c:#x}, {o_s:?}, {o_c:?})");
+        println!("({x}).sinh_cosh_prec({prec}) = ({s}, {c}, {o_s:?}, {o_c:?})");
+    }
+}
+
+fn demo_big_exponent_float_sinh_cosh_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec, _) in big_exponent_float_unsigned_rounding_mode_triple_gen_var_9()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (s, c, o_s, o_c) = x.sinh_cosh_prec_ref(prec);
+        println!("({x:#x}).sinh_cosh_prec({prec}) = ({s:#x}, {c:#x}, {o_s:?}, {o_c:?})");
     }
 }
 
 fn demo_big_exponent_float_sinh_cosh_rational_prec_round(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, prec, rm) in rational_unsigned_rounding_mode_triple_gen_var_19()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (s, c, o_s, o_c) = BigExponentFloat::sinh_cosh_rational_prec_round_ref(&x, prec, rm);
+        println!(
+            "BigExponentFloat::sinh_cosh_rational_prec_round({x}, {prec}, {rm}) = \
+            ({s}, {c}, {o_s:?}, {o_c:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_sinh_cosh_rational_prec_round_debug(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -87,6 +141,23 @@ fn demo_big_exponent_float_sinh_cosh_rational_prec_round(
 }
 
 fn demo_big_exponent_float_sinh_cosh_rational_prec(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec, _) in rational_unsigned_rounding_mode_triple_gen_var_19()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (s, c, o_s, o_c) = BigExponentFloat::sinh_cosh_rational_prec_ref(&x, prec);
+        println!(
+            "BigExponentFloat::sinh_cosh_rational_prec({x}, {prec}) = \
+            ({s}, {c}, {o_s:?}, {o_c:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_sinh_cosh_rational_prec_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
     for (x, prec, _) in rational_unsigned_rounding_mode_triple_gen_var_19()
         .get(gm, config)
         .take(limit)

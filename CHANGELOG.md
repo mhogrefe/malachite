@@ -1168,6 +1168,52 @@ documented by git history.
 
 ### malachite-float
 
+- `BigExponentFloat`, a new floating-point type modeled on FLINT's `arf_t`: its exponent is an
+  `Integer`, so it never overflows or underflows, and it stores no precision; its significand is
+  exactly as long as the value needs. Every rounded operation takes a target precision and a
+  `RoundingMode` (`_prec_round` and `_prec` forms, with `_ref`, `_val_ref`, `_ref_val`, `_ref_ref`,
+  and `_assign` variants as for `Float`), and the plain operators (`+`, `-`, `*`, `<<`, `>>`, `-x`,
+  `abs`) are exact. There is no negative zero, so the results whose sign `Float` takes from a
+  signed zero are `NaN` instead: $x/0$, $0^y$ for a negative odd integer $y$, a logarithm to base
+  1, and $\operatorname{acsch}(0)$. The type has
+  - the basics: classification, `get_exponent`, `get_prec` (the significand's length),
+    `significand`, `round_to_prec_round`, `can_round`, the constants (`Zero`, `One`, `Infinity`,
+    `NaN`, ...), and exhaustive and random generators in `big_exponent_float::exhaustive` and
+    `big_exponent_float::random`;
+  - comparisons, plain and by absolute value, with `BigExponentFloat`, `Float`, `Natural`,
+    `Integer`, `Rational`, `GaussianInteger`, `GaussianRational`, and the primitive types; a total
+    order through `ComparableBigExponentFloat` and `ComparableBigExponentFloatRef`; and `min`,
+    `max`, and their rounded and `Rational` forms;
+  - conversions: exact `From` for `Float`, `Natural`, `Integer`, and the primitive types (only
+    $-0.0$ loses its sign), `from_rational_prec_round` and the other rounded constructors, and
+    conversions back to every one of those types, including `TryFrom<BigExponentFloat>` for `Float`
+    and `Float::from_big_exponent_float_prec_round`, which rounds into `Float`'s exponent range;
+    strings in every base (`Display`, `FromStr`, `ToSci`, `FromSciString`, `ToStringBase`,
+    `FromStringBase`, binary, octal, and hexadecimal, `ToLatex`, and `ToTypst`); and serde support,
+    through hexadecimal strings;
+  - arithmetic: addition, subtraction, multiplication, division, squaring, reciprocals, the
+    remainder, shifts, sums, products, dot products, `add_mul`, `sub_mul`, `mul_add_mul`, and
+    `mul_sub_mul`, with `Rational` forms throughout; square, cube, and general roots and the
+    reciprocal square root; integer and general powers (`pow`, `powr`, and the `Rational` and
+    unsigned-base forms); `hypot`, `average`, `positive_difference`, rounding to an integer, the
+    fractional part, and the Gaussian-unit operations;
+  - the exponential functions and logarithms: $e^x$, $2^x$, $10^x$, their minus-one forms, `ln`,
+    the logarithms to base 2, 10, a power of 2, a `BigExponentFloat`, or a `Rational`, the
+    $\log(1+x)$ form of each, and `compound`;
+  - the arithmetic-geometric mean (`agm`, with `Rational` forms);
+  - the trigonometric functions, their inverses, and `atan2`, each with `_pi` and `_with_period`
+    forms and `Rational` forms, and the hyperbolic functions and their inverses; and
+  - the constants of `Float`, from $\pi$ and $e$ to the Gelfond–Schneider constant.
+
+  Huge exponents are always computed, never refused, but for some functions the time and memory grow
+  with the exponent $E$ of the argument: $e^x$, $10^x$, their minus-one forms, $\sinh$, $\cosh$, and
+  their reciprocals reduce $x$ using about $E$ bits of $\log 2$, the trigonometric functions use
+  about $E$ bits of $\pi$, and general powers grow with the exponent of $y$. The documentation of
+  each such function carries a warning.
+- `Float`'s internal `ExtendedFloat` type, which carried an extra exponent offset through the
+  logarithms, the arithmetic-geometric mean, and $\log 2$, has been replaced by
+  `BigExponentFloat`. Results and running times are unchanged.
+
 - `Float::reciprocal_sqrt_rational_prec_round` and its `_ref` form now compute $\sqrt{1/x}$ with
   `sqrt_rational_prec_round`, since inverting a `Rational` is exact; results are unchanged, and the
   duplicated implementation is gone.

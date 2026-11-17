@@ -20,10 +20,15 @@ use malachite_float::test_util::generators::{
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_u64_rounding_from);
+    register_demo!(runner, demo_big_exponent_float_u64_rounding_from_debug);
     register_demo!(runner, demo_big_exponent_float_i64_rounding_from);
+    register_demo!(runner, demo_big_exponent_float_i64_rounding_from_debug);
     register_demo!(runner, demo_big_exponent_float_u64_try_from);
+    register_demo!(runner, demo_big_exponent_float_u64_try_from_debug);
     register_demo!(runner, demo_big_exponent_float_i64_try_from);
+    register_demo!(runner, demo_big_exponent_float_i64_try_from_debug);
     register_demo!(runner, demo_big_exponent_float_u64_convertible_from);
+    register_demo!(runner, demo_big_exponent_float_u64_convertible_from_debug);
 
     register_bench!(runner, benchmark_big_exponent_float_u64_rounding_from);
     register_bench!(runner, benchmark_big_exponent_float_i64_rounding_from);
@@ -35,6 +40,24 @@ pub(crate) fn register(runner: &mut Runner) {
 }
 
 fn demo_big_exponent_float_u64_rounding_from(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, rm) in big_exponent_float_rounding_mode_pair_gen_var_1()
+        .get(gm, config)
+        .filter(|(x, rm)| {
+            x.is_finite()
+                && x.get_exponent().is_none_or(|e| *e < 63u32)
+                && (x.is_sign_positive() || matches!(rm, Ceiling | Down | Nearest))
+                && (*rm != Exact || u64::convertible_from(x))
+        })
+        .take(limit)
+    {
+        println!(
+            "u64::rounding_from({x}, {rm}) = {:?}",
+            u64::rounding_from(&x, rm)
+        );
+    }
+}
+
+fn demo_big_exponent_float_u64_rounding_from_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, rm) in big_exponent_float_rounding_mode_pair_gen_var_1()
         .get(gm, config)
         .filter(|(x, rm)| {
@@ -63,6 +86,23 @@ fn demo_big_exponent_float_i64_rounding_from(gm: GenMode, config: &GenConfig, li
         .take(limit)
     {
         println!(
+            "i64::rounding_from({x}, {rm}) = {:?}",
+            i64::rounding_from(&x, rm)
+        );
+    }
+}
+
+fn demo_big_exponent_float_i64_rounding_from_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, rm) in big_exponent_float_rounding_mode_pair_gen_var_1()
+        .get(gm, config)
+        .filter(|(x, rm)| {
+            x.is_finite()
+                && x.get_exponent().is_none_or(|e| *e < 63u32)
+                && (*rm != Exact || i64::convertible_from(x))
+        })
+        .take(limit)
+    {
+        println!(
             "i64::rounding_from({x:#x}, {rm}) = {:?}",
             i64::rounding_from(&x, rm)
         );
@@ -71,17 +111,39 @@ fn demo_big_exponent_float_i64_rounding_from(gm: GenMode, config: &GenConfig, li
 
 fn demo_big_exponent_float_u64_try_from(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in big_exponent_float_gen().get(gm, config).take(limit) {
+        println!("u64::try_from({x}) = {:?}", u64::try_from(&x));
+    }
+}
+
+fn demo_big_exponent_float_u64_try_from_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in big_exponent_float_gen().get(gm, config).take(limit) {
         println!("u64::try_from({x:#x}) = {:?}", u64::try_from(&x));
     }
 }
 
 fn demo_big_exponent_float_i64_try_from(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in big_exponent_float_gen().get(gm, config).take(limit) {
+        println!("i64::try_from({x}) = {:?}", i64::try_from(&x));
+    }
+}
+
+fn demo_big_exponent_float_i64_try_from_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in big_exponent_float_gen().get(gm, config).take(limit) {
         println!("i64::try_from({x:#x}) = {:?}", i64::try_from(&x));
     }
 }
 
 fn demo_big_exponent_float_u64_convertible_from(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in big_exponent_float_gen().get(gm, config).take(limit) {
+        println!("u64::convertible_from({x}) = {}", u64::convertible_from(&x));
+    }
+}
+
+fn demo_big_exponent_float_u64_convertible_from_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
     for x in big_exponent_float_gen().get(gm, config).take(limit) {
         println!(
             "u64::convertible_from({x:#x}) = {}",

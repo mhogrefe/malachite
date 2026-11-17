@@ -18,8 +18,11 @@ use malachite_float::{BigExponentFloat, Float};
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_sum);
+    register_demo!(runner, demo_big_exponent_float_sum_debug);
     register_demo!(runner, demo_big_exponent_float_sum_prec_round);
+    register_demo!(runner, demo_big_exponent_float_sum_prec_round_debug);
     register_demo!(runner, demo_big_exponent_float_sum_prec);
+    register_demo!(runner, demo_big_exponent_float_sum_prec_debug);
 
     register_bench!(runner, benchmark_big_exponent_float_sum_evaluation_strategy);
     register_bench!(
@@ -30,6 +33,18 @@ pub(crate) fn register(runner: &mut Runner) {
         runner,
         benchmark_big_exponent_float_sum_prec_round_float_comparison
     );
+}
+
+fn decimal_slice(xs: &[BigExponentFloat]) -> String {
+    let mut s = String::from("[");
+    for (i, x) in xs.iter().enumerate() {
+        if i != 0 {
+            s.push_str(", ");
+        }
+        s.push_str(&x.to_string());
+    }
+    s.push(']');
+    s
 }
 
 fn hex_slice(xs: &[BigExponentFloat]) -> String {
@@ -50,11 +65,34 @@ fn demo_big_exponent_float_sum(gm: GenMode, config: &GenConfig, limit: usize) {
         .take(limit)
     {
         let r: BigExponentFloat = xs.iter().sum();
+        println!("sum({}) = {r}", decimal_slice(&xs));
+    }
+}
+
+fn demo_big_exponent_float_sum_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for xs in big_exponent_float_vec_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let r: BigExponentFloat = xs.iter().sum();
         println!("sum({}) = {r:#x}", hex_slice(&xs));
     }
 }
 
 fn demo_big_exponent_float_sum_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (xs, prec, rm) in big_exponent_float_vec_unsigned_rounding_mode_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (r, o) = BigExponentFloat::sum_prec_round(&xs, prec, rm);
+        println!(
+            "sum_prec_round({}, {prec}, {rm}) = ({r}, {o:?})",
+            decimal_slice(&xs)
+        );
+    }
+}
+
+fn demo_big_exponent_float_sum_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, prec, rm) in big_exponent_float_vec_unsigned_rounding_mode_triple_gen_var_1()
         .get(gm, config)
         .take(limit)
@@ -68,6 +106,16 @@ fn demo_big_exponent_float_sum_prec_round(gm: GenMode, config: &GenConfig, limit
 }
 
 fn demo_big_exponent_float_sum_prec(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (xs, prec) in big_exponent_float_vec_unsigned_pair_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (r, o) = BigExponentFloat::sum_prec(&xs, prec);
+        println!("sum_prec({}, {prec}) = ({r}, {o:?})", decimal_slice(&xs));
+    }
+}
+
+fn demo_big_exponent_float_sum_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, prec) in big_exponent_float_vec_unsigned_pair_gen_var_1()
         .get(gm, config)
         .take(limit)

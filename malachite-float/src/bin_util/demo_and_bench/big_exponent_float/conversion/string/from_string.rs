@@ -16,11 +16,27 @@ use malachite_float::test_util::generators::big_exponent_float_gen;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_from_string_base);
+    register_demo!(runner, demo_big_exponent_float_from_string_base_debug);
 
     register_bench!(runner, benchmark_big_exponent_float_from_string_base);
 }
 
 fn demo_big_exponent_float_from_string_base(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in big_exponent_float_gen().get(gm, config).take(limit) {
+        for base in [2, 4, 8, 16, 32] {
+            for s in [x.to_string_base(base), x.to_string_base_upper(base)] {
+                match BigExponentFloat::from_string_base(base, &s) {
+                    Some(y) => {
+                        println!("BigExponentFloat::from_string_base({base}, \"{s}\") = Some({y})");
+                    }
+                    None => println!("BigExponentFloat::from_string_base({base}, \"{s}\") = None"),
+                }
+            }
+        }
+    }
+}
+
+fn demo_big_exponent_float_from_string_base_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in big_exponent_float_gen().get(gm, config).take(limit) {
         for base in [2, 4, 8, 16, 32] {
             for s in [x.to_string_base(base), x.to_string_base_upper(base)] {

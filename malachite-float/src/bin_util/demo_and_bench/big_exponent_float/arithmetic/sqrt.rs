@@ -27,7 +27,9 @@ use malachite_q::test_util::generators::rational_unsigned_pair_gen_var_3;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_sqrt_prec_round);
+    register_demo!(runner, demo_big_exponent_float_sqrt_prec_round_debug);
     register_demo!(runner, demo_big_exponent_float_sqrt_prec);
+    register_demo!(runner, demo_big_exponent_float_sqrt_prec_debug);
 
     register_bench!(
         runner,
@@ -46,7 +48,12 @@ pub(crate) fn register(runner: &mut Runner) {
         benchmark_big_exponent_float_sqrt_prec_round_float_comparison
     );
     register_demo!(runner, demo_big_exponent_float_sqrt_rational_prec_round);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_sqrt_rational_prec_round_debug
+    );
     register_demo!(runner, demo_big_exponent_float_sqrt_rational_prec);
+    register_demo!(runner, demo_big_exponent_float_sqrt_rational_prec_debug);
     register_bench!(
         runner,
         benchmark_big_exponent_float_sqrt_rational_prec_round_evaluation_strategy
@@ -63,7 +70,17 @@ fn demo_big_exponent_float_sqrt_prec_round(gm: GenMode, config: &GenConfig, limi
         .take(limit)
     {
         let (z, o) = x.sqrt_prec_round_ref(prec, rm);
-        println!("{x:#x}.sqrt_prec_round({prec}, {rm}) = ({z:#x}, {o:?})");
+        println!("({x}).sqrt_prec_round({prec}, {rm}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_sqrt_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec, rm) in big_exponent_float_unsigned_rounding_mode_triple_gen_var_4()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = x.sqrt_prec_round_ref(prec, rm);
+        println!("({x:#x}).sqrt_prec_round({prec}, {rm}) = ({z:#x}, {o:?})");
     }
 }
 
@@ -73,7 +90,17 @@ fn demo_big_exponent_float_sqrt_prec(gm: GenMode, config: &GenConfig, limit: usi
         .take(limit)
     {
         let (z, o) = x.sqrt_prec_ref(prec);
-        println!("{x:#x}.sqrt_prec({prec}) = ({z:#x}, {o:?})");
+        println!("({x}).sqrt_prec({prec}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_sqrt_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec) in big_exponent_float_unsigned_pair_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = x.sqrt_prec_ref(prec);
+        println!("({x:#x}).sqrt_prec({prec}) = ({z:#x}, {o:?})");
     }
 }
 
@@ -201,11 +228,35 @@ fn demo_big_exponent_float_sqrt_rational_prec_round(gm: GenMode, config: &GenCon
         .take(limit)
     {
         let (z, o) = BigExponentFloat::sqrt_rational_prec_round_ref(&x, prec, rm);
+        println!("BigExponentFloat::sqrt_rational_prec_round({x}, {prec}, {rm}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_sqrt_rational_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, prec, rm) in rational_unsigned_rounding_mode_triple_gen_var_3()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = BigExponentFloat::sqrt_rational_prec_round_ref(&x, prec, rm);
         println!("BigExponentFloat::sqrt_rational_prec_round({x}, {prec}, {rm}) = ({z:#x}, {o:?})");
     }
 }
 
 fn demo_big_exponent_float_sqrt_rational_prec(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec) in rational_unsigned_pair_gen_var_3()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = BigExponentFloat::sqrt_rational_prec_ref(&x, prec);
+        println!("BigExponentFloat::sqrt_rational_prec({x}, {prec}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_sqrt_rational_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, prec) in rational_unsigned_pair_gen_var_3()
         .get(gm, config)
         .take(limit)

@@ -22,9 +22,13 @@ use malachite_float::test_util::generators::{
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_f64_rounding_from);
+    register_demo!(runner, demo_big_exponent_float_f64_rounding_from_debug);
     register_demo!(runner, demo_big_exponent_float_f32_rounding_from);
+    register_demo!(runner, demo_big_exponent_float_f32_rounding_from_debug);
     register_demo!(runner, demo_big_exponent_float_f64_try_from);
+    register_demo!(runner, demo_big_exponent_float_f64_try_from_debug);
     register_demo!(runner, demo_big_exponent_float_f64_convertible_from);
+    register_demo!(runner, demo_big_exponent_float_f64_convertible_from_debug);
 
     register_bench!(
         runner,
@@ -48,6 +52,17 @@ fn demo_big_exponent_float_f64_rounding_from(gm: GenMode, config: &GenConfig, li
         .take(limit)
     {
         let (y, o) = f64::rounding_from(&x, rm);
+        println!("f64::rounding_from({x}, {rm}) = ({}, {o:?})", NiceFloat(y));
+    }
+}
+
+fn demo_big_exponent_float_f64_rounding_from_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, rm) in big_exponent_float_rounding_mode_pair_gen_var_1()
+        .get(gm, config)
+        .filter(|(x, rm)| *rm != Exact || f64::convertible_from(x))
+        .take(limit)
+    {
+        let (y, o) = f64::rounding_from(&x, rm);
         println!(
             "f64::rounding_from({x:#x}, {rm}) = ({}, {o:?})",
             NiceFloat(y)
@@ -56,6 +71,17 @@ fn demo_big_exponent_float_f64_rounding_from(gm: GenMode, config: &GenConfig, li
 }
 
 fn demo_big_exponent_float_f32_rounding_from(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, rm) in big_exponent_float_rounding_mode_pair_gen_var_1()
+        .get(gm, config)
+        .filter(|(x, rm)| *rm != Exact || f32::convertible_from(x))
+        .take(limit)
+    {
+        let (y, o) = f32::rounding_from(&x, rm);
+        println!("f32::rounding_from({x}, {rm}) = ({}, {o:?})", NiceFloat(y));
+    }
+}
+
+fn demo_big_exponent_float_f32_rounding_from_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, rm) in big_exponent_float_rounding_mode_pair_gen_var_1()
         .get(gm, config)
         .filter(|(x, rm)| *rm != Exact || f32::convertible_from(x))
@@ -72,6 +98,15 @@ fn demo_big_exponent_float_f32_rounding_from(gm: GenMode, config: &GenConfig, li
 fn demo_big_exponent_float_f64_try_from(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in big_exponent_float_gen().get(gm, config).take(limit) {
         println!(
+            "f64::try_from({x}) = {:?}",
+            f64::try_from(&x).map(NiceFloat)
+        );
+    }
+}
+
+fn demo_big_exponent_float_f64_try_from_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in big_exponent_float_gen().get(gm, config).take(limit) {
+        println!(
             "f64::try_from({x:#x}) = {:?}",
             f64::try_from(&x).map(NiceFloat)
         );
@@ -79,6 +114,16 @@ fn demo_big_exponent_float_f64_try_from(gm: GenMode, config: &GenConfig, limit: 
 }
 
 fn demo_big_exponent_float_f64_convertible_from(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in big_exponent_float_gen().get(gm, config).take(limit) {
+        println!("f64::convertible_from({x}) = {}", f64::convertible_from(&x));
+    }
+}
+
+fn demo_big_exponent_float_f64_convertible_from_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
     for x in big_exponent_float_gen().get(gm, config).take(limit) {
         println!(
             "f64::convertible_from({x:#x}) = {}",

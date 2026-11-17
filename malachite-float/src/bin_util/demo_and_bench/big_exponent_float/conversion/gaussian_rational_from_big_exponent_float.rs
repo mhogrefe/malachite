@@ -18,7 +18,15 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_gaussian_rational_try_from);
     register_demo!(
         runner,
+        demo_big_exponent_float_gaussian_rational_try_from_debug
+    );
+    register_demo!(
+        runner,
         demo_big_exponent_float_gaussian_rational_convertible_from
+    );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_gaussian_rational_convertible_from_debug
     );
 
     register_bench!(
@@ -38,6 +46,19 @@ fn demo_big_exponent_float_gaussian_rational_try_from(
 ) {
     for x in big_exponent_float_gen_var_2().get(gm, config).take(limit) {
         println!(
+            "GaussianRational::try_from({x}) = {:?}",
+            GaussianRational::try_from(&x)
+        );
+    }
+}
+
+fn demo_big_exponent_float_gaussian_rational_try_from_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for x in big_exponent_float_gen_var_2().get(gm, config).take(limit) {
+        println!(
             "GaussianRational::try_from({x:#x}) = {:?}",
             GaussianRational::try_from(&x)
         );
@@ -45,6 +66,19 @@ fn demo_big_exponent_float_gaussian_rational_try_from(
 }
 
 fn demo_big_exponent_float_gaussian_rational_convertible_from(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for x in big_exponent_float_gen_var_2().get(gm, config).take(limit) {
+        println!(
+            "GaussianRational::convertible_from({x}) = {}",
+            GaussianRational::convertible_from(&x)
+        );
+    }
+}
+
+fn demo_big_exponent_float_gaussian_rational_convertible_from_debug(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,

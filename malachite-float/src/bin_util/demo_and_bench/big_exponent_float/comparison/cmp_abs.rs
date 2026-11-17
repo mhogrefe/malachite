@@ -22,8 +22,11 @@ use std::cmp::Ordering::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_partial_cmp_abs);
+    register_demo!(runner, demo_big_exponent_float_partial_cmp_abs_debug);
     register_demo!(runner, demo_comparable_big_exponent_float_ref_cmp_abs);
+    register_demo!(runner, demo_comparable_big_exponent_float_ref_cmp_abs_debug);
     register_demo!(runner, demo_big_exponent_float_partial_cmp_abs_double);
+    register_demo!(runner, demo_big_exponent_float_partial_cmp_abs_double_debug);
 
     register_bench!(
         runner,
@@ -39,6 +42,17 @@ pub(crate) fn register(runner: &mut Runner) {
 fn demo_big_exponent_float_partial_cmp_abs(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y) in big_exponent_float_pair_gen().get(gm, config).take(limit) {
         match x.partial_cmp_abs(&y) {
+            None => println!("|{x}| and |{y}| are incomparable"),
+            Some(Less) => println!("|{x}| < |{y}|"),
+            Some(Equal) => println!("|{x}| = |{y}|"),
+            Some(Greater) => println!("|{x}| > |{y}|"),
+        }
+    }
+}
+
+fn demo_big_exponent_float_partial_cmp_abs_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in big_exponent_float_pair_gen().get(gm, config).take(limit) {
+        match x.partial_cmp_abs(&y) {
             None => println!("|{x:#x}| and |{y:#x}| are incomparable"),
             Some(Less) => println!("|{x:#x}| < |{y:#x}|"),
             Some(Equal) => println!("|{x:#x}| = |{y:#x}|"),
@@ -48,6 +62,22 @@ fn demo_big_exponent_float_partial_cmp_abs(gm: GenMode, config: &GenConfig, limi
 }
 
 fn demo_comparable_big_exponent_float_ref_cmp_abs(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in big_exponent_float_pair_gen().get(gm, config).take(limit) {
+        let cx = ComparableBigExponentFloatRef(&x);
+        let cy = ComparableBigExponentFloatRef(&y);
+        match cx.cmp_abs(&cy) {
+            Less => println!("|{x}| < |{y}|"),
+            Equal => println!("|{x}| = |{y}|"),
+            Greater => println!("|{x}| > |{y}|"),
+        }
+    }
+}
+
+fn demo_comparable_big_exponent_float_ref_cmp_abs_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
     for (x, y) in big_exponent_float_pair_gen().get(gm, config).take(limit) {
         let cx = ComparableBigExponentFloatRef(&x);
         let cy = ComparableBigExponentFloatRef(&y);
@@ -105,6 +135,19 @@ fn benchmark_comparable_big_exponent_float_ref_cmp_abs(
 }
 
 fn demo_big_exponent_float_partial_cmp_abs_double(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in big_exponent_float_pair_gen().get(gm, config).take(limit) {
+        println!(
+            "({x}).partial_cmp_abs_double(&{y}) = {:?}",
+            x.partial_cmp_abs_double(&y)
+        );
+    }
+}
+
+fn demo_big_exponent_float_partial_cmp_abs_double_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
     for (x, y) in big_exponent_float_pair_gen().get(gm, config).take(limit) {
         println!(
             "({x:#x}).partial_cmp_abs_double(&{y:#x}) = {:?}",

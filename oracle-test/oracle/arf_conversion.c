@@ -390,15 +390,16 @@ check_ok(int line_number, const char * expected, const char * value)
 static int
 check_get_fmpz(char * line, int line_number)
 {
-    /* `T::method(X, ...) = r`, or `(X).method() = r` */
+    /* `T::method(X, ...) = r`, or `X.method() = r` */
     char * rest;
     char * target;
     char * method;
     char * arg;
-    if (line[0] == '(')
+    char * colons = strstr(line, "::");
+    char * paren = strchr(line, '(');
+    if (colons == NULL || (paren != NULL && paren < colons))
     {
-        arg = line + 1;
-        method = split(arg, ").");
+        method = arf_split_receiver(line, &arg);
         rest = method == NULL ? NULL : split(method, "() = ");
         target = NULL;
     }
@@ -711,14 +712,14 @@ check_mantissa(char * line, int line_number)
         }
         goto done;
     }
-    if (line[0] != '(')
+    char * arg;
+    char * method = arf_split_receiver(line, &arg);
+    if (method == NULL)
     {
         result = fail(line_number, "unrecognized line");
         goto done;
     }
-    char * arg = line + 1;
-    char * method = split(arg, ").");
-    char * rest = method == NULL ? NULL : split(method, ") = ");
+    char * rest = split(method, ") = ");
     if (rest == NULL || arf_parse_base(arg, 4, x) || !arf_is_normal(x))
     {
         result = fail(line_number, "unreadable line");
@@ -896,11 +897,11 @@ check_string(char * line, int line_number)
                 result = fail(line_number, "missing prefix");
         }
     }
-    else if (line[0] == '(')
+    else if (strstr(line, ".to_string_base") != NULL)
     {
-        /* `(v).to_string_base[_upper](b) = s` */
-        char * v = line + 1;
-        char * method = split(v, ").");
+        /* `v.to_string_base[_upper](b) = s` */
+        char * v;
+        char * method = arf_split_receiver(line, &v);
         char * b = method == NULL ? NULL : split(method, "(");
         char * s = b == NULL ? NULL : split(b, ") = ");
         int upper = method != NULL && strcmp(method, "to_string_base_upper") == 0;
@@ -956,7 +957,7 @@ run(const char * arg, const char * name, conversion_kind k)
     checked = 0;
     kind = k;
     mode_name = name;
-    int result = for_each_line(arg, check_line);
+    int result = arf_for_each_line(arg, check_line);
     return result != 0 ? result : require_some_lines(name, checked);
 }
 

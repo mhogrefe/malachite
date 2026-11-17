@@ -19,8 +19,14 @@ use malachite_nz::test_util::generators::{integer_gen, integer_unsigned_pair_gen
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_from_integer);
+    register_demo!(runner, demo_big_exponent_float_from_integer_debug);
     register_demo!(runner, demo_big_exponent_float_from_integer_prec_round);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_from_integer_prec_round_debug
+    );
     register_demo!(runner, demo_big_exponent_float_from_integer_prec);
+    register_demo!(runner, demo_big_exponent_float_from_integer_prec_debug);
 
     register_bench!(
         runner,
@@ -40,6 +46,15 @@ pub(crate) fn register(runner: &mut Runner) {
 fn demo_big_exponent_float_from_integer(gm: GenMode, config: &GenConfig, limit: usize) {
     for n in integer_gen().get(gm, config).take(limit) {
         println!(
+            "BigExponentFloat::from({n}) = {}",
+            BigExponentFloat::from(&n)
+        );
+    }
+}
+
+fn demo_big_exponent_float_from_integer_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in integer_gen().get(gm, config).take(limit) {
+        println!(
             "BigExponentFloat::from({n}) = {:#x}",
             BigExponentFloat::from(&n)
         );
@@ -52,11 +67,35 @@ fn demo_big_exponent_float_from_integer_prec_round(gm: GenMode, config: &GenConf
         .take(limit)
     {
         let (x, o) = BigExponentFloat::from_integer_prec_round_ref(&n, prec, rm);
+        println!("BigExponentFloat::from_integer_prec_round({n}, {prec}, {rm}) = ({x}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_from_integer_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (n, prec, rm) in integer_unsigned_rounding_mode_triple_gen_var_3()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (x, o) = BigExponentFloat::from_integer_prec_round_ref(&n, prec, rm);
         println!("BigExponentFloat::from_integer_prec_round({n}, {prec}, {rm}) = ({x:#x}, {o:?})");
     }
 }
 
 fn demo_big_exponent_float_from_integer_prec(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, prec) in integer_unsigned_pair_gen_var_6()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (x, o) = BigExponentFloat::from_integer_prec_ref(&n, prec);
+        println!("BigExponentFloat::from_integer_prec({n}, {prec}) = ({x}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_from_integer_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for (n, prec) in integer_unsigned_pair_gen_var_6()
         .get(gm, config)
         .take(limit)

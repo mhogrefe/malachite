@@ -20,7 +20,9 @@ use malachite_float::test_util::generators::{
 
 pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_demos!(runner, demo_big_exponent_float_shl_unsigned);
+    register_unsigned_demos!(runner, demo_big_exponent_float_shl_unsigned_debug);
     register_signed_demos!(runner, demo_big_exponent_float_shl_signed);
+    register_signed_demos!(runner, demo_big_exponent_float_shl_signed_debug);
 
     register_unsigned_benches!(
         runner,
@@ -33,6 +35,21 @@ pub(crate) fn register(runner: &mut Runner) {
 }
 
 fn demo_big_exponent_float_shl_unsigned<T: PrimitiveUnsigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    for<'a> &'a BigExponentFloat: Shl<T, Output = BigExponentFloat>,
+{
+    for (x, k) in big_exponent_float_unsigned_pair_gen::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!("{x} << {k} = {}", &x << k);
+    }
+}
+
+fn demo_big_exponent_float_shl_unsigned_debug<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -88,6 +105,21 @@ fn benchmark_big_exponent_float_shl_unsigned_evaluation_strategy<T: PrimitiveUns
 }
 
 fn demo_big_exponent_float_shl_signed<T: PrimitiveSigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    for<'a> &'a BigExponentFloat: Shl<T, Output = BigExponentFloat>,
+{
+    for (x, k) in big_exponent_float_signed_pair_gen::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!("{x} << {k} = {}", &x << k);
+    }
+}
+
+fn demo_big_exponent_float_shl_signed_debug<T: PrimitiveSigned>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,

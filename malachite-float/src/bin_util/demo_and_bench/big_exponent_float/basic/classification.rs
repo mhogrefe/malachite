@@ -15,20 +15,38 @@ use malachite_float::test_util::bench::bucketers::{
 use malachite_float::test_util::generators::{
     big_exponent_float_gen, big_exponent_float_gen_var_1_float,
 };
+use std::fmt::Display;
+
+// Prints an `Option` of a `Display` value the way `{:?}` would, but with the value in decimal.
+fn decimal_option<T: Display>(x: Option<T>) -> String {
+    x.map_or_else(|| "None".to_string(), |x| format!("Some({x})"))
+}
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_is_nan);
+    register_demo!(runner, demo_big_exponent_float_is_nan_debug);
     register_demo!(runner, demo_big_exponent_float_is_finite);
+    register_demo!(runner, demo_big_exponent_float_is_finite_debug);
     register_demo!(runner, demo_big_exponent_float_is_infinite);
+    register_demo!(runner, demo_big_exponent_float_is_infinite_debug);
     register_demo!(runner, demo_big_exponent_float_is_zero);
+    register_demo!(runner, demo_big_exponent_float_is_zero_debug);
     register_demo!(runner, demo_big_exponent_float_is_normal);
+    register_demo!(runner, demo_big_exponent_float_is_normal_debug);
     register_demo!(runner, demo_big_exponent_float_is_sign_positive);
+    register_demo!(runner, demo_big_exponent_float_is_sign_positive_debug);
     register_demo!(runner, demo_big_exponent_float_is_sign_negative);
+    register_demo!(runner, demo_big_exponent_float_is_sign_negative_debug);
     register_demo!(runner, demo_big_exponent_float_classify);
+    register_demo!(runner, demo_big_exponent_float_classify_debug);
     register_demo!(runner, demo_big_exponent_float_into_non_nan);
+    register_demo!(runner, demo_big_exponent_float_into_non_nan_debug);
     register_demo!(runner, demo_big_exponent_float_to_non_nan);
+    register_demo!(runner, demo_big_exponent_float_to_non_nan_debug);
     register_demo!(runner, demo_big_exponent_float_into_finite);
+    register_demo!(runner, demo_big_exponent_float_into_finite_debug);
     register_demo!(runner, demo_big_exponent_float_to_finite);
+    register_demo!(runner, demo_big_exponent_float_to_finite_debug);
 
     register_bench!(runner, benchmark_big_exponent_float_is_nan);
     register_bench!(runner, benchmark_big_exponent_float_is_finite);
@@ -53,73 +71,151 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_big_exponent_float_is_nan(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in big_exponent_float_gen().get(gm, config).take(limit) {
-        println!("{x:#x}.is_nan() = {}", x.is_nan());
+        println!("({x}).is_nan() = {}", x.is_nan());
+    }
+}
+
+fn demo_big_exponent_float_is_nan_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in big_exponent_float_gen().get(gm, config).take(limit) {
+        println!("({x:#x}).is_nan() = {}", x.is_nan());
     }
 }
 
 fn demo_big_exponent_float_is_finite(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in big_exponent_float_gen().get(gm, config).take(limit) {
-        println!("{x:#x}.is_finite() = {}", x.is_finite());
+        println!("({x}).is_finite() = {}", x.is_finite());
+    }
+}
+
+fn demo_big_exponent_float_is_finite_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in big_exponent_float_gen().get(gm, config).take(limit) {
+        println!("({x:#x}).is_finite() = {}", x.is_finite());
     }
 }
 
 fn demo_big_exponent_float_is_infinite(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in big_exponent_float_gen().get(gm, config).take(limit) {
-        println!("{x:#x}.is_infinite() = {}", x.is_infinite());
+        println!("({x}).is_infinite() = {}", x.is_infinite());
+    }
+}
+
+fn demo_big_exponent_float_is_infinite_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in big_exponent_float_gen().get(gm, config).take(limit) {
+        println!("({x:#x}).is_infinite() = {}", x.is_infinite());
     }
 }
 
 fn demo_big_exponent_float_is_zero(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in big_exponent_float_gen().get(gm, config).take(limit) {
-        println!("{x:#x}.is_zero() = {}", x.is_zero());
+        println!("({x}).is_zero() = {}", x.is_zero());
+    }
+}
+
+fn demo_big_exponent_float_is_zero_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in big_exponent_float_gen().get(gm, config).take(limit) {
+        println!("({x:#x}).is_zero() = {}", x.is_zero());
     }
 }
 
 fn demo_big_exponent_float_is_normal(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in big_exponent_float_gen().get(gm, config).take(limit) {
-        println!("{x:#x}.is_normal() = {}", x.is_normal());
+        println!("({x}).is_normal() = {}", x.is_normal());
+    }
+}
+
+fn demo_big_exponent_float_is_normal_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in big_exponent_float_gen().get(gm, config).take(limit) {
+        println!("({x:#x}).is_normal() = {}", x.is_normal());
     }
 }
 
 fn demo_big_exponent_float_is_sign_positive(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in big_exponent_float_gen().get(gm, config).take(limit) {
-        println!("{x:#x}.is_sign_positive() = {}", x.is_sign_positive());
+        println!("({x}).is_sign_positive() = {}", x.is_sign_positive());
+    }
+}
+
+fn demo_big_exponent_float_is_sign_positive_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in big_exponent_float_gen().get(gm, config).take(limit) {
+        println!("({x:#x}).is_sign_positive() = {}", x.is_sign_positive());
     }
 }
 
 fn demo_big_exponent_float_is_sign_negative(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in big_exponent_float_gen().get(gm, config).take(limit) {
-        println!("{x:#x}.is_sign_negative() = {}", x.is_sign_negative());
+        println!("({x}).is_sign_negative() = {}", x.is_sign_negative());
+    }
+}
+
+fn demo_big_exponent_float_is_sign_negative_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in big_exponent_float_gen().get(gm, config).take(limit) {
+        println!("({x:#x}).is_sign_negative() = {}", x.is_sign_negative());
     }
 }
 
 fn demo_big_exponent_float_classify(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in big_exponent_float_gen().get(gm, config).take(limit) {
-        println!("{x:#x}.classify() = {:?}", x.classify());
+        println!("({x}).classify() = {:?}", x.classify());
+    }
+}
+
+fn demo_big_exponent_float_classify_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in big_exponent_float_gen().get(gm, config).take(limit) {
+        println!("({x:#x}).classify() = {:?}", x.classify());
     }
 }
 
 fn demo_big_exponent_float_into_non_nan(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in big_exponent_float_gen().get(gm, config).take(limit) {
-        println!("{x:#x}.into_non_nan() = {:?}", x.clone().into_non_nan());
+        println!(
+            "({x}).into_non_nan() = {}",
+            decimal_option(x.clone().into_non_nan())
+        );
+    }
+}
+
+fn demo_big_exponent_float_into_non_nan_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in big_exponent_float_gen().get(gm, config).take(limit) {
+        println!("({x:#x}).into_non_nan() = {:?}", x.clone().into_non_nan());
     }
 }
 
 fn demo_big_exponent_float_to_non_nan(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in big_exponent_float_gen().get(gm, config).take(limit) {
-        println!("{x:#x}.to_non_nan() = {:?}", x.to_non_nan());
+        println!("({x}).to_non_nan() = {}", decimal_option(x.to_non_nan()));
+    }
+}
+
+fn demo_big_exponent_float_to_non_nan_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in big_exponent_float_gen().get(gm, config).take(limit) {
+        println!("({x:#x}).to_non_nan() = {:?}", x.to_non_nan());
     }
 }
 
 fn demo_big_exponent_float_into_finite(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in big_exponent_float_gen().get(gm, config).take(limit) {
-        println!("{x:#x}.into_finite() = {:?}", x.clone().into_finite());
+        println!(
+            "({x}).into_finite() = {}",
+            decimal_option(x.clone().into_finite())
+        );
+    }
+}
+
+fn demo_big_exponent_float_into_finite_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in big_exponent_float_gen().get(gm, config).take(limit) {
+        println!("({x:#x}).into_finite() = {:?}", x.clone().into_finite());
     }
 }
 
 fn demo_big_exponent_float_to_finite(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in big_exponent_float_gen().get(gm, config).take(limit) {
-        println!("{x:#x}.to_finite() = {:?}", x.to_finite());
+        println!("({x}).to_finite() = {}", decimal_option(x.to_finite()));
+    }
+}
+
+fn demo_big_exponent_float_to_finite_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in big_exponent_float_gen().get(gm, config).take(limit) {
+        println!("({x:#x}).to_finite() = {:?}", x.to_finite());
     }
 }
 

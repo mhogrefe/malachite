@@ -15,7 +15,12 @@ use malachite_float::test_util::generators::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_sub_rational_prec_round);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_sub_rational_prec_round_debug
+    );
     register_demo!(runner, demo_big_exponent_float_sub_rational_prec);
+    register_demo!(runner, demo_big_exponent_float_sub_rational_prec_debug);
 
     register_bench!(
         runner,
@@ -41,7 +46,21 @@ fn demo_big_exponent_float_sub_rational_prec_round(gm: GenMode, config: &GenConf
         .take(limit)
     {
         let (z, o) = x.sub_rational_prec_round_ref_ref(&y, prec, rm);
-        println!("{x:#x}.sub_rational_prec_round({y}, {prec}, {rm}) = ({z:#x}, {o:?})");
+        println!("({x}).sub_rational_prec_round({y}, {prec}, {rm}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_sub_rational_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, prec, rm) in big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_3()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = x.sub_rational_prec_round_ref_ref(&y, prec, rm);
+        println!("({x:#x}).sub_rational_prec_round({y}, {prec}, {rm}) = ({z:#x}, {o:?})");
     }
 }
 
@@ -51,7 +70,17 @@ fn demo_big_exponent_float_sub_rational_prec(gm: GenMode, config: &GenConfig, li
         .take(limit)
     {
         let (z, o) = x.sub_rational_prec_ref_ref(&y, prec);
-        println!("{x:#x}.sub_rational_prec({y}, {prec}) = ({z:#x}, {o:?})");
+        println!("({x}).sub_rational_prec({y}, {prec}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_sub_rational_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in big_exponent_float_rational_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = x.sub_rational_prec_ref_ref(&y, prec);
+        println!("({x:#x}).sub_rational_prec({y}, {prec}) = ({z:#x}, {o:?})");
     }
 }
 

@@ -22,11 +22,20 @@ use malachite_nz::platform::{Limb, SignedLimb};
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_from_u64);
+    register_demo!(runner, demo_big_exponent_float_from_u64_debug);
     register_demo!(runner, demo_big_exponent_float_from_i64);
+    register_demo!(runner, demo_big_exponent_float_from_i64_debug);
     register_demo!(runner, demo_big_exponent_float_const_from_unsigned);
+    register_demo!(runner, demo_big_exponent_float_const_from_unsigned_debug);
     register_demo!(runner, demo_big_exponent_float_const_from_signed);
+    register_demo!(runner, demo_big_exponent_float_const_from_signed_debug);
     register_demo!(runner, demo_big_exponent_float_from_unsigned_prec_round);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_from_unsigned_prec_round_debug
+    );
     register_demo!(runner, demo_big_exponent_float_from_signed_prec_round);
+    register_demo!(runner, demo_big_exponent_float_from_signed_prec_round_debug);
 
     register_bench!(runner, benchmark_big_exponent_float_from_u64);
     register_bench!(runner, benchmark_big_exponent_float_from_i64);
@@ -41,6 +50,15 @@ pub(crate) fn register(runner: &mut Runner) {
 fn demo_big_exponent_float_from_u64(gm: GenMode, config: &GenConfig, limit: usize) {
     for n in unsigned_gen::<u64>().get(gm, config).take(limit) {
         println!(
+            "BigExponentFloat::from({n}) = {}",
+            BigExponentFloat::from(n)
+        );
+    }
+}
+
+fn demo_big_exponent_float_from_u64_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in unsigned_gen::<u64>().get(gm, config).take(limit) {
+        println!(
             "BigExponentFloat::from({n}) = {:#x}",
             BigExponentFloat::from(n)
         );
@@ -48,6 +66,15 @@ fn demo_big_exponent_float_from_u64(gm: GenMode, config: &GenConfig, limit: usiz
 }
 
 fn demo_big_exponent_float_from_i64(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in signed_gen::<i64>().get(gm, config).take(limit) {
+        println!(
+            "BigExponentFloat::from({n}) = {}",
+            BigExponentFloat::from(n)
+        );
+    }
+}
+
+fn demo_big_exponent_float_from_i64_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for n in signed_gen::<i64>().get(gm, config).take(limit) {
         println!(
             "BigExponentFloat::from({n}) = {:#x}",
@@ -59,6 +86,19 @@ fn demo_big_exponent_float_from_i64(gm: GenMode, config: &GenConfig, limit: usiz
 fn demo_big_exponent_float_const_from_unsigned(gm: GenMode, config: &GenConfig, limit: usize) {
     for n in unsigned_gen::<Limb>().get(gm, config).take(limit) {
         println!(
+            "BigExponentFloat::from({n}) = {}",
+            BigExponentFloat::const_from_unsigned(n)
+        );
+    }
+}
+
+fn demo_big_exponent_float_const_from_unsigned_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for n in unsigned_gen::<Limb>().get(gm, config).take(limit) {
+        println!(
             "BigExponentFloat::from({n}) = {:#x}",
             BigExponentFloat::const_from_unsigned(n)
         );
@@ -66,6 +106,15 @@ fn demo_big_exponent_float_const_from_unsigned(gm: GenMode, config: &GenConfig, 
 }
 
 fn demo_big_exponent_float_const_from_signed(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in signed_gen::<SignedLimb>().get(gm, config).take(limit) {
+        println!(
+            "BigExponentFloat::from({n}) = {}",
+            BigExponentFloat::const_from_signed(n)
+        );
+    }
+}
+
+fn demo_big_exponent_float_const_from_signed_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for n in signed_gen::<SignedLimb>().get(gm, config).take(limit) {
         println!(
             "BigExponentFloat::from({n}) = {:#x}",
@@ -80,11 +129,39 @@ fn demo_big_exponent_float_from_unsigned_prec_round(gm: GenMode, config: &GenCon
         .take(limit)
     {
         let (x, o) = BigExponentFloat::from_unsigned_prec_round(n, prec, rm);
+        println!("BigExponentFloat::from_unsigned_prec_round({n}, {prec}, {rm}) = ({x}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_from_unsigned_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (n, prec, rm) in unsigned_unsigned_rounding_mode_triple_gen_var_5::<u64>()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (x, o) = BigExponentFloat::from_unsigned_prec_round(n, prec, rm);
         println!("BigExponentFloat::from_unsigned_prec_round({n}, {prec}, {rm}) = ({x:#x}, {o:?})");
     }
 }
 
 fn demo_big_exponent_float_from_signed_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, prec, rm) in signed_unsigned_rounding_mode_triple_gen_var_3::<i64>()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (x, o) = BigExponentFloat::from_signed_prec_round(n, prec, rm);
+        println!("BigExponentFloat::from_signed_prec_round({n}, {prec}, {rm}) = ({x}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_from_signed_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
     for (n, prec, rm) in signed_unsigned_rounding_mode_triple_gen_var_3::<i64>()
         .get(gm, config)
         .take(limit)

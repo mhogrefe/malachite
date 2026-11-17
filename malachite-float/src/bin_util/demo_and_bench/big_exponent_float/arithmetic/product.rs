@@ -17,8 +17,11 @@ use malachite_float::{BigExponentFloat, Float};
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_product);
+    register_demo!(runner, demo_big_exponent_float_product_debug);
     register_demo!(runner, demo_big_exponent_float_product_prec_round);
+    register_demo!(runner, demo_big_exponent_float_product_prec_round_debug);
     register_demo!(runner, demo_big_exponent_float_product_prec);
+    register_demo!(runner, demo_big_exponent_float_product_prec_debug);
 
     register_bench!(
         runner,
@@ -28,6 +31,18 @@ pub(crate) fn register(runner: &mut Runner) {
         runner,
         benchmark_big_exponent_float_product_prec_round_float_comparison
     );
+}
+
+fn decimal_slice(xs: &[BigExponentFloat]) -> String {
+    let mut s = String::from("[");
+    for (i, x) in xs.iter().enumerate() {
+        if i != 0 {
+            s.push_str(", ");
+        }
+        s.push_str(&x.to_string());
+    }
+    s.push(']');
+    s
 }
 
 fn hex_slice(xs: &[BigExponentFloat]) -> String {
@@ -48,11 +63,34 @@ fn demo_big_exponent_float_product(gm: GenMode, config: &GenConfig, limit: usize
         .take(limit)
     {
         let r: BigExponentFloat = xs.iter().product();
+        println!("product({}) = {r}", decimal_slice(&xs));
+    }
+}
+
+fn demo_big_exponent_float_product_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for xs in big_exponent_float_vec_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let r: BigExponentFloat = xs.iter().product();
         println!("product({}) = {r:#x}", hex_slice(&xs));
     }
 }
 
 fn demo_big_exponent_float_product_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (xs, prec, rm) in big_exponent_float_vec_unsigned_rounding_mode_triple_gen_var_2()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (r, o) = BigExponentFloat::product_prec_round(&xs, prec, rm);
+        println!(
+            "product_prec_round({}, {prec}, {rm}) = ({r}, {o:?})",
+            decimal_slice(&xs)
+        );
+    }
+}
+
+fn demo_big_exponent_float_product_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, prec, rm) in big_exponent_float_vec_unsigned_rounding_mode_triple_gen_var_2()
         .get(gm, config)
         .take(limit)
@@ -66,6 +104,19 @@ fn demo_big_exponent_float_product_prec_round(gm: GenMode, config: &GenConfig, l
 }
 
 fn demo_big_exponent_float_product_prec(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (xs, prec) in big_exponent_float_vec_unsigned_pair_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (r, o) = BigExponentFloat::product_prec(&xs, prec);
+        println!(
+            "product_prec({}, {prec}) = ({r}, {o:?})",
+            decimal_slice(&xs)
+        );
+    }
+}
+
+fn demo_big_exponent_float_product_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for (xs, prec) in big_exponent_float_vec_unsigned_pair_gen_var_1()
         .get(gm, config)
         .take(limit)

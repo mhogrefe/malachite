@@ -25,15 +25,31 @@ use malachite_float::test_util::generators::{
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_min);
+    register_demo!(runner, demo_big_exponent_float_min_debug);
     register_demo!(runner, demo_big_exponent_float_min_prec_round);
+    register_demo!(runner, demo_big_exponent_float_min_prec_round_debug);
     register_demo!(runner, demo_big_exponent_float_min_prec);
+    register_demo!(runner, demo_big_exponent_float_min_prec_debug);
     register_demo!(runner, demo_big_exponent_float_min_rational_prec_round);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_min_rational_prec_round_debug
+    );
     register_demo!(runner, demo_big_exponent_float_min_rational_prec);
+    register_demo!(runner, demo_big_exponent_float_min_rational_prec_debug);
     register_demo!(runner, demo_big_exponent_float_max);
+    register_demo!(runner, demo_big_exponent_float_max_debug);
     register_demo!(runner, demo_big_exponent_float_max_prec_round);
+    register_demo!(runner, demo_big_exponent_float_max_prec_round_debug);
     register_demo!(runner, demo_big_exponent_float_max_prec);
+    register_demo!(runner, demo_big_exponent_float_max_prec_debug);
     register_demo!(runner, demo_big_exponent_float_max_rational_prec_round);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_max_rational_prec_round_debug
+    );
     register_demo!(runner, demo_big_exponent_float_max_rational_prec);
+    register_demo!(runner, demo_big_exponent_float_max_rational_prec_debug);
 
     register_bench!(runner, benchmark_big_exponent_float_min_evaluation_strategy);
     register_bench!(
@@ -73,7 +89,13 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_big_exponent_float_min(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y) in big_exponent_float_pair_gen().get(gm, config).take(limit) {
-        println!("{x:#x}.min({y:#x}) = {:#x}", x.min_ref_ref(&y));
+        println!("({x}).min({y}) = {}", x.min_ref_ref(&y));
+    }
+}
+
+fn demo_big_exponent_float_min_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in big_exponent_float_pair_gen().get(gm, config).take(limit) {
+        println!("({x:#x}).min({y:#x}) = {:#x}", x.min_ref_ref(&y));
     }
 }
 
@@ -84,7 +106,18 @@ fn demo_big_exponent_float_min_prec_round(gm: GenMode, config: &GenConfig, limit
             .take(limit)
     {
         let (z, o) = x.min_prec_round_ref_ref(&y, prec, rm);
-        println!("{x:#x}.min_prec_round({y:#x}, {prec}, {rm}) = ({z:#x}, {o:?})");
+        println!("({x}).min_prec_round({y}, {prec}, {rm}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_min_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec, rm) in
+        big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_1()
+            .get(gm, config)
+            .take(limit)
+    {
+        let (z, o) = x.min_prec_round_ref_ref(&y, prec, rm);
+        println!("({x:#x}).min_prec_round({y:#x}, {prec}, {rm}) = ({z:#x}, {o:?})");
     }
 }
 
@@ -94,7 +127,17 @@ fn demo_big_exponent_float_min_prec(gm: GenMode, config: &GenConfig, limit: usiz
         .take(limit)
     {
         let (z, o) = x.min_prec_ref_ref(&y, prec);
-        println!("{x:#x}.min_prec({y:#x}, {prec}) = ({z:#x}, {o:?})");
+        println!("({x}).min_prec({y}, {prec}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_min_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in big_exponent_float_big_exponent_float_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = x.min_prec_ref_ref(&y, prec);
+        println!("({x:#x}).min_prec({y:#x}, {prec}) = ({z:#x}, {o:?})");
     }
 }
 
@@ -104,7 +147,21 @@ fn demo_big_exponent_float_min_rational_prec_round(gm: GenMode, config: &GenConf
         .take(limit)
     {
         let (z, o) = x.min_rational_prec_round_ref_ref(&y, prec, rm);
-        println!("{x:#x}.min_rational_prec_round({y}, {prec}, {rm}) = ({z:#x}, {o:?})");
+        println!("({x}).min_rational_prec_round({y}, {prec}, {rm}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_min_rational_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, prec, rm) in big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = x.min_rational_prec_round_ref_ref(&y, prec, rm);
+        println!("({x:#x}).min_rational_prec_round({y}, {prec}, {rm}) = ({z:#x}, {o:?})");
     }
 }
 
@@ -114,7 +171,17 @@ fn demo_big_exponent_float_min_rational_prec(gm: GenMode, config: &GenConfig, li
         .take(limit)
     {
         let (z, o) = x.min_rational_prec_ref_ref(&y, prec);
-        println!("{x:#x}.min_rational_prec({y}, {prec}) = ({z:#x}, {o:?})");
+        println!("({x}).min_rational_prec({y}, {prec}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_min_rational_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in big_exponent_float_rational_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = x.min_rational_prec_ref_ref(&y, prec);
+        println!("({x:#x}).min_rational_prec({y}, {prec}) = ({z:#x}, {o:?})");
     }
 }
 
@@ -333,7 +400,13 @@ fn benchmark_big_exponent_float_min_rational_prec_evaluation_strategy(
 
 fn demo_big_exponent_float_max(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y) in big_exponent_float_pair_gen().get(gm, config).take(limit) {
-        println!("{x:#x}.max({y:#x}) = {:#x}", x.max_ref_ref(&y));
+        println!("({x}).max({y}) = {}", x.max_ref_ref(&y));
+    }
+}
+
+fn demo_big_exponent_float_max_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in big_exponent_float_pair_gen().get(gm, config).take(limit) {
+        println!("({x:#x}).max({y:#x}) = {:#x}", x.max_ref_ref(&y));
     }
 }
 
@@ -344,7 +417,18 @@ fn demo_big_exponent_float_max_prec_round(gm: GenMode, config: &GenConfig, limit
             .take(limit)
     {
         let (z, o) = x.max_prec_round_ref_ref(&y, prec, rm);
-        println!("{x:#x}.max_prec_round({y:#x}, {prec}, {rm}) = ({z:#x}, {o:?})");
+        println!("({x}).max_prec_round({y}, {prec}, {rm}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_max_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec, rm) in
+        big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_1()
+            .get(gm, config)
+            .take(limit)
+    {
+        let (z, o) = x.max_prec_round_ref_ref(&y, prec, rm);
+        println!("({x:#x}).max_prec_round({y:#x}, {prec}, {rm}) = ({z:#x}, {o:?})");
     }
 }
 
@@ -354,7 +438,17 @@ fn demo_big_exponent_float_max_prec(gm: GenMode, config: &GenConfig, limit: usiz
         .take(limit)
     {
         let (z, o) = x.max_prec_ref_ref(&y, prec);
-        println!("{x:#x}.max_prec({y:#x}, {prec}) = ({z:#x}, {o:?})");
+        println!("({x}).max_prec({y}, {prec}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_max_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in big_exponent_float_big_exponent_float_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = x.max_prec_ref_ref(&y, prec);
+        println!("({x:#x}).max_prec({y:#x}, {prec}) = ({z:#x}, {o:?})");
     }
 }
 
@@ -364,7 +458,21 @@ fn demo_big_exponent_float_max_rational_prec_round(gm: GenMode, config: &GenConf
         .take(limit)
     {
         let (z, o) = x.max_rational_prec_round_ref_ref(&y, prec, rm);
-        println!("{x:#x}.max_rational_prec_round({y}, {prec}, {rm}) = ({z:#x}, {o:?})");
+        println!("({x}).max_rational_prec_round({y}, {prec}, {rm}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_max_rational_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, prec, rm) in big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = x.max_rational_prec_round_ref_ref(&y, prec, rm);
+        println!("({x:#x}).max_rational_prec_round({y}, {prec}, {rm}) = ({z:#x}, {o:?})");
     }
 }
 
@@ -374,7 +482,17 @@ fn demo_big_exponent_float_max_rational_prec(gm: GenMode, config: &GenConfig, li
         .take(limit)
     {
         let (z, o) = x.max_rational_prec_ref_ref(&y, prec);
-        println!("{x:#x}.max_rational_prec({y}, {prec}) = ({z:#x}, {o:?})");
+        println!("({x}).max_rational_prec({y}, {prec}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_max_rational_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in big_exponent_float_rational_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = x.max_rational_prec_ref_ref(&y, prec);
+        println!("({x:#x}).max_rational_prec({y}, {prec}) = ({z:#x}, {o:?})");
     }
 }
 

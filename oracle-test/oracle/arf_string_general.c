@@ -771,10 +771,8 @@ check_line(char * line, int line_number)
         arf_clear(y);
         return result;
     }
-    if (line[0] != '(')
-        return fail(line_number, "malformed line");
-    char * x_str = line + 1;
-    rest = split(x_str, ").");
+    char * x_str;
+    rest = arf_split_receiver(line, &x_str);
     if (rest == NULL)
         return fail(line_number, "malformed line");
     char * out = split(rest, " = ");
@@ -844,6 +842,6 @@ int
 run_arf_string_general(const char * arg)
 {
     checked = 0;
-    int result = for_each_line(arg, check_line);
+    int result = arf_for_each_line(arg, check_line);
     return result != 0 ? result : require_some_lines("arf_string_general", checked);
 }

@@ -842,6 +842,6 @@ int
 run_arf_pow(const char * arg)
 {
     checked = 0;
-    int result = for_each_line(arg, check_line);
+    int result = arf_for_each_line(arg, check_line);
     return result != 0 ? result : require_some_lines("arf_pow", checked);
 }

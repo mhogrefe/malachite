@@ -666,7 +666,7 @@ run(const char * arg, const char * name, comparison_kind k)
     checked = 0;
     kind = k;
     mode_name = name;
-    int result = for_each_line(arg, check_line);
+    int result = arf_for_each_line(arg, check_line);
     return result != 0 ? result : require_some_lines(name, checked);
 }
 

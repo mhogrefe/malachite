@@ -19,11 +19,23 @@ pub(crate) fn register(runner: &mut Runner) {
     );
     register_demo!(
         runner,
+        demo_big_exponent_float_log_base_big_exponent_float_base_1_plus_x_prec_round_debug
+    );
+    register_demo!(
+        runner,
         demo_big_exponent_float_log_base_big_exponent_float_base_1_plus_x_prec
     );
     register_demo!(
         runner,
+        demo_big_exponent_float_log_base_big_exponent_float_base_1_plus_x_prec_debug
+    );
+    register_demo!(
+        runner,
         demo_big_exponent_float_log_base_big_exponent_float_base_1_plus_x_prec_round_in_domain
+    );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_log_base_big_exponent_float_base_1_plus_x_prec_round_in_domain_debug
     );
 
     register_bench!(runner, benchmark_big_exponent_float_log_base_big_exponent_float_base_1_plus_x_prec_round_evaluation_strategy);
@@ -43,7 +55,24 @@ fn demo_big_exponent_float_log_base_big_exponent_float_base_1_plus_x_prec_round(
     {
         let (z, o) = x.log_base_big_exponent_float_base_1_plus_x_prec_round_ref(&b, prec, rm);
         println!(
-            "{x:#x}.log_base_big_exponent_float_base_1_plus_x_prec_round({b:#x}, {prec}, {rm}) = ({z:#x}, {o:?})"
+            "({x}).log_base_big_exponent_float_base_1_plus_x_prec_round({b}, {prec}, {rm}) = ({z}, {o:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_log_base_big_exponent_float_base_1_plus_x_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, b, prec, rm) in
+        big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_12()
+            .get(gm, config)
+            .take(limit)
+    {
+        let (z, o) = x.log_base_big_exponent_float_base_1_plus_x_prec_round_ref(&b, prec, rm);
+        println!(
+            "({x:#x}).log_base_big_exponent_float_base_1_plus_x_prec_round({b:#x}, {prec}, {rm}) = ({z:#x}, {o:?})"
         );
     }
 }
@@ -60,7 +89,24 @@ fn demo_big_exponent_float_log_base_big_exponent_float_base_1_plus_x_prec(
     {
         let (z, o) = x.log_base_big_exponent_float_base_1_plus_x_prec_ref(&b, prec);
         println!(
-            "{x:#x}.log_base_big_exponent_float_base_1_plus_x_prec({b:#x}, {prec}) = ({z:#x}, {o:?})"
+            "({x}).log_base_big_exponent_float_base_1_plus_x_prec({b}, {prec}) = ({z}, {o:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_log_base_big_exponent_float_base_1_plus_x_prec_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, b, prec, _) in
+        big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_12()
+            .get(gm, config)
+            .take(limit)
+    {
+        let (z, o) = x.log_base_big_exponent_float_base_1_plus_x_prec_ref(&b, prec);
+        println!(
+            "({x:#x}).log_base_big_exponent_float_base_1_plus_x_prec({b:#x}, {prec}) = ({z:#x}, {o:?})"
         );
     }
 }
@@ -77,7 +123,24 @@ fn demo_big_exponent_float_log_base_big_exponent_float_base_1_plus_x_prec_round_
     {
         let (z, o) = x.log_base_big_exponent_float_base_1_plus_x_prec_round_ref(&b, prec, rm);
         println!(
-            "{x:#x}.log_base_big_exponent_float_base_1_plus_x_prec_round({b:#x}, {prec}, {rm}) = ({z:#x}, {o:?})"
+            "({x}).log_base_big_exponent_float_base_1_plus_x_prec_round({b}, {prec}, {rm}) = ({z}, {o:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_log_base_big_exponent_float_base_1_plus_x_prec_round_in_domain_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, b, prec, rm) in
+        big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_14()
+            .get(gm, config)
+            .take(limit)
+    {
+        let (z, o) = x.log_base_big_exponent_float_base_1_plus_x_prec_round_ref(&b, prec, rm);
+        println!(
+            "({x:#x}).log_base_big_exponent_float_base_1_plus_x_prec_round({b:#x}, {prec}, {rm}) = ({z:#x}, {o:?})"
         );
     }
 }

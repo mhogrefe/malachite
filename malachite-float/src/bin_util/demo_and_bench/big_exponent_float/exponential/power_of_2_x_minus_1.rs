@@ -19,14 +19,30 @@ pub(crate) fn register(runner: &mut Runner) {
         runner,
         demo_big_exponent_float_power_of_2_x_minus_1_prec_round
     );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_power_of_2_x_minus_1_prec_round_debug
+    );
     register_demo!(runner, demo_big_exponent_float_power_of_2_x_minus_1_prec);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_power_of_2_x_minus_1_prec_debug
+    );
     register_demo!(
         runner,
         demo_big_exponent_float_power_of_2_x_minus_1_rational_prec_round
     );
     register_demo!(
         runner,
+        demo_big_exponent_float_power_of_2_x_minus_1_rational_prec_round_debug
+    );
+    register_demo!(
+        runner,
         demo_big_exponent_float_power_of_2_x_minus_1_rational_prec
+    );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_power_of_2_x_minus_1_rational_prec_debug
     );
 
     register_bench!(
@@ -61,7 +77,21 @@ fn demo_big_exponent_float_power_of_2_x_minus_1_prec_round(
         .take(limit)
     {
         let (z, o) = x.power_of_2_x_minus_1_prec_round_ref(prec, rm);
-        println!("{x:#x}.power_of_2_x_minus_1_prec_round({prec}, {rm}) = ({z:#x}, {o:?})");
+        println!("({x}).power_of_2_x_minus_1_prec_round({prec}, {rm}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_power_of_2_x_minus_1_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, prec, rm) in big_exponent_float_unsigned_rounding_mode_triple_gen_var_12()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = x.power_of_2_x_minus_1_prec_round_ref(prec, rm);
+        println!("({x:#x}).power_of_2_x_minus_1_prec_round({prec}, {rm}) = ({z:#x}, {o:?})");
     }
 }
 
@@ -75,11 +105,41 @@ fn demo_big_exponent_float_power_of_2_x_minus_1_prec(
         .take(limit)
     {
         let (z, o) = x.power_of_2_x_minus_1_prec_ref(prec);
-        println!("{x:#x}.power_of_2_x_minus_1_prec({prec}) = ({z:#x}, {o:?})");
+        println!("({x}).power_of_2_x_minus_1_prec({prec}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_power_of_2_x_minus_1_prec_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, prec, _) in big_exponent_float_unsigned_rounding_mode_triple_gen_var_12()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = x.power_of_2_x_minus_1_prec_ref(prec);
+        println!("({x:#x}).power_of_2_x_minus_1_prec({prec}) = ({z:#x}, {o:?})");
     }
 }
 
 fn demo_big_exponent_float_power_of_2_x_minus_1_rational_prec_round(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, prec, rm) in rational_unsigned_rounding_mode_triple_gen_var_22()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = BigExponentFloat::power_of_2_x_minus_1_rational_prec_round_ref(&x, prec, rm);
+        println!(
+            "BigExponentFloat::power_of_2_x_minus_1_rational_prec_round({x}, {prec}, {rm}) = ({z}, {o:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_power_of_2_x_minus_1_rational_prec_round_debug(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -96,6 +156,22 @@ fn demo_big_exponent_float_power_of_2_x_minus_1_rational_prec_round(
 }
 
 fn demo_big_exponent_float_power_of_2_x_minus_1_rational_prec(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, prec, _) in rational_unsigned_rounding_mode_triple_gen_var_22()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = BigExponentFloat::power_of_2_x_minus_1_rational_prec_ref(&x, prec);
+        println!(
+            "BigExponentFloat::power_of_2_x_minus_1_rational_prec({x}, {prec}) = ({z}, {o:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_power_of_2_x_minus_1_rational_prec_debug(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,

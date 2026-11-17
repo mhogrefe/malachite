@@ -17,9 +17,13 @@ use malachite_q::test_util::bench::bucketers::quadruple_1_3_rational_bit_u64_max
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_root_u_prec_round);
+    register_demo!(runner, demo_big_exponent_float_root_u_prec_round_debug);
     register_demo!(runner, demo_big_exponent_float_root_u_prec);
+    register_demo!(runner, demo_big_exponent_float_root_u_prec_debug);
     register_demo!(runner, demo_big_exponent_float_root_s_prec_round);
+    register_demo!(runner, demo_big_exponent_float_root_s_prec_round_debug);
     register_demo!(runner, demo_big_exponent_float_root_s_prec);
+    register_demo!(runner, demo_big_exponent_float_root_s_prec_debug);
 
     register_bench!(
         runner,
@@ -54,7 +58,12 @@ pub(crate) fn register(runner: &mut Runner) {
         benchmark_big_exponent_float_root_s_prec_round_float_comparison
     );
     register_demo!(runner, demo_big_exponent_float_root_u_rational_prec_round);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_root_u_rational_prec_round_debug
+    );
     register_demo!(runner, demo_big_exponent_float_root_u_rational_prec);
+    register_demo!(runner, demo_big_exponent_float_root_u_rational_prec_debug);
     register_bench!(
         runner,
         benchmark_big_exponent_float_root_u_rational_prec_round_evaluation_strategy
@@ -64,7 +73,12 @@ pub(crate) fn register(runner: &mut Runner) {
         benchmark_big_exponent_float_root_u_rational_prec_round_float_comparison
     );
     register_demo!(runner, demo_big_exponent_float_root_s_rational_prec_round);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_root_s_rational_prec_round_debug
+    );
     register_demo!(runner, demo_big_exponent_float_root_s_rational_prec);
+    register_demo!(runner, demo_big_exponent_float_root_s_rational_prec_debug);
     register_bench!(
         runner,
         benchmark_big_exponent_float_root_s_rational_prec_round_evaluation_strategy
@@ -81,7 +95,17 @@ fn demo_big_exponent_float_root_u_prec_round(gm: GenMode, config: &GenConfig, li
         .take(limit)
     {
         let (z, o) = x.root_u_prec_round_ref(k, prec, rm);
-        println!("{x:#x}.root_u_prec_round({k}, {prec}, {rm}) = ({z:#x}, {o:?})");
+        println!("({x}).root_u_prec_round({k}, {prec}, {rm}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_root_u_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, k, prec, rm) in big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = x.root_u_prec_round_ref(k, prec, rm);
+        println!("({x:#x}).root_u_prec_round({k}, {prec}, {rm}) = ({z:#x}, {o:?})");
     }
 }
 
@@ -91,7 +115,17 @@ fn demo_big_exponent_float_root_u_prec(gm: GenMode, config: &GenConfig, limit: u
         .take(limit)
     {
         let (z, o) = x.root_u_prec_ref(k, prec);
-        println!("{x:#x}.root_u_prec({k}, {prec}) = ({z:#x}, {o:?})");
+        println!("({x}).root_u_prec({k}, {prec}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_root_u_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, k, prec) in big_exponent_float_unsigned_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = x.root_u_prec_ref(k, prec);
+        println!("({x:#x}).root_u_prec({k}, {prec}) = ({z:#x}, {o:?})");
     }
 }
 
@@ -226,7 +260,17 @@ fn demo_big_exponent_float_root_s_prec_round(gm: GenMode, config: &GenConfig, li
         .take(limit)
     {
         let (z, o) = x.root_s_prec_round_ref(k, prec, rm);
-        println!("{x:#x}.root_s_prec_round({k}, {prec}, {rm}) = ({z:#x}, {o:?})");
+        println!("({x}).root_s_prec_round({k}, {prec}, {rm}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_root_s_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, k, prec, rm) in big_exponent_float_signed_unsigned_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = x.root_s_prec_round_ref(k, prec, rm);
+        println!("({x:#x}).root_s_prec_round({k}, {prec}, {rm}) = ({z:#x}, {o:?})");
     }
 }
 
@@ -236,7 +280,17 @@ fn demo_big_exponent_float_root_s_prec(gm: GenMode, config: &GenConfig, limit: u
         .take(limit)
     {
         let (z, o) = x.root_s_prec_ref(k, prec);
-        println!("{x:#x}.root_s_prec({k}, {prec}) = ({z:#x}, {o:?})");
+        println!("({x}).root_s_prec({k}, {prec}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_root_s_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, k, prec) in big_exponent_float_signed_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = x.root_s_prec_ref(k, prec);
+        println!("({x:#x}).root_s_prec({k}, {prec}) = ({z:#x}, {o:?})");
     }
 }
 
@@ -377,12 +431,43 @@ fn demo_big_exponent_float_root_u_rational_prec_round(
         let (z, o) = BigExponentFloat::root_u_rational_prec_round_ref(&x, k, prec, rm);
         println!(
             "BigExponentFloat::root_u_rational_prec_round({x}, {k}, {prec}, {rm}) = \
+            ({z}, {o:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_root_u_rational_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, k, prec, rm) in rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_3()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = BigExponentFloat::root_u_rational_prec_round_ref(&x, k, prec, rm);
+        println!(
+            "BigExponentFloat::root_u_rational_prec_round({x}, {k}, {prec}, {rm}) = \
             ({z:#x}, {o:?})"
         );
     }
 }
 
 fn demo_big_exponent_float_root_u_rational_prec(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, k, prec, _) in rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_3()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = BigExponentFloat::root_u_rational_prec_ref(&x, k, prec);
+        println!("BigExponentFloat::root_u_rational_prec({x}, {k}, {prec}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_root_u_rational_prec_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
     for (x, k, prec, _) in rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_3()
         .get(gm, config)
         .take(limit)
@@ -464,12 +549,43 @@ fn demo_big_exponent_float_root_s_rational_prec_round(
         let (z, o) = BigExponentFloat::root_s_rational_prec_round_ref(&x, k, prec, rm);
         println!(
             "BigExponentFloat::root_s_rational_prec_round({x}, {k}, {prec}, {rm}) = \
+            ({z}, {o:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_root_s_rational_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, k, prec, rm) in rational_signed_unsigned_rounding_mode_quadruple_gen_var_2()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = BigExponentFloat::root_s_rational_prec_round_ref(&x, k, prec, rm);
+        println!(
+            "BigExponentFloat::root_s_rational_prec_round({x}, {k}, {prec}, {rm}) = \
             ({z:#x}, {o:?})"
         );
     }
 }
 
 fn demo_big_exponent_float_root_s_rational_prec(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, k, prec, _) in rational_signed_unsigned_rounding_mode_quadruple_gen_var_2()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = BigExponentFloat::root_s_rational_prec_ref(&x, k, prec);
+        println!("BigExponentFloat::root_s_rational_prec({x}, {k}, {prec}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_root_s_rational_prec_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
     for (x, k, prec, _) in rational_signed_unsigned_rounding_mode_quadruple_gen_var_2()
         .get(gm, config)
         .take(limit)

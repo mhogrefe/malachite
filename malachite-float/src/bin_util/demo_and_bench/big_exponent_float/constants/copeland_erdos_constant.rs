@@ -27,13 +27,29 @@ pub(crate) fn register(runner: &mut Runner) {
     );
     register_demo!(
         runner,
+        demo_big_exponent_float_copeland_erdos_constant_base_prec_round_debug
+    );
+    register_demo!(
+        runner,
         demo_big_exponent_float_copeland_erdos_constant_base_prec
+    );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_copeland_erdos_constant_base_prec_debug
     );
     register_demo!(
         runner,
         demo_big_exponent_float_copeland_erdos_constant_prec_round
     );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_copeland_erdos_constant_prec_round_debug
+    );
     register_demo!(runner, demo_big_exponent_float_copeland_erdos_constant_prec);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_copeland_erdos_constant_prec_debug
+    );
 
     register_bench!(
         runner,
@@ -54,6 +70,22 @@ pub(crate) fn register(runner: &mut Runner) {
 }
 
 fn demo_big_exponent_float_copeland_erdos_constant_base_prec_round(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (b, p, rm) in unsigned_unsigned_rounding_mode_triple_gen_var_10()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (x, o) = BigExponentFloat::copeland_erdos_constant_base_prec_round(b, p, rm);
+        println!(
+            "BigExponentFloat::copeland_erdos_constant_base_prec_round({b}, {p}, {rm}) = ({x}, {o:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_copeland_erdos_constant_base_prec_round_debug(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -103,6 +135,17 @@ fn demo_big_exponent_float_copeland_erdos_constant_base_prec(
 ) {
     for (b, p) in unsigned_pair_gen_var_51().get(gm, config).take(limit) {
         let (x, o) = BigExponentFloat::copeland_erdos_constant_base_prec(b, p);
+        println!("BigExponentFloat::copeland_erdos_constant_base_prec({b}, {p}) = ({x}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_copeland_erdos_constant_base_prec_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (b, p) in unsigned_pair_gen_var_51().get(gm, config).take(limit) {
+        let (x, o) = BigExponentFloat::copeland_erdos_constant_base_prec(b, p);
         println!("BigExponentFloat::copeland_erdos_constant_base_prec({b}, {p}) = ({x:#x}, {o:?})");
     }
 }
@@ -133,6 +176,20 @@ fn benchmark_big_exponent_float_copeland_erdos_constant_base_prec_float_comparis
 }
 
 fn demo_big_exponent_float_copeland_erdos_constant_prec_round(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (p, rm) in unsigned_rounding_mode_pair_gen_var_4()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (x, o) = BigExponentFloat::copeland_erdos_constant_prec_round(p, rm);
+        println!("BigExponentFloat::copeland_erdos_constant_prec_round({p}, {rm}) = ({x}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_copeland_erdos_constant_prec_round_debug(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -174,6 +231,17 @@ fn benchmark_big_exponent_float_copeland_erdos_constant_prec_round_float_compari
 }
 
 fn demo_big_exponent_float_copeland_erdos_constant_prec(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for p in unsigned_gen_var_11().get(gm, config).take(limit) {
+        let (x, o) = BigExponentFloat::copeland_erdos_constant_prec(p);
+        println!("BigExponentFloat::copeland_erdos_constant_prec({p}) = ({x}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_copeland_erdos_constant_prec_debug(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,

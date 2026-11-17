@@ -22,8 +22,14 @@ use malachite_nz::natural::Natural;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_natural_rounding_from);
+    register_demo!(runner, demo_big_exponent_float_natural_rounding_from_debug);
     register_demo!(runner, demo_big_exponent_float_natural_try_from);
+    register_demo!(runner, demo_big_exponent_float_natural_try_from_debug);
     register_demo!(runner, demo_big_exponent_float_natural_convertible_from);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_natural_convertible_from_debug
+    );
 
     register_bench!(
         runner,
@@ -54,6 +60,27 @@ fn demo_big_exponent_float_natural_rounding_from(gm: GenMode, config: &GenConfig
         .take(limit)
     {
         println!(
+            "Natural::rounding_from({x}, {rm}) = {:?}",
+            Natural::rounding_from(&x, rm)
+        );
+    }
+}
+
+fn demo_big_exponent_float_natural_rounding_from_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, rm) in big_exponent_float_rounding_mode_pair_gen_var_1()
+        .get(gm, config)
+        .filter(|(x, rm)| {
+            x.is_finite()
+                && (x.is_sign_positive() || matches!(rm, Ceiling | Down | Nearest))
+                && (*rm != Exact || Natural::convertible_from(x))
+        })
+        .take(limit)
+    {
+        println!(
             "Natural::rounding_from({x:#x}, {rm}) = {:?}",
             Natural::rounding_from(&x, rm)
         );
@@ -62,11 +89,30 @@ fn demo_big_exponent_float_natural_rounding_from(gm: GenMode, config: &GenConfig
 
 fn demo_big_exponent_float_natural_try_from(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in big_exponent_float_gen_var_2().get(gm, config).take(limit) {
+        println!("Natural::try_from({x}) = {:?}", Natural::try_from(&x));
+    }
+}
+
+fn demo_big_exponent_float_natural_try_from_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in big_exponent_float_gen_var_2().get(gm, config).take(limit) {
         println!("Natural::try_from({x:#x}) = {:?}", Natural::try_from(&x));
     }
 }
 
 fn demo_big_exponent_float_natural_convertible_from(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in big_exponent_float_gen_var_2().get(gm, config).take(limit) {
+        println!(
+            "Natural::convertible_from({x}) = {}",
+            Natural::convertible_from(&x)
+        );
+    }
+}
+
+fn demo_big_exponent_float_natural_convertible_from_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
     for x in big_exponent_float_gen_var_2().get(gm, config).take(limit) {
         println!(
             "Natural::convertible_from({x:#x}) = {}",

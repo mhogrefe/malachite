@@ -477,6 +477,6 @@ int
 run_arf_qfused(const char * arg)
 {
     checked = 0;
-    int result = for_each_line(arg, check_line);
+    int result = arf_for_each_line(arg, check_line);
     return result != 0 ? result : require_some_lines("arf_qfused", checked);
 }

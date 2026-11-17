@@ -15,8 +15,11 @@ use malachite_float::test_util::generators::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_average_prec_round);
+    register_demo!(runner, demo_big_exponent_float_average_prec_round_debug);
     register_demo!(runner, demo_big_exponent_float_average_prec);
+    register_demo!(runner, demo_big_exponent_float_average_prec_debug);
     register_demo!(runner, demo_big_exponent_float_average);
+    register_demo!(runner, demo_big_exponent_float_average_debug);
 
     register_bench!(
         runner,
@@ -39,7 +42,18 @@ fn demo_big_exponent_float_average_prec_round(gm: GenMode, config: &GenConfig, l
             .take(limit)
     {
         let (z, o) = x.average_prec_round_ref_ref(&y, prec, rm);
-        println!("{x:#x}.average_prec_round({y:#x}, {prec}, {rm}) = ({z:#x}, {o:?})");
+        println!("({x}).average_prec_round({y}, {prec}, {rm}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_average_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec, rm) in
+        big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_7()
+            .get(gm, config)
+            .take(limit)
+    {
+        let (z, o) = x.average_prec_round_ref_ref(&y, prec, rm);
+        println!("({x:#x}).average_prec_round({y:#x}, {prec}, {rm}) = ({z:#x}, {o:?})");
     }
 }
 
@@ -49,7 +63,17 @@ fn demo_big_exponent_float_average_prec(gm: GenMode, config: &GenConfig, limit: 
         .take(limit)
     {
         let (z, o) = x.average_prec_ref_ref(&y, prec);
-        println!("{x:#x}.average_prec({y:#x}, {prec}) = ({z:#x}, {o:?})");
+        println!("({x}).average_prec({y}, {prec}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_average_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in big_exponent_float_big_exponent_float_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = x.average_prec_ref_ref(&y, prec);
+        println!("({x:#x}).average_prec({y:#x}, {prec}) = ({z:#x}, {o:?})");
     }
 }
 
@@ -140,7 +164,16 @@ fn demo_big_exponent_float_average(gm: GenMode, config: &GenConfig, limit: usize
         .get(gm, config)
         .take(limit)
     {
-        println!("{x:#x}.average({y:#x}) = {:#x}", (&x).average(&y));
+        println!("({x}).average({y}) = {}", (&x).average(&y));
+    }
+}
+
+fn demo_big_exponent_float_average_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in big_exponent_float_pair_gen_var_2()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!("({x:#x}).average({y:#x}) = {:#x}", (&x).average(&y));
     }
 }
 

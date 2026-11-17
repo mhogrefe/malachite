@@ -20,15 +20,38 @@ use malachite_float::test_util::generators::{
 
 pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_demos!(runner, demo_big_exponent_float_eq_abs_unsigned);
+    register_unsigned_demos!(runner, demo_big_exponent_float_eq_abs_unsigned_debug);
     register_unsigned_demos!(runner, demo_unsigned_eq_abs_big_exponent_float);
+    register_unsigned_demos!(runner, demo_unsigned_eq_abs_big_exponent_float_debug);
     register_signed_demos!(runner, demo_big_exponent_float_eq_abs_signed);
+    register_signed_demos!(runner, demo_big_exponent_float_eq_abs_signed_debug);
     register_signed_demos!(runner, demo_signed_eq_abs_big_exponent_float);
+    register_signed_demos!(runner, demo_signed_eq_abs_big_exponent_float_debug);
 
     register_unsigned_benches!(runner, benchmark_big_exponent_float_eq_abs_unsigned);
     register_signed_benches!(runner, benchmark_big_exponent_float_eq_abs_signed);
 }
 
 fn demo_big_exponent_float_eq_abs_unsigned<T: PrimitiveUnsigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    BigExponentFloat: EqAbs<T>,
+{
+    for (x, y) in big_exponent_float_unsigned_pair_gen::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
+        if x.eq_abs(&y) {
+            println!("|{x}| = |{y}|");
+        } else {
+            println!("|{x}| ≠ |{y}|");
+        }
+    }
+}
+
+fn demo_big_exponent_float_eq_abs_unsigned_debug<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -48,6 +71,23 @@ fn demo_big_exponent_float_eq_abs_unsigned<T: PrimitiveUnsigned>(
 }
 
 fn demo_unsigned_eq_abs_big_exponent_float<T: PrimitiveUnsigned + EqAbs<BigExponentFloat>>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y) in big_exponent_float_unsigned_pair_gen::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
+        if y.eq_abs(&x) {
+            println!("|{y}| = |{x}|");
+        } else {
+            println!("|{y}| ≠ |{x}|");
+        }
+    }
+}
+
+fn demo_unsigned_eq_abs_big_exponent_float_debug<T: PrimitiveUnsigned + EqAbs<BigExponentFloat>>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -98,6 +138,25 @@ fn demo_big_exponent_float_eq_abs_signed<T: PrimitiveSigned>(
         .take(limit)
     {
         if x.eq_abs(&y) {
+            println!("|{x}| = |{y}|");
+        } else {
+            println!("|{x}| ≠ |{y}|");
+        }
+    }
+}
+
+fn demo_big_exponent_float_eq_abs_signed_debug<T: PrimitiveSigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    BigExponentFloat: EqAbs<T>,
+{
+    for (x, y) in big_exponent_float_signed_pair_gen::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
+        if x.eq_abs(&y) {
             println!("|{x:#x}| = |{y}|");
         } else {
             println!("|{x:#x}| ≠ |{y}|");
@@ -106,6 +165,23 @@ fn demo_big_exponent_float_eq_abs_signed<T: PrimitiveSigned>(
 }
 
 fn demo_signed_eq_abs_big_exponent_float<T: PrimitiveSigned + EqAbs<BigExponentFloat>>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y) in big_exponent_float_signed_pair_gen::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
+        if y.eq_abs(&x) {
+            println!("|{y}| = |{x}|");
+        } else {
+            println!("|{y}| ≠ |{x}|");
+        }
+    }
+}
+
+fn demo_signed_eq_abs_big_exponent_float_debug<T: PrimitiveSigned + EqAbs<BigExponentFloat>>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,

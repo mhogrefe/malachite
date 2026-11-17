@@ -13,12 +13,26 @@ use malachite_float::test_util::generators::big_exponent_float_gen;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_canonical_unit_i_pow);
+    register_demo!(runner, demo_big_exponent_float_canonical_unit_i_pow_debug);
 }
 
 fn demo_big_exponent_float_canonical_unit_i_pow(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in big_exponent_float_gen().get(gm, config).take(limit) {
         println!(
-            "{x:#x}.canonical_unit_i_pow() = {}",
+            "({x}).canonical_unit_i_pow() = {}",
+            x.canonical_unit_i_pow()
+        );
+    }
+}
+
+fn demo_big_exponent_float_canonical_unit_i_pow_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for x in big_exponent_float_gen().get(gm, config).take(limit) {
+        println!(
+            "({x:#x}).canonical_unit_i_pow() = {}",
             x.canonical_unit_i_pow()
         );
     }

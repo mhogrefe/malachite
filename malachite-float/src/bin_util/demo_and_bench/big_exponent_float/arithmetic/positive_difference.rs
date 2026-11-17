@@ -18,8 +18,17 @@ pub(crate) fn register(runner: &mut Runner) {
         runner,
         demo_big_exponent_float_positive_difference_prec_round
     );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_positive_difference_prec_round_debug
+    );
     register_demo!(runner, demo_big_exponent_float_positive_difference_prec);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_positive_difference_prec_debug
+    );
     register_demo!(runner, demo_big_exponent_float_positive_difference);
+    register_demo!(runner, demo_big_exponent_float_positive_difference_debug);
 
     register_bench!(
         runner,
@@ -35,7 +44,15 @@ pub(crate) fn register(runner: &mut Runner) {
     );
     register_demo!(
         runner,
+        demo_big_exponent_float_positive_difference_rational_prec_round_debug
+    );
+    register_demo!(
+        runner,
         demo_big_exponent_float_positive_difference_rational_prec
+    );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_positive_difference_rational_prec_debug
     );
     register_demo!(
         runner,
@@ -43,7 +60,15 @@ pub(crate) fn register(runner: &mut Runner) {
     );
     register_demo!(
         runner,
+        demo_big_exponent_float_rational_positive_difference_big_exponent_float_prec_round_debug
+    );
+    register_demo!(
+        runner,
         demo_big_exponent_float_rational_positive_difference_big_exponent_float_prec
+    );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_rational_positive_difference_big_exponent_float_prec_debug
     );
     register_bench!(
         runner,
@@ -68,7 +93,22 @@ fn demo_big_exponent_float_positive_difference_prec_round(
             .take(limit)
     {
         let (z, o) = x.positive_difference_prec_round_ref_ref(&y, prec, rm);
-        println!("{x:#x}.positive_difference_prec_round({y:#x}, {prec}, {rm}) = ({z:#x}, {o:?})");
+        println!("({x}).positive_difference_prec_round({y}, {prec}, {rm}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_positive_difference_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, prec, rm) in
+        big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_8()
+            .get(gm, config)
+            .take(limit)
+    {
+        let (z, o) = x.positive_difference_prec_round_ref_ref(&y, prec, rm);
+        println!("({x:#x}).positive_difference_prec_round({y:#x}, {prec}, {rm}) = ({z:#x}, {o:?})");
     }
 }
 
@@ -78,7 +118,21 @@ fn demo_big_exponent_float_positive_difference_prec(gm: GenMode, config: &GenCon
         .take(limit)
     {
         let (z, o) = x.positive_difference_prec_ref_ref(&y, prec);
-        println!("{x:#x}.positive_difference_prec({y:#x}, {prec}) = ({z:#x}, {o:?})");
+        println!("({x}).positive_difference_prec({y}, {prec}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_positive_difference_prec_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, prec) in big_exponent_float_big_exponent_float_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = x.positive_difference_prec_ref_ref(&y, prec);
+        println!("({x:#x}).positive_difference_prec({y:#x}, {prec}) = ({z:#x}, {o:?})");
     }
 }
 
@@ -170,7 +224,23 @@ fn demo_big_exponent_float_positive_difference(gm: GenMode, config: &GenConfig, 
         .take(limit)
     {
         println!(
-            "{x:#x}.positive_difference({y:#x}) = {:#x}",
+            "({x}).positive_difference({y}) = {}",
+            x.positive_difference_ref_ref(&y)
+        );
+    }
+}
+
+fn demo_big_exponent_float_positive_difference_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y) in big_exponent_float_pair_gen_var_2()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "({x:#x}).positive_difference({y:#x}) = {:#x}",
             x.positive_difference_ref_ref(&y)
         );
     }
@@ -186,8 +256,22 @@ fn demo_big_exponent_float_positive_difference_rational_prec_round(
         .take(limit)
     {
         let (z, o) = x.positive_difference_rational_prec_round_ref_ref(&y, prec, rm);
+        println!("({x}).positive_difference_rational_prec_round({y}, {prec}, {rm}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_positive_difference_rational_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, prec, rm) in big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_7()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = x.positive_difference_rational_prec_round_ref_ref(&y, prec, rm);
         println!(
-            "{x:#x}.positive_difference_rational_prec_round({y}, {prec}, {rm}) = ({z:#x}, {o:?})"
+            "({x:#x}).positive_difference_rational_prec_round({y}, {prec}, {rm}) = ({z:#x}, {o:?})"
         );
     }
 }
@@ -202,7 +286,21 @@ fn demo_big_exponent_float_positive_difference_rational_prec(
         .take(limit)
     {
         let (z, o) = x.positive_difference_rational_prec_ref_ref(&y, prec);
-        println!("{x:#x}.positive_difference_rational_prec({y}, {prec}) = ({z:#x}, {o:?})");
+        println!("({x}).positive_difference_rational_prec({y}, {prec}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_positive_difference_rational_prec_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, prec) in big_exponent_float_rational_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = x.positive_difference_rational_prec_ref_ref(&y, prec);
+        println!("({x:#x}).positive_difference_rational_prec({y}, {prec}) = ({z:#x}, {o:?})");
     }
 }
 
@@ -303,12 +401,49 @@ fn demo_big_exponent_float_rational_positive_difference_big_exponent_float_prec_
                 &x, &y, prec, rm,
             );
         println!(
+            "BigExponentFloat::rational_positive_difference_big_exponent_float_prec_round({x}, {y}, {prec}, {rm}) = ({z}, {o:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_rational_positive_difference_big_exponent_float_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (y, x, prec, rm) in big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_8()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) =
+            BigExponentFloat::rational_positive_difference_big_exponent_float_prec_round_ref_ref(
+                &x, &y, prec, rm,
+            );
+        println!(
             "BigExponentFloat::rational_positive_difference_big_exponent_float_prec_round({x}, {y:#x}, {prec}, {rm}) = ({z:#x}, {o:?})"
         );
     }
 }
 
 fn demo_big_exponent_float_rational_positive_difference_big_exponent_float_prec(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (y, x, prec) in big_exponent_float_rational_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = BigExponentFloat::rational_positive_difference_big_exponent_float_prec_ref_ref(
+            &x, &y, prec,
+        );
+        println!(
+            "BigExponentFloat::rational_positive_difference_big_exponent_float_prec({x}, {y}, {prec}) = ({z}, {o:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_rational_positive_difference_big_exponent_float_prec_debug(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,

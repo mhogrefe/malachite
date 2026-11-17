@@ -14,7 +14,9 @@ use malachite_float::test_util::generators::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_ln_1_plus_x_prec_round);
+    register_demo!(runner, demo_big_exponent_float_ln_1_plus_x_prec_round_debug);
     register_demo!(runner, demo_big_exponent_float_ln_1_plus_x_prec);
+    register_demo!(runner, demo_big_exponent_float_ln_1_plus_x_prec_debug);
 
     register_bench!(
         runner,
@@ -36,7 +38,21 @@ fn demo_big_exponent_float_ln_1_plus_x_prec_round(gm: GenMode, config: &GenConfi
         .take(limit)
     {
         let (z, o) = x.ln_1_plus_x_prec_round_ref(prec, rm);
-        println!("{x:#x}.ln_1_plus_x_prec_round({prec}, {rm}) = ({z:#x}, {o:?})");
+        println!("({x}).ln_1_plus_x_prec_round({prec}, {rm}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_ln_1_plus_x_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, prec, rm) in big_exponent_float_unsigned_rounding_mode_triple_gen_var_16()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = x.ln_1_plus_x_prec_round_ref(prec, rm);
+        println!("({x:#x}).ln_1_plus_x_prec_round({prec}, {rm}) = ({z:#x}, {o:?})");
     }
 }
 
@@ -46,7 +62,17 @@ fn demo_big_exponent_float_ln_1_plus_x_prec(gm: GenMode, config: &GenConfig, lim
         .take(limit)
     {
         let (z, o) = x.ln_1_plus_x_prec_ref(prec);
-        println!("{x:#x}.ln_1_plus_x_prec({prec}) = ({z:#x}, {o:?})");
+        println!("({x}).ln_1_plus_x_prec({prec}) = ({z}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_ln_1_plus_x_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec, _) in big_exponent_float_unsigned_rounding_mode_triple_gen_var_16()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = x.ln_1_plus_x_prec_ref(prec);
+        println!("({x:#x}).ln_1_plus_x_prec({prec}) = ({z:#x}, {o:?})");
     }
 }
 

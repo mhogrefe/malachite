@@ -22,10 +22,16 @@ use malachite_float::{ComparableFloat, Float};
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_float_try_from);
+    register_demo!(runner, demo_big_exponent_float_float_try_from_debug);
     register_demo!(runner, demo_big_exponent_float_float_convertible_from);
+    register_demo!(runner, demo_big_exponent_float_float_convertible_from_debug);
     register_demo!(
         runner,
         demo_big_exponent_float_float_from_big_exponent_float_prec_round
+    );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_float_from_big_exponent_float_prec_round_debug
     );
 
     register_bench!(
@@ -40,6 +46,12 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_big_exponent_float_float_try_from(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in big_exponent_float_gen().get(gm, config).take(limit) {
+        println!("Float::try_from({x}) = {:?}", Float::try_from(&x));
+    }
+}
+
+fn demo_big_exponent_float_float_try_from_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in big_exponent_float_gen().get(gm, config).take(limit) {
         println!(
             "Float::try_from({x:#x}) = {:?}",
             Float::try_from(&x).map(|f| format!("{:#x}", ComparableFloat(f)))
@@ -50,6 +62,19 @@ fn demo_big_exponent_float_float_try_from(gm: GenMode, config: &GenConfig, limit
 fn demo_big_exponent_float_float_convertible_from(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in big_exponent_float_gen().get(gm, config).take(limit) {
         println!(
+            "Float::convertible_from({x}) = {}",
+            Float::convertible_from(&x)
+        );
+    }
+}
+
+fn demo_big_exponent_float_float_convertible_from_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for x in big_exponent_float_gen().get(gm, config).take(limit) {
+        println!(
             "Float::convertible_from({x:#x}) = {}",
             Float::convertible_from(&x)
         );
@@ -57,6 +82,24 @@ fn demo_big_exponent_float_float_convertible_from(gm: GenMode, config: &GenConfi
 }
 
 fn demo_big_exponent_float_float_from_big_exponent_float_prec_round(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, prec, rm) in big_exponent_float_unsigned_rounding_mode_triple_gen_var_1()
+        .get(gm, config)
+        .filter(|(x, _, rm)| *rm != Exact || Float::convertible_from(x))
+        .take(limit)
+    {
+        let (f, o) = Float::from_big_exponent_float_prec_round_ref(&x, prec, rm);
+        println!(
+            "Float::from_big_exponent_float_prec_round({x}, {prec}, {rm}) = ({}, {o:?})",
+            ComparableFloat(f)
+        );
+    }
+}
+
+fn demo_big_exponent_float_float_from_big_exponent_float_prec_round_debug(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
