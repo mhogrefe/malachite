@@ -79,3 +79,9 @@ pub mod power_of_2_of_big_exponent_float;
 /// Functions for computing $2^x-1$ for [`BigExponentFloat`](super::BigExponentFloat)s and
 /// [`Rational`](malachite_q::Rational)s.
 pub mod power_of_2_x_minus_1;
+/// Functions for computing $T_0(x)$, the principal branch of the tree function $T$, of
+/// [`BigExponentFloat`](super::BigExponentFloat)s and [`Rational`](malachite_q::Rational)s.
+pub mod tree_t0;
+/// Functions for computing $T_{-1}(x)$, the other real branch of the tree function $T$, of
+/// [`BigExponentFloat`](super::BigExponentFloat)s and [`Rational`](malachite_q::Rational)s.
+pub mod tree_t_minus_1;

@@ -3424,6 +3424,70 @@ const AZURITE_FLOAT_STAGES: &[(&str, &str)] = &[
         "demo_float_power_of_2_x_minus_1_rational_prec_round_ref_debug",
         "az_float_power_of_2_x_minus_1_rational",
     ),
+    ("demo_float_tree_t0_assign_debug", "az_float_tree_t0"),
+    ("demo_float_tree_t0_debug", "az_float_tree_t0"),
+    ("demo_float_tree_t0_extreme_debug", "az_float_tree_t0"),
+    ("demo_float_tree_t0_prec_debug", "az_float_tree_t0"),
+    ("demo_float_tree_t0_prec_round_debug", "az_float_tree_t0"),
+    (
+        "demo_float_tree_t0_rational_prec_debug",
+        "az_float_tree_t0_rational",
+    ),
+    (
+        "demo_float_tree_t0_rational_prec_ref_debug",
+        "az_float_tree_t0_rational",
+    ),
+    (
+        "demo_float_tree_t0_rational_prec_round_debug",
+        "az_float_tree_t0_rational",
+    ),
+    (
+        "demo_float_tree_t0_rational_prec_round_ref_debug",
+        "az_float_tree_t0_rational",
+    ),
+    ("demo_float_tree_t0_ref_debug", "az_float_tree_t0"),
+    ("demo_float_tree_t0_round_debug", "az_float_tree_t0"),
+    (
+        "demo_float_tree_t_minus_1_assign_debug",
+        "az_float_tree_t_minus_1",
+    ),
+    ("demo_float_tree_t_minus_1_debug", "az_float_tree_t_minus_1"),
+    (
+        "demo_float_tree_t_minus_1_extreme_debug",
+        "az_float_tree_t_minus_1",
+    ),
+    (
+        "demo_float_tree_t_minus_1_prec_debug",
+        "az_float_tree_t_minus_1",
+    ),
+    (
+        "demo_float_tree_t_minus_1_prec_round_debug",
+        "az_float_tree_t_minus_1",
+    ),
+    (
+        "demo_float_tree_t_minus_1_rational_prec_debug",
+        "az_float_tree_t_minus_1_rational",
+    ),
+    (
+        "demo_float_tree_t_minus_1_rational_prec_ref_debug",
+        "az_float_tree_t_minus_1_rational",
+    ),
+    (
+        "demo_float_tree_t_minus_1_rational_prec_round_debug",
+        "az_float_tree_t_minus_1_rational",
+    ),
+    (
+        "demo_float_tree_t_minus_1_rational_prec_round_ref_debug",
+        "az_float_tree_t_minus_1_rational",
+    ),
+    (
+        "demo_float_tree_t_minus_1_ref_debug",
+        "az_float_tree_t_minus_1",
+    ),
+    (
+        "demo_float_tree_t_minus_1_round_debug",
+        "az_float_tree_t_minus_1",
+    ),
     (
         "demo_float_unsigned_pow_rational_prec_round_debug",
         "az_float_unsigned_pow_rational",
@@ -6417,6 +6481,38 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
     (
         "demo_big_exponent_float_power_of_2_x_minus_1_rational_prec_round_debug",
         "az_big_exponent_float_power_of_2_x_minus_1_rational",
+    ),
+    (
+        "demo_big_exponent_float_tree_t0_prec_debug",
+        "az_big_exponent_float_tree_t0",
+    ),
+    (
+        "demo_big_exponent_float_tree_t0_prec_round_debug",
+        "az_big_exponent_float_tree_t0",
+    ),
+    (
+        "demo_big_exponent_float_tree_t0_rational_prec_debug",
+        "az_big_exponent_float_tree_t0_rational",
+    ),
+    (
+        "demo_big_exponent_float_tree_t0_rational_prec_round_debug",
+        "az_big_exponent_float_tree_t0_rational",
+    ),
+    (
+        "demo_big_exponent_float_tree_t_minus_1_prec_debug",
+        "az_big_exponent_float_tree_t_minus_1",
+    ),
+    (
+        "demo_big_exponent_float_tree_t_minus_1_prec_round_debug",
+        "az_big_exponent_float_tree_t_minus_1",
+    ),
+    (
+        "demo_big_exponent_float_tree_t_minus_1_rational_prec_debug",
+        "az_big_exponent_float_tree_t_minus_1_rational",
+    ),
+    (
+        "demo_big_exponent_float_tree_t_minus_1_rational_prec_round_debug",
+        "az_big_exponent_float_tree_t_minus_1_rational",
     ),
     (
         "demo_big_exponent_float_unsigned_pow_rational_prec_debug",

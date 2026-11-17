@@ -34,6 +34,8 @@ pub(crate) fn register(runner: &mut Runner) {
     power_of_10_x_minus_1::register(runner);
     power_of_2_of_big_exponent_float::register(runner);
     power_of_2_x_minus_1::register(runner);
+    tree_t0::register(runner);
+    tree_t_minus_1::register(runner);
 }
 
 mod compound;
@@ -61,3 +63,5 @@ mod power_of_10;
 mod power_of_10_x_minus_1;
 mod power_of_2_of_big_exponent_float;
 mod power_of_2_x_minus_1;
+mod tree_t0;
+mod tree_t_minus_1;

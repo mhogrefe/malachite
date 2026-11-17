@@ -64,6 +64,8 @@ documented by git history.
 
 - The `LambertW0`, `LambertW0Assign`, `LambertWMinus1`, and `LambertWMinus1Assign` traits, in
   `num::exponential::traits`, for the two real branches of the Lambert $W$ function.
+- The `TreeT0`, `TreeT0Assign`, `TreeTMinus1`, and `TreeTMinus1Assign` traits, in
+  `num::exponential::traits`, for the two real branches of the tree function $T(x) = -W(-x)$.
 - The `ShrRoundWithOrdering` and `ShrRoundWithOrderingAssign` traits, in
   `num::arithmetic::traits`, for right-shifting a number that is itself an approximation of an
   exact value, given its `Ordering` against that value, and rounding the result.
@@ -1203,7 +1205,7 @@ documented by git history.
     the logarithms to base 2, 10, a power of 2, a `BigExponentFloat`, or a `Rational`, the
     $\log(1+x)$ form of each, and `compound`;
   - the two real branches of the Lambert $W$ function (`lambert_w0` and `lambert_w_minus_1`, with
-    `Rational` forms);
+    `Rational` forms), and those of the tree function (`tree_t0` and `tree_t_minus_1`);
   - the arithmetic-geometric mean (`agm`, with `Rational` forms);
   - the trigonometric functions, their inverses, and `atan2`, each with `_pi` and `_with_period`
     forms and `Rational` forms, and the hyperbolic functions and their inverses; and
@@ -1227,6 +1229,16 @@ documented by git history.
   Halley's iteration is certified by an enclosure from the mean value theorem, inside Ziv's loop.
   The special cases: $W_0(\pm0.0) = \pm0.0$, $W_0(\infty) = \infty$, $W_{-1}(\pm0.0) = -\infty$, and
   `NaN` outside the domain of each branch.
+- The tree function $T(x) = -W(-x)$, a solution of $Te^{-T} = x$, on both of its real branches,
+  named as in the Digital Library of Mathematical Functions: $T_0(x) \leq 1$ for $x \leq 1/e$, and
+  $T_{-1}(x) \geq 1$ for $0 < x \leq 1/e$. `tree_t0` and `tree_t_minus_1` have the same forms as
+  `lambert_w0` and `lambert_w_minus_1`, on `Float` (with the `TreeT0`, `TreeT0Assign`,
+  `TreeTMinus1`, and `TreeTMinus1Assign` traits and the `primitive_float_tree_t0` and
+  `primitive_float_tree_t_minus_1` functions) and on `BigExponentFloat`, and are correctly rounded.
+  They are ports of Azurite's `treeT0PrecRound` and `treeTm1PrecRound`: the Lambert $W$ function of
+  the negated argument, rounded in the opposite direction and negated. The special cases:
+  $T_0(\pm0.0) = \pm0.0$, $T_0(-\infty) = -\infty$, $T_{-1}(\pm0.0) = \infty$, and `NaN` outside the
+  domain of each branch.
 - `Float`'s internal `ExtendedFloat` type, which carried an extra exponent offset through the
   logarithms, the arithmetic-geometric mean, and $\log 2$, has been replaced by
   `BigExponentFloat`. Results and running times are unchanged.

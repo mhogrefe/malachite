@@ -286,6 +286,8 @@ pub mod big_exponent_float {
         pub mod power_of_10_x_minus_1;
         pub mod power_of_2_of_big_exponent_float;
         pub mod power_of_2_x_minus_1;
+        pub mod tree_t0;
+        pub mod tree_t_minus_1;
     }
     pub mod trigonometric {
         pub mod acos;
@@ -531,6 +533,8 @@ pub mod float {
         pub mod power_of_10_x_minus_1;
         pub mod power_of_2_of_float;
         pub mod power_of_2_x_minus_1;
+        pub mod tree_t0;
+        pub mod tree_t_minus_1;
     }
     pub mod hyperbolic {
         pub mod acosh;

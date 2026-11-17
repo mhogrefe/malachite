@@ -285,3 +285,27 @@ pub trait PowerOf10<POW> {
 pub trait PowerOf10Assign {
     fn power_of_10_assign(&mut self);
 }
+
+/// Computes $T_0(x)$, the principal branch of the tree function $T$.
+pub trait TreeT0 {
+    type Output;
+
+    fn tree_t0(self) -> Self::Output;
+}
+
+/// Replaces a number $x$ with $T_0(x)$, the principal branch of the tree function $T$.
+pub trait TreeT0Assign {
+    fn tree_t0_assign(&mut self);
+}
+
+/// Computes $T_{-1}(x)$, the other real branch of the tree function $T$.
+pub trait TreeTMinus1 {
+    type Output;
+
+    fn tree_t_minus_1(self) -> Self::Output;
+}
+
+/// Replaces a number $x$ with $T_{-1}(x)$, the other real branch of the tree function $T$.
+pub trait TreeTMinus1Assign {
+    fn tree_t_minus_1_assign(&mut self);
+}

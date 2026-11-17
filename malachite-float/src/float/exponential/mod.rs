@@ -13,7 +13,8 @@ use malachite_base::num::exponential::traits::{
     LogBase, LogBase2, LogBase2Assign, LogBase2Of1PlusX, LogBase2Of1PlusXAssign, LogBase10,
     LogBase10Assign, LogBase10Of1PlusX, LogBase10Of1PlusXAssign, LogBaseAssign, LogBaseOf1PlusX,
     LogBaseOf1PlusXAssign, LogBasePowerOf2, LogBasePowerOf2Assign, LogBasePowerOf2Of1PlusX,
-    LogBasePowerOf2Of1PlusXAssign, PowerOf2XMinus1, PowerOf2XMinus1Assign,
+    LogBasePowerOf2Of1PlusXAssign, PowerOf2XMinus1, PowerOf2XMinus1Assign, TreeT0, TreeT0Assign,
+    TreeTMinus1, TreeTMinus1Assign,
 };
 
 /// [`Compound`] and [`CompoundAssign`], traits for computing the compound function $(1+x)^n$ for
@@ -87,3 +88,9 @@ pub mod power_of_2_of_float;
 /// Implementations of [`PowerOf2XMinus1`] and [`PowerOf2XMinus1Assign`], traits for computing
 /// $2^x-1$.
 pub mod power_of_2_x_minus_1;
+/// [`TreeT0`] and [`TreeT0Assign`], traits for computing $T_0(x)$, the principal branch of the tree
+/// function $T$, for [`Float`](super::Float)s.
+pub mod tree_t0;
+/// [`TreeTMinus1`] and [`TreeTMinus1Assign`], traits for computing $T_{-1}(x)$, the other real
+/// branch of the tree function $T$, for [`Float`](super::Float)s.
+pub mod tree_t_minus_1;

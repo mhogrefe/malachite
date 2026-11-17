@@ -408,6 +408,8 @@ long_lines_exceptions = [
     { file = "malachite-float/src/bin_util/demo_and_bench/big_exponent_float/exponential/lambert_w_minus_1.rs", line = 143 },
     { file = "malachite-float/src/bin_util/demo_and_bench/big_exponent_float/exponential/lambert_w_minus_1.rs", line = 293 },
     { file = "malachite-float/src/bin_util/demo_and_bench/big_exponent_float/exponential/lambert_w_minus_1.rs", line = 301 },
+    { file = "malachite-float/src/bin_util/demo_and_bench/big_exponent_float/exponential/tree_t_minus_1.rs", line = 140 },
+    { file = "malachite-float/src/bin_util/demo_and_bench/big_exponent_float/exponential/tree_t_minus_1.rs", line = 296 },
     { file = "malachite-float/src/test_util/generators/mod.rs", line = 13 },
     { file = "malachite-float/src/test_util/generators/mod.rs", line = 183 },
     { file = "malachite-float/src/test_util/generators/mod.rs", line = 192 },
