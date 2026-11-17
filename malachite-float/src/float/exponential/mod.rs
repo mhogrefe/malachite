@@ -8,11 +8,12 @@
 
 #[cfg(doc)]
 use malachite_base::num::exponential::traits::{
-    Compound, CompoundAssign, Exp, ExpAssign, ExpXMinus1, ExpXMinus1Assign, Ln, Ln1PlusX,
-    Ln1PlusXAssign, LnAssign, LogBase, LogBase2, LogBase2Assign, LogBase2Of1PlusX,
-    LogBase2Of1PlusXAssign, LogBase10, LogBase10Assign, LogBase10Of1PlusX, LogBase10Of1PlusXAssign,
-    LogBaseAssign, LogBaseOf1PlusX, LogBaseOf1PlusXAssign, LogBasePowerOf2, LogBasePowerOf2Assign,
-    LogBasePowerOf2Of1PlusX, LogBasePowerOf2Of1PlusXAssign, PowerOf2XMinus1, PowerOf2XMinus1Assign,
+    Compound, CompoundAssign, Exp, ExpAssign, ExpXMinus1, ExpXMinus1Assign, LambertW0,
+    LambertW0Assign, LambertWMinus1, LambertWMinus1Assign, Ln, Ln1PlusX, Ln1PlusXAssign, LnAssign,
+    LogBase, LogBase2, LogBase2Assign, LogBase2Of1PlusX, LogBase2Of1PlusXAssign, LogBase10,
+    LogBase10Assign, LogBase10Of1PlusX, LogBase10Of1PlusXAssign, LogBaseAssign, LogBaseOf1PlusX,
+    LogBaseOf1PlusXAssign, LogBasePowerOf2, LogBasePowerOf2Assign, LogBasePowerOf2Of1PlusX,
+    LogBasePowerOf2Of1PlusXAssign, PowerOf2XMinus1, PowerOf2XMinus1Assign,
 };
 
 /// [`Compound`] and [`CompoundAssign`], traits for computing the compound function $(1+x)^n$ for
@@ -23,6 +24,12 @@ pub mod exp;
 /// [`ExpXMinus1`] and [`ExpXMinus1Assign`], traits for computing $e^x-1$ for
 /// [`Float`](super::Float)s.
 pub mod exp_x_minus_1;
+/// [`LambertW0`] and [`LambertW0Assign`], traits for computing $W_0(x)$, the principal branch of
+/// the Lambert $W$ function, for [`Float`](super::Float)s.
+pub mod lambert_w0;
+/// [`LambertWMinus1`] and [`LambertWMinus1Assign`], traits for computing $W_{-1}(x)$, the lower
+/// real branch of the Lambert $W$ function, for [`Float`](super::Float)s.
+pub mod lambert_w_minus_1;
 /// [`Ln`] and [`LnAssign`], traits for computing the natural logarithm of [`Float`](super::Float)s.
 pub mod ln;
 /// [`Ln1PlusX`] and [`Ln1PlusXAssign`], traits for computing $\ln(1+x)$ for

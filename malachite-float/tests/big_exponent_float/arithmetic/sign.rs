@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::Sign;
-use malachite_base::num::basic::traits::{NaN, Zero};
+use malachite_base::num::basic::traits::NaN;
 use malachite_float::BigExponentFloat;
 use malachite_float::test_util::big_exponent_float::{
     float_to_big_exponent_float, parse_big_exponent_float_hex,
@@ -50,7 +50,7 @@ fn sign_properties() {
     big_exponent_float_gen().test_properties(|x| {
         if !x.is_nan() {
             let s = x.sign();
-            assert_eq!(s, x.partial_cmp(&BigExponentFloat::ZERO).unwrap());
+            assert_eq!(s, x.partial_cmp(&0u32).unwrap());
             assert_eq!((-&x).sign(), s.reverse());
         }
     });

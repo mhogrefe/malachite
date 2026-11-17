@@ -10,10 +10,15 @@ use crate::big_exponent_float::BigExponentFloat;
 use crate::big_exponent_float::InnerBigExponentFloat::{Finite, Infinity, NaN, Zero};
 use crate::big_exponent_float::exhaustive::*;
 use crate::{Float, InnerFloat};
+use core::cmp::Ordering::{self, *};
 use itertools::Itertools;
-use malachite_base::num::basic::traits::{Infinity as _, NaN as _, NegativeInfinity, Zero as _};
+use malachite_base::num::arithmetic::traits::{Square, UnsignedAbs};
+use malachite_base::num::basic::traits::{
+    Infinity as _, NaN as _, NegativeInfinity, One, Zero as ZeroTrait,
+};
 use malachite_base::num::conversion::traits::FromStringBase;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::stats::common_values_map::common_values_map;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
@@ -165,4 +170,108 @@ pub fn big_exponent_float_exact_string(x: &BigExponentFloat) -> String {
     let k = x.get_exponent().unwrap() - Integer::from(m.significant_bits());
     let sign = if x.is_sign_negative() { "-" } else { "" };
     format!("{sign}{m}*2^{k}")
+}
+
+// Whether `t` is less than W(x), where W is the principal branch W_0 of the Lambert W function if
+// `branch0` and the branch W_{-1} otherwise, and x is in the open domain of the branch (x > -1/e,
+// and x < 0 for W_{-1}), is nonzero, and is not t * e^t. The answer comes from comparing t * e^t
+// with x at growing precision, using that t * e^t increases on [-1, ∞) and decreases on (-∞,
+// -1]: a check of the Lambert W functions that shares nothing with their algorithm but the
+// exponential function. x is given by `cmp_x`, which compares its argument with x.
+//
+// Deciding a tiny `t` that way would take about as many bits as its exponent is negative, so when x
+// is a `BigExponentFloat`, also given as `x_float`, a tiny `t` close to it is first compared using
+// t + t^2 / 2 < t * e^t < t + 2 * t^2, which holds for 0 < |t| < 1.
+pub fn lambert_w_exceeds(
+    branch0: bool,
+    cmp_x: &dyn Fn(&BigExponentFloat) -> Ordering,
+    x_float: Option<&BigExponentFloat>,
+    t: &BigExponentFloat,
+) -> bool {
+    if branch0 {
+        if *t <= -1i32 {
+            return true;
+        }
+    } else if *t >= -1i32 {
+        return false;
+    }
+    if t.is_zero() {
+        return cmp_x(t) == Less;
+    }
+    if let Some(x) = x_float
+        && let (Some(e_x), Some(e_t)) = (x.get_exponent(), t.get_exponent())
+        && *e_t <= -32i32
+        && (e_x - e_t).unsigned_abs() <= 2u32
+    {
+        let d = x - t;
+        let t_squared = t.square();
+        if d < &t_squared >> 1u32 {
+            return false;
+        } else if d > t_squared << 1u32 {
+            return true;
+        }
+    }
+    let mut prec = t.get_prec().unwrap() + 64;
+    loop {
+        let e_lo = t.exp_prec_round_ref(prec, Floor).0;
+        let e_hi = t.exp_prec_round_ref(prec, Ceiling).0;
+        let (f_lo, f_hi) = if t.is_sign_positive() {
+            (
+                t.mul_prec_round_ref_val(e_lo, prec, Floor).0,
+                t.mul_prec_round_ref_val(e_hi, prec, Ceiling).0,
+            )
+        } else {
+            (
+                t.mul_prec_round_ref_val(e_hi, prec, Floor).0,
+                t.mul_prec_round_ref_val(e_lo, prec, Ceiling).0,
+            )
+        };
+        if cmp_x(&f_hi) == Less {
+            return branch0;
+        } else if cmp_x(&f_lo) == Greater {
+            return !branch0;
+        }
+        prec <<= 1;
+    }
+}
+
+// Asserts that `w`, with the `Ordering` `o`, is W(x) correctly rounded to `prec` bits with `rm`,
+// for a finite nonzero `w`, an x as in `lambert_w_exceeds`, and `rm` not `Exact`: that `o` tells
+// the side of W(x) that `w` is on, and that W(x) is closer to `w` than the next number with `prec`
+// bits on that side is (or, for `Nearest`, than the midpoint is).
+pub fn assert_lambert_w_correctly_rounded(
+    branch0: bool,
+    cmp_x: &dyn Fn(&BigExponentFloat) -> Ordering,
+    x_float: Option<&BigExponentFloat>,
+    w: &BigExponentFloat,
+    o: Ordering,
+    prec: u64,
+    rm: RoundingMode,
+) {
+    assert!(w.is_finite() && !w.is_zero());
+    assert!(w.get_prec().unwrap() <= prec);
+    assert_ne!(o, Equal);
+    assert_ne!(rm, Exact);
+    let below = o == Less;
+    assert_eq!(lambert_w_exceeds(branch0, cmp_x, x_float, w), below);
+    let positive = w.is_sign_positive();
+    match rm {
+        Floor => assert!(below),
+        Ceiling => assert!(!below),
+        Down => assert_eq!(below, positive),
+        Up => assert_eq!(below, !positive),
+        _ => {}
+    }
+    // The gap between w and the next number with `prec` bits on the side of W(x): halved when that
+    // side is toward zero and |w| is a power of 2.
+    let mut gap_exponent = w.get_exponent().unwrap() - Integer::from(prec);
+    if below != positive && w.get_prec() == Some(1) {
+        gap_exponent -= Integer::ONE;
+    }
+    if rm == Nearest {
+        gap_exponent -= Integer::ONE;
+    }
+    let gap = big_exponent_float_power_of_2(gap_exponent);
+    let bound = if below { w + gap } else { w - gap };
+    assert_eq!(lambert_w_exceeds(branch0, cmp_x, x_float, &bound), !below);
 }

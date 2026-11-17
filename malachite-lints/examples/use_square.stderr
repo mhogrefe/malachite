@@ -1,5 +1,5 @@
 error: use `square()` (or `square_assign()`) instead of multiplying a value by itself
-  --> $DIR/use_square.rs:10:13
+  --> $DIR/use_square.rs:19:13
    |
 LL |     let _ = &x * &x;
    |             ^^^^^^^
@@ -7,28 +7,96 @@ LL |     let _ = &x * &x;
    = note: `#[deny(use_square)]` on by default
 
 error: use `square()` instead of `pow(2)`
-  --> $DIR/use_square.rs:12:13
+  --> $DIR/use_square.rs:21:13
    |
 LL |     let _ = (&x).pow(2);
    |             ^^^^^^^^^^^
 
 error: use `square_assign()` instead of `pow_assign(2)`
-  --> $DIR/use_square.rs:14:5
+  --> $DIR/use_square.rs:23:5
    |
 LL |     q.pow_assign(2u64);
    |     ^^^^^^^^^^^^^^^^^^
 
 error: use `square()` (or `square_assign()`) instead of multiplying a value by itself
-  --> $DIR/use_square.rs:23:13
+  --> $DIR/use_square.rs:32:13
    |
 LL |     let _ = &g * &g;
    |             ^^^^^^^
 
 error: use `square()` (or `square_assign()`) instead of multiplying a value by itself
-  --> $DIR/use_square.rs:24:13
+  --> $DIR/use_square.rs:33:13
    |
 LL |     let _ = &h * &h;
    |             ^^^^^^^
 
-error: aborting due to 5 previous errors
+error: use `square_prec_ref` instead of multiplying a value by itself
+  --> $DIR/use_square.rs:37:13
+   |
+LL |     let _ = f.mul_prec_ref_ref(&f, 10);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `square_round_ref` instead of multiplying a value by itself
+  --> $DIR/use_square.rs:38:13
+   |
+LL |     let _ = f.mul_round_ref_ref(&f, Floor);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: avoid cloning the receiver: use `mul_prec_round_ref_ref` on a reference instead
+  --> $DIR/use_square.rs:39:13
+   |
+LL |     let _ = f.clone().mul_prec_round_val_ref(&f, 10, Floor);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[deny(clone_with_ref_variant)]` on by default
+
+error: use `square_prec_round_ref` instead of multiplying a value by itself
+  --> $DIR/use_square.rs:39:13
+   |
+LL |     let _ = f.clone().mul_prec_round_val_ref(&f, 10, Floor);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `square()` (or `square_assign()`) instead of multiplying a value by itself
+  --> $DIR/use_square.rs:41:13
+   |
+LL |     let _ = &b * &b;
+   |             ^^^^^^^
+
+error: use `square_prec_ref` instead of multiplying a value by itself
+  --> $DIR/use_square.rs:42:13
+   |
+LL |     let _ = b.mul_prec_ref_ref(&b, 10).0;
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: avoid cloning the argument: use `mul_prec_round_ref_ref` with a reference instead
+  --> $DIR/use_square.rs:43:13
+   |
+LL |     let _ = b.mul_prec_round_ref_val(b.clone(), 10, Floor);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `square_prec_round_ref` instead of multiplying a value by itself
+  --> $DIR/use_square.rs:43:13
+   |
+LL |     let _ = b.mul_prec_round_ref_val(b.clone(), 10, Floor);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: avoid cloning the receiver: use `mul_prec_ref_val` on a reference instead
+  --> $DIR/use_square.rs:44:13
+   |
+LL |     let _ = b.clone().mul_prec(b.clone(), 10);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `square_prec_ref` instead of multiplying a value by itself
+  --> $DIR/use_square.rs:44:13
+   |
+LL |     let _ = b.clone().mul_prec(b.clone(), 10);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `square_prec_assign` instead of multiplying a value by itself
+  --> $DIR/use_square.rs:46:13
+   |
+LL |     let _ = c.mul_prec_assign(c.clone(), 10);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: aborting due to 16 previous errors
 

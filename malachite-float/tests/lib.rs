@@ -264,6 +264,8 @@ pub mod big_exponent_float {
         pub mod compound;
         pub mod exp;
         pub mod exp_x_minus_1;
+        pub mod lambert_w0;
+        pub mod lambert_w_minus_1;
         pub mod ln;
         pub mod ln_1_plus_x;
         pub mod log_base;
@@ -507,6 +509,8 @@ pub mod float {
         pub mod compound;
         pub mod exp;
         pub mod exp_x_minus_1;
+        pub mod lambert_w0;
+        pub mod lambert_w_minus_1;
         pub mod ln;
         pub mod ln_1_plus_x;
         pub mod log_base;

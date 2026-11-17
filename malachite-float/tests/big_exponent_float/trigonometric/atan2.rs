@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::basic::traits::One;
+use malachite_base::num::basic::traits::{One, Two};
 use malachite_base::num::conversion::traits::FromStringBase;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_float::big_exponent_float::ComparableBigExponentFloatRef;
@@ -2068,7 +2068,7 @@ fn atan2_prec_round_fail_1() {
 #[test]
 #[should_panic]
 fn atan2_prec_round_fail_2() {
-    BigExponentFloat::ONE.atan2_prec_round(BigExponentFloat::from(2), 10, Exact);
+    BigExponentFloat::ONE.atan2_prec_round(BigExponentFloat::TWO, 10, Exact);
 }
 
 #[test]
@@ -2080,5 +2080,5 @@ fn atan2_rational_prec_round_fail_1() {
 #[test]
 #[should_panic]
 fn atan2_with_period_prec_round_fail_1() {
-    BigExponentFloat::ONE.atan2_with_period_prec_round(BigExponentFloat::from(2), 7, 10, Exact);
+    BigExponentFloat::ONE.atan2_with_period_prec_round(BigExponentFloat::TWO, 7, 10, Exact);
 }

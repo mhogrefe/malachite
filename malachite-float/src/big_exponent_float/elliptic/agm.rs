@@ -174,7 +174,7 @@ crate_test_fn! {
             return (z, Equal);
         }
         if x == y {
-            return x.clone().round_to_prec_round(prec, rm);
+            return x.round_to_prec_round_ref(prec, rm);
         }
         assert_ne!(rm, Exact, "Inexact BigExponentFloat AGM");
         ziv_loop(prec, rm, |wp| {

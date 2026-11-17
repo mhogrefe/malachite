@@ -266,7 +266,7 @@ fn tiny_atan_asin(s: &BigExponentFloat, ks: u64, w: u64, asin: bool) -> (BigExpo
     let limit = t.get_exponent().unwrap() - Integer::from(w + 2);
     let mut n: u64 = 1;
     loop {
-        power = power.mul_prec_ref_ref(&t2, w).0;
+        power.mul_prec_assign_ref(&t2, w);
         let term = power
             .div_prec_ref_val(BigExponentFloat::from((n << 1) + 1), w)
             .0;
@@ -732,7 +732,11 @@ fn round_eighth_turns(
             ziv_loop(prec, rm, |wp| {
                 let pi = BigExponentFloat::from(Float::pi_prec(wp + 4).0);
                 (
-                    pi.mul_prec_val_ref(&BigExponentFloat::from(3u32), wp + 4).0 >> 2u32,
+                    pi.mul_prec_val_ref(
+                        &const { BigExponentFloat::const_from_unsigned(3) },
+                        wp + 4,
+                    )
+                    .0 >> 2u32,
                     wp + 2,
                 )
             })

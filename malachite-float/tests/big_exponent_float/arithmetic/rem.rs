@@ -8,7 +8,9 @@
 
 use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{ModInverse, ModMul, ModPow, ModPowerOf2, PowerOf2};
-use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, One, Two, Zero};
+use malachite_base::num::basic::traits::{
+    Infinity, NaN, NegativeInfinity, NegativeOne, One, Two, Zero,
+};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
@@ -1265,7 +1267,7 @@ fn test_rem_unsigned_and_ieee_quotient_bits() {
         &p2(Integer::from(i64::MAX)),
         &BigExponentFloat::from(3),
     );
-    assert!(same(&r, &BigExponentFloat::from(-1)));
+    assert!(same(&r, &BigExponentFloat::NEGATIVE_ONE));
     assert_eq!(q, minus_two_thirds_mod_2_63() + 1);
     let (r, q) = ieee_remainder_and_quotient_bits_exact_all(
         &BigExponentFloat::from(-10.5),

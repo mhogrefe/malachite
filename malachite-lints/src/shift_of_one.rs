@@ -258,10 +258,7 @@ impl<'tcx> LateLintPass<'tcx> for ShiftOfOne {
                 expr.span,
                 "`power_of_2(n) - 1` builds a mask of the low `n` bits",
                 None,
-                format!(
-                    "use `{prefix}::low_mask({})`",
-                    snippet(cx, n.span, "..")
-                ),
+                format!("use `{prefix}::low_mask({})`", snippet(cx, n.span, "..")),
             );
             return;
         }

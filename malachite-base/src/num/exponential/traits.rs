@@ -66,6 +66,30 @@ pub trait PowerOf10XMinus1Assign {
     fn power_of_10_x_minus_1_assign(&mut self);
 }
 
+/// Computes $W_0(x)$, the principal branch of the Lambert $W$ function.
+pub trait LambertW0 {
+    type Output;
+
+    fn lambert_w0(self) -> Self::Output;
+}
+
+/// Replaces a number $x$ with $W_0(x)$, the principal branch of the Lambert $W$ function.
+pub trait LambertW0Assign {
+    fn lambert_w0_assign(&mut self);
+}
+
+/// Computes $W_{-1}(x)$, the lower real branch of the Lambert $W$ function.
+pub trait LambertWMinus1 {
+    type Output;
+
+    fn lambert_w_minus_1(self) -> Self::Output;
+}
+
+/// Replaces a number $x$ with $W_{-1}(x)$, the lower real branch of the Lambert $W$ function.
+pub trait LambertWMinus1Assign {
+    fn lambert_w_minus_1_assign(&mut self);
+}
+
 /// Takes the natural logarithm of a number.
 pub trait Ln {
     type Output;

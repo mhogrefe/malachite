@@ -62,6 +62,8 @@ documented by git history.
 
 ### malachite-base
 
+- The `LambertW0`, `LambertW0Assign`, `LambertWMinus1`, and `LambertWMinus1Assign` traits, in
+  `num::exponential::traits`, for the two real branches of the Lambert $W$ function.
 - The `ShrRoundWithOrdering` and `ShrRoundWithOrderingAssign` traits, in
   `num::arithmetic::traits`, for right-shifting a number that is itself an approximation of an
   exact value, given its `Ordering` against that value, and rounding the result.
@@ -1200,6 +1202,8 @@ documented by git history.
   - the exponential functions and logarithms: $e^x$, $2^x$, $10^x$, their minus-one forms, `ln`,
     the logarithms to base 2, 10, a power of 2, a `BigExponentFloat`, or a `Rational`, the
     $\log(1+x)$ form of each, and `compound`;
+  - the two real branches of the Lambert $W$ function (`lambert_w0` and `lambert_w_minus_1`, with
+    `Rational` forms);
   - the arithmetic-geometric mean (`agm`, with `Rational` forms);
   - the trigonometric functions, their inverses, and `atan2`, each with `_pi` and `_with_period`
     forms and `Rational` forms, and the hyperbolic functions and their inverses; and
@@ -1210,6 +1214,19 @@ documented by git history.
   their reciprocals reduce $x$ using about $E$ bits of $\log 2$, the trigonometric functions use
   about $E$ bits of $\pi$, and general powers grow with the exponent of $y$. The documentation of
   each such function carries a warning.
+- The Lambert $W$ function, the inverse of $we^w$, on both of its real branches: $W_0(x)$, the
+  principal branch, with $W_0(x) \geq -1$ for $x \geq -1/e$, and $W_{-1}(x)$, the lower branch, with
+  $W_{-1}(x) \leq -1$ for $-1/e \leq x < 0$. `Float` has `lambert_w0_prec_round`,
+  `lambert_w0_prec`, and `lambert_w0_round`, with their `_ref` and `_assign` forms,
+  `lambert_w0_rational_prec_round` and `lambert_w0_rational_prec` for a `Rational` argument, and the
+  `LambertW0` and `LambertW0Assign` traits; `primitive_float_lambert_w0` and
+  `primitive_float_lambert_w0_rational` give correctly rounded `f32` and `f64` results; and
+  `lambert_w_minus_1` has the same forms throughout. `BigExponentFloat` has the `_prec_round` and
+  `_prec` forms of both. The results are correctly rounded. The algorithm is a port of the one in
+  [Azurite](https://github.com/mhogrefe/azurite), where it is formally verified: a candidate from
+  Halley's iteration is certified by an enclosure from the mean value theorem, inside Ziv's loop.
+  The special cases: $W_0(\pm0.0) = \pm0.0$, $W_0(\infty) = \infty$, $W_{-1}(\pm0.0) = -\infty$, and
+  `NaN` outside the domain of each branch.
 - `Float`'s internal `ExtendedFloat` type, which carried an extra exponent offset through the
   logarithms, the arithmetic-geometric mean, and $\log 2$, has been replaced by
   `BigExponentFloat`. Results and running times are unchanged.

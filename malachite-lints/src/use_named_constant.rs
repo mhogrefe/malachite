@@ -27,6 +27,8 @@ declare_lint! {
     /// `Float`, only constructions yielding precision 1 are flagged: the named constants have
     /// precision 1. `Float::one_prec(p)` with any other `p` is not the same value-and-precision,
     /// but `Float::from` of 0, 1, 2, or -1 is, since integer conversion strips trailing zeros.
+    /// A `BigExponentFloat` stores no precision, so `BigExponentFloat::from` of 0, 1, 2, or -1 is
+    /// always the named constant.
     ///
     /// ### Example
     ///

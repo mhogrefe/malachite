@@ -255,7 +255,7 @@ impl InverseHyperbolicArgument<'_> {
 fn asinh_minus_one_argument(a: &BigExponentFloat, w: u64) -> BigExponentFloat {
     let s = a.square_prec_ref(w).0;
     let r = BigExponentFloat::ONE
-        .add_prec(s.clone(), w)
+        .add_prec_val_ref(&s, w)
         .0
         .sqrt_prec(w)
         .0;

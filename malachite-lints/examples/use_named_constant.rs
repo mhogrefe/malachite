@@ -1,4 +1,4 @@
-use malachite_float::Float;
+use malachite_float::{BigExponentFloat, Float};
 use malachite_nz::gaussian_integer::GaussianInteger;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
@@ -23,6 +23,13 @@ fn main() {
     let _ = Float::from(1u32);
     let _ = Float::from(2);
     let _ = Float::from(-1);
+    // A `BigExponentFloat` stores no precision, so these are its named constants: flagged.
+    let _ = BigExponentFloat::from(0u32);
+    let _ = BigExponentFloat::from(1u32);
+    let _ = BigExponentFloat::from(2u32);
+    let _ = BigExponentFloat::from(-1);
+    let _ = BigExponentFloat::const_from_unsigned(2);
+    let _ = BigExponentFloat::const_from_signed(-1);
     // Other values don't get the named-constant advice (`runtime_literal_conversion` fires
     // instead).
     let _ = Natural::from(3u32);
@@ -33,6 +40,9 @@ fn main() {
     // `Float::from` of other values is not a named constant (`runtime_literal_conversion` fires
     // instead).
     let _ = Float::from(3);
+    let _ = BigExponentFloat::from(3u32);
+    // A primitive float is not an integer literal: fine.
+    let _ = BigExponentFloat::from(1.0);
     // A non-literal argument: fine.
     let k = 1u32;
     let _ = Natural::from(k);

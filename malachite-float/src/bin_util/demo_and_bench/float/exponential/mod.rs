@@ -12,6 +12,8 @@ pub(crate) fn register(runner: &mut Runner) {
     compound::register(runner);
     exp::register(runner);
     exp_x_minus_1::register(runner);
+    lambert_w0::register(runner);
+    lambert_w_minus_1::register(runner);
     ln::register(runner);
     ln_1_plus_x::register(runner);
     log_base::register(runner);
@@ -37,6 +39,8 @@ pub(crate) fn register(runner: &mut Runner) {
 mod compound;
 mod exp;
 mod exp_x_minus_1;
+mod lambert_w0;
+mod lambert_w_minus_1;
 mod ln;
 mod ln_1_plus_x;
 mod log_base;

@@ -15,6 +15,12 @@ pub mod exp;
 /// Functions for computing $e^x-1$ for [`BigExponentFloat`](super::BigExponentFloat)s and
 /// [`Rational`](malachite_q::Rational)s.
 pub mod exp_x_minus_1;
+/// Functions for computing $W_0(x)$, the principal branch of the Lambert $W$ function, of
+/// [`BigExponentFloat`](super::BigExponentFloat)s and [`Rational`](malachite_q::Rational)s.
+pub mod lambert_w0;
+/// Functions for computing $W_{-1}(x)$, the lower real branch of the Lambert $W$ function, of
+/// [`BigExponentFloat`](super::BigExponentFloat)s and [`Rational`](malachite_q::Rational)s.
+pub mod lambert_w_minus_1;
 /// Functions for computing the natural logarithm of [`BigExponentFloat`](super::BigExponentFloat)s,
 /// [`Rational`](malachite_q::Rational)s, and [`u64`]s.
 pub mod ln;

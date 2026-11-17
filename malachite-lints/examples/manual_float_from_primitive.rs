@@ -1,6 +1,6 @@
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::Floor;
-use malachite_float::Float;
+use malachite_float::{BigExponentFloat, Float};
 use std::cmp::max;
 
 fn f(x: u64, y: i64) -> (Float, Float, Float, Float, Float, Float, Float) {
@@ -21,6 +21,16 @@ fn f(x: u64, y: i64) -> (Float, Float, Float, Float, Float, Float, Float) {
     (a, b, c, d, e, f, g)
 }
 
+fn g(x: u64, y: i64) -> (BigExponentFloat, BigExponentFloat, BigExponentFloat) {
+    // `BigExponentFloat` has the same constructors, and the same exact conversion: flagged.
+    let a = BigExponentFloat::from_unsigned_prec(x, x.significant_bits().max(1)).0;
+    let b = BigExponentFloat::from_signed_prec_round(y, y.significant_bits(), Floor).0;
+    // A fixed, unrelated precision: fine.
+    let c = BigExponentFloat::from_unsigned_prec(x, 100).0;
+    (a, b, c)
+}
+
 fn main() {
+    let _ = g(std::hint::black_box(3u64), std::hint::black_box(-5i64));
     let _ = f(std::hint::black_box(3u64), std::hint::black_box(-5i64));
 }

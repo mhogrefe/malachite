@@ -63,11 +63,11 @@ fn is_bignum<'tcx>(cx: &LateContext<'tcx>, e: &'tcx Expr<'tcx>) -> bool {
 }
 
 // If `e`, after peeling `&`s, is an integer literal or a negated one, returns the expression to
-// replace (the literal, or the negation), the literal itself, whether it is negated, and its
-// suffix.
+// replace (the literal, or the negation), the literal itself, whether it is negated, its suffix,
+// and its magnitude.
 fn int_literal<'tcx>(
     e: &'tcx Expr<'tcx>,
-) -> Option<(&'tcx Expr<'tcx>, &'tcx Expr<'tcx>, bool, LitIntType)> {
+) -> Option<(&'tcx Expr<'tcx>, &'tcx Expr<'tcx>, bool, LitIntType, u128)> {
     let mut e = e;
     while let ExprKind::AddrOf(_, _, inner) = e.kind {
         e = inner;
@@ -80,18 +80,24 @@ fn int_literal<'tcx>(
     let ExprKind::Lit(lit) = lit_expr.kind else {
         return None;
     };
-    let LitKind::Int(_, ty) = lit.node else {
+    let LitKind::Int(value, ty) = lit.node else {
         return None;
     };
-    Some((e, lit_expr, neg, ty))
+    Some((e, lit_expr, neg, ty, value.get()))
 }
 
 // Lints `e` if it is an integer literal that departs from the convention. `role` describes the
 // literal's use in the message.
 fn check_literal<'tcx>(cx: &LateContext<'tcx>, e: &'tcx Expr<'tcx>, role: &str) {
-    let Some((e, lit_expr, neg, ty)) = int_literal(e) else {
+    let Some((e, lit_expr, neg, ty, value)) = int_literal(e) else {
         return;
     };
+    // A literal too large for a `u32`, or too negative for an `i32`, has to be of a wider type; a
+    // `BigExponentFloat` can be shifted by 2^32.
+    let limit = if neg { 1 << 31 } else { u128::from(u32::MAX) };
+    if value > limit {
+        return;
+    }
     let conforms = match ty {
         LitIntType::Unsigned(UintTy::U32) => !neg,
         LitIntType::Signed(IntTy::I32) => neg,

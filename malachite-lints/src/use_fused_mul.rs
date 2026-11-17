@@ -36,7 +36,8 @@ declare_lint! {
     /// as `self + y * z`, so it saves nothing. `Float` is excluded because its fused operations are
     /// not the same value spelled differently: they round once instead of twice, and pay for the
     /// exact product, so the choice between the spellings is a semantic one that the lint must not
-    /// make.
+    /// make. `BigExponentFloat` is excluded because its fused operations form the exact product
+    /// and then add it, just as `x + y * z` does, so they save nothing.
     ///
     /// ### Example
     ///
@@ -86,10 +87,17 @@ pub(crate) fn trait_path(name: &str) -> String {
 // full, where the rounded `*` uses the short-product kernel). Rewriting would silently change
 // numeric results while pessimizing the code; reaching for `Float`'s fused operations is an
 // accuracy decision for the author to make explicitly.
+//
+// `BigExponentFloat` is excluded for the same reason as the primitive floats: its `*` and `+` are
+// exact, so its fused operations compute the same value, but they form the product in full and
+// then add it, saving nothing.
 fn operator_form_is_worthwhile<'tcx>(cx: &LateContext<'tcx>, ty: Ty<'tcx>) -> bool {
     crate::bignum_name(cx, ty).is_some_and(|name| {
         // The Gaussian types have no fused operations yet.
-        !matches!(name, "Float" | "GaussianInteger" | "GaussianRational")
+        !matches!(
+            name,
+            "Float" | "BigExponentFloat" | "GaussianInteger" | "GaussianRational"
+        )
     })
 }
 

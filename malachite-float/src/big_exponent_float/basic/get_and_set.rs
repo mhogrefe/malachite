@@ -210,14 +210,13 @@ impl BigExponentFloat {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::One;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::BigExponentFloat;
     /// use std::cmp::Ordering::*;
     ///
-    /// let mut x = BigExponentFloat::ONE;
-    /// assert_eq!(x.round_to_prec_round_assign(10, Nearest), Equal);
-    /// assert_eq!(x.to_string(), "1.0");
+    /// let mut x = BigExponentFloat::from(7.0);
+    /// assert_eq!(x.round_to_prec_round_assign(2, Floor), Less);
+    /// assert_eq!(x.to_string(), "6.0");
     /// ```
     pub fn round_to_prec_round_assign(&mut self, prec: u64, rm: RoundingMode) -> Ordering {
         assert_ne!(prec, 0);
@@ -265,14 +264,13 @@ impl BigExponentFloat {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::BigExponentFloat;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (x, o) = BigExponentFloat::TWO.round_to_prec_round(1, Floor);
-    /// assert_eq!(x.to_string(), "2.0");
-    /// assert_eq!(o, Equal);
+    /// let (x, o) = BigExponentFloat::from(7.0).round_to_prec_round(2, Floor);
+    /// assert_eq!(x.to_string(), "6.0");
+    /// assert_eq!(o, Less);
     /// ```
     #[inline]
     pub fn round_to_prec_round(mut self, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
@@ -299,18 +297,19 @@ impl BigExponentFloat {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::BigExponentFloat;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (x, o) = BigExponentFloat::TWO.round_to_prec_round_ref(1, Ceiling);
-    /// assert_eq!(x.to_string(), "2.0");
-    /// assert_eq!(o, Equal);
+    /// let (x, o) = BigExponentFloat::from(7.0).round_to_prec_round_ref(2, Ceiling);
+    /// assert_eq!(x.to_string(), "8.0");
+    /// assert_eq!(o, Greater);
     /// ```
     #[inline]
     pub fn round_to_prec_round_ref(&self, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
-        self.clone().round_to_prec_round(prec, rm)
+        let mut x = self.clone();
+        let o = x.round_to_prec_round_assign(prec, rm);
+        (x, o)
     }
 
     /// Rounds a [`BigExponentFloat`] to a given precision, in place, rounding to the nearest value
@@ -331,13 +330,12 @@ impl BigExponentFloat {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::One;
     /// use malachite_float::BigExponentFloat;
     /// use std::cmp::Ordering::*;
     ///
-    /// let mut x = BigExponentFloat::ONE;
-    /// assert_eq!(x.round_to_prec_assign(1), Equal);
-    /// assert_eq!(x.to_string(), "1.0");
+    /// let mut x = BigExponentFloat::from(7.0);
+    /// assert_eq!(x.round_to_prec_assign(2), Greater);
+    /// assert_eq!(x.to_string(), "8.0");
     /// ```
     #[inline]
     pub fn round_to_prec_assign(&mut self, prec: u64) -> Ordering {
@@ -363,13 +361,12 @@ impl BigExponentFloat {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::One;
     /// use malachite_float::BigExponentFloat;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (x, o) = BigExponentFloat::ONE.round_to_prec(1);
-    /// assert_eq!(x.to_string(), "1.0");
-    /// assert_eq!(o, Equal);
+    /// let (x, o) = BigExponentFloat::from(7.0).round_to_prec(2);
+    /// assert_eq!(x.to_string(), "8.0");
+    /// assert_eq!(o, Greater);
     /// ```
     #[inline]
     pub fn round_to_prec(self, prec: u64) -> (Self, Ordering) {
@@ -395,13 +392,12 @@ impl BigExponentFloat {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::One;
     /// use malachite_float::BigExponentFloat;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (x, o) = BigExponentFloat::ONE.round_to_prec_ref(1);
-    /// assert_eq!(x.to_string(), "1.0");
-    /// assert_eq!(o, Equal);
+    /// let (x, o) = BigExponentFloat::from(7.0).round_to_prec_ref(2);
+    /// assert_eq!(x.to_string(), "8.0");
+    /// assert_eq!(o, Greater);
     /// ```
     #[inline]
     pub fn round_to_prec_ref(&self, prec: u64) -> (Self, Ordering) {

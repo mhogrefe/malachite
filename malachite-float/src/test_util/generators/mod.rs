@@ -1723,6 +1723,42 @@ pub fn big_exponent_float_unsigned_rounding_mode_triple_gen_var_15_float() -> Ge
     )
 }
 
+// All `(BigExponentFloat, u64, RoundingMode)` that are valid inputs to
+// `BigExponentFloat::lambert_w0_prec_round` and `BigExponentFloat::lambert_w_minus_1_prec_round`.
+pub fn big_exponent_float_unsigned_rounding_mode_triple_gen_var_24()
+-> Generator<(BigExponentFloat, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_big_exponent_float_unsigned_rounding_mode_triple_gen_var_24,
+        &random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_24,
+        &special_random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_24,
+    )
+}
+
+// Like `big_exponent_float_unsigned_rounding_mode_triple_gen_var_24`, paired with the equal
+// `Float`s, excluding `Exact`.
+pub fn big_exponent_float_unsigned_rounding_mode_triple_gen_var_24_float() -> Generator<(
+    (Float, u64, RoundingMode),
+    (BigExponentFloat, u64, RoundingMode),
+)> {
+    Generator::new(
+        &|| {
+            big_exponent_float_unsigned_rounding_mode_triple_float_no_exact(
+                exhaustive_big_exponent_float_unsigned_rounding_mode_triple_gen_var_24(),
+            )
+        },
+        &|config| {
+            big_exponent_float_unsigned_rounding_mode_triple_float_no_exact(
+                random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_24(config),
+            )
+        },
+        &|config| {
+            big_exponent_float_unsigned_rounding_mode_triple_float_no_exact(
+                special_random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_24(config),
+            )
+        },
+    )
+}
+
 // Like `big_exponent_float_unsigned_rounding_mode_triple_gen_var_16`, paired with the equal
 // `Float`s, excluding `Exact`.
 pub fn big_exponent_float_unsigned_rounding_mode_triple_gen_var_16_float() -> Generator<(

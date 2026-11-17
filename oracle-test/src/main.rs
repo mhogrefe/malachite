@@ -2702,6 +2702,76 @@ const AZURITE_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_float_ln_rational",
     ),
     ("demo_float_ln_unsigned_prec_debug", "az_float_ln_rational"),
+    ("demo_float_lambert_w0_assign_debug", "az_float_lambert_w0"),
+    ("demo_float_lambert_w0_debug", "az_float_lambert_w0"),
+    ("demo_float_lambert_w0_extreme_debug", "az_float_lambert_w0"),
+    ("demo_float_lambert_w0_prec_debug", "az_float_lambert_w0"),
+    (
+        "demo_float_lambert_w0_prec_round_debug",
+        "az_float_lambert_w0",
+    ),
+    (
+        "demo_float_lambert_w0_rational_prec_debug",
+        "az_float_lambert_w0_rational",
+    ),
+    (
+        "demo_float_lambert_w0_rational_prec_ref_debug",
+        "az_float_lambert_w0_rational",
+    ),
+    (
+        "demo_float_lambert_w0_rational_prec_round_debug",
+        "az_float_lambert_w0_rational",
+    ),
+    (
+        "demo_float_lambert_w0_rational_prec_round_ref_debug",
+        "az_float_lambert_w0_rational",
+    ),
+    ("demo_float_lambert_w0_ref_debug", "az_float_lambert_w0"),
+    ("demo_float_lambert_w0_round_debug", "az_float_lambert_w0"),
+    (
+        "demo_float_lambert_w_minus_1_assign_debug",
+        "az_float_lambert_w_minus_1",
+    ),
+    (
+        "demo_float_lambert_w_minus_1_debug",
+        "az_float_lambert_w_minus_1",
+    ),
+    (
+        "demo_float_lambert_w_minus_1_extreme_debug",
+        "az_float_lambert_w_minus_1",
+    ),
+    (
+        "demo_float_lambert_w_minus_1_prec_debug",
+        "az_float_lambert_w_minus_1",
+    ),
+    (
+        "demo_float_lambert_w_minus_1_prec_round_debug",
+        "az_float_lambert_w_minus_1",
+    ),
+    (
+        "demo_float_lambert_w_minus_1_rational_prec_debug",
+        "az_float_lambert_w_minus_1_rational",
+    ),
+    (
+        "demo_float_lambert_w_minus_1_rational_prec_ref_debug",
+        "az_float_lambert_w_minus_1_rational",
+    ),
+    (
+        "demo_float_lambert_w_minus_1_rational_prec_round_debug",
+        "az_float_lambert_w_minus_1_rational",
+    ),
+    (
+        "demo_float_lambert_w_minus_1_rational_prec_round_ref_debug",
+        "az_float_lambert_w_minus_1_rational",
+    ),
+    (
+        "demo_float_lambert_w_minus_1_ref_debug",
+        "az_float_lambert_w_minus_1",
+    ),
+    (
+        "demo_float_lambert_w_minus_1_round_debug",
+        "az_float_lambert_w_minus_1",
+    ),
     ("demo_float_ln_1_plus_x_debug", "az_float_ln_1_plus_x"),
     ("demo_float_ln_1_plus_x_ref_debug", "az_float_ln_1_plus_x"),
     (
@@ -6099,6 +6169,38 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
     (
         "demo_big_exponent_float_agm_big_exponent_float_rational_prec_round_debug",
         "az_big_exponent_float_agm_float_rational",
+    ),
+    (
+        "demo_big_exponent_float_lambert_w0_prec_debug",
+        "az_big_exponent_float_lambert_w0",
+    ),
+    (
+        "demo_big_exponent_float_lambert_w0_prec_round_debug",
+        "az_big_exponent_float_lambert_w0",
+    ),
+    (
+        "demo_big_exponent_float_lambert_w0_rational_prec_debug",
+        "az_big_exponent_float_lambert_w0_rational",
+    ),
+    (
+        "demo_big_exponent_float_lambert_w0_rational_prec_round_debug",
+        "az_big_exponent_float_lambert_w0_rational",
+    ),
+    (
+        "demo_big_exponent_float_lambert_w_minus_1_prec_debug",
+        "az_big_exponent_float_lambert_w_minus_1",
+    ),
+    (
+        "demo_big_exponent_float_lambert_w_minus_1_prec_round_debug",
+        "az_big_exponent_float_lambert_w_minus_1",
+    ),
+    (
+        "demo_big_exponent_float_lambert_w_minus_1_rational_prec_debug",
+        "az_big_exponent_float_lambert_w_minus_1_rational",
+    ),
+    (
+        "demo_big_exponent_float_lambert_w_minus_1_rational_prec_round_debug",
+        "az_big_exponent_float_lambert_w_minus_1_rational",
     ),
     (
         "demo_big_exponent_float_ln_prec_debug",

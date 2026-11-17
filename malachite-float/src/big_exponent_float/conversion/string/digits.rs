@@ -168,10 +168,10 @@ big_exponent_float_get_str(
             // c^j and the product are each correctly rounded to wp bits, so the relative error is
             // below 2^(1 - wp) (1 + 2^(-wp)), and the error below 2^(EXP - wp + 2).
             let c_power = c.pow_integer_prec_ref_ref(&j, wp).0;
-            let y = scaled.mul_prec_ref_val(c_power, wp).0;
+            let mut y = scaled.mul_prec_ref_val(c_power, wp).0;
             let integer_bits = u64::exact_from(y.get_exponent().unwrap());
             if finite_can_round(&y, wp - 2, wp, integer_bits, mrm) {
-                let (y, o) = y.round_to_prec_round(integer_bits, mrm);
+                let o = y.round_to_prec_round_assign(integer_bits, mrm);
                 break (Natural::exact_from(&y), o);
             }
             wp += wp >> 1;

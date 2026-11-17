@@ -3252,6 +3252,7 @@ impl Rem<Self> for BigExponentFloat {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::PowerOf2;
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_float::BigExponentFloat;
     ///
     /// assert_eq!(
@@ -3262,7 +3263,7 @@ impl Rem<Self> for BigExponentFloat {
     /// // 2^(2^63 - 1) is 2 more than a multiple of 3, since 2^k mod 3 is 2 for every odd k.
     /// assert_eq!(
     ///     BigExponentFloat::power_of_2(i64::MAX) % BigExponentFloat::from(3),
-    ///     BigExponentFloat::from(2)
+    ///     BigExponentFloat::TWO
     /// );
     /// ```
     #[inline]

@@ -494,7 +494,7 @@ fn pow_properties_helper(x: &BigExponentFloat, n: &Integer, prec: u64, rm: Round
             let product = &r.0 * &power;
             assert_eq!(
                 if power.is_sign_positive() {
-                    product.partial_cmp(&BigExponentFloat::ONE)
+                    product.partial_cmp(&1u32)
                 } else {
                     BigExponentFloat::ONE.partial_cmp(&product)
                 },

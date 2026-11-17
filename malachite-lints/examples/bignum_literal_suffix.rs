@@ -1,7 +1,7 @@
 use malachite_base::num::arithmetic::traits::ShrRound;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::rounding_modes::RoundingMode::*;
-use malachite_float::Float;
+use malachite_float::{BigExponentFloat, Float};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 
@@ -56,6 +56,16 @@ fn main() {
     let _ = &n << 1u32;
     let _ = &i >> -1i32;
     let _ = (&n).shr_round(1u32, Ceiling).0;
+    // A `BigExponentFloat` is covered like the other bignums: flagged.
+    let b = BigExponentFloat::from(3.0);
+    let _ = &b << 1000;
+    if b > 1u64 {
+        println!("big");
+    }
+    // A literal that does not fit in a `u32` (or, negated, in an `i32`) must be wider: fine.
+    let _ = &b << 0x1_0000_0000_u64;
+    let _ = &b >> -0x1_0000_0000_i64;
+    let _ = &b << 0xffff_ffffu32;
     // Primitives are not covered, and neither are variable shift counts.
     let k = 5u64;
     let _ = &n << k;

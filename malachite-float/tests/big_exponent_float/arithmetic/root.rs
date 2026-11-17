@@ -487,7 +487,7 @@ fn check_root_ordering(x: &BigExponentFloat, k: i64, r: &(BigExponentFloat, Orde
         assert_eq!(power.partial_cmp(x), Some(r.1));
     } else if x.is_sign_positive() {
         // x^(1/k) = 1/x^(1/|k|), and r is too large iff r^|k| * x > 1.
-        assert_eq!((power * x).partial_cmp(&BigExponentFloat::ONE), Some(r.1));
+        assert_eq!((power * x).partial_cmp(&1u32), Some(r.1));
     }
 }
 
@@ -777,7 +777,7 @@ fn root_u_rational_prec_round_properties() {
             if r.0.is_finite() && !r.0.is_zero() && k <= 1000 {
                 let s = 1000 * i64::exact_from(k);
                 let (y, o) = root_u_rational_prec_round_all(&(&x << s), k, prec, rm);
-                assert!(same(&y, &(&r.0 << 1000)));
+                assert!(same(&y, &(&r.0 << 1000u32)));
                 assert_eq!(o, r.1);
             }
             // A dyadic x gives the root of the equal `BigExponentFloat`.

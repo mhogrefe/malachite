@@ -61,7 +61,7 @@ pub(crate) fn power_of_10_approx(
     (y, err): (BigExponentFloat, u64),
     wp: u64,
 ) -> (BigExponentFloat, u64) {
-    let power_of_5 = BigExponentFloat::from(5u32)
+    let power_of_5 = const { BigExponentFloat::const_from_unsigned(5) }
         .pow_integer_prec_val_ref(n, wp)
         .0;
     (shift_finite(power_of_5.mul_prec(y, wp).0, n), err - 3)
@@ -74,7 +74,8 @@ pub(crate) fn power_of_10_integer(
     prec: u64,
     rm: RoundingMode,
 ) -> (BigExponentFloat, Ordering) {
-    let (power_of_5, o) = BigExponentFloat::from(5u32).pow_integer_prec_round_val_ref(n, prec, rm);
+    let (power_of_5, o) = const { BigExponentFloat::const_from_unsigned(5) }
+        .pow_integer_prec_round_val_ref(n, prec, rm);
     (shift_finite(power_of_5, n), o)
 }
 

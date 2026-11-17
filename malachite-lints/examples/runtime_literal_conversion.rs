@@ -1,6 +1,7 @@
 // `twenty` exists to show a `const_from*` call inside a `const fn`; it is never called.
 #![allow(dead_code)]
 
+use malachite_float::BigExponentFloat;
 use malachite_nz::gaussian_integer::GaussianInteger;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
@@ -14,11 +15,16 @@ fn main() {
     let _ = Natural::from(100u32);
     let _ = Integer::from(-100i32);
     let _ = Rational::from(7u32);
+    let _ = BigExponentFloat::from(11u32);
+    let _ = BigExponentFloat::from(-72);
     // `const_from*` outside a const context still runs at runtime: flagged.
     let _ = Natural::const_from(10);
+    let _ = BigExponentFloat::const_from_unsigned(11);
     // Wrapped in a `const` block or bound to a named `const`: fine.
     let _ = const { Natural::const_from(10) };
     let _ = TEN;
+    let _ = const { BigExponentFloat::const_from_unsigned(11) };
+    let _ = const { BigExponentFloat::const_from_signed(-72) };
     // A non-literal argument: fine.
     let k = 100u32;
     let _ = Natural::from(k);

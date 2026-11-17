@@ -27,6 +27,11 @@ declare_lint! {
     /// always `Equal`. Use the dedicated constructor, e.g. `(Float::one_prec(prec), Equal)`, which
     /// says the value is exact and skips the rounding machinery.
     ///
+    /// The same goes for the `BigExponentFloat` constants: converting one to a `Float` with
+    /// `Float::from_big_exponent_float_prec_round` is `(Float::one_prec(prec), Equal)`, and
+    /// rounding one with `round_to_prec_round` is a no-op, since a `BigExponentFloat` stores no
+    /// precision: `(BigExponentFloat::ONE, Equal)`.
+    ///
     /// ### Example
     ///
     /// ```rust,ignore
@@ -46,9 +51,13 @@ declare_lint! {
 
 declare_lint_pass!(RedundantPrecRoundOfExactConstant => [REDUNDANT_PREC_ROUND_OF_EXACT_CONSTANT]);
 
-// If `e` is a path to a named `Float` constant that is exact at every precision, returns the name
-// of its dedicated `*_prec` constructor.
-fn prec_constructor_for<'tcx>(cx: &LateContext<'tcx>, e: &'tcx Expr<'tcx>) -> Option<&'static str> {
+// If `e` is a path to a named `Float` or `BigExponentFloat` constant that is exact at every
+// precision, returns the type's name, the constant's name, and the name of `Float`'s dedicated
+// `*_prec` constructor for it.
+fn prec_constructor_for<'tcx>(
+    cx: &LateContext<'tcx>,
+    e: &'tcx Expr<'tcx>,
+) -> Option<(&'static str, &'static str, &'static str)> {
     // Peel `&` layers so the by-reference spelling `&Float::ONE` is recognized too.
     let e = e.peel_borrows();
     let ExprKind::Path(qpath) = &e.kind else {
@@ -57,17 +66,20 @@ fn prec_constructor_for<'tcx>(cx: &LateContext<'tcx>, e: &'tcx Expr<'tcx>) -> Op
     let Some(did) = cx.qpath_res(qpath, e.hir_id).opt_def_id() else {
         return None;
     };
-    if crate::bignum_name(cx, cx.typeck_results().expr_ty(e).peel_refs()) != Some("Float") {
+    let Some(ty_name @ ("Float" | "BigExponentFloat")) =
+        crate::bignum_name(cx, cx.typeck_results().expr_ty(e).peel_refs())
+    else {
         return None;
-    }
+    };
     // Only single-significant-bit constants are exact at every precision; `THREE` etc. are not.
-    match cx.tcx.item_name(did).as_str() {
-        "ONE" => Some("one_prec"),
-        "TWO" => Some("two_prec"),
-        "NEGATIVE_ONE" => Some("negative_one_prec"),
-        "ONE_HALF" => Some("one_half_prec"),
-        _ => None,
-    }
+    let (constant, ctor) = match cx.tcx.item_name(did).as_str() {
+        "ONE" => ("ONE", "one_prec"),
+        "TWO" => ("TWO", "two_prec"),
+        "NEGATIVE_ONE" => ("NEGATIVE_ONE", "negative_one_prec"),
+        "ONE_HALF" => ("ONE_HALF", "one_half_prec"),
+        _ => return None,
+    };
+    Some((ty_name, constant, ctor))
 }
 
 impl<'tcx> LateLintPass<'tcx> for RedundantPrecRoundOfExactConstant {
@@ -75,31 +87,58 @@ impl<'tcx> LateLintPass<'tcx> for RedundantPrecRoundOfExactConstant {
         if expr.span.from_expansion() {
             return;
         }
-        let ExprKind::Call(callee, args) = expr.kind else {
-            return;
-        };
-        // `from_float_prec_round(c, prec, rm)` or `from_float_prec(c, prec)`.
-        let ([c, prec, _] | [c, prec]) = args else {
-            return;
-        };
-        let ExprKind::Path(qpath) = &callee.kind else {
-            return;
-        };
-        let Res::Def(DefKind::AssocFn, fn_did) = cx.qpath_res(qpath, callee.hir_id) else {
-            return;
-        };
-        let fn_name = cx.tcx.item_name(fn_did);
-        if !matches!(
-            fn_name.as_str(),
-            "from_float_prec_round"
-                | "from_float_prec"
-                | "from_float_prec_round_ref"
-                | "from_float_prec_ref"
-        ) {
-            return;
-        }
-        let Some(ctor) = prec_constructor_for(cx, c) else {
-            return;
+        let (c, replacement) = match expr.kind {
+            // `Float::from_float_prec_round(c, prec, rm)` or `Float::from_float_prec(c, prec)`,
+            // and likewise `Float::from_big_exponent_float_prec_round` of a `BigExponentFloat`
+            // constant. Either way the result is a `Float`.
+            ExprKind::Call(callee, [c, prec, _] | [c, prec]) => {
+                let ExprKind::Path(qpath) = &callee.kind else {
+                    return;
+                };
+                let Res::Def(DefKind::AssocFn, fn_did) = cx.qpath_res(qpath, callee.hir_id) else {
+                    return;
+                };
+                let source = match cx.tcx.item_name(fn_did).as_str() {
+                    "from_float_prec_round"
+                    | "from_float_prec"
+                    | "from_float_prec_round_ref"
+                    | "from_float_prec_ref" => "Float",
+                    "from_big_exponent_float_prec_round"
+                    | "from_big_exponent_float_prec"
+                    | "from_big_exponent_float_prec_round_ref"
+                    | "from_big_exponent_float_prec_ref" => "BigExponentFloat",
+                    _ => return,
+                };
+                let Some((ty_name, _, ctor)) = prec_constructor_for(cx, c) else {
+                    return;
+                };
+                if ty_name != source {
+                    return;
+                }
+                (
+                    c,
+                    format!("(Float::{ctor}({}), Equal)", snippet(cx, prec.span, "..")),
+                )
+            }
+            // `BigExponentFloat::ONE.round_to_prec_round(prec, rm)` or
+            // `BigExponentFloat::ONE.round_to_prec(prec)`. A `BigExponentFloat` stores no
+            // precision, so the constant itself is the result.
+            ExprKind::MethodCall(seg, c, [_, _] | [_], _) => {
+                if !matches!(
+                    seg.ident.name.as_str(),
+                    "round_to_prec_round"
+                        | "round_to_prec"
+                        | "round_to_prec_round_ref"
+                        | "round_to_prec_ref"
+                ) {
+                    return;
+                }
+                let Some(("BigExponentFloat", constant, _)) = prec_constructor_for(cx, c) else {
+                    return;
+                };
+                (c, format!("(BigExponentFloat::{constant}, Equal)"))
+            }
+            _ => return,
         };
         if crate::in_cross_check_code(cx, expr.span) {
             return;
@@ -114,9 +153,7 @@ impl<'tcx> LateLintPass<'tcx> for RedundantPrecRoundOfExactConstant {
             ),
             None,
             format!(
-                "use `(Float::{ctor}({}), Equal)`; the rounding mode is dead and the ordering is \
-                 always `Equal`",
-                snippet(cx, prec.span, ".."),
+                "use `{replacement}`; the rounding mode is dead and the ordering is always `Equal`"
             ),
         );
     }

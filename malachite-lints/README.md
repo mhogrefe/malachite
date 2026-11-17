@@ -28,6 +28,13 @@ or run every crate at once with `bash additional-lints.sh` from the repo root, w
 
 Lint configuration lives in `dylint.toml` at the repo root.
 
+Where a lint is described as applying to "a bignum", that means `Natural`, `Integer`, `Rational`,
+`Float`, `BigExponentFloat`, `GaussianInteger`, and `GaussianRational`, unless the description
+narrows it. `BigExponentFloat` is covered wherever `Float` is, with two kinds of exception: lints
+about a `Float`'s stored precision (`use_round_variant`, and the `*_prec` constructors in
+`use_named_constant`) have nothing to check on a type that stores none, and `BigExponentFloat`
+has no `/` operator, so only the function forms of a division can be flagged on it.
+
 ## Using these lints in your own project
 
 Most of these lints check usage of Malachite's public API, so they are also useful in downstream
@@ -90,7 +97,8 @@ comparand is wider than a limb and takes a limb loop (for `Float`, it even build
 shift counts are converted to `u64` internally whatever their type. One convention for both
 comparisons and shifts is easier to remember than two. Exempt: the comparison modules, the
 `shl`/`shr` family, and the operator examples in the arithmetic module docs, all of which
-exercise every primitive type on purpose.
+exercise every primitive type on purpose. A literal too large for a `u32` (or, negated, too
+negative for an `i32`) is left alone; a `BigExponentFloat` can be shifted by 2^32.
 
 ### `redundant_nearest`
 
@@ -184,6 +192,8 @@ dedicated constructors `one_prec`, `two_prec`, `negative_one_prec`, and `one_hal
 literal precision of 1. The named constant says what the value is at a glance and involves no
 conversion. For `Float`, only precision-1 constructions are flagged: the named constants have
 precision 1, so `Float::one_prec(p)` with any other `p` is not the same value-and-precision.
+`BigExponentFloat`, which stores no precision, is covered too: `BigExponentFloat::from` of 0, 1,
+2, or -1 is always its named constant.
 Tests, demos, and test utilities are linted like library code, except under `conversion/`,
 `basic/constants`, and `comparison/` directories (and the matching doctests), which exercise these
 constructions on purpose.
@@ -219,6 +229,8 @@ intent of compile-time evaluation, and for the fraction constructors it is genui
 gcd-heavy inputs). `const fn` bodies count as const contexts. Literals 0, 1, 2, and -1 (and the
 fraction (1, 2)) are `use_named_constant`'s territory, and literals that don't fit in a 32-bit
 limb are skipped (`const_from*` takes a `Limb`, so they would not compile under `32_bit_limbs`).
+`BigExponentFloat` is covered as the bignum types are: `BigExponentFloat::from(11u32)` becomes
+`const { BigExponentFloat::const_from_unsigned(11) }`.
 
 ### `use_assign_variant`
 
@@ -268,7 +280,10 @@ one half or the other per invocation.
 
 Flags multiplying a bignum by itself (`&x * &x`) and raising one to the power of 2 (`x.pow(2)`,
 `x.pow_assign(2)`): squaring has a dedicated, faster implementation — `square()`, `(&x).square()`,
-or `square_assign()`.
+or `square_assign()`. For `Float` and `BigExponentFloat`, the rounding multiplication functions
+are flagged too: `x.mul_prec_ref_ref(&x, prec)` is `x.square_prec_ref(prec)`, and likewise for the
+`mul_prec_round*`, `mul_round*`, and `*_assign` families. Those function forms are not flagged
+inside a function with `square` in its name, which may be defining or checking squaring.
 
 ### `use_fused_mul_shl`
 
@@ -309,7 +324,10 @@ or a primitive integer: use `even()` and `odd()`. The `% 2 == 1` / `!= 1` forms 
 
 Flags dividing `ONE` by a `Rational`, a `Float`, or a `GaussianRational` (`Float::ONE / x`): use
 `reciprocal()`, `reciprocal_assign()`, or (for `Float`) the `reciprocal_prec*` family for a
-specific output precision.
+specific output precision. Also flags dividing `ONE` by a `Float` or a `BigExponentFloat` with a
+rounding division function: `BigExponentFloat::ONE.div_prec(x, prec)` is `x.reciprocal_prec(prec)`,
+and likewise for the `div_prec_round*` and `div_round*` families. Those function forms are not
+flagged inside a function with `reciprocal` in its name.
 
 ### `let_tuple_underscore_to_field`
 
@@ -346,7 +364,7 @@ precision and discarding the ordering, like `Float::from_unsigned_prec(x, x.sign
 rounding mode is equally dead). That is an exact conversion — precisely `Float::from(x)`, which is
 shorter and also handles `x == 0`, where the unguarded spelling panics on the zero precision. The
 machine-applicable suggestion spells the type `Self` inside an `impl Float` so it does not trip
-`use_self`.
+`use_self`. `BigExponentFloat`'s constructors of the same names are flagged in the same way.
 
 ### `manual_from_sign_and_abs`
 
@@ -369,7 +387,11 @@ Flags rounding one of the named [`Float`] constants that are exact at every prec
 `TWO`, `NEGATIVE_ONE`, `ONE_HALF` — the single-significant-bit values) to a precision, like
 `Float::from_float_prec_round(Float::ONE, prec, rm)`, in all four `from_float_prec*` spellings
 (by value or by reference). The rounding is a no-op: the rounding mode is dead and the ordering is
-always `Equal`, so write the dedicated constructor, `(Float::one_prec(prec), Equal)`.
+always `Equal`, so write the dedicated constructor, `(Float::one_prec(prec), Equal)`. The same
+`BigExponentFloat` constants are flagged when converted to a `Float` with
+`Float::from_big_exponent_float_prec*` (again `(Float::one_prec(prec), Equal)`), and when rounded
+with `round_to_prec*`: a `BigExponentFloat` stores no precision, so the result is the constant
+itself, `(BigExponentFloat::ONE, Equal)`.
 
 ### `redundant_shift_conversion`
 

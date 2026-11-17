@@ -96,8 +96,44 @@ error: use `Float::NEGATIVE_ONE` instead of `from(..)`
 LL |     let _ = Float::from(-1);
    |             ^^^^^^^^^^^^^^^
 
-error: evaluate this at compile time: use `Natural::const_from(..)` in a `const` block or a named `const`
+error: use `BigExponentFloat::ZERO` instead of `from(..)`
+  --> $DIR/use_named_constant.rs:27:13
+   |
+LL |     let _ = BigExponentFloat::from(0u32);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `BigExponentFloat::ONE` instead of `from(..)`
   --> $DIR/use_named_constant.rs:28:13
+   |
+LL |     let _ = BigExponentFloat::from(1u32);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `BigExponentFloat::TWO` instead of `from(..)`
+  --> $DIR/use_named_constant.rs:29:13
+   |
+LL |     let _ = BigExponentFloat::from(2u32);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `BigExponentFloat::NEGATIVE_ONE` instead of `from(..)`
+  --> $DIR/use_named_constant.rs:30:13
+   |
+LL |     let _ = BigExponentFloat::from(-1);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `BigExponentFloat::TWO` instead of `const_from_unsigned(..)`
+  --> $DIR/use_named_constant.rs:31:13
+   |
+LL |     let _ = BigExponentFloat::const_from_unsigned(2);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `BigExponentFloat::NEGATIVE_ONE` instead of `const_from_signed(..)`
+  --> $DIR/use_named_constant.rs:32:13
+   |
+LL |     let _ = BigExponentFloat::const_from_signed(-1);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: evaluate this at compile time: use `Natural::const_from(..)` in a `const` block or a named `const`
+  --> $DIR/use_named_constant.rs:35:13
    |
 LL |     let _ = Natural::from(3u32);
    |             ^^^^^^^^^^^^^^^^^^^
@@ -105,40 +141,46 @@ LL |     let _ = Natural::from(3u32);
    = note: `#[deny(runtime_literal_conversion)]` on by default
 
 error: evaluate this at compile time: use `Integer::const_from_signed(..)` in a `const` block or a named `const`
-  --> $DIR/use_named_constant.rs:29:13
+  --> $DIR/use_named_constant.rs:36:13
    |
 LL |     let _ = Integer::from(-2);
    |             ^^^^^^^^^^^^^^^^^
 
 error: evaluate this at compile time: use `Rational::const_from_unsigneds(..)` in a `const` block or a named `const`
-  --> $DIR/use_named_constant.rs:30:13
+  --> $DIR/use_named_constant.rs:37:13
    |
 LL |     let _ = Rational::from_unsigneds(1u32, 3u32);
    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 error: evaluate this at compile time: use `Float::const_from_unsigned(..)` in a `const` block or a named `const`
-  --> $DIR/use_named_constant.rs:35:13
+  --> $DIR/use_named_constant.rs:42:13
    |
 LL |     let _ = Float::from(3);
    |             ^^^^^^^^^^^^^^
 
+error: evaluate this at compile time: use `BigExponentFloat::const_from_unsigned(..)` in a `const` block or a named `const`
+  --> $DIR/use_named_constant.rs:43:13
+   |
+LL |     let _ = BigExponentFloat::from(3u32);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 error: use `GaussianInteger::ZERO` instead of `from(..)`
-  --> $DIR/use_named_constant.rs:39:13
+  --> $DIR/use_named_constant.rs:49:13
    |
 LL |     let _ = GaussianInteger::from(0u32);
    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 error: use `GaussianInteger::NEGATIVE_ONE` instead of `from(..)`
-  --> $DIR/use_named_constant.rs:40:13
+  --> $DIR/use_named_constant.rs:50:13
    |
 LL |     let _ = GaussianInteger::from(-1i32);
    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 error: use `GaussianRational::TWO` instead of `from(..)`
-  --> $DIR/use_named_constant.rs:41:13
+  --> $DIR/use_named_constant.rs:51:13
    |
 LL |     let _ = GaussianRational::from(2u32);
    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-error: aborting due to 23 previous errors
+error: aborting due to 30 previous errors
 

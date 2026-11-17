@@ -926,7 +926,7 @@ fn agm_prec_round_fail_1() {
 #[test]
 #[should_panic]
 fn agm_prec_round_fail_2() {
-    BigExponentFloat::ONE.agm_prec_round(BigExponentFloat::from(2), 10, Exact);
+    BigExponentFloat::ONE.agm_prec_round(BigExponentFloat::TWO, 10, Exact);
 }
 
 #[test]

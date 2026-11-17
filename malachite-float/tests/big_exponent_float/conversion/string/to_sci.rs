@@ -6,8 +6,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::Abs;
 use malachite_base::num::basic::traits::NegativeOne;
+use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::string::options::{
     FromSciStringOptions, SciSizeOptions, ToSciOptions,
 };
@@ -992,8 +992,8 @@ fn to_sci_properties() {
         match options.get_rounding_mode() {
             Floor => assert!(back(Floor) <= x),
             Ceiling => assert!(back(Ceiling) >= x),
-            Down => assert!(back(Floor).abs() <= (&x).abs() || back(Ceiling).abs() <= (&x).abs()),
-            Up => assert!(back(Floor).abs() >= (&x).abs() || back(Ceiling).abs() >= (&x).abs()),
+            Down => assert!(back(Floor).le_abs(&x) || back(Ceiling).le_abs(&x)),
+            Up => assert!(back(Floor).ge_abs(&x) || back(Ceiling).ge_abs(&x)),
             Exact => assert!(same(&back(Floor), &x)),
             Nearest => {}
         }

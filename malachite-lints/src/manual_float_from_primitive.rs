@@ -29,6 +29,8 @@ declare_lint! {
     /// `Float::from(x)`, which is shorter and also handles `x == 0` (where `significant_bits()` is
     /// 0, so `from_unsigned_prec(x, x.significant_bits())` panics on the zero precision).
     ///
+    /// The same holds for `BigExponentFloat`, whose constructors have the same names.
+    ///
     /// ### Example
     ///
     /// ```rust,ignore
@@ -120,15 +122,17 @@ impl<'tcx> LateLintPass<'tcx> for ManualFloatFromPrimitive {
         ) {
             return;
         }
-        // The extracted value (`<call>.0`) must be a `Float`.
-        if crate::bignum_name(cx, cx.typeck_results().expr_ty(expr).peel_refs()) != Some("Float") {
+        // The extracted value (`<call>.0`) must be a `Float` or a `BigExponentFloat`.
+        let Some(name @ ("Float" | "BigExponentFloat")) =
+            crate::bignum_name(cx, cx.typeck_results().expr_ty(expr).peel_refs())
+        else {
             return;
-        }
+        };
         if !is_min1_significant_bits(cx, prec, x) || crate::in_cross_check_code(cx, expr.span) {
             return;
         }
-        // Inside an `impl Float`, `Self` names the type and clippy's `use_self` prefers it, so
-        // suggest `Self::from` there and `Float::from` elsewhere. The enclosing item's direct
+        // Inside an `impl` of the type, `Self` names it and clippy's `use_self` prefers it, so
+        // suggest `Self::from` there and the type's name elsewhere. The enclosing item's direct
         // parent is the `impl` exactly when the expression is in one of its methods (a nested `fn`
         // does not see `Self`).
         let owner = cx.tcx.hir_get_parent_item(expr.hir_id).to_def_id();
@@ -137,17 +141,17 @@ impl<'tcx> LateLintPass<'tcx> for ManualFloatFromPrimitive {
             && crate::bignum_name(
                 cx,
                 cx.tcx.type_of(parent).instantiate_identity().peel_refs(),
-            ) == Some("Float")
+            ) == Some(name)
         {
             "Self"
         } else {
-            "Float"
+            name
         };
         span_lint_and_sugg(
             cx,
             MANUAL_FLOAT_FROM_PRIMITIVE,
             expr.span,
-            "this is an exact conversion, which is what `Float::from` does",
+            format!("this is an exact conversion, which is what `{name}::from` does"),
             "use it directly",
             format!("{ty_name}::from({})", snippet(cx, x.span, "..")),
             Applicability::MachineApplicable,

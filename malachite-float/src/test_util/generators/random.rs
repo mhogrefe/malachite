@@ -64,8 +64,8 @@ use crate::test_util::generators::exhaustive::{
     big_exponent_float_general_pow_prec_round_valid, big_exponent_float_hypot_prec_round_valid,
     big_exponent_float_ieee_remainder_prec_round_valid,
     big_exponent_float_ieee_remainder_rational_prec_round_valid,
-    big_exponent_float_ln_1_plus_x_prec_round_valid, big_exponent_float_ln_prec_round_valid,
-    big_exponent_float_log_base_1_plus_x_prec_round_valid,
+    big_exponent_float_lambert_w_prec_round_valid, big_exponent_float_ln_1_plus_x_prec_round_valid,
+    big_exponent_float_ln_prec_round_valid, big_exponent_float_log_base_1_plus_x_prec_round_valid,
     big_exponent_float_log_base_2_1_plus_x_prec_round_valid,
     big_exponent_float_log_base_2_prec_round_valid,
     big_exponent_float_log_base_10_1_plus_x_prec_round_valid,
@@ -1128,6 +1128,38 @@ pub fn random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_15(
             &random_rounding_modes,
         )
         .filter(|(x, p, rm)| big_exponent_float_ln_prec_round_valid(x, *p, *rm)),
+    )
+}
+
+// The unsigned is positive, and the rounding mode is `Exact` only if the `BigExponentFloat` is zero
+// or not finite, so that the Lambert W functions' results are exact.
+pub fn random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_24(
+    config: &GenConfig,
+) -> It<(BigExponentFloat, u64, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_big_exponent_floats(
+                    seed,
+                    config.get_or("mean_exponent_bits_n", 8),
+                    config.get_or("mean_exponent_bits_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_special_p_n", 1),
+                    config.get_or("mean_special_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(x, p, rm)| big_exponent_float_lambert_w_prec_round_valid(x, *p, *rm)),
     )
 }
 

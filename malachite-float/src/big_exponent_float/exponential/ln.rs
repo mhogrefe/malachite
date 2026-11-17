@@ -133,7 +133,7 @@ crate_test_fn! {
         let mut k = 1u64;
         loop {
             k += 1;
-            power = power.mul_prec_val_ref(t, wp).0;
+            power.mul_prec_assign_ref(t, wp);
             let term = power.div_prec_ref_val(BigExponentFloat::from(k), wp).0;
             if k.even() {
                 sum.sub_prec_assign_ref(&term, wp);

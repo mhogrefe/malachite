@@ -533,6 +533,22 @@ pub fn exhaustive_big_exponent_float_unsigned_rounding_mode_triple_gen_var_15()
     ))
 }
 
+// The unsigned is positive, and the rounding mode is `Exact` only if the `BigExponentFloat` is zero
+// or not finite, so that the Lambert W functions' results are exact.
+pub fn exhaustive_big_exponent_float_unsigned_rounding_mode_triple_gen_var_24()
+-> It<(BigExponentFloat, u64, RoundingMode)> {
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(
+                exhaustive_big_exponent_floats(),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, p), rm)| big_exponent_float_lambert_w_prec_round_valid(x, p, rm)),
+    ))
+}
+
 // The unsigned is positive, and the rounding mode is `Exact` only if $\ln(1+x)$ is representable
 // with that many bits.
 pub fn exhaustive_big_exponent_float_unsigned_rounding_mode_triple_gen_var_16()
@@ -1715,6 +1731,16 @@ pub fn big_exponent_float_power_of_10_x_minus_1_rational_prec_round_valid(
     rm: RoundingMode,
 ) -> bool {
     rm != Exact || Integer::try_from(x).is_ok_and(|n| integer_exponential_is_exact(10, &n, p, true))
+}
+
+// Like `add_prec_round_valid`, for the Lambert W functions of a `BigExponentFloat`, whose results
+// are exact only for arguments that are zero or not finite (results outside the domain are NaN).
+pub fn big_exponent_float_lambert_w_prec_round_valid(
+    x: &BigExponentFloat,
+    _p: u64,
+    rm: RoundingMode,
+) -> bool {
+    rm != Exact || !x.is_finite() || x.is_zero()
 }
 
 // Like `add_prec_round_valid`, for $\ln x$, where x is a `BigExponentFloat`.

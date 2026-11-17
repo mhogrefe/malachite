@@ -39,5 +39,37 @@ LL |     let e = Float::from_float_prec_round_ref(&Float::ONE, prec, rm).0;
    |
    = help: use `(Float::one_prec(prec), Equal)`; the rounding mode is dead and the ordering is always `Equal`
 
-error: aborting due to 5 previous errors
+error: `BigExponentFloat::ONE` rounds a value that is exact at every precision
+  --> $DIR/redundant_prec_round_of_exact_constant.rs:33:13
+   |
+LL |     let a = Float::from_big_exponent_float_prec_round(BigExponentFloat::ONE, prec, rm).0;
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: use `(Float::one_prec(prec), Equal)`; the rounding mode is dead and the ordering is always `Equal`
+
+error: `&BigExponentFloat::ONE_HALF` rounds a value that is exact at every precision
+  --> $DIR/redundant_prec_round_of_exact_constant.rs:34:13
+   |
+LL |     let b = Float::from_big_exponent_float_prec_ref(&BigExponentFloat::ONE_HALF, prec).0;
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: use `(Float::one_half_prec(prec), Equal)`; the rounding mode is dead and the ordering is always `Equal`
+
+error: `BigExponentFloat::TWO` rounds a value that is exact at every precision
+  --> $DIR/redundant_prec_round_of_exact_constant.rs:36:13
+   |
+LL |     let c = BigExponentFloat::TWO.round_to_prec_round(prec, rm).0;
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: use `(BigExponentFloat::TWO, Equal)`; the rounding mode is dead and the ordering is always `Equal`
+
+error: `BigExponentFloat::NEGATIVE_ONE` rounds a value that is exact at every precision
+  --> $DIR/redundant_prec_round_of_exact_constant.rs:37:13
+   |
+LL |     let d = BigExponentFloat::NEGATIVE_ONE.round_to_prec_ref(prec).0;
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: use `(BigExponentFloat::NEGATIVE_ONE, Equal)`; the rounding mode is dead and the ordering is always `Equal`
+
+error: aborting due to 9 previous errors
 

@@ -253,8 +253,8 @@ fn sinh_cosh_series(t: &BigExponentFloat, w: u64) -> (BigExponentFloat, BigExpon
         let sinh_term = term
             .div_prec_ref_ref(&BigExponentFloat::from((k << 1) + 1), w)
             .0;
-        cosh_sum = cosh_sum.add_prec_ref_ref(&term, w).0;
-        sinh_sum = sinh_sum.add_prec_ref_ref(&sinh_term, w).0;
+        cosh_sum.add_prec_assign_ref(&term, w);
+        sinh_sum.add_prec_assign_ref(&sinh_term, w);
         if *term.get_exponent().unwrap() < limit {
             break;
         }

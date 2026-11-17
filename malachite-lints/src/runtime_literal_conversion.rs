@@ -16,7 +16,8 @@ declare_lint! {
     /// ### What it does
     ///
     /// Flags bignum conversions of integer literals that happen at runtime --
-    /// `Natural::from(100u32)` and the like, and `Rational::from_unsigneds`/`from_signeds` of two
+    /// `Natural::from(100u32)`, `BigExponentFloat::from(11u32)`, and the like, and
+    /// `Rational::from_unsigneds`/`from_signeds` of two
     /// literals -- as well as `const_from*` calls that are not inside a const context (a `const`
     /// block, a named `const`, a `static`, or a `const fn`). The latter matters most for the
     /// fraction constructors: `const_from_unsigneds`' naive Euclidean gcd is measurably slower at

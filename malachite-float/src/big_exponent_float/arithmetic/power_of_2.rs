@@ -27,10 +27,7 @@ impl PowerOf2<u64> for BigExponentFloat {
     /// use malachite_float::BigExponentFloat;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!(
-    ///     BigExponentFloat::power_of_2(0u64),
-    ///     BigExponentFloat::from(1)
-    /// );
+    /// assert_eq!(BigExponentFloat::power_of_2(0u64), BigExponentFloat::ONE);
     /// assert_eq!(
     ///     BigExponentFloat::power_of_2(3u64),
     ///     BigExponentFloat::from(8)
@@ -66,10 +63,7 @@ impl PowerOf2<i64> for BigExponentFloat {
     /// use malachite_float::BigExponentFloat;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!(
-    ///     BigExponentFloat::power_of_2(0i64),
-    ///     BigExponentFloat::from(1)
-    /// );
+    /// assert_eq!(BigExponentFloat::power_of_2(0i64), BigExponentFloat::ONE);
     /// assert_eq!(
     ///     BigExponentFloat::power_of_2(3i64),
     ///     BigExponentFloat::from(8)

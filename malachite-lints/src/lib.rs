@@ -91,11 +91,15 @@ mod use_width_mask;
 
 dylint_linting::dylint_library!();
 
-const BIGNUM_TYPES: [(&[&str], &str); 6] = [
+const BIGNUM_TYPES: [(&[&str], &str); 7] = [
     (&["malachite_nz", "natural", "Natural"], "Natural"),
     (&["malachite_nz", "integer", "Integer"], "Integer"),
     (&["malachite_q", "rational", "Rational"], "Rational"),
     (&["malachite_float", "float", "Float"], "Float"),
+    (
+        &["malachite_float", "big_exponent_float", "BigExponentFloat"],
+        "BigExponentFloat",
+    ),
     (
         &["malachite_nz", "gaussian_integer", "GaussianInteger"],
         "GaussianInteger",
@@ -147,6 +151,17 @@ fn bignum_name<'tcx>(
             path.len() == p.len() && path.iter().zip(p.iter()).all(|(a, b)| a.as_str() == *b)
         })
         .map(|&(_, name)| name)
+}
+
+// Whether `e` is inside a function whose name contains `word`. A function named for an operation may
+// define it through another one -- a reference implementation of squaring that multiplies, or of
+// the reciprocal that divides -- and must not be told to call the operation it is defining or
+// checking.
+fn in_fn_named_for(cx: &rustc_lint::LateContext<'_>, e: &rustc_hir::Expr<'_>, word: &str) -> bool {
+    let owner = cx.tcx.hir_enclosing_body_owner(e.hir_id);
+    cx.tcx
+        .opt_item_name(owner.to_def_id())
+        .is_some_and(|n| n.as_str().contains(word))
 }
 
 // Strips any trailing `_val`/`_ref` variant suffixes, so that all by-value/by-reference variants of

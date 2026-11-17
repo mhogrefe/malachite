@@ -16,12 +16,18 @@ declare_lint! {
     /// ### What it does
     ///
     /// Flags multiplying a bignum by itself (`&x * &x`) and raising one to the power of 2
-    /// (`x.pow(2)`, `x.pow_assign(2)`).
+    /// (`x.pow(2)`, `x.pow_assign(2)`). For `Float` and `BigExponentFloat`, the rounding
+    /// multiplication functions are flagged too, like `x.mul_prec_ref_ref(&x, prec)`,
+    /// `x.mul_prec_round(x.clone(), prec, rm)`, or `x.mul_round_ref_ref(&x, rm)`.
     ///
     /// ### Why is this bad?
     ///
     /// Squaring has a dedicated, faster implementation: use `square()`, `(&x).square()`, or
-    /// `square_assign()`.
+    /// `square_assign()`, or the corresponding member of the `square_prec*`/`square_round*`
+    /// families, like `x.square_prec_ref(prec)`.
+    ///
+    /// The rounding multiplication functions are not flagged inside a function with `square` in
+    /// its name, which may be defining or checking squaring by multiplying.
     ///
     /// ### Example
     ///
@@ -64,6 +70,56 @@ impl<'tcx> LateLintPass<'tcx> for UseSquare {
                         by itself",
                     );
                 }
+            }
+            ExprKind::MethodCall(seg, recv, [arg, _, ..], _) => {
+                // `x.mul_prec_ref_ref(&x, prec)` and the rest of the rounding multiplication
+                // families, when the type has the corresponding squaring function.
+                let name = seg.ident.name.as_str();
+                let base = crate::strip_variant_suffixes(name);
+                let Some(stem) = base.strip_prefix("mul_") else {
+                    return;
+                };
+                if !matches!(
+                    stem,
+                    "prec_round"
+                        | "prec"
+                        | "round"
+                        | "prec_round_assign"
+                        | "prec_assign"
+                        | "round_assign"
+                ) {
+                    return;
+                }
+                let l = crate::peel_clone_and_borrows(recv);
+                let r = crate::peel_clone_and_borrows(arg);
+                let Some(adt_did) = crate::bignum_adt_did(cx, cx.typeck_results().expr_ty(l))
+                else {
+                    return;
+                };
+                if !eq_expr_value(cx, l, r) {
+                    return;
+                }
+                // The by-reference squaring functions end in a single `_ref`. A receiver taken by
+                // reference is spelled `_ref_val` or `_ref_ref` in the multiplication's name; a
+                // receiver cloned for the call is better squared by reference, too.
+                let cloned = matches!(
+                    recv.kind,
+                    ExprKind::MethodCall(seg, _, [], _) if seg.ident.name.as_str() == "clone"
+                );
+                let by_ref =
+                    !stem.ends_with("assign") && (cloned || name[base.len()..].starts_with("_ref"));
+                let square = format!("square_{stem}{}", if by_ref { "_ref" } else { "" });
+                if !crate::has_inherent_fn(cx, adt_did, &square)
+                    || crate::in_fn_named_for(cx, expr, "square")
+                {
+                    return;
+                }
+                span_lint(
+                    cx,
+                    USE_SQUARE,
+                    expr.span,
+                    format!("use `{square}` instead of multiplying a value by itself"),
+                );
             }
             ExprKind::MethodCall(seg, recv, [arg], _) => {
                 let name = seg.ident.name.as_str();

@@ -470,7 +470,7 @@ fn pow_integer(x: &Float, z: &Integer, prec: u64, rm: RoundingMode) -> (Float, O
             Floor
         };
         loop {
-            let t = Float::ONE.div_prec_round_val_ref(x, wprec, rnd1).0;
+            let t = x.reciprocal_prec_round_ref(wprec, rnd1).0;
             if t.is_infinite() {
                 // For |x| < 1 the reciprocal is rounded toward zero, so an overflowing 1/x
                 // saturates at the largest finite value rather than reaching infinity (and the

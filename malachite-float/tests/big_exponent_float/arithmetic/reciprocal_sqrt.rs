@@ -190,10 +190,7 @@ fn reciprocal_sqrt_prec_round_properties() {
             assert_eq!(o, r.1);
             if finite_nonzero(&x) && x.is_sign_positive() {
                 // The function is decreasing, so r^2 * x is greater than 1 iff r is too large.
-                assert_eq!(
-                    ((&r.0).square() * &x).partial_cmp(&BigExponentFloat::ONE),
-                    Some(r.1)
-                );
+                assert_eq!(((&r.0).square() * &x).partial_cmp(&1u32), Some(r.1));
             }
         },
     );
