@@ -309,3 +309,15 @@ pub trait TreeTMinus1 {
 pub trait TreeTMinus1Assign {
     fn tree_t_minus_1_assign(&mut self);
 }
+
+/// Computes the Wright omega function $\omega(x)$ of a number.
+pub trait WrightOmega {
+    type Output;
+
+    fn wright_omega(self) -> Self::Output;
+}
+
+/// Replaces a number $x$ with $\omega(x)$, its Wright omega function.
+pub trait WrightOmegaAssign {
+    fn wright_omega_assign(&mut self);
+}

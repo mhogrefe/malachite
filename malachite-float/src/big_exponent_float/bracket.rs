@@ -12,6 +12,7 @@
 use crate::big_exponent_float::BigExponentFloat;
 use crate::big_exponent_float::exponential::exp::power_of_2_integer;
 use core::cmp::Ordering;
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::integer::Integer;
@@ -25,8 +26,12 @@ pub(crate) const ZIV_GUARD_BITS: u64 = 64;
 // An enclosure [lo, hi] of a real number.
 pub(crate) type Bracket = (BigExponentFloat, BigExponentFloat);
 
-// The enclosure [lo, lo + ulp] of a positive value whose rounding down to `prec` bits is `lo`.
+// The enclosure [lo, lo + ulp] of a value whose rounding down to `prec` bits is `lo`. A zero `lo`
+// is taken to be exact: a `BigExponentFloat` does not underflow.
 pub(crate) fn floor_bracket(lo: BigExponentFloat, prec: u64) -> Bracket {
+    if lo == 0u32 {
+        return (BigExponentFloat::ZERO, BigExponentFloat::ZERO);
+    }
     let ulp = power_of_2_integer(lo.get_exponent().unwrap() - Integer::from(prec));
     let hi = lo.add_prec_round_ref_val(ulp, prec, Ceiling).0;
     (lo, hi)

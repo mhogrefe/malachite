@@ -85,3 +85,6 @@ pub mod tree_t0;
 /// Functions for computing $T_{-1}(x)$, the other real branch of the tree function $T$, of
 /// [`BigExponentFloat`](super::BigExponentFloat)s and [`Rational`](malachite_q::Rational)s.
 pub mod tree_t_minus_1;
+/// Functions for computing the Wright omega function $\omega(x)$ of
+/// [`BigExponentFloat`](super::BigExponentFloat)s and [`Rational`](malachite_q::Rational)s.
+pub mod wright_omega;

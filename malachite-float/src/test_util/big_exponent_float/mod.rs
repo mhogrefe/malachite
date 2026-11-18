@@ -432,3 +432,58 @@ pub fn inverse_gudermannian_rational_prec_round_naive(
         }
     })
 }
+
+// The Wright omega function of a finite `BigExponentFloat` other than 1, from the identity omega(x)
+// = W_0(e^x): the exponential and the Lambert W function are rounded down and up at a working
+// precision that doubles until the two results round alike. The time taken grows with |x|.
+pub fn wright_omega_prec_round_naive(
+    x: &BigExponentFloat,
+    prec: u64,
+    rm: RoundingMode,
+) -> (BigExponentFloat, Ordering) {
+    assert!(x.is_finite() && *x != 1u32);
+    assert_ne!(rm, Exact);
+    let mut working_prec = prec + 64;
+    loop {
+        let lo = x
+            .exp_prec_round_ref(working_prec, Floor)
+            .0
+            .lambert_w0_prec_round(working_prec, Floor)
+            .0;
+        let hi = x
+            .exp_prec_round_ref(working_prec, Ceiling)
+            .0
+            .lambert_w0_prec_round(working_prec, Ceiling)
+            .0;
+        if let Some(r) = round_between(&lo, &hi, prec, rm) {
+            return r;
+        }
+        working_prec <<= 1;
+    }
+}
+
+// The Wright omega function of a `Rational` other than 1, computed like
+// `wright_omega_prec_round_naive`.
+pub fn wright_omega_rational_prec_round_naive(
+    x: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> (BigExponentFloat, Ordering) {
+    assert_ne!(*x, 1u32);
+    assert_ne!(rm, Exact);
+    let mut working_prec = prec + 64;
+    loop {
+        let lo = BigExponentFloat::exp_rational_prec_round_ref(x, working_prec, Floor)
+            .0
+            .lambert_w0_prec_round(working_prec, Floor)
+            .0;
+        let hi = BigExponentFloat::exp_rational_prec_round_ref(x, working_prec, Ceiling)
+            .0
+            .lambert_w0_prec_round(working_prec, Ceiling)
+            .0;
+        if let Some(r) = round_between(&lo, &hi, prec, rm) {
+            return r;
+        }
+        working_prec <<= 1;
+    }
+}

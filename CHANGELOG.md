@@ -66,6 +66,8 @@ documented by git history.
   `num::exponential::traits`, for the two real branches of the Lambert $W$ function.
 - The `TreeT0`, `TreeT0Assign`, `TreeTMinus1`, and `TreeTMinus1Assign` traits, in
   `num::exponential::traits`, for the two real branches of the tree function $T(x) = -W(-x)$.
+- The `WrightOmega` and `WrightOmegaAssign` traits, in `num::exponential::traits`, for the Wright
+  omega function.
 - The `Gudermannian`, `GudermannianAssign`, `InverseGudermannian`, and
   `InverseGudermannianAssign` traits, in `num::hyperbolic::traits`, for the Gudermannian function
   and its inverse.
@@ -1208,7 +1210,8 @@ documented by git history.
     the logarithms to base 2, 10, a power of 2, a `BigExponentFloat`, or a `Rational`, the
     $\log(1+x)$ form of each, and `compound`;
   - the two real branches of the Lambert $W$ function (`lambert_w0` and `lambert_w_minus_1`, with
-    `Rational` forms), and those of the tree function (`tree_t0` and `tree_t_minus_1`);
+    `Rational` forms), those of the tree function (`tree_t0` and `tree_t_minus_1`), and the Wright
+    omega function (`wright_omega`);
   - the arithmetic-geometric mean (`agm`, with `Rational` forms);
   - the trigonometric functions, their inverses, and `atan2`, each with `_pi` and `_with_period`
     forms and `Rational` forms, the hyperbolic functions and their inverses, and the Gudermannian
@@ -1244,6 +1247,16 @@ documented by git history.
   the negated argument, rounded in the opposite direction and negated. The special cases:
   $T_0(\pm0.0) = \pm0.0$, $T_0(-\infty) = -\infty$, $T_{-1}(\pm0.0) = \infty$, and `NaN` outside the
   domain of each branch.
+- The Wright omega function $\omega(x) = W_0(e^x)$, the positive solution $y$ of $y + \ln y = x$,
+  correctly rounded for every real $x$: `wright_omega`, with the same forms as `lambert_w0` on
+  `Float` (including the `WrightOmega` and `WrightOmegaAssign` traits and the
+  `primitive_float_wright_omega` functions) and on `BigExponentFloat`. The algorithm is a port of
+  the one in Azurite: a Newton candidate for $y + \ln y = x$ verified by one enclosure of its
+  residual, so that $e^x$ is not formed and a large $x$ costs about a logarithm, with one path added
+  for a very negative $x$, where $\omega(x)$ is found from $e^x$ alone. The special cases:
+  $\omega(\infty) = \infty$, $\omega(-\infty) = 0$, and $\omega(1) = 1$ exactly. A `Float` result
+  underflows when $x$ is negative enough; the `BigExponentFloat` function never underflows, but
+  its time and memory grow with the exponent of a negative argument, as those of `exp` do.
 - The Gudermannian function $\operatorname{gd}(x) = \int_0^x \operatorname{sech} t\,dt =
   2\arctan(\tanh(x/2))$, correctly rounded. `Float` has `gudermannian_prec_round`,
   `gudermannian_prec`, and `gudermannian_round`, with their `_ref` and `_assign` forms,

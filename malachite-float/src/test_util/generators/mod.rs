@@ -10256,3 +10256,108 @@ pub fn float_rounding_mode_pair_gen_var_54() -> Generator<(Float, RoundingMode)>
         },
     )
 }
+
+// All `(Float, u64, RoundingMode)` that are valid inputs to `Float.wright_omega_prec_round`: those
+// of `float_unsigned_rounding_mode_triple_gen_var_36`, without `Exact` for a zero `Float`.
+pub fn float_unsigned_rounding_mode_triple_gen_var_58() -> Generator<(Float, u64, RoundingMode)> {
+    Generator::new(
+        &|| {
+            Box::new(
+                exhaustive_float_unsigned_rounding_mode_triple_gen_var_36()
+                    .filter(|(x, _, rm)| *rm != RoundingMode::Exact || !x.is_zero()),
+            )
+        },
+        &|config| {
+            Box::new(
+                random_float_unsigned_rounding_mode_triple_gen_var_36(config)
+                    .filter(|(x, _, rm)| *rm != RoundingMode::Exact || !x.is_zero()),
+            )
+        },
+        &|config| {
+            Box::new(
+                special_random_float_unsigned_rounding_mode_triple_gen_var_36(config)
+                    .filter(|(x, _, rm)| *rm != RoundingMode::Exact || !x.is_zero()),
+            )
+        },
+    )
+}
+
+// All `(Float, RoundingMode)` that are valid inputs to `Float.wright_omega_round`: those of
+// `float_rounding_mode_pair_gen_var_47`, without `Exact` for a zero `Float`.
+pub fn float_rounding_mode_pair_gen_var_55() -> Generator<(Float, RoundingMode)> {
+    Generator::new(
+        &|| {
+            Box::new(
+                exhaustive_float_rounding_mode_pair_gen_var_47()
+                    .filter(|(x, rm)| *rm != RoundingMode::Exact || !x.is_zero()),
+            )
+        },
+        &|config| {
+            Box::new(
+                random_float_rounding_mode_pair_gen_var_47(config)
+                    .filter(|(x, rm)| *rm != RoundingMode::Exact || !x.is_zero()),
+            )
+        },
+        &|config| {
+            Box::new(
+                special_random_float_rounding_mode_pair_gen_var_47(config)
+                    .filter(|(x, rm)| *rm != RoundingMode::Exact || !x.is_zero()),
+            )
+        },
+    )
+}
+
+// All `(BigExponentFloat, u64, RoundingMode)` that are valid inputs to
+// `BigExponentFloat::wright_omega_prec_round`, with exponents at most 2^10: those of
+// `big_exponent_float_unsigned_rounding_mode_triple_gen_var_9`, without `Exact` for a zero
+// `BigExponentFloat`.
+pub fn big_exponent_float_unsigned_rounding_mode_triple_gen_var_25()
+-> Generator<(BigExponentFloat, u64, RoundingMode)> {
+    Generator::new(
+        &|| {
+            Box::new(
+                exhaustive_big_exponent_float_unsigned_rounding_mode_triple_gen_var_9()
+                    .filter(|(x, _, rm)| *rm != RoundingMode::Exact || !x.is_zero()),
+            )
+        },
+        &|config| {
+            Box::new(
+                random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_9(config)
+                    .filter(|(x, _, rm)| *rm != RoundingMode::Exact || !x.is_zero()),
+            )
+        },
+        &|config| {
+            Box::new(
+                special_random_big_exponent_float_unsigned_rounding_mode_triple_gen_var_9(config)
+                    .filter(|(x, _, rm)| *rm != RoundingMode::Exact || !x.is_zero()),
+            )
+        },
+    )
+}
+
+// All `(Rational, u64, RoundingMode)` that are valid inputs to
+// `BigExponentFloat::wright_omega_rational_prec_round` and
+// `Float::wright_omega_rational_prec_round`: those of
+// `rational_unsigned_rounding_mode_triple_gen_var_19`, without `Exact` for a zero `Rational`.
+pub fn rational_unsigned_rounding_mode_triple_gen_var_25() -> GT3 {
+    Generator::new(
+        &|| {
+            Box::new(
+                exhaustive_rational_unsigned_rounding_mode_triple_gen_var_19()
+                    .filter(|(x, _, rm)| *rm != RoundingMode::Exact || *x != 0u32),
+            )
+        },
+        &|config| {
+            Box::new(
+                random_rational_unsigned_rounding_mode_triple_gen_var_19(config)
+                    .filter(|(x, _, rm)| *rm != RoundingMode::Exact || *x != 0u32),
+            )
+        },
+        &|config| {
+            Box::new(
+                special_random_rational_unsigned_rounding_mode_triple_gen_var_19(config)
+                    .filter(|(x, _, rm)| *rm != RoundingMode::Exact || *x != 0u32),
+            )
+        },
+    )
+}

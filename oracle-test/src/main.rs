@@ -3571,6 +3571,40 @@ const AZURITE_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_float_tree_t_minus_1",
     ),
     (
+        "demo_float_wright_omega_assign_debug",
+        "az_float_wright_omega",
+    ),
+    ("demo_float_wright_omega_debug", "az_float_wright_omega"),
+    (
+        "demo_float_wright_omega_prec_debug",
+        "az_float_wright_omega",
+    ),
+    (
+        "demo_float_wright_omega_prec_round_debug",
+        "az_float_wright_omega",
+    ),
+    (
+        "demo_float_wright_omega_rational_prec_debug",
+        "az_float_wright_omega_rational",
+    ),
+    (
+        "demo_float_wright_omega_rational_prec_ref_debug",
+        "az_float_wright_omega_rational",
+    ),
+    (
+        "demo_float_wright_omega_rational_prec_round_debug",
+        "az_float_wright_omega_rational",
+    ),
+    (
+        "demo_float_wright_omega_rational_prec_round_ref_debug",
+        "az_float_wright_omega_rational",
+    ),
+    ("demo_float_wright_omega_ref_debug", "az_float_wright_omega"),
+    (
+        "demo_float_wright_omega_round_debug",
+        "az_float_wright_omega",
+    ),
+    (
         "demo_float_unsigned_pow_rational_prec_round_debug",
         "az_float_unsigned_pow_rational",
     ),
@@ -6627,6 +6661,22 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
     (
         "demo_big_exponent_float_tree_t_minus_1_rational_prec_round_debug",
         "az_big_exponent_float_tree_t_minus_1_rational",
+    ),
+    (
+        "demo_big_exponent_float_wright_omega_prec_debug",
+        "az_big_exponent_float_wright_omega",
+    ),
+    (
+        "demo_big_exponent_float_wright_omega_prec_round_debug",
+        "az_big_exponent_float_wright_omega",
+    ),
+    (
+        "demo_big_exponent_float_wright_omega_rational_prec_debug",
+        "az_big_exponent_float_wright_omega_rational",
+    ),
+    (
+        "demo_big_exponent_float_wright_omega_rational_prec_round_debug",
+        "az_big_exponent_float_wright_omega_rational",
     ),
     (
         "demo_big_exponent_float_unsigned_pow_rational_prec_debug",

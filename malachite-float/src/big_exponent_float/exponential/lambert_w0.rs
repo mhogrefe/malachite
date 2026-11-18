@@ -48,51 +48,64 @@ const LOG_SEED_STEPS: usize = 4;
 // The number of mean-value rounds that shrink the enclosure around a candidate.
 const MEAN_VALUE_ROUNDS: usize = 3;
 
-// The argument of a Lambert W function: a `BigExponentFloat` or a `Rational`.
+// The argument of a Lambert W function: a `BigExponentFloat` or a `Rational`, or e^x for a
+// `BigExponentFloat` or a `Rational` x (the argument that the Wright omega function passes to W_0).
 pub(crate) enum LambertTarget<'a> {
     BigExponentFloat(&'a BigExponentFloat),
     Rational(&'a Rational),
+    Exp(&'a BigExponentFloat),
+    ExpRational(&'a Rational),
 }
 
 impl LambertTarget<'_> {
     // A float at or below the argument, at precision `prec`: the float itself for a float, and the
-    // `Floor` rounding of a rational.
+    // `Floor` rounding of a rational or of an exponential.
     //
     // This is equivalent to the first components of `floatAt` and `ratAt` from
-    // `AzFloat/LambertWBracket.lean`, Azurite.
+    // `AzFloat/LambertWBracket.lean`, and of `expAt` and `expRatAt` from
+    // `AzFloat/WrightOmegaBracket.lean`, Azurite.
     #[inline]
-    fn lower(&self, prec: u64) -> Cow<'_, BigExponentFloat> {
+    pub(crate) fn lower(&self, prec: u64) -> Cow<'_, BigExponentFloat> {
         match self {
             LambertTarget::BigExponentFloat(x) => Cow::Borrowed(*x),
             LambertTarget::Rational(q) => {
                 Cow::Owned(BigExponentFloat::from_rational_prec_round_ref(q, prec, Floor).0)
             }
+            LambertTarget::Exp(x) => Cow::Owned(x.exp_prec_round_ref(prec, Floor).0),
+            LambertTarget::ExpRational(q) => {
+                Cow::Owned(BigExponentFloat::exp_rational_prec_round_ref(q, prec, Floor).0)
+            }
         }
     }
 
     // A float at or above the argument, at precision `prec`: the float itself for a float, and the
-    // `Ceiling` rounding of a rational.
+    // `Ceiling` rounding of a rational or of an exponential.
     //
     // This is equivalent to the second components of `floatAt` and `ratAt` from
-    // `AzFloat/LambertWBracket.lean`, Azurite.
+    // `AzFloat/LambertWBracket.lean`, and of `expAt` and `expRatAt` from
+    // `AzFloat/WrightOmegaBracket.lean`, Azurite.
     #[inline]
-    fn upper(&self, prec: u64) -> Cow<'_, BigExponentFloat> {
+    pub(crate) fn upper(&self, prec: u64) -> Cow<'_, BigExponentFloat> {
         match self {
             LambertTarget::BigExponentFloat(x) => Cow::Borrowed(*x),
             LambertTarget::Rational(q) => {
                 Cow::Owned(BigExponentFloat::from_rational_prec_round_ref(q, prec, Ceiling).0)
+            }
+            LambertTarget::Exp(x) => Cow::Owned(x.exp_prec_round_ref(prec, Ceiling).0),
+            LambertTarget::ExpRational(q) => {
+                Cow::Owned(BigExponentFloat::exp_rational_prec_round_ref(q, prec, Ceiling).0)
             }
         }
     }
 }
 
 // This is equivalent to `maxOf` from `AzFloat/Compare.lean`, Azurite.
-fn max_of(x: BigExponentFloat, y: BigExponentFloat) -> BigExponentFloat {
+pub(crate) fn max_of(x: BigExponentFloat, y: BigExponentFloat) -> BigExponentFloat {
     if x < y { y } else { x }
 }
 
 // This is equivalent to `minOf` from `AzFloat/Compare.lean`, Azurite.
-fn min_of(x: BigExponentFloat, y: BigExponentFloat) -> BigExponentFloat {
+pub(crate) fn min_of(x: BigExponentFloat, y: BigExponentFloat) -> BigExponentFloat {
     if y < x { y } else { x }
 }
 
@@ -233,7 +246,7 @@ fn q_tight(target: &LambertTarget, q: Bracket) -> Bracket {
 // The bit length of the exponent of a float: ln|x| has about that many integer bits.
 //
 // This is equivalent to `expSize` from `AzFloat/LambertWBracket.lean`, Azurite.
-fn exponent_size(x: &BigExponentFloat) -> u64 {
+pub(crate) fn exponent_size(x: &BigExponentFloat) -> u64 {
     x.get_exponent()
         .map_or(0, SignificantBits::significant_bits)
 }
@@ -243,7 +256,7 @@ fn exponent_size(x: &BigExponentFloat) -> u64 {
 // end stays close to W_0(x) however large x is.
 //
 // This is equivalent to `aprioriW0Pos` from `AzFloat/LambertWBracket.lean`, Azurite.
-fn apriori_w0_pos(target: &LambertTarget, prec: u64) -> Bracket {
+pub(crate) fn apriori_w0_pos(target: &LambertTarget, prec: u64) -> Bracket {
     let x_lo = target.lower(prec);
     let x_hi = target.upper(prec).into_owned();
     if *x_lo < 3u32 {
@@ -573,7 +586,11 @@ fn seed_float(branch0: bool, x: &BigExponentFloat) -> Option<BigExponentFloat> {
 // One Newton step for w + ln|w| = l at precision `prec`.
 //
 // This is equivalent to `logSeedStep` from `AzFloat/LambertWBracket.lean`, Azurite.
-fn log_seed_step(l: &BigExponentFloat, w: &BigExponentFloat, prec: u64) -> BigExponentFloat {
+pub(crate) fn log_seed_step(
+    l: &BigExponentFloat,
+    w: &BigExponentFloat,
+    prec: u64,
+) -> BigExponentFloat {
     let g = w
         .add_prec_ref_val(w.abs().ln_prec(prec).0, prec)
         .0
@@ -720,7 +737,7 @@ fn halley_candidate(
 //
 // This is equivalent to `lambertBracket` (with `lambertWork` and `lambertTarget`) from
 // `AzFloat/LambertWBracket.lean`, Azurite.
-fn lambert_bracket(
+pub(crate) fn lambert_bracket(
     branch0: bool,
     target: &LambertTarget,
     q: Option<&Bracket>,

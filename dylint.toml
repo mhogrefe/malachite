@@ -416,6 +416,8 @@ long_lines_exceptions = [
     { file = "malachite-float/src/bin_util/demo_and_bench/big_exponent_float/hyperbolic/inverse_gudermannian.rs", line = 153 },
     { file = "malachite-float/src/bin_util/demo_and_bench/big_exponent_float/hyperbolic/inverse_gudermannian.rs", line = 305 },
     { file = "malachite-float/src/bin_util/demo_and_bench/big_exponent_float/hyperbolic/inverse_gudermannian.rs", line = 313 },
+    { file = "malachite-float/src/bin_util/demo_and_bench/big_exponent_float/exponential/wright_omega.rs", line = 132 },
+    { file = "malachite-float/src/bin_util/demo_and_bench/big_exponent_float/exponential/wright_omega.rs", line = 288 },
     { file = "malachite-float/src/test_util/generators/mod.rs", line = 13 },
     { file = "malachite-float/src/test_util/generators/mod.rs", line = 183 },
     { file = "malachite-float/src/test_util/generators/mod.rs", line = 192 },
