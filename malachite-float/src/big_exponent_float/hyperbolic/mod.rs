@@ -34,6 +34,9 @@ pub mod coth;
 /// Functions for computing the hyperbolic cosecant of
 /// [`BigExponentFloat`](super::BigExponentFloat)s and [`Rational`](malachite_q::Rational)s.
 pub mod csch;
+/// Functions for computing the Gudermannian function of
+/// [`BigExponentFloat`](super::BigExponentFloat)s and [`Rational`](malachite_q::Rational)s.
+pub mod gudermannian;
 /// Functions for computing the hyperbolic secant of [`BigExponentFloat`](super::BigExponentFloat)s
 /// and [`Rational`](malachite_q::Rational)s.
 pub mod sech;

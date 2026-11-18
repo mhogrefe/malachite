@@ -22,6 +22,7 @@ use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::stats::common_values_map::common_values_map;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
+use malachite_q::Rational;
 
 // The `Float` with the same value as `x` and with `x`'s precision, if `x`'s exponent is in
 // `Float`'s range. NaN, infinities, and zero map to the corresponding `Float`s (zero to positive
@@ -274,4 +275,99 @@ pub fn assert_lambert_w_correctly_rounded(
     let gap = big_exponent_float_power_of_2(gap_exponent);
     let bound = if below { w + gap } else { w - gap };
     assert_eq!(lambert_w_exceeds(branch0, cmp_x, x_float, &bound), !below);
+}
+
+// Rounds a positive value lying strictly between `lo` and `hi` to `prec` bits with `rm`, when the
+// two ends determine the result and its `Ordering`.
+fn round_between(
+    lo: &BigExponentFloat,
+    hi: &BigExponentFloat,
+    prec: u64,
+    rm: RoundingMode,
+) -> Option<(BigExponentFloat, Ordering)> {
+    let l = lo.round_to_prec_round_ref(prec, rm).0;
+    if l != hi.round_to_prec_round_ref(prec, rm).0 {
+        None
+    } else if l <= *lo {
+        Some((l, Less))
+    } else if l >= *hi {
+        Some((l, Greater))
+    } else {
+        None
+    }
+}
+
+// Gives a finite nonzero result of a function that is odd the sign of its argument: `f` computes
+// the function of the absolute value, given the rounding mode to use.
+fn odd_function_result<F: Fn(RoundingMode) -> (BigExponentFloat, Ordering)>(
+    negative: bool,
+    rm: RoundingMode,
+    f: F,
+) -> (BigExponentFloat, Ordering) {
+    if negative {
+        let (g, o) = f(-rm);
+        (-g, o.reverse())
+    } else {
+        f(rm)
+    }
+}
+
+// The Gudermannian function of a finite nonzero `BigExponentFloat`, from the identity gd(x) =
+// arctan(sinh(x)): the hyperbolic sine and the arctangent are rounded down and up at a working
+// precision that doubles until the two results round alike. The time taken grows with |x|.
+pub fn gudermannian_prec_round_naive(
+    x: &BigExponentFloat,
+    prec: u64,
+    rm: RoundingMode,
+) -> (BigExponentFloat, Ordering) {
+    assert!(x.is_finite() && !x.is_zero());
+    assert_ne!(rm, Exact);
+    let a = if *x < 0u32 { -x } else { x.clone() };
+    odd_function_result(*x < 0u32, rm, |rm| {
+        let mut working_prec = prec + 64;
+        loop {
+            let lo = a
+                .sinh_prec_round_ref(working_prec, Floor)
+                .0
+                .atan_prec_round(working_prec, Floor)
+                .0;
+            let hi = a
+                .sinh_prec_round_ref(working_prec, Ceiling)
+                .0
+                .atan_prec_round(working_prec, Ceiling)
+                .0;
+            if let Some(r) = round_between(&lo, &hi, prec, rm) {
+                return r;
+            }
+            working_prec <<= 1;
+        }
+    })
+}
+
+// The Gudermannian function of a nonzero `Rational`, computed like `gudermannian_prec_round_naive`.
+pub fn gudermannian_rational_prec_round_naive(
+    x: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> (BigExponentFloat, Ordering) {
+    assert_ne!(*x, 0u32);
+    assert_ne!(rm, Exact);
+    let a = if *x < 0u32 { -x } else { x.clone() };
+    odd_function_result(*x < 0u32, rm, |rm| {
+        let mut working_prec = prec + 64;
+        loop {
+            let lo = BigExponentFloat::sinh_rational_prec_round_ref(&a, working_prec, Floor)
+                .0
+                .atan_prec_round(working_prec, Floor)
+                .0;
+            let hi = BigExponentFloat::sinh_rational_prec_round_ref(&a, working_prec, Ceiling)
+                .0
+                .atan_prec_round(working_prec, Ceiling)
+                .0;
+            if let Some(r) = round_between(&lo, &hi, prec, rm) {
+                return r;
+            }
+            working_prec <<= 1;
+        }
+    })
 }

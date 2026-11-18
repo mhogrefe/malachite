@@ -214,6 +214,7 @@ impl Deref for ComparableBigExponentFloatRef<'_> {
 pub mod arithmetic;
 /// Basic functions for working with [`BigExponentFloat`]s.
 pub mod basic;
+pub(crate) mod bracket;
 /// Traits for comparing [`BigExponentFloat`]s for equality or order, with each other and with other
 /// numeric types.
 pub mod comparison;

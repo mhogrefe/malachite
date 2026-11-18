@@ -42,6 +42,10 @@ pub mod coth;
 /// [`CschAssign`](malachite_base::num::hyperbolic::traits::CschAssign), traits for computing the
 /// hyperbolic cosecant of [`Float`](super::Float)s.
 pub mod csch;
+/// Implementations of [`Gudermannian`](malachite_base::num::hyperbolic::traits::Gudermannian) and
+/// [`GudermannianAssign`](malachite_base::num::hyperbolic::traits::GudermannianAssign), traits for
+/// computing the Gudermannian function of [`Float`](super::Float)s.
+pub mod gudermannian;
 /// Implementations of [`Sech`](malachite_base::num::hyperbolic::traits::Sech) and
 /// [`SechAssign`](malachite_base::num::hyperbolic::traits::SechAssign), traits for computing the
 /// hyperbolic secant of [`Float`](super::Float)s.

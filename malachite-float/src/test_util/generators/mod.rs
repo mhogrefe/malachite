@@ -10206,3 +10206,53 @@ pub fn big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_22_f
         },
     )
 }
+
+// All `(Float, u64, RoundingMode)` that are valid inputs to `Float.gudermannian_prec_round`: those
+// of `float_unsigned_rounding_mode_triple_gen_var_36`, without `Exact` for an infinite `Float`.
+pub fn float_unsigned_rounding_mode_triple_gen_var_57() -> Generator<(Float, u64, RoundingMode)> {
+    Generator::new(
+        &|| {
+            Box::new(
+                exhaustive_float_unsigned_rounding_mode_triple_gen_var_36()
+                    .filter(|(x, _, rm)| *rm != RoundingMode::Exact || !x.is_infinite()),
+            )
+        },
+        &|config| {
+            Box::new(
+                random_float_unsigned_rounding_mode_triple_gen_var_36(config)
+                    .filter(|(x, _, rm)| *rm != RoundingMode::Exact || !x.is_infinite()),
+            )
+        },
+        &|config| {
+            Box::new(
+                special_random_float_unsigned_rounding_mode_triple_gen_var_36(config)
+                    .filter(|(x, _, rm)| *rm != RoundingMode::Exact || !x.is_infinite()),
+            )
+        },
+    )
+}
+
+// All `(Float, RoundingMode)` that are valid inputs to `Float.gudermannian_round`: those of
+// `float_rounding_mode_pair_gen_var_47`, without `Exact` for an infinite `Float`.
+pub fn float_rounding_mode_pair_gen_var_54() -> Generator<(Float, RoundingMode)> {
+    Generator::new(
+        &|| {
+            Box::new(
+                exhaustive_float_rounding_mode_pair_gen_var_47()
+                    .filter(|(x, rm)| *rm != RoundingMode::Exact || !x.is_infinite()),
+            )
+        },
+        &|config| {
+            Box::new(
+                random_float_rounding_mode_pair_gen_var_47(config)
+                    .filter(|(x, rm)| *rm != RoundingMode::Exact || !x.is_infinite()),
+            )
+        },
+        &|config| {
+            Box::new(
+                special_random_float_rounding_mode_pair_gen_var_47(config)
+                    .filter(|(x, rm)| *rm != RoundingMode::Exact || !x.is_infinite()),
+            )
+        },
+    )
+}

@@ -242,6 +242,7 @@ pub mod big_exponent_float {
         pub mod cosh;
         pub mod coth;
         pub mod csch;
+        pub mod gudermannian;
         pub mod sech;
         pub mod sinh;
         pub mod sinh_cosh;
@@ -546,6 +547,7 @@ pub mod float {
         pub mod cosh;
         pub mod coth;
         pub mod csch;
+        pub mod gudermannian;
         pub mod sech;
         pub mod sinh;
         pub mod sinh_cosh;

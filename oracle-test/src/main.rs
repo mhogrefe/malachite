@@ -2702,6 +2702,44 @@ const AZURITE_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_float_ln_rational",
     ),
     ("demo_float_ln_unsigned_prec_debug", "az_float_ln_rational"),
+    (
+        "demo_float_gudermannian_assign_debug",
+        "az_float_gudermannian",
+    ),
+    ("demo_float_gudermannian_debug", "az_float_gudermannian"),
+    (
+        "demo_float_gudermannian_extreme_debug",
+        "az_float_gudermannian",
+    ),
+    (
+        "demo_float_gudermannian_prec_debug",
+        "az_float_gudermannian",
+    ),
+    (
+        "demo_float_gudermannian_prec_round_debug",
+        "az_float_gudermannian",
+    ),
+    (
+        "demo_float_gudermannian_rational_prec_debug",
+        "az_float_gudermannian_rational",
+    ),
+    (
+        "demo_float_gudermannian_rational_prec_ref_debug",
+        "az_float_gudermannian_rational",
+    ),
+    (
+        "demo_float_gudermannian_rational_prec_round_debug",
+        "az_float_gudermannian_rational",
+    ),
+    (
+        "demo_float_gudermannian_rational_prec_round_ref_debug",
+        "az_float_gudermannian_rational",
+    ),
+    ("demo_float_gudermannian_ref_debug", "az_float_gudermannian"),
+    (
+        "demo_float_gudermannian_round_debug",
+        "az_float_gudermannian",
+    ),
     ("demo_float_lambert_w0_assign_debug", "az_float_lambert_w0"),
     ("demo_float_lambert_w0_debug", "az_float_lambert_w0"),
     ("demo_float_lambert_w0_extreme_debug", "az_float_lambert_w0"),
@@ -6233,6 +6271,22 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
     (
         "demo_big_exponent_float_agm_big_exponent_float_rational_prec_round_debug",
         "az_big_exponent_float_agm_float_rational",
+    ),
+    (
+        "demo_big_exponent_float_gudermannian_prec_debug",
+        "az_big_exponent_float_gudermannian",
+    ),
+    (
+        "demo_big_exponent_float_gudermannian_prec_round_debug",
+        "az_big_exponent_float_gudermannian",
+    ),
+    (
+        "demo_big_exponent_float_gudermannian_rational_prec_debug",
+        "az_big_exponent_float_gudermannian_rational",
+    ),
+    (
+        "demo_big_exponent_float_gudermannian_rational_prec_round_debug",
+        "az_big_exponent_float_gudermannian_rational",
     ),
     (
         "demo_big_exponent_float_lambert_w0_prec_debug",

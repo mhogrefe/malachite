@@ -66,6 +66,8 @@ documented by git history.
   `num::exponential::traits`, for the two real branches of the Lambert $W$ function.
 - The `TreeT0`, `TreeT0Assign`, `TreeTMinus1`, and `TreeTMinus1Assign` traits, in
   `num::exponential::traits`, for the two real branches of the tree function $T(x) = -W(-x)$.
+- The `Gudermannian` and `GudermannianAssign` traits, in `num::hyperbolic::traits`, for the
+  Gudermannian function.
 - The `ShrRoundWithOrdering` and `ShrRoundWithOrderingAssign` traits, in
   `num::arithmetic::traits`, for right-shifting a number that is itself an approximation of an
   exact value, given its `Ordering` against that value, and rounding the result.
@@ -1208,7 +1210,8 @@ documented by git history.
     `Rational` forms), and those of the tree function (`tree_t0` and `tree_t_minus_1`);
   - the arithmetic-geometric mean (`agm`, with `Rational` forms);
   - the trigonometric functions, their inverses, and `atan2`, each with `_pi` and `_with_period`
-    forms and `Rational` forms, and the hyperbolic functions and their inverses; and
+    forms and `Rational` forms, the hyperbolic functions and their inverses, and the Gudermannian
+    function (`gudermannian`, with `Rational` forms); and
   - the constants of `Float`, from $\pi$ and $e$ to the Gelfond–Schneider constant.
 
   Huge exponents are always computed, never refused, but for some functions the time and memory grow
@@ -1239,6 +1242,17 @@ documented by git history.
   the negated argument, rounded in the opposite direction and negated. The special cases:
   $T_0(\pm0.0) = \pm0.0$, $T_0(-\infty) = -\infty$, $T_{-1}(\pm0.0) = \infty$, and `NaN` outside the
   domain of each branch.
+- The Gudermannian function $\operatorname{gd}(x) = \int_0^x \operatorname{sech} t\,dt =
+  2\arctan(\tanh(x/2))$, correctly rounded. `Float` has `gudermannian_prec_round`,
+  `gudermannian_prec`, and `gudermannian_round`, with their `_ref` and `_assign` forms,
+  `gudermannian_rational_prec_round` and `gudermannian_rational_prec` for a `Rational` argument, and
+  the `Gudermannian` and `GudermannianAssign` traits; `primitive_float_gudermannian` and
+  `primitive_float_gudermannian_rational` give correctly rounded `f32` and `f64` results.
+  `BigExponentFloat` has the `_prec_round` and `_prec` forms. The algorithm is a port of the one in
+  [Azurite](https://github.com/mhogrefe/azurite): one rounding test for a tiny argument, $\pi/2$
+  alone for a huge one, the alternating series of the arctangent of $\tanh(x/2)$ or $e^{-|x|}$
+  when few terms suffice, and $2\arctan(\tanh(x/2))$ otherwise. The special cases:
+  $\operatorname{gd}(\pm0.0) = \pm0.0$ and $\operatorname{gd}(\pm\infty) = \pm\pi/2$, rounded.
 - `Float`'s internal `ExtendedFloat` type, which carried an extra exponent offset through the
   logarithms, the arithmetic-geometric mean, and $\log 2$, has been replaced by
   `BigExponentFloat`. Results and running times are unchanged.

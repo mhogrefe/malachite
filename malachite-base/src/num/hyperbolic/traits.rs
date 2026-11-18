@@ -162,3 +162,15 @@ pub trait Acoth {
 pub trait AcothAssign {
     fn acoth_assign(&mut self);
 }
+
+/// Computes the Gudermannian function $\operatorname{gd}(x)$ of a number.
+pub trait Gudermannian {
+    type Output;
+
+    fn gudermannian(self) -> Self::Output;
+}
+
+/// Replaces a number $x$ with $\operatorname{gd}(x)$, its Gudermannian function.
+pub trait GudermannianAssign {
+    fn gudermannian_assign(&mut self);
+}

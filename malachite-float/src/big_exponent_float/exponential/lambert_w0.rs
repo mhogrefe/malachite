@@ -10,6 +10,10 @@ use crate::big_exponent_float::BigExponentFloat;
 use crate::big_exponent_float::InnerBigExponentFloat::{Finite, Infinity, NaN, Zero};
 use crate::big_exponent_float::arithmetic::add::significand_prec;
 use crate::big_exponent_float::arithmetic::mul_rational::shift_finite;
+use crate::big_exponent_float::bracket::{
+    Bracket, ZIV_GUARD_BITS, floor_bracket, rational_exponent_bound, rounding_possible,
+    ziv_loop_certified,
+};
 use crate::big_exponent_float::exponential::exp::power_of_2_integer;
 use crate::float::exponential::exp::primitive_float_exp;
 use crate::float::exponential::ln::primitive_float_ln;
@@ -30,11 +34,6 @@ use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::integer::Integer;
 use malachite_q::Rational;
 
-// The guard bits of the first working precision of the Ziv loops.
-//
-// This is equivalent to `zivGuardBits` from `AzFloat/Ziv.lean`, Azurite.
-const ZIV_GUARD_BITS: u64 = 64;
-
 // The largest absolute value of an argument for which a seed is made in `f64`: 2^1000. From about
 // 2^1021 on, the product (w + 2) * f in the `f64` iteration overflows and the iteration stays at
 // its start value.
@@ -48,8 +47,6 @@ const LOG_SEED_STEPS: usize = 4;
 
 // The number of mean-value rounds that shrink the enclosure around a candidate.
 const MEAN_VALUE_ROUNDS: usize = 3;
-
-type Bracket = (BigExponentFloat, BigExponentFloat);
 
 // The argument of a Lambert W function: a `BigExponentFloat` or a `Rational`.
 pub(crate) enum LambertTarget<'a> {
@@ -109,10 +106,7 @@ fn exp_bracket_at(x: &BigExponentFloat, prec: u64) -> Bracket {
         fail_on_untested_path("exp_bracket_at, x == 0");
         return (BigExponentFloat::ONE, BigExponentFloat::ONE);
     }
-    let lo = x.exp_prec_round_ref(prec, Floor).0;
-    let ulp = power_of_2_integer(lo.get_exponent().unwrap() - Integer::from(prec));
-    let hi = lo.add_prec_round_ref_val(ulp, prec, Ceiling).0;
-    (lo, hi)
+    floor_bracket(x.exp_prec_round_ref(prec, Floor).0, prec)
 }
 
 // `y` times a bracket of any signs, at precision `prec`, rounded outward.
@@ -467,27 +461,6 @@ fn bisect_grid(branch0: bool, target: &LambertTarget, steps: u64, interval: &Bra
     (integer_shl(&a, &e), integer_shl(&b, &e))
 }
 
-// When the exact value lies in (l, h] (or is l = h), its rounding to precision `prec` is determined
-// as soon as the two ends have the same (`prec` + 1)-bit truncation; the rounding is then that of
-// h.
-//
-// This is equivalent to `roundingPossible` from `AzFloat/Ziv.lean`, Azurite.
-fn rounding_possible<
-    L: Fn(u64, RoundingMode) -> (BigExponentFloat, Ordering),
-    H: Fn(u64, RoundingMode) -> (BigExponentFloat, Ordering),
->(
-    l: &L,
-    h: &H,
-    prec: u64,
-    rm: RoundingMode,
-) -> Option<(BigExponentFloat, Ordering)> {
-    if l(prec + 1, Floor).0 == h(prec + 1, Floor).0 {
-        Some(h(prec, rm))
-    } else {
-        None
-    }
-}
-
 // The tiny-argument path of W_0, for an argument x with |x| < 2^e, given by the rounding procedure
 // `nx` of -x and a float `nx_hi` >= -x: -W_0(x) lies in (-x, -x + 2^(2e + 2)].
 //
@@ -771,30 +744,6 @@ fn lambert_bracket(
     }
 }
 
-// Ziv's loop: `approx(w)` brackets the exact value at working precision `w`, which starts at `prec`
-// + `ZIV_GUARD_BITS` and doubles until rounding is possible.
-//
-// This is equivalent to `zivLoopCertified` from `AzFloat/Ziv.lean`, Azurite.
-fn ziv_loop_certified<F: Fn(u64) -> Bracket>(
-    approx: &F,
-    prec: u64,
-    rm: RoundingMode,
-) -> (BigExponentFloat, Ordering) {
-    let mut w = prec + ZIV_GUARD_BITS;
-    loop {
-        let (lo, hi) = approx(w);
-        if let Some(r) = rounding_possible(
-            &|p, m| lo.round_to_prec_round_ref(p, m),
-            &|p, m| hi.round_to_prec_round_ref(p, m),
-            prec,
-            rm,
-        ) {
-            return r;
-        }
-        w <<= 1;
-    }
-}
-
 // Ziv's loop for W_0 of a positive target.
 //
 // This is equivalent to `lambertW0Pos` from `AzFloat/LambertW.lean`, Azurite.
@@ -875,15 +824,6 @@ pub(crate) fn lambert_w0_helper(
     } else {
         lambert_w_neg(true, &target, prec, rm)
     }
-}
-
-// An exponent bound for |q|: |q| < 2^(bits(numerator) - bits(denominator) + 1), taken with one bit
-// of margin.
-//
-// This is equivalent to `ratExpBound` from `AzFloat/PowRatBracket.lean`, Azurite.
-fn rational_exponent_bound(q: &Rational) -> Integer {
-    Integer::from(q.numerator_ref().significant_bits() + 2)
-        - Integer::from(q.denominator_ref().significant_bits())
 }
 
 // W_0(q) for a `Rational` q, rounded to `prec` bits with `rm`.
