@@ -174,3 +174,15 @@ pub trait Gudermannian {
 pub trait GudermannianAssign {
     fn gudermannian_assign(&mut self);
 }
+
+/// Computes the inverse Gudermannian function $\operatorname{gd}^{-1}(x)$ of a number.
+pub trait InverseGudermannian {
+    type Output;
+
+    fn inverse_gudermannian(self) -> Self::Output;
+}
+
+/// Replaces a number $x$ with $\operatorname{gd}^{-1}(x)$, its inverse Gudermannian function.
+pub trait InverseGudermannianAssign {
+    fn inverse_gudermannian_assign(&mut self);
+}

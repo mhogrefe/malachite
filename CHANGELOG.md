@@ -66,8 +66,9 @@ documented by git history.
   `num::exponential::traits`, for the two real branches of the Lambert $W$ function.
 - The `TreeT0`, `TreeT0Assign`, `TreeTMinus1`, and `TreeTMinus1Assign` traits, in
   `num::exponential::traits`, for the two real branches of the tree function $T(x) = -W(-x)$.
-- The `Gudermannian` and `GudermannianAssign` traits, in `num::hyperbolic::traits`, for the
-  Gudermannian function.
+- The `Gudermannian`, `GudermannianAssign`, `InverseGudermannian`, and
+  `InverseGudermannianAssign` traits, in `num::hyperbolic::traits`, for the Gudermannian function
+  and its inverse.
 - The `ShrRoundWithOrdering` and `ShrRoundWithOrderingAssign` traits, in
   `num::arithmetic::traits`, for right-shifting a number that is itself an approximation of an
   exact value, given its `Ordering` against that value, and rounding the result.
@@ -1211,7 +1212,8 @@ documented by git history.
   - the arithmetic-geometric mean (`agm`, with `Rational` forms);
   - the trigonometric functions, their inverses, and `atan2`, each with `_pi` and `_with_period`
     forms and `Rational` forms, the hyperbolic functions and their inverses, and the Gudermannian
-    function (`gudermannian`, with `Rational` forms); and
+    function and its inverse (`gudermannian` and `inverse_gudermannian`, with `Rational` forms);
+    and
   - the constants of `Float`, from $\pi$ and $e$ to the Gelfond–Schneider constant.
 
   Huge exponents are always computed, never refused, but for some functions the time and memory grow
@@ -1253,6 +1255,14 @@ documented by git history.
   alone for a huge one, the alternating series of the arctangent of $\tanh(x/2)$ or $e^{-|x|}$
   when few terms suffice, and $2\arctan(\tanh(x/2))$ otherwise. The special cases:
   $\operatorname{gd}(\pm0.0) = \pm0.0$ and $\operatorname{gd}(\pm\infty) = \pm\pi/2$, rounded.
+- The inverse Gudermannian function $\operatorname{gd}^{-1}(x) = \int_0^x \sec t\,dt =
+  \ln((1+\sin x)/\cos x)$ for $|x| < \pi/2$, correctly rounded: `inverse_gudermannian`, with the
+  same forms as `gudermannian` on `Float` (including the `InverseGudermannian` and
+  `InverseGudermannianAssign` traits and the `primitive_float_inverse_gudermannian` functions) and
+  on `BigExponentFloat`. It is a port of the one in Azurite: one rounding test for a tiny
+  argument, and otherwise a sine and cosine computed together and one logarithm. Whether
+  $|x| < \pi/2$ is decided exactly; outside the domain, which includes $\pm\infty$, the result
+  is `NaN`, and $\operatorname{gd}^{-1}(\pm0.0) = \pm0.0$.
 - `Float`'s internal `ExtendedFloat` type, which carried an extra exponent offset through the
   logarithms, the arithmetic-geometric mean, and $\log 2$, has been replaced by
   `BigExponentFloat`. Results and running times are unchanged.

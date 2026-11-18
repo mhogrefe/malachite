@@ -371,3 +371,64 @@ pub fn gudermannian_rational_prec_round_naive(
         }
     })
 }
+
+// The inverse Gudermannian function of a finite nonzero `BigExponentFloat` x with |x| < pi / 2,
+// from the identity gd^-1(x) = atanh(sin(x)): the sine and the inverse hyperbolic tangent are
+// rounded down and up at a working precision that doubles until the two results round alike.
+pub fn inverse_gudermannian_prec_round_naive(
+    x: &BigExponentFloat,
+    prec: u64,
+    rm: RoundingMode,
+) -> (BigExponentFloat, Ordering) {
+    assert!(x.is_finite() && !x.is_zero());
+    assert_ne!(rm, Exact);
+    let a = if *x < 0u32 { -x } else { x.clone() };
+    odd_function_result(*x < 0u32, rm, |rm| {
+        let mut working_prec = prec + 64;
+        loop {
+            let lo = a
+                .sin_prec_round_ref(working_prec, Floor)
+                .0
+                .atanh_prec_round(working_prec, Floor)
+                .0;
+            let hi = a
+                .sin_prec_round_ref(working_prec, Ceiling)
+                .0
+                .atanh_prec_round(working_prec, Ceiling)
+                .0;
+            if let Some(r) = round_between(&lo, &hi, prec, rm) {
+                return r;
+            }
+            working_prec <<= 1;
+        }
+    })
+}
+
+// The inverse Gudermannian function of a nonzero `Rational` x with |x| < pi / 2, computed like
+// `inverse_gudermannian_prec_round_naive`.
+pub fn inverse_gudermannian_rational_prec_round_naive(
+    x: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> (BigExponentFloat, Ordering) {
+    assert_ne!(*x, 0u32);
+    assert_ne!(rm, Exact);
+    let a = if *x < 0u32 { -x } else { x.clone() };
+    odd_function_result(*x < 0u32, rm, |rm| {
+        let mut working_prec = prec + 64;
+        loop {
+            let lo = BigExponentFloat::sin_rational_prec_round_ref(&a, working_prec, Floor)
+                .0
+                .atanh_prec_round(working_prec, Floor)
+                .0;
+            let hi = BigExponentFloat::sin_rational_prec_round_ref(&a, working_prec, Ceiling)
+                .0
+                .atanh_prec_round(working_prec, Ceiling)
+                .0;
+            if let Some(r) = round_between(&lo, &hi, prec, rm) {
+                return r;
+            }
+            working_prec <<= 1;
+        }
+    })
+}

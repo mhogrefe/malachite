@@ -223,15 +223,15 @@ fn gd_huge(n: Integer, w: u64) -> Bracket {
     )
 }
 
-// The positive argument a of gd: a `BigExponentFloat` with its exponent, or a `Rational` with an
-// exponent bound. In either case a < 2^e for the second field e.
-enum GdTarget<'a> {
+// The positive argument a of gd or of its inverse: a `BigExponentFloat` with its exponent, or a
+// `Rational` with an exponent bound. In either case a < 2^e for the second field e.
+pub(crate) enum GdTarget<'a> {
     BigExponentFloat(&'a BigExponentFloat, &'a Integer),
     Rational(&'a Rational, &'a Integer),
 }
 
 impl GdTarget<'_> {
-    const fn exponent_bound(&self) -> &Integer {
+    pub(crate) const fn exponent_bound(&self) -> &Integer {
         match self {
             Self::BigExponentFloat(_, e) | Self::Rational(_, e) => e,
         }
@@ -279,6 +279,21 @@ impl GdTarget<'_> {
             },
             prec,
         )
+    }
+
+    // Enclosures of sin(a) and cos(a) at precision `prec`, for a < pi / 2, where both are positive.
+    //
+    // This is equivalent to `sinCosBracket` from `AzFloat/SinCosBracket.lean` and
+    // `sinCosRatBracket` from `AzFloat/SinCosRatBracket.lean`, Azurite, with the correctly rounded
+    // sine and cosine in place of Azurite's brackets.
+    pub(crate) fn sin_cos(&self, prec: u64) -> (Bracket, Bracket) {
+        let (s, c, _, _) = match self {
+            Self::BigExponentFloat(a, _) => a.sin_cos_prec_round_ref(prec, Floor),
+            Self::Rational(q, _) => {
+                BigExponentFloat::sin_cos_rational_prec_round_ref(q, prec, Floor)
+            }
+        };
+        (floor_bracket(s, prec), floor_bracket(c, prec))
     }
 
     // An enclosure of e^(-a) at precision `prec`.
@@ -331,82 +346,81 @@ fn gd_bracket(target: &GdTarget, w: u64) -> Bracket {
     series.unwrap_or_else(|| gd_core_of(&target.tanh_of_half(w + 32), w))
 }
 
-// The tiny-argument path, for a positive argument a < 2^e with e <= -(w + 8): -gd(a) lies in (-a,
-// -a + a^3], and its rounding is decided from the two ends when they round alike.
+// The tiny-argument path of an odd function f with f(a) in (a, a + a^3] (when `above` is set) or in
+// [a - a^3, a) for a tiny positive a, where a < 2^e with e <= -(w + 8): the rounding of f(a) is
+// decided from the two ends of that interval when they round alike.
 //
-// This is equivalent to `sinTiny?` from `AzFloat/SinBracket.lean` and to `sinTinyRat?` and
-// `sinTinyCore?` from `AzFloat/SinRatBracket.lean`, Azurite.
-fn gd_tiny(
+// This is equivalent to `sinTiny?` from `AzFloat/SinBracket.lean`, `tanTiny?` from
+// `AzFloat/TanBracket.lean`, `sinTinyRat?` and `sinTinyCore?` from `AzFloat/SinRatBracket.lean`,
+// and `tanTinyRat?` and `tanTinyCore?` from `AzFloat/TanRatBracket.lean`, Azurite.
+fn tiny_argument(
     target: &GdTarget,
+    above: bool,
     w: u64,
     prec: u64,
     rm: RoundingMode,
 ) -> Option<(BigExponentFloat, Ordering)> {
-    match target {
+    // With s = a when `above` is set and s = -a otherwise, f(a) or -f(a) lies in (s, s + a^3].
+    let rm = if above { rm } else { -rm };
+    let r = match target {
         GdTarget::BigExponentFloat(a, e) => {
-            let nx = -*a;
+            let s = if above { (*a).clone() } else { -*a };
             // a^3 <= a * 2^(2e)
             let cube_bound = *a * power_of_2_integer(*e << 1u32);
-            let hi = nx.add_prec_round_ref_val(cube_bound, w + 8, Ceiling).0;
+            let hi = s.add_prec_round_ref_val(cube_bound, w + 8, Ceiling).0;
             rounding_possible(
-                &|p, m| nx.round_to_prec_round_ref(p, m),
+                &|p, m| s.round_to_prec_round_ref(p, m),
                 &|p, m| hi.round_to_prec_round_ref(p, m),
                 prec,
-                -rm,
+                rm,
             )
         }
         GdTarget::Rational(q, e) => {
-            let nq = -*q;
+            let s = if above { (*q).clone() } else { -*q };
             // a^3 < 2^(3e)
             let cube_bound = power_of_2_integer(const { Integer::const_from_unsigned(3) } * *e);
-            let hi = BigExponentFloat::from_rational_prec_round_ref(&nq, w + 8, Ceiling)
+            let hi = BigExponentFloat::from_rational_prec_round_ref(&s, w + 8, Ceiling)
                 .0
                 .add_prec_round(cube_bound, w + 8, Ceiling)
                 .0;
             rounding_possible(
-                &|p, m| BigExponentFloat::from_rational_prec_round_ref(&nq, p, m),
+                &|p, m| BigExponentFloat::from_rational_prec_round_ref(&s, p, m),
                 &|p, m| hi.round_to_prec_round_ref(p, m),
                 prec,
-                -rm,
+                rm,
             )
         }
+    };
+    if above {
+        r
+    } else {
+        r.map(|(r, o)| (-r, o.reverse()))
     }
-    .map(|(r, o)| (-r, o.reverse()))
 }
 
-// gd(a) for a positive a, rounded to `prec` bits with `rm`; `w` is the level of the tiny-argument
-// path.
-fn gd_positive(
-    target: &GdTarget,
-    w: u64,
-    prec: u64,
-    rm: RoundingMode,
-) -> (BigExponentFloat, Ordering) {
-    if *target.exponent_bound() <= -Integer::from(w + 8)
-        && let Some(r) = gd_tiny(target, w, prec, rm)
-    {
-        return r;
-    }
-    ziv_loop_certified(&|w| gd_bracket(target, w), prec, rm)
-}
-
-// gd of the argument whose absolute value is given by `target` and which is positive when `sign` is
-// set: gd is odd, so gd of the absolute value is computed, with the rounding mode negated for a
-// negative argument.
-fn gd_signed(
+// The value, rounded to `prec` bits with `rm`, of an odd function f at the argument whose absolute
+// value a is given by `target` and which is positive when `sign` is set: f(a) is computed, with the
+// rounding mode negated for a negative argument. A tiny a takes the tiny-argument path, at the
+// level `w` and in the direction `above`; otherwise `general` computes f(a) with a given rounding
+// mode.
+pub(crate) fn odd_function_near_identity<F: Fn(RoundingMode) -> (BigExponentFloat, Ordering)>(
     sign: bool,
     target: &GdTarget,
+    above: bool,
     w: u64,
     prec: u64,
     rm: RoundingMode,
+    general: &F,
 ) -> (BigExponentFloat, Ordering) {
-    assert_ne!(rm, Exact, "Inexact Gudermannian function");
-    if sign {
-        gd_positive(target, w, prec, rm)
+    let abs_rm = if sign { rm } else { -rm };
+    let (f, o) = if *target.exponent_bound() <= -Integer::from(w + 8)
+        && let Some(r) = tiny_argument(target, above, w, prec, abs_rm)
+    {
+        r
     } else {
-        let (g, o) = gd_positive(target, w, prec, -rm);
-        (-g, o.reverse())
-    }
+        general(abs_rm)
+    };
+    if sign { (f, o) } else { (-f, o.reverse()) }
 }
 
 // gd(x), rounded to `prec` bits with `rm`.
@@ -432,13 +446,19 @@ pub(crate) fn gudermannian_helper(
             sign,
             exponent,
             significand,
-        }) => gd_signed(
-            *sign,
-            &GdTarget::BigExponentFloat(&x.abs(), exponent),
-            max(prec, significand_prec(significand)) + ZIV_GUARD_BITS,
-            prec,
-            rm,
-        ),
+        }) => {
+            assert_ne!(rm, Exact, "Inexact Gudermannian function");
+            let target = GdTarget::BigExponentFloat(&x.abs(), exponent);
+            odd_function_near_identity(
+                *sign,
+                &target,
+                false,
+                max(prec, significand_prec(significand)) + ZIV_GUARD_BITS,
+                prec,
+                rm,
+                &|rm| ziv_loop_certified(&|w| gd_bracket(&target, w), prec, rm),
+            )
+        }
     }
 }
 
@@ -454,13 +474,17 @@ pub(crate) fn gudermannian_rational_helper(
     if *q == 0u32 {
         return (BigExponentFloat::ZERO, Equal);
     }
+    assert_ne!(rm, Exact, "Inexact Gudermannian function");
     let a = q.abs();
-    gd_signed(
+    let target = GdTarget::Rational(&a, &rational_exponent_bound(&a));
+    odd_function_near_identity(
         *q > 0u32,
-        &GdTarget::Rational(&a, &rational_exponent_bound(&a)),
+        &target,
+        false,
         prec + ZIV_GUARD_BITS,
         prec,
         rm,
+        &|rm| ziv_loop_certified(&|w| gd_bracket(&target, w), prec, rm),
     )
 }
 

@@ -19,6 +19,7 @@ pub(crate) fn register(runner: &mut Runner) {
     coth::register(runner);
     csch::register(runner);
     gudermannian::register(runner);
+    inverse_gudermannian::register(runner);
     sech::register(runner);
     sinh::register(runner);
     sinh_cosh::register(runner);
@@ -35,6 +36,7 @@ mod cosh;
 mod coth;
 mod csch;
 mod gudermannian;
+mod inverse_gudermannian;
 mod sech;
 mod sinh;
 mod sinh_cosh;

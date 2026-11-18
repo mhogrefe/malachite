@@ -62,7 +62,19 @@ pub(crate) fn ziv_loop_certified<F: Fn(u64) -> Bracket>(
     prec: u64,
     rm: RoundingMode,
 ) -> (BigExponentFloat, Ordering) {
-    let mut w = prec + ZIV_GUARD_BITS;
+    ziv_loop_certified_from(approx, prec, rm, prec + ZIV_GUARD_BITS)
+}
+
+// Ziv's loop with the working precision starting at `start`.
+//
+// This is equivalent to `zivLoopCertified` from `AzFloat/Ziv.lean`, Azurite.
+pub(crate) fn ziv_loop_certified_from<F: Fn(u64) -> Bracket>(
+    approx: &F,
+    prec: u64,
+    rm: RoundingMode,
+    start: u64,
+) -> (BigExponentFloat, Ordering) {
+    let mut w = start;
     loop {
         let (lo, hi) = approx(w);
         if let Some(r) = rounding_possible(

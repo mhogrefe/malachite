@@ -46,6 +46,11 @@ pub mod csch;
 /// [`GudermannianAssign`](malachite_base::num::hyperbolic::traits::GudermannianAssign), traits for
 /// computing the Gudermannian function of [`Float`](super::Float)s.
 pub mod gudermannian;
+/// Implementations of
+/// [`InverseGudermannian`](malachite_base::num::hyperbolic::traits::InverseGudermannian) and
+/// `InverseGudermannianAssign`, traits for computing the inverse Gudermannian function of
+/// [`Float`](super::Float)s.
+pub mod inverse_gudermannian;
 /// Implementations of [`Sech`](malachite_base::num::hyperbolic::traits::Sech) and
 /// [`SechAssign`](malachite_base::num::hyperbolic::traits::SechAssign), traits for computing the
 /// hyperbolic secant of [`Float`](super::Float)s.
