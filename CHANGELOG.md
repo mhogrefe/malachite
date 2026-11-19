@@ -1108,6 +1108,10 @@ documented by git history.
   already took either.
 - `FactoradicDigits` for `Natural`, dividing by successive single-limb bases and evaluating by
   Horner's rule.
+- `tangent_numbers_prefix`, in `natural::number_theory::tangent_numbers`, which returns the first
+  `len` tangent numbers $T_1, \ldots, T_{\mathrm{len}}$, the coefficients of the Taylor series of
+  the tangent, as a `Vec<Natural>`. It uses Algorithm 4.3 of Brent and Zimmermann's _Modern
+  Computer Arithmetic_, which needs only additions and multiplications by small numbers.
 
 ### malachite-q
 

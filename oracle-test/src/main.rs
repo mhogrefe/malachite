@@ -1050,6 +1050,10 @@ const AZURITE_NATURAL_STAGES_NO_SPECIAL: &[(&str, &str)] = &[
         "az_nat_landau_function_prefix",
     ),
     (
+        "demo_natural_tangent_numbers_prefix",
+        "az_nat_tangent_numbers_prefix",
+    ),
+    (
         "demo_natural_primes_less_than_or_equal_to",
         "az_nat_primes_less_than",
     ),

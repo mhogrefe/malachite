@@ -61,6 +61,8 @@ pub mod rising_factorial;
 /// malachite_base::num::number_theory::traits::StirlingNumberOfTheSecondKind), a trait for
 /// computing Stirling numbers of the second kind.
 pub mod stirling_number_of_the_second_kind;
+/// A function for computing the tangent numbers.
+pub mod tangent_numbers;
 /// An implementation of [`UnsignedStirlingNumberOfTheFirstKind`](
 /// malachite_base::num::number_theory::traits::UnsignedStirlingNumberOfTheFirstKind), a trait for
 /// computing unsigned Stirling numbers of the first kind.

@@ -904,6 +904,7 @@ pub mod natural {
         pub mod primorial;
         pub mod rising_factorial;
         pub mod stirling_number_of_the_second_kind;
+        pub mod tangent_numbers;
         pub mod unsigned_stirling_number_of_the_first_kind;
     }
     pub mod random {

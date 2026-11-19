@@ -22,6 +22,7 @@ pub(crate) fn register(runner: &mut Runner) {
     primorial::register(runner);
     rising_factorial::register(runner);
     stirling_number_of_the_second_kind::register(runner);
+    tangent_numbers::register(runner);
     unsigned_stirling_number_of_the_first_kind::register(runner);
 }
 
@@ -38,4 +39,5 @@ mod lcm;
 mod primorial;
 mod rising_factorial;
 mod stirling_number_of_the_second_kind;
+mod tangent_numbers;
 mod unsigned_stirling_number_of_the_first_kind;

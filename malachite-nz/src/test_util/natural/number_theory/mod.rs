@@ -13,3 +13,4 @@ pub mod fibonacci;
 pub mod gcd;
 pub mod kronecker_symbol;
 pub mod primorial;
+pub mod tangent_numbers;
