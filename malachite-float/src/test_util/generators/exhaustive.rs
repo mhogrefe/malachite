@@ -9470,6 +9470,21 @@ pub fn sin_with_period_rational_prec_round_valid(
     rm != Exact || Float::sin_with_period_rational_prec_round_ref(x, u, prec, Floor).1 == Equal
 }
 
+// Whether `(x, u, prec, rm)` is a valid input to `Float::sin_cos_with_period_rational_prec_round`:
+// `Exact` is only allowed when both the sine and the cosine are exact.
+pub fn sin_cos_with_period_rational_prec_round_valid(
+    x: &Rational,
+    u: u64,
+    prec: u64,
+    rm: RoundingMode,
+) -> bool {
+    rm != Exact || {
+        let (_, _, o_s, o_c) =
+            Float::sin_cos_with_period_rational_prec_round_ref(x, u, prec, Floor);
+        o_s == Equal && o_c == Equal
+    }
+}
+
 // Whether `(x, u, prec, rm)` is a valid input to `Float::atan_with_period_rational_prec_round`.
 pub fn atan_with_period_rational_prec_round_valid(
     x: &Rational,
@@ -9585,6 +9600,69 @@ pub fn sin_with_period_prec_round_valid(x: &Float, u: u64, prec: u64, rm: Roundi
 // Whether `(x, u, rm)` is a valid input to `Float::sin_with_period_round`.
 pub fn sin_with_period_round_valid(x: &Float, u: u64, rm: RoundingMode) -> bool {
     rm != Exact || x.sin_with_period_round_ref(u, Floor).1 == Equal
+}
+
+// Whether `(x, u, prec, rm)` is a valid input to `Float::sin_cos_with_period_prec_round`: `Exact`
+// is only allowed when both the sine and the cosine are exact.
+pub fn sin_cos_with_period_prec_round_valid(
+    x: &Float,
+    u: u64,
+    prec: u64,
+    rm: RoundingMode,
+) -> bool {
+    rm != Exact || {
+        let (_, _, o_s, o_c) = x.sin_cos_with_period_prec_round_ref(u, prec, Floor);
+        o_s == Equal && o_c == Equal
+    }
+}
+
+// Whether `(x, u, prec, rm)` is a valid input to `Float::tan_with_period_prec_round`.
+pub fn tan_with_period_prec_round_valid(x: &Float, u: u64, prec: u64, rm: RoundingMode) -> bool {
+    rm != Exact || x.tan_with_period_prec_round_ref(u, prec, Floor).1 == Equal
+}
+
+// Whether `(x, u, rm)` is a valid input to `Float::tan_with_period_round`.
+pub fn tan_with_period_round_valid(x: &Float, u: u64, rm: RoundingMode) -> bool {
+    rm != Exact || x.tan_with_period_round_ref(u, Floor).1 == Equal
+}
+
+// Whether `(x, u, prec, rm)` is a valid input to `Float::tan_with_period_rational_prec_round`.
+pub fn tan_with_period_rational_prec_round_valid(
+    x: &Rational,
+    u: u64,
+    prec: u64,
+    rm: RoundingMode,
+) -> bool {
+    rm != Exact || Float::tan_with_period_rational_prec_round_ref(x, u, prec, Floor).1 == Equal
+}
+
+// Whether `(x, u, prec, rm)` is a valid input to `Float::sec_with_period_prec_round`.
+pub fn sec_with_period_prec_round_valid(x: &Float, u: u64, prec: u64, rm: RoundingMode) -> bool {
+    rm != Exact || x.sec_with_period_prec_round_ref(u, prec, Floor).1 == Equal
+}
+
+// Whether `(x, u, rm)` is a valid input to `Float::sec_with_period_round`.
+pub fn sec_with_period_round_valid(x: &Float, u: u64, rm: RoundingMode) -> bool {
+    rm != Exact || x.sec_with_period_round_ref(u, Floor).1 == Equal
+}
+
+// Whether `(x, u, prec, rm)` is a valid input to `Float::sec_with_period_rational_prec_round`.
+pub fn sec_with_period_rational_prec_round_valid(
+    x: &Rational,
+    u: u64,
+    prec: u64,
+    rm: RoundingMode,
+) -> bool {
+    rm != Exact || Float::sec_with_period_rational_prec_round_ref(x, u, prec, Floor).1 == Equal
+}
+
+// Whether `(x, u, rm)` is a valid input to `Float::sin_cos_with_period_round`: `Exact` is only
+// allowed when both the sine and the cosine are exact.
+pub fn sin_cos_with_period_round_valid(x: &Float, u: u64, rm: RoundingMode) -> bool {
+    rm != Exact || {
+        let (_, _, o_s, o_c) = x.sin_cos_with_period_round_ref(u, Floor);
+        o_s == Equal && o_c == Equal
+    }
 }
 
 // Whether `(x, u, prec, rm)` is a valid input to `Float::atan_with_period_prec_round`.

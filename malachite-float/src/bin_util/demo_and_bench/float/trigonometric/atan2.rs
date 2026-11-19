@@ -24,8 +24,11 @@ use malachite_float::float::trigonometric::atan2::{
 };
 use malachite_float::test_util::bench::bucketers::*;
 use malachite_float::test_util::generators::{
-    float_float_rounding_mode_triple_gen_var_43,
-    float_float_unsigned_rounding_mode_quadruple_gen_var_24, float_float_unsigned_triple_gen_var_1,
+    float_float_rounding_mode_triple_gen_var_45, float_float_rounding_mode_triple_gen_var_46,
+    float_float_rounding_mode_triple_gen_var_47,
+    float_float_unsigned_rounding_mode_quadruple_gen_var_26,
+    float_float_unsigned_rounding_mode_quadruple_gen_var_27,
+    float_float_unsigned_rounding_mode_quadruple_gen_var_28, float_float_unsigned_triple_gen_var_1,
     float_pair_gen, rational_rational_unsigned_rounding_mode_quadruple_gen_var_4,
 };
 use malachite_float::{ComparableFloat, Float};
@@ -36,15 +39,19 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_atan2_prec_round);
     register_demo!(runner, demo_float_atan2_prec_round_debug);
     register_demo!(runner, demo_float_atan2_prec);
+    register_demo!(runner, demo_float_atan2_prec_debug);
     register_demo!(runner, demo_float_atan2_round);
+    register_demo!(runner, demo_float_atan2_round_debug);
     register_demo!(runner, demo_float_atan2_prec_round_assign);
     register_demo!(runner, demo_float_atan2);
+    register_demo!(runner, demo_float_atan2_debug);
     register_primitive_float_demos!(runner, demo_primitive_float_atan2);
     register_bench!(runner, benchmark_float_atan2_prec_round_evaluation_strategy);
     register_primitive_float_benches!(runner, benchmark_primitive_float_atan2);
     register_demo!(runner, demo_float_atan2_rational_prec_round);
     register_demo!(runner, demo_float_atan2_rational_prec_round_debug);
     register_demo!(runner, demo_float_atan2_rational_prec);
+    register_demo!(runner, demo_float_atan2_rational_prec_debug);
     register_demo!(runner, demo_float_atan2_rational_prec_ref);
     register_primitive_float_demos!(runner, demo_primitive_float_atan2_rational);
     register_bench!(
@@ -55,7 +62,9 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_atan2_with_period_prec_round);
     register_demo!(runner, demo_float_atan2_with_period_prec_round_debug);
     register_demo!(runner, demo_float_atan2_with_period_prec);
+    register_demo!(runner, demo_float_atan2_with_period_prec_debug);
     register_demo!(runner, demo_float_atan2_with_period_round);
+    register_demo!(runner, demo_float_atan2_with_period_round_debug);
     register_demo!(runner, demo_float_atan2_with_period_prec_round_assign);
     register_primitive_float_demos!(runner, demo_primitive_float_atan2_with_period);
     register_bench!(
@@ -64,7 +73,12 @@ pub(crate) fn register(runner: &mut Runner) {
     );
     register_primitive_float_benches!(runner, benchmark_primitive_float_atan2_with_period);
     register_demo!(runner, demo_float_atan2_with_period_rational_prec_round);
+    register_demo!(
+        runner,
+        demo_float_atan2_with_period_rational_prec_round_debug
+    );
     register_demo!(runner, demo_float_atan2_with_period_rational_prec);
+    register_demo!(runner, demo_float_atan2_with_period_rational_prec_debug);
     register_primitive_float_demos!(runner, demo_primitive_float_atan2_with_period_rational);
     register_bench!(
         runner,
@@ -72,9 +86,13 @@ pub(crate) fn register(runner: &mut Runner) {
     );
     register_primitive_float_benches!(runner, benchmark_primitive_float_atan2_with_period_rational);
     register_demo!(runner, demo_float_atan2_pi_prec_round);
+    register_demo!(runner, demo_float_atan2_pi_prec_round_debug);
     register_demo!(runner, demo_float_atan2_pi_prec);
+    register_demo!(runner, demo_float_atan2_pi_prec_debug);
     register_demo!(runner, demo_float_atan2_pi_round);
+    register_demo!(runner, demo_float_atan2_pi_round_debug);
     register_demo!(runner, demo_float_atan2_pi_rational_prec_round);
+    register_demo!(runner, demo_float_atan2_pi_rational_prec_round_debug);
     register_primitive_float_demos!(runner, demo_primitive_float_atan2_pi);
     register_primitive_float_demos!(runner, demo_primitive_float_atan2_pi_rational);
     register_bench!(
@@ -84,7 +102,7 @@ pub(crate) fn register(runner: &mut Runner) {
 }
 
 fn demo_float_atan2_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
-    for (x, y, prec, rm) in float_float_unsigned_rounding_mode_quadruple_gen_var_24()
+    for (x, y, prec, rm) in float_float_unsigned_rounding_mode_quadruple_gen_var_26()
         .get(gm, config)
         .take(limit)
     {
@@ -102,7 +120,7 @@ fn demo_float_atan2_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
 }
 
 fn demo_float_atan2_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
-    for (x, y, prec, rm) in float_float_unsigned_rounding_mode_quadruple_gen_var_24()
+    for (x, y, prec, rm) in float_float_unsigned_rounding_mode_quadruple_gen_var_26()
         .get(gm, config)
         .take(limit)
     {
@@ -138,8 +156,25 @@ fn demo_float_atan2_prec(gm: GenMode, config: &GenConfig, limit: usize) {
     }
 }
 
+fn demo_float_atan2_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (y, x, prec) in float_float_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = y.clone().atan2_prec(x.clone(), prec);
+        println!(
+            "({:#x}).atan2_prec({:#x}, {}) = ({:#x}, {:?})",
+            ComparableFloat(y),
+            ComparableFloat(x),
+            prec,
+            ComparableFloat(z),
+            o
+        );
+    }
+}
+
 fn demo_float_atan2_round(gm: GenMode, config: &GenConfig, limit: usize) {
-    for (x, y, rm) in float_float_rounding_mode_triple_gen_var_43()
+    for (x, y, rm) in float_float_rounding_mode_triple_gen_var_45()
         .get(gm, config)
         .take(limit)
     {
@@ -155,8 +190,25 @@ fn demo_float_atan2_round(gm: GenMode, config: &GenConfig, limit: usize) {
     }
 }
 
+fn demo_float_atan2_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (y, x, rm) in float_float_rounding_mode_triple_gen_var_45()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = y.clone().atan2_round(x.clone(), rm);
+        println!(
+            "({:#x}).atan2_round({:#x}, {}) = ({:#x}, {:?})",
+            ComparableFloat(y),
+            ComparableFloat(x),
+            rm,
+            ComparableFloat(z),
+            o
+        );
+    }
+}
+
 fn demo_float_atan2_prec_round_assign(gm: GenMode, config: &GenConfig, limit: usize) {
-    for (mut x, y, prec, rm) in float_float_unsigned_rounding_mode_quadruple_gen_var_24()
+    for (mut x, y, prec, rm) in float_float_unsigned_rounding_mode_quadruple_gen_var_26()
         .get(gm, config)
         .take(limit)
     {
@@ -172,6 +224,18 @@ fn demo_float_atan2(gm: GenMode, config: &GenConfig, limit: usize) {
         let x_old = x.clone();
         let y_old = y.clone();
         println!("({}).atan2({}) = {}", x_old, y_old, x.atan2(y));
+    }
+}
+
+fn demo_float_atan2_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (y, x) in float_pair_gen().get(gm, config).take(limit) {
+        let z = y.clone().atan2(x.clone());
+        println!(
+            "({:#x}).atan2({:#x}) = {:#x}",
+            ComparableFloat(y),
+            ComparableFloat(x),
+            ComparableFloat(z)
+        );
     }
 }
 
@@ -200,7 +264,7 @@ fn benchmark_float_atan2_prec_round_evaluation_strategy(
     run_benchmark(
         "Float.atan2_prec_round(Float, u64, RoundingMode)",
         BenchmarkType::EvaluationStrategy,
-        float_float_unsigned_rounding_mode_quadruple_gen_var_24().get(gm, config),
+        float_float_unsigned_rounding_mode_quadruple_gen_var_26().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -299,6 +363,23 @@ fn demo_float_atan2_rational_prec(gm: GenMode, config: &GenConfig, limit: usize)
     }
 }
 
+fn demo_float_atan2_rational_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (y, x, prec, _) in rational_rational_unsigned_rounding_mode_quadruple_gen_var_4()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = Float::atan2_rational_prec(y.clone(), x.clone(), prec);
+        println!(
+            "Float::atan2_rational_prec({}, {}, {}) = ({:#x}, {:?})",
+            y,
+            x,
+            prec,
+            ComparableFloat(z),
+            o
+        );
+    }
+}
+
 fn demo_float_atan2_rational_prec_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (y, x, prec, _) in rational_rational_unsigned_rounding_mode_quadruple_gen_var_4()
         .get(gm, config)
@@ -390,7 +471,7 @@ fn benchmark_primitive_float_atan2_rational<T: PrimitiveFloat>(
 }
 
 fn demo_float_atan2_with_period_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
-    for (y, x, prec, rm) in float_float_unsigned_rounding_mode_quadruple_gen_var_24()
+    for (y, x, prec, rm) in float_float_unsigned_rounding_mode_quadruple_gen_var_27()
         .get(gm, config)
         .take(limit)
     {
@@ -406,7 +487,7 @@ fn demo_float_atan2_with_period_prec_round(gm: GenMode, config: &GenConfig, limi
 }
 
 fn demo_float_atan2_with_period_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
-    for (y, x, prec, rm) in float_float_unsigned_rounding_mode_quadruple_gen_var_24()
+    for (y, x, prec, rm) in float_float_unsigned_rounding_mode_quadruple_gen_var_27()
         .get(gm, config)
         .take(limit)
     {
@@ -440,8 +521,25 @@ fn demo_float_atan2_with_period_prec(gm: GenMode, config: &GenConfig, limit: usi
     }
 }
 
+fn demo_float_atan2_with_period_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (y, x, prec) in float_float_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = y.clone().atan2_with_period_prec(x.clone(), 360, prec);
+        println!(
+            "({:#x}).atan2_with_period_prec({:#x}, 360, {}) = ({:#x}, {:?})",
+            ComparableFloat(y),
+            ComparableFloat(x),
+            prec,
+            ComparableFloat(z),
+            o
+        );
+    }
+}
+
 fn demo_float_atan2_with_period_round(gm: GenMode, config: &GenConfig, limit: usize) {
-    for (y, x, rm) in float_float_rounding_mode_triple_gen_var_43()
+    for (y, x, rm) in float_float_rounding_mode_triple_gen_var_46()
         .get(gm, config)
         .take(limit)
     {
@@ -455,8 +553,25 @@ fn demo_float_atan2_with_period_round(gm: GenMode, config: &GenConfig, limit: us
     }
 }
 
+fn demo_float_atan2_with_period_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (y, x, rm) in float_float_rounding_mode_triple_gen_var_46()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = y.clone().atan2_with_period_round(x.clone(), 360, rm);
+        println!(
+            "({:#x}).atan2_with_period_round({:#x}, 360, {}) = ({:#x}, {:?})",
+            ComparableFloat(y),
+            ComparableFloat(x),
+            rm,
+            ComparableFloat(z),
+            o
+        );
+    }
+}
+
 fn demo_float_atan2_with_period_prec_round_assign(gm: GenMode, config: &GenConfig, limit: usize) {
-    for (y, x, prec, rm) in float_float_unsigned_rounding_mode_quadruple_gen_var_24()
+    for (y, x, prec, rm) in float_float_unsigned_rounding_mode_quadruple_gen_var_27()
         .get(gm, config)
         .take(limit)
     {
@@ -497,7 +612,7 @@ fn benchmark_float_atan2_with_period_prec_round_evaluation_strategy(
     run_benchmark(
         "Float::atan2_with_period_prec_round(Float, u64, u64, RoundingMode)",
         BenchmarkType::EvaluationStrategy,
-        float_float_unsigned_rounding_mode_quadruple_gen_var_24().get(gm, config),
+        float_float_unsigned_rounding_mode_quadruple_gen_var_27().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -564,6 +679,29 @@ fn demo_float_atan2_with_period_rational_prec_round(gm: GenMode, config: &GenCon
     }
 }
 
+fn demo_float_atan2_with_period_rational_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (y, x, prec, rm) in rational_rational_unsigned_rounding_mode_quadruple_gen_var_4()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) =
+            Float::atan2_with_period_rational_prec_round(y.clone(), x.clone(), 360, prec, rm);
+        println!(
+            "Float::atan2_with_period_rational_prec_round({}, {}, 360, {}, {}) = ({:#x}, {:?})",
+            y,
+            x,
+            prec,
+            rm,
+            ComparableFloat(z),
+            o
+        );
+    }
+}
+
 fn demo_float_atan2_with_period_rational_prec(gm: GenMode, config: &GenConfig, limit: usize) {
     for (y, x, prec, _) in rational_rational_unsigned_rounding_mode_quadruple_gen_var_4()
         .get(gm, config)
@@ -575,6 +713,23 @@ fn demo_float_atan2_with_period_rational_prec(gm: GenMode, config: &GenConfig, l
             x.clone(),
             prec,
             Float::atan2_with_period_rational_prec(y, x, 360, prec)
+        );
+    }
+}
+
+fn demo_float_atan2_with_period_rational_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (y, x, prec, _) in rational_rational_unsigned_rounding_mode_quadruple_gen_var_4()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = Float::atan2_with_period_rational_prec(y.clone(), x.clone(), 360, prec);
+        println!(
+            "Float::atan2_with_period_rational_prec({}, {}, 360, {}) = ({:#x}, {:?})",
+            y,
+            x,
+            prec,
+            ComparableFloat(z),
+            o
         );
     }
 }
@@ -663,7 +818,7 @@ fn benchmark_primitive_float_atan2_with_period_rational<T: PrimitiveFloat>(
 }
 
 fn demo_float_atan2_pi_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
-    for (y, x, prec, rm) in float_float_unsigned_rounding_mode_quadruple_gen_var_24()
+    for (y, x, prec, rm) in float_float_unsigned_rounding_mode_quadruple_gen_var_28()
         .get(gm, config)
         .take(limit)
     {
@@ -674,6 +829,24 @@ fn demo_float_atan2_pi_prec_round(gm: GenMode, config: &GenConfig, limit: usize)
             prec,
             rm,
             y.atan2_pi_prec_round(x, prec, rm)
+        );
+    }
+}
+
+fn demo_float_atan2_pi_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (y, x, prec, rm) in float_float_unsigned_rounding_mode_quadruple_gen_var_28()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = y.clone().atan2_pi_prec_round(x.clone(), prec, rm);
+        println!(
+            "({:#x}).atan2_pi_prec_round({:#x}, {}, {}) = ({:#x}, {:?})",
+            ComparableFloat(y),
+            ComparableFloat(x),
+            prec,
+            rm,
+            ComparableFloat(z),
+            o
         );
     }
 }
@@ -693,8 +866,25 @@ fn demo_float_atan2_pi_prec(gm: GenMode, config: &GenConfig, limit: usize) {
     }
 }
 
+fn demo_float_atan2_pi_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (y, x, prec) in float_float_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = y.clone().atan2_pi_prec(x.clone(), prec);
+        println!(
+            "({:#x}).atan2_pi_prec({:#x}, {}) = ({:#x}, {:?})",
+            ComparableFloat(y),
+            ComparableFloat(x),
+            prec,
+            ComparableFloat(z),
+            o
+        );
+    }
+}
+
 fn demo_float_atan2_pi_round(gm: GenMode, config: &GenConfig, limit: usize) {
-    for (y, x, rm) in float_float_rounding_mode_triple_gen_var_43()
+    for (y, x, rm) in float_float_rounding_mode_triple_gen_var_47()
         .get(gm, config)
         .take(limit)
     {
@@ -704,6 +894,23 @@ fn demo_float_atan2_pi_round(gm: GenMode, config: &GenConfig, limit: usize) {
             x.clone(),
             rm,
             y.atan2_pi_round(x, rm)
+        );
+    }
+}
+
+fn demo_float_atan2_pi_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (y, x, rm) in float_float_rounding_mode_triple_gen_var_47()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = y.clone().atan2_pi_round(x.clone(), rm);
+        println!(
+            "({:#x}).atan2_pi_round({:#x}, {}) = ({:#x}, {:?})",
+            ComparableFloat(y),
+            ComparableFloat(x),
+            rm,
+            ComparableFloat(z),
+            o
         );
     }
 }
@@ -720,6 +927,24 @@ fn demo_float_atan2_pi_rational_prec_round(gm: GenMode, config: &GenConfig, limi
             prec,
             rm,
             Float::atan2_pi_rational_prec_round(y, x, prec, rm)
+        );
+    }
+}
+
+fn demo_float_atan2_pi_rational_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (y, x, prec, rm) in rational_rational_unsigned_rounding_mode_quadruple_gen_var_4()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (z, o) = Float::atan2_pi_rational_prec_round(y.clone(), x.clone(), prec, rm);
+        println!(
+            "Float::atan2_pi_rational_prec_round({}, {}, {}, {}) = ({:#x}, {:?})",
+            y,
+            x,
+            prec,
+            rm,
+            ComparableFloat(z),
+            o
         );
     }
 }
@@ -768,7 +993,7 @@ fn benchmark_float_atan2_pi_prec_round_evaluation_strategy(
     run_benchmark(
         "Float::atan2_pi_prec_round(Float, u64, RoundingMode)",
         BenchmarkType::EvaluationStrategy,
-        float_float_unsigned_rounding_mode_quadruple_gen_var_24().get(gm, config),
+        float_float_unsigned_rounding_mode_quadruple_gen_var_28().get(gm, config),
         gm.name(),
         limit,
         file_name,

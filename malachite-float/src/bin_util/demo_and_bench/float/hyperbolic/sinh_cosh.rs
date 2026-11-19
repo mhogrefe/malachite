@@ -46,6 +46,7 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_sinh_cosh_rational_prec_round_debug);
     register_demo!(runner, demo_float_sinh_cosh_rational_prec_round_ref);
     register_demo!(runner, demo_float_sinh_cosh_rational_prec);
+    register_demo!(runner, demo_float_sinh_cosh_rational_prec_debug);
     register_demo!(runner, demo_float_sinh_cosh_rational_prec_ref);
     register_primitive_float_demos!(runner, demo_primitive_float_sinh_cosh_rational);
     register_bench!(
@@ -67,9 +68,11 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_sinh_cosh_ref);
     register_demo!(runner, demo_float_sinh_cosh_assign);
     register_demo!(runner, demo_float_sinh_cosh_prec);
+    register_demo!(runner, demo_float_sinh_cosh_prec_debug);
     register_demo!(runner, demo_float_sinh_cosh_prec_ref);
     register_demo!(runner, demo_float_sinh_cosh_prec_assign);
     register_demo!(runner, demo_float_sinh_cosh_round);
+    register_demo!(runner, demo_float_sinh_cosh_round_debug);
     register_demo!(runner, demo_float_sinh_cosh_round_ref);
     register_demo!(runner, demo_float_sinh_cosh_round_assign);
     register_demo!(runner, demo_float_sinh_cosh_prec_round);
@@ -148,6 +151,21 @@ fn demo_float_sinh_cosh_prec(gm: GenMode, config: &GenConfig, limit: usize) {
     }
 }
 
+fn demo_float_sinh_cosh_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec) in float_unsigned_pair_gen_var_1().get(gm, config).take(limit) {
+        let (s, c, o_s, o_c) = x.clone().sinh_cosh_prec(prec);
+        println!(
+            "({:#x}).sinh_cosh_prec({}) = ({:#x}, {:#x}, {:?}, {:?})",
+            ComparableFloat(x),
+            prec,
+            ComparableFloat(s),
+            ComparableFloat(c),
+            o_s,
+            o_c
+        );
+    }
+}
+
 fn demo_float_sinh_cosh_prec_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, prec) in float_unsigned_pair_gen_var_1().get(gm, config).take(limit) {
         println!(
@@ -179,6 +197,24 @@ fn demo_float_sinh_cosh_round(gm: GenMode, config: &GenConfig, limit: usize) {
             x_old,
             rm,
             x.sinh_cosh_round(rm)
+        );
+    }
+}
+
+fn demo_float_sinh_cosh_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, rm) in float_rounding_mode_pair_gen_var_47()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (s, c, o_s, o_c) = x.clone().sinh_cosh_round(rm);
+        println!(
+            "({:#x}).sinh_cosh_round({}) = ({:#x}, {:#x}, {:?}, {:?})",
+            ComparableFloat(x),
+            rm,
+            ComparableFloat(s),
+            ComparableFloat(c),
+            o_s,
+            o_c
         );
     }
 }
@@ -545,6 +581,24 @@ fn demo_float_sinh_cosh_rational_prec(gm: GenMode, config: &GenConfig, limit: us
             n.clone(),
             p,
             Float::sinh_cosh_rational_prec(n, p)
+        );
+    }
+}
+
+fn demo_float_sinh_cosh_rational_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec) in rational_unsigned_pair_gen_var_3()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (s, c, o_s, o_c) = Float::sinh_cosh_rational_prec(x.clone(), prec);
+        println!(
+            "Float::sinh_cosh_rational_prec({}, {}) = ({:#x}, {:#x}, {:?}, {:?})",
+            x,
+            prec,
+            ComparableFloat(s),
+            ComparableFloat(c),
+            o_s,
+            o_c
         );
     }
 }

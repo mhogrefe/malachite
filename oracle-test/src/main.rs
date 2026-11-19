@@ -5811,6 +5811,913 @@ const AZURITE_FLOAT_STAGES: &[(&str, &str)] = &[
         "demo_float_sin_pi_rational_prec_round_debug",
         "az_float_sin_pi_rational",
     ),
+    ("demo_float_sin_cos_debug", "az_float_sin_cos"),
+    ("demo_float_sin_cos_prec_debug", "az_float_sin_cos"),
+    ("demo_float_sin_cos_round_debug", "az_float_sin_cos"),
+    ("demo_float_sin_cos_prec_round_debug", "az_float_sin_cos"),
+    (
+        "demo_float_sin_cos_rational_prec_debug",
+        "az_float_sin_cos_rational",
+    ),
+    (
+        "demo_float_sin_cos_rational_prec_round_debug",
+        "az_float_sin_cos_rational",
+    ),
+    (
+        "demo_float_sin_cos_with_period_debug",
+        "az_float_sin_cos_with_period",
+    ),
+    (
+        "demo_float_sin_cos_with_period_prec_debug",
+        "az_float_sin_cos_with_period",
+    ),
+    (
+        "demo_float_sin_cos_with_period_round_debug",
+        "az_float_sin_cos_with_period",
+    ),
+    (
+        "demo_float_sin_cos_with_period_prec_round_debug",
+        "az_float_sin_cos_with_period",
+    ),
+    (
+        "demo_float_sin_cos_with_period_rational_prec_debug",
+        "az_float_sin_cos_with_period_rational",
+    ),
+    (
+        "demo_float_sin_cos_with_period_rational_prec_round_debug",
+        "az_float_sin_cos_with_period_rational",
+    ),
+    ("demo_float_sin_cos_pi_debug", "az_float_sin_cos_pi"),
+    ("demo_float_sin_cos_pi_prec_debug", "az_float_sin_cos_pi"),
+    ("demo_float_sin_cos_pi_round_debug", "az_float_sin_cos_pi"),
+    (
+        "demo_float_sin_cos_pi_prec_round_debug",
+        "az_float_sin_cos_pi",
+    ),
+    (
+        "demo_float_sin_cos_pi_rational_prec_debug",
+        "az_float_sin_cos_pi_rational",
+    ),
+    (
+        "demo_float_sin_cos_pi_rational_prec_round_debug",
+        "az_float_sin_cos_pi_rational",
+    ),
+    ("demo_float_tan_debug", "az_float_tan"),
+    ("demo_float_tan_ref_debug", "az_float_tan"),
+    ("demo_float_tan_assign_debug", "az_float_tan"),
+    ("demo_float_tan_prec_debug", "az_float_tan"),
+    ("demo_float_tan_round_debug", "az_float_tan"),
+    ("demo_float_tan_prec_round_debug", "az_float_tan"),
+    (
+        "demo_float_tan_rational_prec_debug",
+        "az_float_tan_rational",
+    ),
+    (
+        "demo_float_tan_rational_prec_ref_debug",
+        "az_float_tan_rational",
+    ),
+    (
+        "demo_float_tan_rational_prec_round_debug",
+        "az_float_tan_rational",
+    ),
+    (
+        "demo_float_tan_rational_prec_round_ref_debug",
+        "az_float_tan_rational",
+    ),
+    (
+        "demo_float_tan_with_period_debug",
+        "az_float_tan_with_period",
+    ),
+    (
+        "demo_float_tan_with_period_prec_debug",
+        "az_float_tan_with_period",
+    ),
+    (
+        "demo_float_tan_with_period_round_debug",
+        "az_float_tan_with_period",
+    ),
+    (
+        "demo_float_tan_with_period_prec_round_debug",
+        "az_float_tan_with_period",
+    ),
+    (
+        "demo_float_tan_with_period_rational_prec_debug",
+        "az_float_tan_with_period_rational",
+    ),
+    (
+        "demo_float_tan_with_period_rational_prec_round_debug",
+        "az_float_tan_with_period_rational",
+    ),
+    ("demo_float_tan_pi_debug", "az_float_tan_pi"),
+    ("demo_float_tan_pi_prec_debug", "az_float_tan_pi"),
+    ("demo_float_tan_pi_round_debug", "az_float_tan_pi"),
+    ("demo_float_tan_pi_prec_round_debug", "az_float_tan_pi"),
+    (
+        "demo_float_tan_pi_rational_prec_debug",
+        "az_float_tan_pi_rational",
+    ),
+    (
+        "demo_float_tan_pi_rational_prec_round_debug",
+        "az_float_tan_pi_rational",
+    ),
+    ("demo_float_sec_debug", "az_float_sec"),
+    ("demo_float_sec_ref_debug", "az_float_sec"),
+    ("demo_float_sec_assign_debug", "az_float_sec"),
+    ("demo_float_sec_prec_debug", "az_float_sec"),
+    ("demo_float_sec_round_debug", "az_float_sec"),
+    ("demo_float_sec_prec_round_debug", "az_float_sec"),
+    (
+        "demo_float_sec_rational_prec_debug",
+        "az_float_sec_rational",
+    ),
+    (
+        "demo_float_sec_rational_prec_ref_debug",
+        "az_float_sec_rational",
+    ),
+    (
+        "demo_float_sec_rational_prec_round_debug",
+        "az_float_sec_rational",
+    ),
+    (
+        "demo_float_sec_rational_prec_round_ref_debug",
+        "az_float_sec_rational",
+    ),
+    (
+        "demo_float_sec_with_period_debug",
+        "az_float_sec_with_period",
+    ),
+    (
+        "demo_float_sec_with_period_prec_debug",
+        "az_float_sec_with_period",
+    ),
+    (
+        "demo_float_sec_with_period_round_debug",
+        "az_float_sec_with_period",
+    ),
+    (
+        "demo_float_sec_with_period_prec_round_debug",
+        "az_float_sec_with_period",
+    ),
+    (
+        "demo_float_sec_with_period_rational_prec_debug",
+        "az_float_sec_with_period_rational",
+    ),
+    (
+        "demo_float_sec_with_period_rational_prec_round_debug",
+        "az_float_sec_with_period_rational",
+    ),
+    ("demo_float_sec_pi_debug", "az_float_sec_pi"),
+    ("demo_float_sec_pi_prec_debug", "az_float_sec_pi"),
+    ("demo_float_sec_pi_round_debug", "az_float_sec_pi"),
+    ("demo_float_sec_pi_prec_round_debug", "az_float_sec_pi"),
+    (
+        "demo_float_sec_pi_rational_prec_debug",
+        "az_float_sec_pi_rational",
+    ),
+    (
+        "demo_float_sec_pi_rational_prec_round_debug",
+        "az_float_sec_pi_rational",
+    ),
+    ("demo_float_csc_debug", "az_float_csc"),
+    ("demo_float_csc_ref_debug", "az_float_csc"),
+    ("demo_float_csc_assign_debug", "az_float_csc"),
+    ("demo_float_csc_prec_debug", "az_float_csc"),
+    ("demo_float_csc_round_debug", "az_float_csc"),
+    ("demo_float_csc_prec_round_debug", "az_float_csc"),
+    (
+        "demo_float_csc_rational_prec_debug",
+        "az_float_csc_rational",
+    ),
+    (
+        "demo_float_csc_rational_prec_ref_debug",
+        "az_float_csc_rational",
+    ),
+    (
+        "demo_float_csc_rational_prec_round_debug",
+        "az_float_csc_rational",
+    ),
+    (
+        "demo_float_csc_rational_prec_round_ref_debug",
+        "az_float_csc_rational",
+    ),
+    (
+        "demo_float_csc_with_period_debug",
+        "az_float_csc_with_period",
+    ),
+    (
+        "demo_float_csc_with_period_prec_debug",
+        "az_float_csc_with_period",
+    ),
+    (
+        "demo_float_csc_with_period_round_debug",
+        "az_float_csc_with_period",
+    ),
+    (
+        "demo_float_csc_with_period_prec_round_debug",
+        "az_float_csc_with_period",
+    ),
+    (
+        "demo_float_csc_with_period_rational_prec_debug",
+        "az_float_csc_with_period_rational",
+    ),
+    (
+        "demo_float_csc_with_period_rational_prec_round_debug",
+        "az_float_csc_with_period_rational",
+    ),
+    ("demo_float_csc_pi_debug", "az_float_csc_pi"),
+    ("demo_float_csc_pi_prec_debug", "az_float_csc_pi"),
+    ("demo_float_csc_pi_round_debug", "az_float_csc_pi"),
+    ("demo_float_csc_pi_prec_round_debug", "az_float_csc_pi"),
+    (
+        "demo_float_csc_pi_rational_prec_debug",
+        "az_float_csc_pi_rational",
+    ),
+    (
+        "demo_float_csc_pi_rational_prec_round_debug",
+        "az_float_csc_pi_rational",
+    ),
+    ("demo_float_cot_debug", "az_float_cot"),
+    ("demo_float_cot_ref_debug", "az_float_cot"),
+    ("demo_float_cot_assign_debug", "az_float_cot"),
+    ("demo_float_cot_prec_debug", "az_float_cot"),
+    ("demo_float_cot_round_debug", "az_float_cot"),
+    ("demo_float_cot_prec_round_debug", "az_float_cot"),
+    (
+        "demo_float_cot_rational_prec_debug",
+        "az_float_cot_rational",
+    ),
+    (
+        "demo_float_cot_rational_prec_ref_debug",
+        "az_float_cot_rational",
+    ),
+    (
+        "demo_float_cot_rational_prec_round_debug",
+        "az_float_cot_rational",
+    ),
+    (
+        "demo_float_cot_rational_prec_round_ref_debug",
+        "az_float_cot_rational",
+    ),
+    (
+        "demo_float_cot_with_period_debug",
+        "az_float_cot_with_period",
+    ),
+    (
+        "demo_float_cot_with_period_prec_debug",
+        "az_float_cot_with_period",
+    ),
+    (
+        "demo_float_cot_with_period_round_debug",
+        "az_float_cot_with_period",
+    ),
+    (
+        "demo_float_cot_with_period_prec_round_debug",
+        "az_float_cot_with_period",
+    ),
+    (
+        "demo_float_cot_with_period_rational_prec_debug",
+        "az_float_cot_with_period_rational",
+    ),
+    (
+        "demo_float_cot_with_period_rational_prec_round_debug",
+        "az_float_cot_with_period_rational",
+    ),
+    ("demo_float_cot_pi_debug", "az_float_cot_pi"),
+    ("demo_float_cot_pi_prec_debug", "az_float_cot_pi"),
+    ("demo_float_cot_pi_round_debug", "az_float_cot_pi"),
+    ("demo_float_cot_pi_prec_round_debug", "az_float_cot_pi"),
+    (
+        "demo_float_cot_pi_rational_prec_debug",
+        "az_float_cot_pi_rational",
+    ),
+    (
+        "demo_float_cot_pi_rational_prec_round_debug",
+        "az_float_cot_pi_rational",
+    ),
+    ("demo_float_atan_debug", "az_float_atan"),
+    ("demo_float_atan_ref_debug", "az_float_atan"),
+    ("demo_float_atan_assign_debug", "az_float_atan"),
+    ("demo_float_atan_prec_debug", "az_float_atan"),
+    ("demo_float_atan_round_debug", "az_float_atan"),
+    ("demo_float_atan_prec_round_debug", "az_float_atan"),
+    (
+        "demo_float_atan_rational_prec_debug",
+        "az_float_atan_rational",
+    ),
+    (
+        "demo_float_atan_rational_prec_ref_debug",
+        "az_float_atan_rational",
+    ),
+    (
+        "demo_float_atan_rational_prec_round_debug",
+        "az_float_atan_rational",
+    ),
+    (
+        "demo_float_atan_rational_prec_round_ref_debug",
+        "az_float_atan_rational",
+    ),
+    (
+        "demo_float_atan_with_period_debug",
+        "az_float_atan_with_period",
+    ),
+    (
+        "demo_float_atan_with_period_prec_debug",
+        "az_float_atan_with_period",
+    ),
+    (
+        "demo_float_atan_with_period_round_debug",
+        "az_float_atan_with_period",
+    ),
+    (
+        "demo_float_atan_with_period_prec_round_debug",
+        "az_float_atan_with_period",
+    ),
+    (
+        "demo_float_atan_with_period_rational_prec_debug",
+        "az_float_atan_with_period_rational",
+    ),
+    (
+        "demo_float_atan_with_period_rational_prec_round_debug",
+        "az_float_atan_with_period_rational",
+    ),
+    ("demo_float_atan_pi_debug", "az_float_atan_pi"),
+    ("demo_float_atan_pi_prec_debug", "az_float_atan_pi"),
+    ("demo_float_atan_pi_round_debug", "az_float_atan_pi"),
+    ("demo_float_atan_pi_prec_round_debug", "az_float_atan_pi"),
+    (
+        "demo_float_atan_pi_rational_prec_debug",
+        "az_float_atan_pi_rational",
+    ),
+    (
+        "demo_float_atan_pi_rational_prec_round_debug",
+        "az_float_atan_pi_rational",
+    ),
+    ("demo_float_atan2_debug", "az_float_atan2"),
+    ("demo_float_atan2_prec_debug", "az_float_atan2"),
+    ("demo_float_atan2_round_debug", "az_float_atan2"),
+    ("demo_float_atan2_prec_round_debug", "az_float_atan2"),
+    (
+        "demo_float_atan2_rational_prec_debug",
+        "az_float_atan2_rational",
+    ),
+    (
+        "demo_float_atan2_rational_prec_round_debug",
+        "az_float_atan2_rational",
+    ),
+    (
+        "demo_float_atan2_with_period_prec_debug",
+        "az_float_atan2_with_period",
+    ),
+    (
+        "demo_float_atan2_with_period_round_debug",
+        "az_float_atan2_with_period",
+    ),
+    (
+        "demo_float_atan2_with_period_prec_round_debug",
+        "az_float_atan2_with_period",
+    ),
+    (
+        "demo_float_atan2_with_period_rational_prec_debug",
+        "az_float_atan2_with_period_rational",
+    ),
+    (
+        "demo_float_atan2_with_period_rational_prec_round_debug",
+        "az_float_atan2_with_period_rational",
+    ),
+    ("demo_float_atan2_pi_prec_debug", "az_float_atan2_pi"),
+    ("demo_float_atan2_pi_round_debug", "az_float_atan2_pi"),
+    ("demo_float_atan2_pi_prec_round_debug", "az_float_atan2_pi"),
+    (
+        "demo_float_atan2_pi_rational_prec_round_debug",
+        "az_float_atan2_pi_rational",
+    ),
+    ("demo_float_asin_debug", "az_float_asin"),
+    ("demo_float_asin_prec_debug", "az_float_asin"),
+    ("demo_float_asin_round_debug", "az_float_asin"),
+    ("demo_float_asin_prec_round_debug", "az_float_asin"),
+    (
+        "demo_float_asin_rational_prec_debug",
+        "az_float_asin_rational",
+    ),
+    (
+        "demo_float_asin_rational_prec_round_debug",
+        "az_float_asin_rational",
+    ),
+    (
+        "demo_float_asin_with_period_debug",
+        "az_float_asin_with_period",
+    ),
+    (
+        "demo_float_asin_with_period_prec_debug",
+        "az_float_asin_with_period",
+    ),
+    (
+        "demo_float_asin_with_period_round_debug",
+        "az_float_asin_with_period",
+    ),
+    (
+        "demo_float_asin_with_period_prec_round_debug",
+        "az_float_asin_with_period",
+    ),
+    (
+        "demo_float_asin_with_period_rational_prec_debug",
+        "az_float_asin_with_period_rational",
+    ),
+    (
+        "demo_float_asin_with_period_rational_prec_round_debug",
+        "az_float_asin_with_period_rational",
+    ),
+    ("demo_float_asin_pi_debug", "az_float_asin_pi"),
+    ("demo_float_asin_pi_prec_debug", "az_float_asin_pi"),
+    ("demo_float_asin_pi_round_debug", "az_float_asin_pi"),
+    ("demo_float_asin_pi_prec_round_debug", "az_float_asin_pi"),
+    (
+        "demo_float_asin_pi_rational_prec_debug",
+        "az_float_asin_pi_rational",
+    ),
+    (
+        "demo_float_asin_pi_rational_prec_round_debug",
+        "az_float_asin_pi_rational",
+    ),
+    ("demo_float_acos_debug", "az_float_acos"),
+    ("demo_float_acos_prec_debug", "az_float_acos"),
+    ("demo_float_acos_round_debug", "az_float_acos"),
+    ("demo_float_acos_prec_round_debug", "az_float_acos"),
+    (
+        "demo_float_acos_rational_prec_debug",
+        "az_float_acos_rational",
+    ),
+    (
+        "demo_float_acos_rational_prec_round_debug",
+        "az_float_acos_rational",
+    ),
+    (
+        "demo_float_acos_with_period_debug",
+        "az_float_acos_with_period",
+    ),
+    (
+        "demo_float_acos_with_period_prec_debug",
+        "az_float_acos_with_period",
+    ),
+    (
+        "demo_float_acos_with_period_round_debug",
+        "az_float_acos_with_period",
+    ),
+    (
+        "demo_float_acos_with_period_prec_round_debug",
+        "az_float_acos_with_period",
+    ),
+    (
+        "demo_float_acos_with_period_rational_prec_debug",
+        "az_float_acos_with_period_rational",
+    ),
+    (
+        "demo_float_acos_with_period_rational_prec_round_debug",
+        "az_float_acos_with_period_rational",
+    ),
+    ("demo_float_acos_pi_debug", "az_float_acos_pi"),
+    ("demo_float_acos_pi_prec_debug", "az_float_acos_pi"),
+    ("demo_float_acos_pi_round_debug", "az_float_acos_pi"),
+    ("demo_float_acos_pi_prec_round_debug", "az_float_acos_pi"),
+    (
+        "demo_float_acos_pi_rational_prec_debug",
+        "az_float_acos_pi_rational",
+    ),
+    (
+        "demo_float_acos_pi_rational_prec_round_debug",
+        "az_float_acos_pi_rational",
+    ),
+    ("demo_float_asec_debug", "az_float_asec"),
+    ("demo_float_asec_prec_debug", "az_float_asec"),
+    ("demo_float_asec_round_debug", "az_float_asec"),
+    ("demo_float_asec_prec_round_debug", "az_float_asec"),
+    (
+        "demo_float_asec_rational_prec_debug",
+        "az_float_asec_rational",
+    ),
+    (
+        "demo_float_asec_rational_prec_round_debug",
+        "az_float_asec_rational",
+    ),
+    (
+        "demo_float_asec_with_period_debug",
+        "az_float_asec_with_period",
+    ),
+    (
+        "demo_float_asec_with_period_prec_debug",
+        "az_float_asec_with_period",
+    ),
+    (
+        "demo_float_asec_with_period_round_debug",
+        "az_float_asec_with_period",
+    ),
+    (
+        "demo_float_asec_with_period_prec_round_debug",
+        "az_float_asec_with_period",
+    ),
+    (
+        "demo_float_asec_with_period_rational_prec_debug",
+        "az_float_asec_with_period_rational",
+    ),
+    (
+        "demo_float_asec_with_period_rational_prec_round_debug",
+        "az_float_asec_with_period_rational",
+    ),
+    ("demo_float_asec_pi_debug", "az_float_asec_pi"),
+    ("demo_float_asec_pi_prec_debug", "az_float_asec_pi"),
+    ("demo_float_asec_pi_round_debug", "az_float_asec_pi"),
+    ("demo_float_asec_pi_prec_round_debug", "az_float_asec_pi"),
+    (
+        "demo_float_asec_pi_rational_prec_debug",
+        "az_float_asec_pi_rational",
+    ),
+    (
+        "demo_float_asec_pi_rational_prec_round_debug",
+        "az_float_asec_pi_rational",
+    ),
+    ("demo_float_acsc_debug", "az_float_acsc"),
+    ("demo_float_acsc_prec_debug", "az_float_acsc"),
+    ("demo_float_acsc_round_debug", "az_float_acsc"),
+    ("demo_float_acsc_prec_round_debug", "az_float_acsc"),
+    (
+        "demo_float_acsc_rational_prec_debug",
+        "az_float_acsc_rational",
+    ),
+    (
+        "demo_float_acsc_rational_prec_round_debug",
+        "az_float_acsc_rational",
+    ),
+    (
+        "demo_float_acsc_with_period_debug",
+        "az_float_acsc_with_period",
+    ),
+    (
+        "demo_float_acsc_with_period_prec_debug",
+        "az_float_acsc_with_period",
+    ),
+    (
+        "demo_float_acsc_with_period_round_debug",
+        "az_float_acsc_with_period",
+    ),
+    (
+        "demo_float_acsc_with_period_prec_round_debug",
+        "az_float_acsc_with_period",
+    ),
+    (
+        "demo_float_acsc_with_period_rational_prec_debug",
+        "az_float_acsc_with_period_rational",
+    ),
+    (
+        "demo_float_acsc_with_period_rational_prec_round_debug",
+        "az_float_acsc_with_period_rational",
+    ),
+    ("demo_float_acsc_pi_debug", "az_float_acsc_pi"),
+    ("demo_float_acsc_pi_prec_debug", "az_float_acsc_pi"),
+    ("demo_float_acsc_pi_round_debug", "az_float_acsc_pi"),
+    ("demo_float_acsc_pi_prec_round_debug", "az_float_acsc_pi"),
+    (
+        "demo_float_acsc_pi_rational_prec_debug",
+        "az_float_acsc_pi_rational",
+    ),
+    (
+        "demo_float_acsc_pi_rational_prec_round_debug",
+        "az_float_acsc_pi_rational",
+    ),
+    ("demo_float_acot_debug", "az_float_acot"),
+    ("demo_float_acot_prec_debug", "az_float_acot"),
+    ("demo_float_acot_round_debug", "az_float_acot"),
+    ("demo_float_acot_prec_round_debug", "az_float_acot"),
+    (
+        "demo_float_acot_rational_prec_debug",
+        "az_float_acot_rational",
+    ),
+    (
+        "demo_float_acot_rational_prec_round_debug",
+        "az_float_acot_rational",
+    ),
+    (
+        "demo_float_acot_with_period_debug",
+        "az_float_acot_with_period",
+    ),
+    (
+        "demo_float_acot_with_period_prec_debug",
+        "az_float_acot_with_period",
+    ),
+    (
+        "demo_float_acot_with_period_round_debug",
+        "az_float_acot_with_period",
+    ),
+    (
+        "demo_float_acot_with_period_prec_round_debug",
+        "az_float_acot_with_period",
+    ),
+    (
+        "demo_float_acot_with_period_rational_prec_debug",
+        "az_float_acot_with_period_rational",
+    ),
+    (
+        "demo_float_acot_with_period_rational_prec_round_debug",
+        "az_float_acot_with_period_rational",
+    ),
+    ("demo_float_acot_pi_debug", "az_float_acot_pi"),
+    ("demo_float_acot_pi_prec_debug", "az_float_acot_pi"),
+    ("demo_float_acot_pi_round_debug", "az_float_acot_pi"),
+    ("demo_float_acot_pi_prec_round_debug", "az_float_acot_pi"),
+    (
+        "demo_float_acot_pi_rational_prec_debug",
+        "az_float_acot_pi_rational",
+    ),
+    (
+        "demo_float_acot_pi_rational_prec_round_debug",
+        "az_float_acot_pi_rational",
+    ),
+    ("demo_float_sinh_debug", "az_float_sinh"),
+    ("demo_float_sinh_ref_debug", "az_float_sinh"),
+    ("demo_float_sinh_assign_debug", "az_float_sinh"),
+    ("demo_float_sinh_prec_debug", "az_float_sinh"),
+    ("demo_float_sinh_round_debug", "az_float_sinh"),
+    ("demo_float_sinh_prec_round_debug", "az_float_sinh"),
+    (
+        "demo_float_sinh_rational_prec_debug",
+        "az_float_sinh_rational",
+    ),
+    (
+        "demo_float_sinh_rational_prec_ref_debug",
+        "az_float_sinh_rational",
+    ),
+    (
+        "demo_float_sinh_rational_prec_round_debug",
+        "az_float_sinh_rational",
+    ),
+    (
+        "demo_float_sinh_rational_prec_round_ref_debug",
+        "az_float_sinh_rational",
+    ),
+    ("demo_float_cosh_debug", "az_float_cosh"),
+    ("demo_float_cosh_ref_debug", "az_float_cosh"),
+    ("demo_float_cosh_assign_debug", "az_float_cosh"),
+    ("demo_float_cosh_prec_debug", "az_float_cosh"),
+    ("demo_float_cosh_round_debug", "az_float_cosh"),
+    ("demo_float_cosh_prec_round_debug", "az_float_cosh"),
+    (
+        "demo_float_cosh_rational_prec_debug",
+        "az_float_cosh_rational",
+    ),
+    (
+        "demo_float_cosh_rational_prec_ref_debug",
+        "az_float_cosh_rational",
+    ),
+    (
+        "demo_float_cosh_rational_prec_round_debug",
+        "az_float_cosh_rational",
+    ),
+    (
+        "demo_float_cosh_rational_prec_round_ref_debug",
+        "az_float_cosh_rational",
+    ),
+    ("demo_float_sinh_cosh_debug", "az_float_sinh_cosh"),
+    ("demo_float_sinh_cosh_prec_debug", "az_float_sinh_cosh"),
+    ("demo_float_sinh_cosh_round_debug", "az_float_sinh_cosh"),
+    (
+        "demo_float_sinh_cosh_prec_round_debug",
+        "az_float_sinh_cosh",
+    ),
+    (
+        "demo_float_sinh_cosh_rational_prec_round_debug",
+        "az_float_sinh_cosh_rational",
+    ),
+    (
+        "demo_float_sinh_cosh_rational_prec_debug",
+        "az_float_sinh_cosh_rational",
+    ),
+    ("demo_float_tanh_debug", "az_float_tanh"),
+    ("demo_float_tanh_extreme_debug", "az_float_tanh"),
+    ("demo_float_tanh_ref_debug", "az_float_tanh"),
+    ("demo_float_tanh_assign_debug", "az_float_tanh"),
+    ("demo_float_tanh_prec_debug", "az_float_tanh"),
+    ("demo_float_tanh_round_debug", "az_float_tanh"),
+    ("demo_float_tanh_prec_round_debug", "az_float_tanh"),
+    (
+        "demo_float_tanh_rational_prec_debug",
+        "az_float_tanh_rational",
+    ),
+    (
+        "demo_float_tanh_rational_prec_ref_debug",
+        "az_float_tanh_rational",
+    ),
+    (
+        "demo_float_tanh_rational_prec_round_debug",
+        "az_float_tanh_rational",
+    ),
+    (
+        "demo_float_tanh_rational_prec_round_ref_debug",
+        "az_float_tanh_rational",
+    ),
+    ("demo_float_sech_debug", "az_float_sech"),
+    ("demo_float_sech_ref_debug", "az_float_sech"),
+    ("demo_float_sech_assign_debug", "az_float_sech"),
+    ("demo_float_sech_prec_debug", "az_float_sech"),
+    ("demo_float_sech_round_debug", "az_float_sech"),
+    ("demo_float_sech_prec_round_debug", "az_float_sech"),
+    (
+        "demo_float_sech_rational_prec_debug",
+        "az_float_sech_rational",
+    ),
+    (
+        "demo_float_sech_rational_prec_ref_debug",
+        "az_float_sech_rational",
+    ),
+    (
+        "demo_float_sech_rational_prec_round_debug",
+        "az_float_sech_rational",
+    ),
+    (
+        "demo_float_sech_rational_prec_round_ref_debug",
+        "az_float_sech_rational",
+    ),
+    ("demo_float_csch_debug", "az_float_csch"),
+    ("demo_float_csch_ref_debug", "az_float_csch"),
+    ("demo_float_csch_assign_debug", "az_float_csch"),
+    ("demo_float_csch_prec_debug", "az_float_csch"),
+    ("demo_float_csch_round_debug", "az_float_csch"),
+    ("demo_float_csch_prec_round_debug", "az_float_csch"),
+    (
+        "demo_float_csch_rational_prec_debug",
+        "az_float_csch_rational",
+    ),
+    (
+        "demo_float_csch_rational_prec_ref_debug",
+        "az_float_csch_rational",
+    ),
+    (
+        "demo_float_csch_rational_prec_round_debug",
+        "az_float_csch_rational",
+    ),
+    (
+        "demo_float_csch_rational_prec_round_ref_debug",
+        "az_float_csch_rational",
+    ),
+    ("demo_float_coth_debug", "az_float_coth"),
+    ("demo_float_coth_extreme_debug", "az_float_coth"),
+    ("demo_float_coth_ref_debug", "az_float_coth"),
+    ("demo_float_coth_assign_debug", "az_float_coth"),
+    ("demo_float_coth_prec_debug", "az_float_coth"),
+    ("demo_float_coth_round_debug", "az_float_coth"),
+    ("demo_float_coth_prec_round_debug", "az_float_coth"),
+    (
+        "demo_float_coth_rational_prec_debug",
+        "az_float_coth_rational",
+    ),
+    (
+        "demo_float_coth_rational_prec_ref_debug",
+        "az_float_coth_rational",
+    ),
+    (
+        "demo_float_coth_rational_prec_round_debug",
+        "az_float_coth_rational",
+    ),
+    (
+        "demo_float_coth_rational_prec_round_ref_debug",
+        "az_float_coth_rational",
+    ),
+    ("demo_float_asinh_debug", "az_float_asinh"),
+    ("demo_float_asinh_extreme_debug", "az_float_asinh"),
+    ("demo_float_asinh_ref_debug", "az_float_asinh"),
+    ("demo_float_asinh_assign_debug", "az_float_asinh"),
+    ("demo_float_asinh_prec_debug", "az_float_asinh"),
+    ("demo_float_asinh_round_debug", "az_float_asinh"),
+    ("demo_float_asinh_prec_round_debug", "az_float_asinh"),
+    (
+        "demo_float_asinh_rational_prec_debug",
+        "az_float_asinh_rational",
+    ),
+    (
+        "demo_float_asinh_rational_prec_ref_debug",
+        "az_float_asinh_rational",
+    ),
+    (
+        "demo_float_asinh_rational_prec_round_debug",
+        "az_float_asinh_rational",
+    ),
+    (
+        "demo_float_asinh_rational_prec_round_ref_debug",
+        "az_float_asinh_rational",
+    ),
+    ("demo_float_acosh_debug", "az_float_acosh"),
+    ("demo_float_acosh_extreme_debug", "az_float_acosh"),
+    ("demo_float_acosh_ref_debug", "az_float_acosh"),
+    ("demo_float_acosh_assign_debug", "az_float_acosh"),
+    ("demo_float_acosh_prec_debug", "az_float_acosh"),
+    ("demo_float_acosh_round_debug", "az_float_acosh"),
+    ("demo_float_acosh_prec_round_debug", "az_float_acosh"),
+    (
+        "demo_float_acosh_rational_prec_debug",
+        "az_float_acosh_rational",
+    ),
+    (
+        "demo_float_acosh_rational_prec_ref_debug",
+        "az_float_acosh_rational",
+    ),
+    (
+        "demo_float_acosh_rational_prec_round_debug",
+        "az_float_acosh_rational",
+    ),
+    (
+        "demo_float_acosh_rational_prec_round_ref_debug",
+        "az_float_acosh_rational",
+    ),
+    ("demo_float_atanh_debug", "az_float_atanh"),
+    ("demo_float_atanh_extreme_debug", "az_float_atanh"),
+    ("demo_float_atanh_ref_debug", "az_float_atanh"),
+    ("demo_float_atanh_assign_debug", "az_float_atanh"),
+    ("demo_float_atanh_prec_debug", "az_float_atanh"),
+    ("demo_float_atanh_round_debug", "az_float_atanh"),
+    ("demo_float_atanh_prec_round_debug", "az_float_atanh"),
+    (
+        "demo_float_atanh_rational_prec_debug",
+        "az_float_atanh_rational",
+    ),
+    (
+        "demo_float_atanh_rational_prec_ref_debug",
+        "az_float_atanh_rational",
+    ),
+    (
+        "demo_float_atanh_rational_prec_round_debug",
+        "az_float_atanh_rational",
+    ),
+    (
+        "demo_float_atanh_rational_prec_round_ref_debug",
+        "az_float_atanh_rational",
+    ),
+    ("demo_float_asech_debug", "az_float_asech"),
+    ("demo_float_asech_extreme_debug", "az_float_asech"),
+    ("demo_float_asech_ref_debug", "az_float_asech"),
+    ("demo_float_asech_assign_debug", "az_float_asech"),
+    ("demo_float_asech_prec_debug", "az_float_asech"),
+    ("demo_float_asech_round_debug", "az_float_asech"),
+    ("demo_float_asech_prec_round_debug", "az_float_asech"),
+    (
+        "demo_float_asech_rational_prec_debug",
+        "az_float_asech_rational",
+    ),
+    (
+        "demo_float_asech_rational_prec_ref_debug",
+        "az_float_asech_rational",
+    ),
+    (
+        "demo_float_asech_rational_prec_round_debug",
+        "az_float_asech_rational",
+    ),
+    (
+        "demo_float_asech_rational_prec_round_ref_debug",
+        "az_float_asech_rational",
+    ),
+    ("demo_float_acsch_debug", "az_float_acsch"),
+    ("demo_float_acsch_extreme_debug", "az_float_acsch"),
+    ("demo_float_acsch_ref_debug", "az_float_acsch"),
+    ("demo_float_acsch_assign_debug", "az_float_acsch"),
+    ("demo_float_acsch_prec_debug", "az_float_acsch"),
+    ("demo_float_acsch_round_debug", "az_float_acsch"),
+    ("demo_float_acsch_prec_round_debug", "az_float_acsch"),
+    (
+        "demo_float_acsch_rational_prec_debug",
+        "az_float_acsch_rational",
+    ),
+    (
+        "demo_float_acsch_rational_prec_ref_debug",
+        "az_float_acsch_rational",
+    ),
+    (
+        "demo_float_acsch_rational_prec_round_debug",
+        "az_float_acsch_rational",
+    ),
+    (
+        "demo_float_acsch_rational_prec_round_ref_debug",
+        "az_float_acsch_rational",
+    ),
+    ("demo_float_acoth_debug", "az_float_acoth"),
+    ("demo_float_acoth_extreme_debug", "az_float_acoth"),
+    ("demo_float_acoth_ref_debug", "az_float_acoth"),
+    ("demo_float_acoth_assign_debug", "az_float_acoth"),
+    ("demo_float_acoth_prec_debug", "az_float_acoth"),
+    ("demo_float_acoth_round_debug", "az_float_acoth"),
+    ("demo_float_acoth_prec_round_debug", "az_float_acoth"),
+    (
+        "demo_float_acoth_rational_prec_debug",
+        "az_float_acoth_rational",
+    ),
+    (
+        "demo_float_acoth_rational_prec_ref_debug",
+        "az_float_acoth_rational",
+    ),
+    (
+        "demo_float_acoth_rational_prec_round_debug",
+        "az_float_acoth_rational",
+    ),
+    (
+        "demo_float_acoth_rational_prec_round_ref_debug",
+        "az_float_acoth_rational",
+    ),
 ];
 
 // Float demos whose extreme inputs make each line slow on Malachite's side (about a tenth of a
@@ -6183,6 +7090,14 @@ const AZURITE_FLOAT_STAGES_NO_SPECIAL: &[(&str, &str)] = &[
     ),
     (
         "demo_float_dottie_number_prec_debug",
+        "az_float_irrational_constant",
+    ),
+    (
+        "demo_float_catalans_constant_prec_round_debug",
+        "az_float_irrational_constant",
+    ),
+    (
+        "demo_float_catalans_constant_prec_debug",
         "az_float_irrational_constant",
     ),
 ];
@@ -7251,6 +8166,790 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_big_exponent_float_sin_pi_rational",
     ),
     (
+        "demo_big_exponent_float_sin_cos_prec_debug",
+        "az_big_exponent_float_sin_cos",
+    ),
+    (
+        "demo_big_exponent_float_sin_cos_prec_round_debug",
+        "az_big_exponent_float_sin_cos",
+    ),
+    (
+        "demo_big_exponent_float_sin_cos_rational_prec_debug",
+        "az_big_exponent_float_sin_cos_rational",
+    ),
+    (
+        "demo_big_exponent_float_sin_cos_rational_prec_round_debug",
+        "az_big_exponent_float_sin_cos_rational",
+    ),
+    (
+        "demo_big_exponent_float_sin_cos_with_period_prec_debug",
+        "az_big_exponent_float_sin_cos_with_period",
+    ),
+    (
+        "demo_big_exponent_float_sin_cos_with_period_prec_round_debug",
+        "az_big_exponent_float_sin_cos_with_period",
+    ),
+    (
+        "demo_big_exponent_float_sin_cos_with_period_rational_prec_debug",
+        "az_big_exponent_float_sin_cos_with_period_rational",
+    ),
+    (
+        "demo_big_exponent_float_sin_cos_with_period_rational_prec_round_debug",
+        "az_big_exponent_float_sin_cos_with_period_rational",
+    ),
+    (
+        "demo_big_exponent_float_sin_cos_pi_prec_debug",
+        "az_big_exponent_float_sin_cos_pi",
+    ),
+    (
+        "demo_big_exponent_float_sin_cos_pi_prec_round_debug",
+        "az_big_exponent_float_sin_cos_pi",
+    ),
+    (
+        "demo_big_exponent_float_sin_cos_pi_rational_prec_debug",
+        "az_big_exponent_float_sin_cos_pi_rational",
+    ),
+    (
+        "demo_big_exponent_float_sin_cos_pi_rational_prec_round_debug",
+        "az_big_exponent_float_sin_cos_pi_rational",
+    ),
+    (
+        "demo_big_exponent_float_tan_prec_debug",
+        "az_big_exponent_float_tan",
+    ),
+    (
+        "demo_big_exponent_float_tan_prec_round_debug",
+        "az_big_exponent_float_tan",
+    ),
+    (
+        "demo_big_exponent_float_tan_rational_prec_debug",
+        "az_big_exponent_float_tan_rational",
+    ),
+    (
+        "demo_big_exponent_float_tan_rational_prec_round_debug",
+        "az_big_exponent_float_tan_rational",
+    ),
+    (
+        "demo_big_exponent_float_tan_with_period_prec_debug",
+        "az_big_exponent_float_tan_with_period",
+    ),
+    (
+        "demo_big_exponent_float_tan_with_period_prec_round_debug",
+        "az_big_exponent_float_tan_with_period",
+    ),
+    (
+        "demo_big_exponent_float_tan_with_period_rational_prec_debug",
+        "az_big_exponent_float_tan_with_period_rational",
+    ),
+    (
+        "demo_big_exponent_float_tan_with_period_rational_prec_round_debug",
+        "az_big_exponent_float_tan_with_period_rational",
+    ),
+    (
+        "demo_big_exponent_float_tan_pi_prec_debug",
+        "az_big_exponent_float_tan_pi",
+    ),
+    (
+        "demo_big_exponent_float_tan_pi_prec_round_debug",
+        "az_big_exponent_float_tan_pi",
+    ),
+    (
+        "demo_big_exponent_float_tan_pi_rational_prec_debug",
+        "az_big_exponent_float_tan_pi_rational",
+    ),
+    (
+        "demo_big_exponent_float_tan_pi_rational_prec_round_debug",
+        "az_big_exponent_float_tan_pi_rational",
+    ),
+    (
+        "demo_big_exponent_float_sec_prec_debug",
+        "az_big_exponent_float_sec",
+    ),
+    (
+        "demo_big_exponent_float_sec_prec_round_debug",
+        "az_big_exponent_float_sec",
+    ),
+    (
+        "demo_big_exponent_float_sec_rational_prec_debug",
+        "az_big_exponent_float_sec_rational",
+    ),
+    (
+        "demo_big_exponent_float_sec_rational_prec_round_debug",
+        "az_big_exponent_float_sec_rational",
+    ),
+    (
+        "demo_big_exponent_float_sec_with_period_prec_debug",
+        "az_big_exponent_float_sec_with_period",
+    ),
+    (
+        "demo_big_exponent_float_sec_with_period_prec_round_debug",
+        "az_big_exponent_float_sec_with_period",
+    ),
+    (
+        "demo_big_exponent_float_sec_with_period_rational_prec_debug",
+        "az_big_exponent_float_sec_with_period_rational",
+    ),
+    (
+        "demo_big_exponent_float_sec_with_period_rational_prec_round_debug",
+        "az_big_exponent_float_sec_with_period_rational",
+    ),
+    (
+        "demo_big_exponent_float_sec_pi_prec_debug",
+        "az_big_exponent_float_sec_pi",
+    ),
+    (
+        "demo_big_exponent_float_sec_pi_prec_round_debug",
+        "az_big_exponent_float_sec_pi",
+    ),
+    (
+        "demo_big_exponent_float_sec_pi_rational_prec_debug",
+        "az_big_exponent_float_sec_pi_rational",
+    ),
+    (
+        "demo_big_exponent_float_sec_pi_rational_prec_round_debug",
+        "az_big_exponent_float_sec_pi_rational",
+    ),
+    (
+        "demo_big_exponent_float_csc_prec_debug",
+        "az_big_exponent_float_csc",
+    ),
+    (
+        "demo_big_exponent_float_csc_prec_round_debug",
+        "az_big_exponent_float_csc",
+    ),
+    (
+        "demo_big_exponent_float_csc_rational_prec_debug",
+        "az_big_exponent_float_csc_rational",
+    ),
+    (
+        "demo_big_exponent_float_csc_rational_prec_round_debug",
+        "az_big_exponent_float_csc_rational",
+    ),
+    (
+        "demo_big_exponent_float_csc_with_period_prec_debug",
+        "az_big_exponent_float_csc_with_period",
+    ),
+    (
+        "demo_big_exponent_float_csc_with_period_prec_round_debug",
+        "az_big_exponent_float_csc_with_period",
+    ),
+    (
+        "demo_big_exponent_float_csc_with_period_rational_prec_debug",
+        "az_big_exponent_float_csc_with_period_rational",
+    ),
+    (
+        "demo_big_exponent_float_csc_with_period_rational_prec_round_debug",
+        "az_big_exponent_float_csc_with_period_rational",
+    ),
+    (
+        "demo_big_exponent_float_csc_pi_prec_debug",
+        "az_big_exponent_float_csc_pi",
+    ),
+    (
+        "demo_big_exponent_float_csc_pi_prec_round_debug",
+        "az_big_exponent_float_csc_pi",
+    ),
+    (
+        "demo_big_exponent_float_csc_pi_rational_prec_debug",
+        "az_big_exponent_float_csc_pi_rational",
+    ),
+    (
+        "demo_big_exponent_float_csc_pi_rational_prec_round_debug",
+        "az_big_exponent_float_csc_pi_rational",
+    ),
+    (
+        "demo_big_exponent_float_cot_prec_debug",
+        "az_big_exponent_float_cot",
+    ),
+    (
+        "demo_big_exponent_float_cot_prec_round_debug",
+        "az_big_exponent_float_cot",
+    ),
+    (
+        "demo_big_exponent_float_cot_rational_prec_debug",
+        "az_big_exponent_float_cot_rational",
+    ),
+    (
+        "demo_big_exponent_float_cot_rational_prec_round_debug",
+        "az_big_exponent_float_cot_rational",
+    ),
+    (
+        "demo_big_exponent_float_cot_with_period_prec_debug",
+        "az_big_exponent_float_cot_with_period",
+    ),
+    (
+        "demo_big_exponent_float_cot_with_period_prec_round_debug",
+        "az_big_exponent_float_cot_with_period",
+    ),
+    (
+        "demo_big_exponent_float_cot_with_period_rational_prec_debug",
+        "az_big_exponent_float_cot_with_period_rational",
+    ),
+    (
+        "demo_big_exponent_float_cot_with_period_rational_prec_round_debug",
+        "az_big_exponent_float_cot_with_period_rational",
+    ),
+    (
+        "demo_big_exponent_float_cot_pi_prec_debug",
+        "az_big_exponent_float_cot_pi",
+    ),
+    (
+        "demo_big_exponent_float_cot_pi_prec_round_debug",
+        "az_big_exponent_float_cot_pi",
+    ),
+    (
+        "demo_big_exponent_float_cot_pi_rational_prec_debug",
+        "az_big_exponent_float_cot_pi_rational",
+    ),
+    (
+        "demo_big_exponent_float_cot_pi_rational_prec_round_debug",
+        "az_big_exponent_float_cot_pi_rational",
+    ),
+    (
+        "demo_big_exponent_float_atan_prec_debug",
+        "az_big_exponent_float_atan",
+    ),
+    (
+        "demo_big_exponent_float_atan_prec_round_debug",
+        "az_big_exponent_float_atan",
+    ),
+    (
+        "demo_big_exponent_float_atan_rational_prec_debug",
+        "az_big_exponent_float_atan_rational",
+    ),
+    (
+        "demo_big_exponent_float_atan_rational_prec_round_debug",
+        "az_big_exponent_float_atan_rational",
+    ),
+    (
+        "demo_big_exponent_float_atan_with_period_prec_debug",
+        "az_big_exponent_float_atan_with_period",
+    ),
+    (
+        "demo_big_exponent_float_atan_with_period_prec_round_debug",
+        "az_big_exponent_float_atan_with_period",
+    ),
+    (
+        "demo_big_exponent_float_atan_with_period_rational_prec_debug",
+        "az_big_exponent_float_atan_with_period_rational",
+    ),
+    (
+        "demo_big_exponent_float_atan_with_period_rational_prec_round_debug",
+        "az_big_exponent_float_atan_with_period_rational",
+    ),
+    (
+        "demo_big_exponent_float_atan_pi_prec_debug",
+        "az_big_exponent_float_atan_pi",
+    ),
+    (
+        "demo_big_exponent_float_atan_pi_prec_round_debug",
+        "az_big_exponent_float_atan_pi",
+    ),
+    (
+        "demo_big_exponent_float_atan_pi_rational_prec_debug",
+        "az_big_exponent_float_atan_pi_rational",
+    ),
+    (
+        "demo_big_exponent_float_atan_pi_rational_prec_round_debug",
+        "az_big_exponent_float_atan_pi_rational",
+    ),
+    (
+        "demo_big_exponent_float_atan2_prec_debug",
+        "az_big_exponent_float_atan2",
+    ),
+    (
+        "demo_big_exponent_float_atan2_prec_round_debug",
+        "az_big_exponent_float_atan2",
+    ),
+    (
+        "demo_big_exponent_float_atan2_rational_prec_debug",
+        "az_big_exponent_float_atan2_rational",
+    ),
+    (
+        "demo_big_exponent_float_atan2_rational_prec_round_debug",
+        "az_big_exponent_float_atan2_rational",
+    ),
+    (
+        "demo_big_exponent_float_atan2_with_period_prec_debug",
+        "az_big_exponent_float_atan2_with_period",
+    ),
+    (
+        "demo_big_exponent_float_atan2_with_period_prec_round_debug",
+        "az_big_exponent_float_atan2_with_period",
+    ),
+    (
+        "demo_big_exponent_float_atan2_with_period_rational_prec_debug",
+        "az_big_exponent_float_atan2_with_period_rational",
+    ),
+    (
+        "demo_big_exponent_float_atan2_with_period_rational_prec_round_debug",
+        "az_big_exponent_float_atan2_with_period_rational",
+    ),
+    (
+        "demo_big_exponent_float_atan2_pi_prec_debug",
+        "az_big_exponent_float_atan2_pi",
+    ),
+    (
+        "demo_big_exponent_float_atan2_pi_prec_round_debug",
+        "az_big_exponent_float_atan2_pi",
+    ),
+    (
+        "demo_big_exponent_float_atan2_pi_rational_prec_debug",
+        "az_big_exponent_float_atan2_pi_rational",
+    ),
+    (
+        "demo_big_exponent_float_atan2_pi_rational_prec_round_debug",
+        "az_big_exponent_float_atan2_pi_rational",
+    ),
+    (
+        "demo_big_exponent_float_asin_prec_debug",
+        "az_big_exponent_float_asin",
+    ),
+    (
+        "demo_big_exponent_float_asin_prec_round_debug",
+        "az_big_exponent_float_asin",
+    ),
+    (
+        "demo_big_exponent_float_asin_rational_prec_debug",
+        "az_big_exponent_float_asin_rational",
+    ),
+    (
+        "demo_big_exponent_float_asin_rational_prec_round_debug",
+        "az_big_exponent_float_asin_rational",
+    ),
+    (
+        "demo_big_exponent_float_asin_with_period_prec_debug",
+        "az_big_exponent_float_asin_with_period",
+    ),
+    (
+        "demo_big_exponent_float_asin_with_period_prec_round_debug",
+        "az_big_exponent_float_asin_with_period",
+    ),
+    (
+        "demo_big_exponent_float_asin_with_period_rational_prec_debug",
+        "az_big_exponent_float_asin_with_period_rational",
+    ),
+    (
+        "demo_big_exponent_float_asin_with_period_rational_prec_round_debug",
+        "az_big_exponent_float_asin_with_period_rational",
+    ),
+    (
+        "demo_big_exponent_float_asin_pi_prec_debug",
+        "az_big_exponent_float_asin_pi",
+    ),
+    (
+        "demo_big_exponent_float_asin_pi_prec_round_debug",
+        "az_big_exponent_float_asin_pi",
+    ),
+    (
+        "demo_big_exponent_float_asin_pi_rational_prec_debug",
+        "az_big_exponent_float_asin_pi_rational",
+    ),
+    (
+        "demo_big_exponent_float_asin_pi_rational_prec_round_debug",
+        "az_big_exponent_float_asin_pi_rational",
+    ),
+    (
+        "demo_big_exponent_float_acos_prec_debug",
+        "az_big_exponent_float_acos",
+    ),
+    (
+        "demo_big_exponent_float_acos_prec_round_debug",
+        "az_big_exponent_float_acos",
+    ),
+    (
+        "demo_big_exponent_float_acos_rational_prec_debug",
+        "az_big_exponent_float_acos_rational",
+    ),
+    (
+        "demo_big_exponent_float_acos_rational_prec_round_debug",
+        "az_big_exponent_float_acos_rational",
+    ),
+    (
+        "demo_big_exponent_float_acos_with_period_prec_debug",
+        "az_big_exponent_float_acos_with_period",
+    ),
+    (
+        "demo_big_exponent_float_acos_with_period_prec_round_debug",
+        "az_big_exponent_float_acos_with_period",
+    ),
+    (
+        "demo_big_exponent_float_acos_with_period_rational_prec_debug",
+        "az_big_exponent_float_acos_with_period_rational",
+    ),
+    (
+        "demo_big_exponent_float_acos_with_period_rational_prec_round_debug",
+        "az_big_exponent_float_acos_with_period_rational",
+    ),
+    (
+        "demo_big_exponent_float_acos_pi_prec_debug",
+        "az_big_exponent_float_acos_pi",
+    ),
+    (
+        "demo_big_exponent_float_acos_pi_prec_round_debug",
+        "az_big_exponent_float_acos_pi",
+    ),
+    (
+        "demo_big_exponent_float_acos_pi_rational_prec_debug",
+        "az_big_exponent_float_acos_pi_rational",
+    ),
+    (
+        "demo_big_exponent_float_acos_pi_rational_prec_round_debug",
+        "az_big_exponent_float_acos_pi_rational",
+    ),
+    (
+        "demo_big_exponent_float_asec_prec_debug",
+        "az_big_exponent_float_asec",
+    ),
+    (
+        "demo_big_exponent_float_asec_prec_round_debug",
+        "az_big_exponent_float_asec",
+    ),
+    (
+        "demo_big_exponent_float_asec_rational_prec_debug",
+        "az_big_exponent_float_asec_rational",
+    ),
+    (
+        "demo_big_exponent_float_asec_rational_prec_round_debug",
+        "az_big_exponent_float_asec_rational",
+    ),
+    (
+        "demo_big_exponent_float_asec_with_period_prec_debug",
+        "az_big_exponent_float_asec_with_period",
+    ),
+    (
+        "demo_big_exponent_float_asec_with_period_prec_round_debug",
+        "az_big_exponent_float_asec_with_period",
+    ),
+    (
+        "demo_big_exponent_float_asec_with_period_rational_prec_debug",
+        "az_big_exponent_float_asec_with_period_rational",
+    ),
+    (
+        "demo_big_exponent_float_asec_with_period_rational_prec_round_debug",
+        "az_big_exponent_float_asec_with_period_rational",
+    ),
+    (
+        "demo_big_exponent_float_asec_pi_prec_debug",
+        "az_big_exponent_float_asec_pi",
+    ),
+    (
+        "demo_big_exponent_float_asec_pi_prec_round_debug",
+        "az_big_exponent_float_asec_pi",
+    ),
+    (
+        "demo_big_exponent_float_asec_pi_rational_prec_debug",
+        "az_big_exponent_float_asec_pi_rational",
+    ),
+    (
+        "demo_big_exponent_float_asec_pi_rational_prec_round_debug",
+        "az_big_exponent_float_asec_pi_rational",
+    ),
+    (
+        "demo_big_exponent_float_acsc_prec_debug",
+        "az_big_exponent_float_acsc",
+    ),
+    (
+        "demo_big_exponent_float_acsc_prec_round_debug",
+        "az_big_exponent_float_acsc",
+    ),
+    (
+        "demo_big_exponent_float_acsc_rational_prec_debug",
+        "az_big_exponent_float_acsc_rational",
+    ),
+    (
+        "demo_big_exponent_float_acsc_rational_prec_round_debug",
+        "az_big_exponent_float_acsc_rational",
+    ),
+    (
+        "demo_big_exponent_float_acsc_with_period_prec_debug",
+        "az_big_exponent_float_acsc_with_period",
+    ),
+    (
+        "demo_big_exponent_float_acsc_with_period_prec_round_debug",
+        "az_big_exponent_float_acsc_with_period",
+    ),
+    (
+        "demo_big_exponent_float_acsc_with_period_rational_prec_debug",
+        "az_big_exponent_float_acsc_with_period_rational",
+    ),
+    (
+        "demo_big_exponent_float_acsc_with_period_rational_prec_round_debug",
+        "az_big_exponent_float_acsc_with_period_rational",
+    ),
+    (
+        "demo_big_exponent_float_acsc_pi_prec_debug",
+        "az_big_exponent_float_acsc_pi",
+    ),
+    (
+        "demo_big_exponent_float_acsc_pi_prec_round_debug",
+        "az_big_exponent_float_acsc_pi",
+    ),
+    (
+        "demo_big_exponent_float_acsc_pi_rational_prec_debug",
+        "az_big_exponent_float_acsc_pi_rational",
+    ),
+    (
+        "demo_big_exponent_float_acsc_pi_rational_prec_round_debug",
+        "az_big_exponent_float_acsc_pi_rational",
+    ),
+    (
+        "demo_big_exponent_float_acot_prec_debug",
+        "az_big_exponent_float_acot",
+    ),
+    (
+        "demo_big_exponent_float_acot_prec_round_debug",
+        "az_big_exponent_float_acot",
+    ),
+    (
+        "demo_big_exponent_float_acot_rational_prec_debug",
+        "az_big_exponent_float_acot_rational",
+    ),
+    (
+        "demo_big_exponent_float_acot_rational_prec_round_debug",
+        "az_big_exponent_float_acot_rational",
+    ),
+    (
+        "demo_big_exponent_float_acot_with_period_prec_debug",
+        "az_big_exponent_float_acot_with_period",
+    ),
+    (
+        "demo_big_exponent_float_acot_with_period_prec_round_debug",
+        "az_big_exponent_float_acot_with_period",
+    ),
+    (
+        "demo_big_exponent_float_acot_with_period_rational_prec_debug",
+        "az_big_exponent_float_acot_with_period_rational",
+    ),
+    (
+        "demo_big_exponent_float_acot_with_period_rational_prec_round_debug",
+        "az_big_exponent_float_acot_with_period_rational",
+    ),
+    (
+        "demo_big_exponent_float_acot_pi_prec_debug",
+        "az_big_exponent_float_acot_pi",
+    ),
+    (
+        "demo_big_exponent_float_acot_pi_prec_round_debug",
+        "az_big_exponent_float_acot_pi",
+    ),
+    (
+        "demo_big_exponent_float_acot_pi_rational_prec_debug",
+        "az_big_exponent_float_acot_pi_rational",
+    ),
+    (
+        "demo_big_exponent_float_acot_pi_rational_prec_round_debug",
+        "az_big_exponent_float_acot_pi_rational",
+    ),
+    (
+        "demo_big_exponent_float_sinh_prec_round_debug",
+        "az_big_exponent_float_sinh",
+    ),
+    (
+        "demo_big_exponent_float_sinh_prec_debug",
+        "az_big_exponent_float_sinh",
+    ),
+    (
+        "demo_big_exponent_float_sinh_rational_prec_round_debug",
+        "az_big_exponent_float_sinh_rational",
+    ),
+    (
+        "demo_big_exponent_float_sinh_rational_prec_debug",
+        "az_big_exponent_float_sinh_rational",
+    ),
+    (
+        "demo_big_exponent_float_cosh_prec_round_debug",
+        "az_big_exponent_float_cosh",
+    ),
+    (
+        "demo_big_exponent_float_cosh_prec_debug",
+        "az_big_exponent_float_cosh",
+    ),
+    (
+        "demo_big_exponent_float_cosh_rational_prec_round_debug",
+        "az_big_exponent_float_cosh_rational",
+    ),
+    (
+        "demo_big_exponent_float_cosh_rational_prec_debug",
+        "az_big_exponent_float_cosh_rational",
+    ),
+    (
+        "demo_big_exponent_float_sinh_cosh_prec_round_debug",
+        "az_big_exponent_float_sinh_cosh",
+    ),
+    (
+        "demo_big_exponent_float_sinh_cosh_prec_debug",
+        "az_big_exponent_float_sinh_cosh",
+    ),
+    (
+        "demo_big_exponent_float_sinh_cosh_rational_prec_round_debug",
+        "az_big_exponent_float_sinh_cosh_rational",
+    ),
+    (
+        "demo_big_exponent_float_sinh_cosh_rational_prec_debug",
+        "az_big_exponent_float_sinh_cosh_rational",
+    ),
+    (
+        "demo_big_exponent_float_tanh_prec_round_debug",
+        "az_big_exponent_float_tanh",
+    ),
+    (
+        "demo_big_exponent_float_tanh_prec_debug",
+        "az_big_exponent_float_tanh",
+    ),
+    (
+        "demo_big_exponent_float_tanh_rational_prec_round_debug",
+        "az_big_exponent_float_tanh_rational",
+    ),
+    (
+        "demo_big_exponent_float_tanh_rational_prec_debug",
+        "az_big_exponent_float_tanh_rational",
+    ),
+    (
+        "demo_big_exponent_float_sech_prec_round_debug",
+        "az_big_exponent_float_sech",
+    ),
+    (
+        "demo_big_exponent_float_sech_prec_debug",
+        "az_big_exponent_float_sech",
+    ),
+    (
+        "demo_big_exponent_float_sech_rational_prec_round_debug",
+        "az_big_exponent_float_sech_rational",
+    ),
+    (
+        "demo_big_exponent_float_sech_rational_prec_debug",
+        "az_big_exponent_float_sech_rational",
+    ),
+    (
+        "demo_big_exponent_float_csch_prec_round_debug",
+        "az_big_exponent_float_csch",
+    ),
+    (
+        "demo_big_exponent_float_csch_prec_debug",
+        "az_big_exponent_float_csch",
+    ),
+    (
+        "demo_big_exponent_float_csch_rational_prec_round_debug",
+        "az_big_exponent_float_csch_rational",
+    ),
+    (
+        "demo_big_exponent_float_csch_rational_prec_debug",
+        "az_big_exponent_float_csch_rational",
+    ),
+    (
+        "demo_big_exponent_float_coth_prec_round_debug",
+        "az_big_exponent_float_coth",
+    ),
+    (
+        "demo_big_exponent_float_coth_prec_debug",
+        "az_big_exponent_float_coth",
+    ),
+    (
+        "demo_big_exponent_float_coth_rational_prec_round_debug",
+        "az_big_exponent_float_coth_rational",
+    ),
+    (
+        "demo_big_exponent_float_coth_rational_prec_debug",
+        "az_big_exponent_float_coth_rational",
+    ),
+    (
+        "demo_big_exponent_float_asinh_prec_round_debug",
+        "az_big_exponent_float_asinh",
+    ),
+    (
+        "demo_big_exponent_float_asinh_prec_debug",
+        "az_big_exponent_float_asinh",
+    ),
+    (
+        "demo_big_exponent_float_asinh_rational_prec_round_debug",
+        "az_big_exponent_float_asinh_rational",
+    ),
+    (
+        "demo_big_exponent_float_asinh_rational_prec_debug",
+        "az_big_exponent_float_asinh_rational",
+    ),
+    (
+        "demo_big_exponent_float_acosh_prec_round_debug",
+        "az_big_exponent_float_acosh",
+    ),
+    (
+        "demo_big_exponent_float_acosh_prec_debug",
+        "az_big_exponent_float_acosh",
+    ),
+    (
+        "demo_big_exponent_float_acosh_rational_prec_round_debug",
+        "az_big_exponent_float_acosh_rational",
+    ),
+    (
+        "demo_big_exponent_float_acosh_rational_prec_debug",
+        "az_big_exponent_float_acosh_rational",
+    ),
+    (
+        "demo_big_exponent_float_atanh_prec_round_debug",
+        "az_big_exponent_float_atanh",
+    ),
+    (
+        "demo_big_exponent_float_atanh_prec_debug",
+        "az_big_exponent_float_atanh",
+    ),
+    (
+        "demo_big_exponent_float_atanh_rational_prec_round_debug",
+        "az_big_exponent_float_atanh_rational",
+    ),
+    (
+        "demo_big_exponent_float_atanh_rational_prec_debug",
+        "az_big_exponent_float_atanh_rational",
+    ),
+    (
+        "demo_big_exponent_float_asech_prec_round_debug",
+        "az_big_exponent_float_asech",
+    ),
+    (
+        "demo_big_exponent_float_asech_prec_debug",
+        "az_big_exponent_float_asech",
+    ),
+    (
+        "demo_big_exponent_float_asech_rational_prec_round_debug",
+        "az_big_exponent_float_asech_rational",
+    ),
+    (
+        "demo_big_exponent_float_asech_rational_prec_debug",
+        "az_big_exponent_float_asech_rational",
+    ),
+    (
+        "demo_big_exponent_float_acsch_prec_round_debug",
+        "az_big_exponent_float_acsch",
+    ),
+    (
+        "demo_big_exponent_float_acsch_prec_debug",
+        "az_big_exponent_float_acsch",
+    ),
+    (
+        "demo_big_exponent_float_acsch_rational_prec_round_debug",
+        "az_big_exponent_float_acsch_rational",
+    ),
+    (
+        "demo_big_exponent_float_acsch_rational_prec_debug",
+        "az_big_exponent_float_acsch_rational",
+    ),
+    (
+        "demo_big_exponent_float_acoth_prec_round_debug",
+        "az_big_exponent_float_acoth",
+    ),
+    (
+        "demo_big_exponent_float_acoth_prec_debug",
+        "az_big_exponent_float_acoth",
+    ),
+    (
+        "demo_big_exponent_float_acoth_rational_prec_round_debug",
+        "az_big_exponent_float_acoth_rational",
+    ),
+    (
+        "demo_big_exponent_float_acoth_rational_prec_debug",
+        "az_big_exponent_float_acoth_rational",
+    ),
+    (
         "demo_big_exponent_float_power_of_2_i64_debug",
         "az_big_exponent_float_power_of_2",
     ),
@@ -7304,6 +9003,14 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES_NO_SPECIAL: &[(&str, &str)] = &[
     ),
     (
         "demo_big_exponent_float_dottie_number_prec_debug",
+        "az_big_exponent_float_irrational_constant",
+    ),
+    (
+        "demo_big_exponent_float_catalans_constant_prec_round_debug",
+        "az_big_exponent_float_irrational_constant",
+    ),
+    (
+        "demo_big_exponent_float_catalans_constant_prec_debug",
         "az_big_exponent_float_irrational_constant",
     ),
     (

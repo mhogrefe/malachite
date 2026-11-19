@@ -47,9 +47,12 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_acsc_prec_round_debug);
     register_demo!(runner, demo_float_acsc_prec_round_extreme);
     register_demo!(runner, demo_float_acsc_prec);
+    register_demo!(runner, demo_float_acsc_prec_debug);
     register_demo!(runner, demo_float_acsc_round);
+    register_demo!(runner, demo_float_acsc_round_debug);
     register_demo!(runner, demo_float_acsc_prec_round_assign);
     register_demo!(runner, demo_float_acsc);
+    register_demo!(runner, demo_float_acsc_debug);
     register_demo!(runner, demo_float_acsc_ref);
     register_primitive_float_demos!(runner, demo_primitive_float_acsc);
     register_bench!(runner, benchmark_float_acsc_prec_round_evaluation_strategy);
@@ -57,6 +60,7 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_acsc_rational_prec_round);
     register_demo!(runner, demo_float_acsc_rational_prec_round_debug);
     register_demo!(runner, demo_float_acsc_rational_prec);
+    register_demo!(runner, demo_float_acsc_rational_prec_debug);
     register_primitive_float_demos!(runner, demo_primitive_float_acsc_rational);
     register_bench!(
         runner,
@@ -68,8 +72,11 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_acsc_with_period_prec_round_extreme);
     register_demo!(runner, demo_float_acsc_with_period_prec_round_assign);
     register_demo!(runner, demo_float_acsc_with_period_prec);
+    register_demo!(runner, demo_float_acsc_with_period_prec_debug);
     register_demo!(runner, demo_float_acsc_with_period_round);
+    register_demo!(runner, demo_float_acsc_with_period_round_debug);
     register_demo!(runner, demo_float_acsc_with_period);
+    register_demo!(runner, demo_float_acsc_with_period_debug);
     register_demo!(runner, demo_float_acsc_with_period_ref);
     register_primitive_float_demos!(runner, demo_primitive_float_acsc_with_period);
     register_bench!(
@@ -83,6 +90,7 @@ pub(crate) fn register(runner: &mut Runner) {
         demo_float_acsc_with_period_rational_prec_round_debug
     );
     register_demo!(runner, demo_float_acsc_with_period_rational_prec);
+    register_demo!(runner, demo_float_acsc_with_period_rational_prec_debug);
     register_primitive_float_demos!(runner, demo_primitive_float_acsc_with_period_rational);
     register_bench!(
         runner,
@@ -92,10 +100,14 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_acsc_pi_prec_round);
     register_demo!(runner, demo_float_acsc_pi_prec_round_debug);
     register_demo!(runner, demo_float_acsc_pi_prec);
+    register_demo!(runner, demo_float_acsc_pi_prec_debug);
     register_demo!(runner, demo_float_acsc_pi_round);
+    register_demo!(runner, demo_float_acsc_pi_round_debug);
     register_demo!(runner, demo_float_acsc_pi_prec_round_assign);
     register_demo!(runner, demo_float_acsc_pi_rational_prec_round);
+    register_demo!(runner, demo_float_acsc_pi_rational_prec_round_debug);
     register_demo!(runner, demo_float_acsc_pi_rational_prec);
+    register_demo!(runner, demo_float_acsc_pi_rational_prec_debug);
     register_primitive_float_demos!(runner, demo_primitive_float_acsc_pi);
     register_primitive_float_demos!(runner, demo_primitive_float_acsc_pi_rational);
     register_demo!(runner, demo_float_acsc_pi);
@@ -162,6 +174,19 @@ fn demo_float_acsc_prec(gm: GenMode, config: &GenConfig, limit: usize) {
     }
 }
 
+fn demo_float_acsc_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec) in float_unsigned_pair_gen_var_1().get(gm, config).take(limit) {
+        let (r, o) = x.clone().acsc_prec(prec);
+        println!(
+            "({:#x}).acsc_prec({}) = ({:#x}, {:?})",
+            ComparableFloat(x),
+            prec,
+            ComparableFloat(r),
+            o
+        );
+    }
+}
+
 fn demo_float_acsc_round(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, rm) in float_rounding_mode_pair_gen_var_51()
         .get(gm, config)
@@ -169,6 +194,22 @@ fn demo_float_acsc_round(gm: GenMode, config: &GenConfig, limit: usize) {
     {
         let x_old = x.clone();
         println!("({}).acsc_round({}) = {:?}", x_old, rm, x.acsc_round(rm));
+    }
+}
+
+fn demo_float_acsc_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, rm) in float_rounding_mode_pair_gen_var_51()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (r, o) = x.clone().acsc_round(rm);
+        println!(
+            "({:#x}).acsc_round({}) = ({:#x}, {:?})",
+            ComparableFloat(x),
+            rm,
+            ComparableFloat(r),
+            o
+        );
     }
 }
 
@@ -187,6 +228,17 @@ fn demo_float_acsc(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in float_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
         println!("({}).acsc() = {}", x_old, x.acsc());
+    }
+}
+
+fn demo_float_acsc_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen().get(gm, config).take(limit) {
+        let r = x.clone().acsc();
+        println!(
+            "({:#x}).acsc() = {:#x}",
+            ComparableFloat(x),
+            ComparableFloat(r)
+        );
     }
 }
 
@@ -304,6 +356,22 @@ fn demo_float_acsc_rational_prec(gm: GenMode, config: &GenConfig, limit: usize) 
             x.clone(),
             prec,
             Float::acsc_rational_prec(x, prec)
+        );
+    }
+}
+
+fn demo_float_acsc_rational_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec) in rational_unsigned_pair_gen_var_3()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (r, o) = Float::acsc_rational_prec(x.clone(), prec);
+        println!(
+            "Float::acsc_rational_prec({}, {}) = ({:#x}, {:?})",
+            x,
+            prec,
+            ComparableFloat(r),
+            o
         );
     }
 }
@@ -459,6 +527,23 @@ fn demo_float_acsc_with_period_prec(gm: GenMode, config: &GenConfig, limit: usiz
     }
 }
 
+fn demo_float_acsc_with_period_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, u, prec) in float_unsigned_unsigned_triple_gen_var_1::<u64, u64>()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (r, o) = x.clone().acsc_with_period_prec(u, prec);
+        println!(
+            "({:#x}).acsc_with_period_prec({}, {}) = ({:#x}, {:?})",
+            ComparableFloat(x),
+            u,
+            prec,
+            ComparableFloat(r),
+            o
+        );
+    }
+}
+
 fn demo_float_acsc_with_period_round(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, u, rm) in float_unsigned_rounding_mode_triple_gen_var_50()
         .get(gm, config)
@@ -474,6 +559,23 @@ fn demo_float_acsc_with_period_round(gm: GenMode, config: &GenConfig, limit: usi
     }
 }
 
+fn demo_float_acsc_with_period_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, u, rm) in float_unsigned_rounding_mode_triple_gen_var_50()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (r, o) = x.clone().acsc_with_period_round(u, rm);
+        println!(
+            "({:#x}).acsc_with_period_round({}, {}) = ({:#x}, {:?})",
+            ComparableFloat(x),
+            u,
+            rm,
+            ComparableFloat(r),
+            o
+        );
+    }
+}
+
 fn demo_float_acsc_with_period(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, u) in float_unsigned_pair_gen_var_2::<u64>()
         .get(gm, config)
@@ -485,6 +587,21 @@ fn demo_float_acsc_with_period(gm: GenMode, config: &GenConfig, limit: usize) {
             x_old,
             u,
             x.acsc_with_period(u)
+        );
+    }
+}
+
+fn demo_float_acsc_with_period_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, u) in float_unsigned_pair_gen_var_2::<u64>()
+        .get(gm, config)
+        .take(limit)
+    {
+        let r = x.clone().acsc_with_period(u);
+        println!(
+            "({:#x}).acsc_with_period({}) = {:#x}",
+            ComparableFloat(x),
+            u,
+            ComparableFloat(r)
         );
     }
 }
@@ -629,6 +746,23 @@ fn demo_float_acsc_with_period_rational_prec(gm: GenMode, config: &GenConfig, li
     }
 }
 
+fn demo_float_acsc_with_period_rational_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, u, prec, _) in rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_10()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (r, o) = Float::acsc_with_period_rational_prec(x.clone(), u, prec);
+        println!(
+            "Float::acsc_with_period_rational_prec({}, {}, {}) = ({:#x}, {:?})",
+            x,
+            u,
+            prec,
+            ComparableFloat(r),
+            o
+        );
+    }
+}
+
 #[allow(clippy::type_repetition_in_bounds)]
 fn demo_primitive_float_acsc_with_period_rational<T: PrimitiveFloat>(
     gm: GenMode,
@@ -755,6 +889,19 @@ fn demo_float_acsc_pi_prec(gm: GenMode, config: &GenConfig, limit: usize) {
     }
 }
 
+fn demo_float_acsc_pi_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec) in float_unsigned_pair_gen_var_1().get(gm, config).take(limit) {
+        let (r, o) = x.clone().acsc_pi_prec(prec);
+        println!(
+            "({:#x}).acsc_pi_prec({}) = ({:#x}, {:?})",
+            ComparableFloat(x),
+            prec,
+            ComparableFloat(r),
+            o
+        );
+    }
+}
+
 fn demo_float_acsc_pi_round(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, rm) in float_rounding_mode_pair_gen_var_51()
         .get(gm, config)
@@ -765,6 +912,22 @@ fn demo_float_acsc_pi_round(gm: GenMode, config: &GenConfig, limit: usize) {
             x.clone(),
             rm,
             x.acsc_pi_round(rm)
+        );
+    }
+}
+
+fn demo_float_acsc_pi_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, rm) in float_rounding_mode_pair_gen_var_51()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (r, o) = x.clone().acsc_pi_round(rm);
+        println!(
+            "({:#x}).acsc_pi_round({}) = ({:#x}, {:?})",
+            ComparableFloat(x),
+            rm,
+            ComparableFloat(r),
+            o
         );
     }
 }
@@ -795,6 +958,23 @@ fn demo_float_acsc_pi_rational_prec_round(gm: GenMode, config: &GenConfig, limit
     }
 }
 
+fn demo_float_acsc_pi_rational_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec, rm) in rational_unsigned_rounding_mode_triple_gen_var_13()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (r, o) = Float::acsc_pi_rational_prec_round(x.clone(), prec, rm);
+        println!(
+            "Float::acsc_pi_rational_prec_round({}, {}, {}) = ({:#x}, {:?})",
+            x,
+            prec,
+            rm,
+            ComparableFloat(r),
+            o
+        );
+    }
+}
+
 fn demo_float_acsc_pi_rational_prec(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, prec) in rational_unsigned_pair_gen_var_3()
         .get(gm, config)
@@ -805,6 +985,22 @@ fn demo_float_acsc_pi_rational_prec(gm: GenMode, config: &GenConfig, limit: usiz
             x.clone(),
             prec,
             Float::acsc_pi_rational_prec(x, prec)
+        );
+    }
+}
+
+fn demo_float_acsc_pi_rational_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec) in rational_unsigned_pair_gen_var_3()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (r, o) = Float::acsc_pi_rational_prec(x.clone(), prec);
+        println!(
+            "Float::acsc_pi_rational_prec({}, {}) = ({:#x}, {:?})",
+            x,
+            prec,
+            ComparableFloat(r),
+            o
         );
     }
 }

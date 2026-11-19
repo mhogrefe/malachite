@@ -149,10 +149,14 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_csc_pi_prec_round);
     register_demo!(runner, demo_float_csc_pi_prec_round_debug);
     register_demo!(runner, demo_float_csc_pi_prec);
+    register_demo!(runner, demo_float_csc_pi_prec_debug);
     register_demo!(runner, demo_float_csc_pi_round);
+    register_demo!(runner, demo_float_csc_pi_round_debug);
     register_demo!(runner, demo_float_csc_pi_prec_round_assign);
     register_demo!(runner, demo_float_csc_pi_rational_prec_round);
+    register_demo!(runner, demo_float_csc_pi_rational_prec_round_debug);
     register_demo!(runner, demo_float_csc_pi_rational_prec);
+    register_demo!(runner, demo_float_csc_pi_rational_prec_debug);
     register_primitive_float_demos!(runner, demo_primitive_float_csc_pi);
     register_primitive_float_demos!(runner, demo_primitive_float_csc_pi_rational);
     register_bench!(
@@ -1431,6 +1435,19 @@ fn demo_float_csc_pi_prec(gm: GenMode, config: &GenConfig, limit: usize) {
     }
 }
 
+fn demo_float_csc_pi_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec) in float_unsigned_pair_gen_var_1().get(gm, config).take(limit) {
+        let (c, o) = x.clone().csc_pi_prec(prec);
+        println!(
+            "({:#x}).csc_pi_prec({}) = ({:#x}, {:?})",
+            ComparableFloat(x),
+            prec,
+            ComparableFloat(c),
+            o
+        );
+    }
+}
+
 fn demo_float_csc_pi_round(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, rm) in float_rounding_mode_pair_gen_var_47()
         .get(gm, config)
@@ -1441,6 +1458,22 @@ fn demo_float_csc_pi_round(gm: GenMode, config: &GenConfig, limit: usize) {
             x.clone(),
             rm,
             x.csc_pi_round(rm)
+        );
+    }
+}
+
+fn demo_float_csc_pi_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, rm) in float_rounding_mode_pair_gen_var_47()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (c, o) = x.clone().csc_pi_round(rm);
+        println!(
+            "({:#x}).csc_pi_round({}) = ({:#x}, {:?})",
+            ComparableFloat(x),
+            rm,
+            ComparableFloat(c),
+            o
         );
     }
 }
@@ -1471,6 +1504,23 @@ fn demo_float_csc_pi_rational_prec_round(gm: GenMode, config: &GenConfig, limit:
     }
 }
 
+fn demo_float_csc_pi_rational_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec, rm) in rational_unsigned_rounding_mode_triple_gen_var_10()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (c, o) = Float::csc_pi_rational_prec_round(x.clone(), prec, rm);
+        println!(
+            "Float::csc_pi_rational_prec_round({}, {}, {}) = ({:#x}, {:?})",
+            x,
+            prec,
+            rm,
+            ComparableFloat(c),
+            o
+        );
+    }
+}
+
 fn demo_float_csc_pi_rational_prec(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, prec) in rational_unsigned_pair_gen_var_3()
         .get(gm, config)
@@ -1481,6 +1531,22 @@ fn demo_float_csc_pi_rational_prec(gm: GenMode, config: &GenConfig, limit: usize
             x.clone(),
             prec,
             Float::csc_pi_rational_prec(x, prec)
+        );
+    }
+}
+
+fn demo_float_csc_pi_rational_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec) in rational_unsigned_pair_gen_var_3()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (c, o) = Float::csc_pi_rational_prec(x.clone(), prec);
+        println!(
+            "Float::csc_pi_rational_prec({}, {}) = ({:#x}, {:?})",
+            x,
+            prec,
+            ComparableFloat(c),
+            o
         );
     }
 }

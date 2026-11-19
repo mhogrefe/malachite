@@ -10207,8 +10207,9 @@ pub fn big_exponent_float_rational_unsigned_rounding_mode_quadruple_gen_var_22_f
     )
 }
 
-// All `(Float, u64, RoundingMode)` that are valid inputs to `Float.gudermannian_prec_round`: those
-// of `float_unsigned_rounding_mode_triple_gen_var_36`, without `Exact` for an infinite `Float`.
+// All `(Float, u64, RoundingMode)` that are valid inputs to `Float.gudermannian_prec_round` and
+// `Float.atan_prec_round`: those of `float_unsigned_rounding_mode_triple_gen_var_36`, without
+// `Exact` for an infinite `Float`.
 pub fn float_unsigned_rounding_mode_triple_gen_var_57() -> Generator<(Float, u64, RoundingMode)> {
     Generator::new(
         &|| {
@@ -10232,8 +10233,9 @@ pub fn float_unsigned_rounding_mode_triple_gen_var_57() -> Generator<(Float, u64
     )
 }
 
-// All `(Float, RoundingMode)` that are valid inputs to `Float.gudermannian_round`: those of
-// `float_rounding_mode_pair_gen_var_47`, without `Exact` for an infinite `Float`.
+// All `(Float, RoundingMode)` that are valid inputs to `Float.gudermannian_round` and
+// `Float.atan_round`: those of `float_rounding_mode_pair_gen_var_47`, without `Exact` for an
+// infinite `Float`.
 pub fn float_rounding_mode_pair_gen_var_54() -> Generator<(Float, RoundingMode)> {
     Generator::new(
         &|| {
@@ -10357,6 +10359,508 @@ pub fn rational_unsigned_rounding_mode_triple_gen_var_25() -> GT3 {
             Box::new(
                 special_random_rational_unsigned_rounding_mode_triple_gen_var_19(config)
                     .filter(|(x, _, rm)| *rm != RoundingMode::Exact || *x != 0u32),
+            )
+        },
+    )
+}
+
+// All `(Float, u64, RoundingMode)` that are valid inputs to `Float::sin_cos_with_period_round`:
+// those of `float_unsigned_rounding_mode_triple_gen_var_39`, with `Exact` only when both the sine
+// and the cosine are exact.
+pub fn float_unsigned_rounding_mode_triple_gen_var_59() -> Generator<(Float, u64, RoundingMode)> {
+    Generator::new(
+        &|| {
+            Box::new(
+                exhaustive_float_unsigned_rounding_mode_triple_gen_var_39()
+                    .filter(|(x, u, rm)| sin_cos_with_period_round_valid(x, *u, *rm)),
+            )
+        },
+        &|config| {
+            Box::new(
+                random_float_unsigned_rounding_mode_triple_gen_var_39(config)
+                    .filter(|(x, u, rm)| sin_cos_with_period_round_valid(x, *u, *rm)),
+            )
+        },
+        &|config| {
+            Box::new(
+                special_random_float_unsigned_rounding_mode_triple_gen_var_39(config)
+                    .filter(|(x, u, rm)| sin_cos_with_period_round_valid(x, *u, *rm)),
+            )
+        },
+    )
+}
+
+// All `(Float, u64, u64, RoundingMode)` that are valid inputs to
+// `Float::sin_cos_with_period_prec_round`: those of
+// `float_unsigned_unsigned_rounding_mode_quadruple_gen_var_17`, with `Exact` only when both the
+// sine and the cosine are exact.
+pub fn float_unsigned_unsigned_rounding_mode_quadruple_gen_var_31()
+-> Generator<(Float, u64, u64, RoundingMode)> {
+    Generator::new(
+        &|| {
+            Box::new(
+                exhaustive_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_17()
+                    .filter(|(x, u, p, rm)| sin_cos_with_period_prec_round_valid(x, *u, *p, *rm)),
+            )
+        },
+        &|config| {
+            Box::new(
+                random_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_17(config)
+                    .filter(|(x, u, p, rm)| sin_cos_with_period_prec_round_valid(x, *u, *p, *rm)),
+            )
+        },
+        &|config| {
+            Box::new(
+                special_random_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_17(config)
+                    .filter(|(x, u, p, rm)| sin_cos_with_period_prec_round_valid(x, *u, *p, *rm)),
+            )
+        },
+    )
+}
+
+// All `(Rational, u64, u64, RoundingMode)` that are valid inputs to
+// `Float::sin_cos_with_period_rational_prec_round`: those of
+// `rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_5`, with `Exact` only when both the
+// sine and the cosine are exact.
+pub fn rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_14()
+-> Generator<(Rational, u64, u64, RoundingMode)> {
+    Generator::new(
+        &|| {
+            Box::new(
+                exhaustive_rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_5().filter(
+                    |(x, u, p, rm)| sin_cos_with_period_rational_prec_round_valid(x, *u, *p, *rm),
+                ),
+            )
+        },
+        &|config| {
+            Box::new(
+                random_rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_5(config).filter(
+                    |(x, u, p, rm)| sin_cos_with_period_rational_prec_round_valid(x, *u, *p, *rm),
+                ),
+            )
+        },
+        &|config| {
+            Box::new(
+                special_random_rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_5(config)
+                    .filter(|(x, u, p, rm)| {
+                        sin_cos_with_period_rational_prec_round_valid(x, *u, *p, *rm)
+                    }),
+            )
+        },
+    )
+}
+
+// All `(Float, u64, RoundingMode)` that are valid inputs to `Float::tan_with_period_round` and
+// `Float::cot_with_period_round`: those of `float_unsigned_rounding_mode_triple_gen_var_39`, with
+// `Exact` only when the tangent (and so the cotangent) is exact.
+pub fn float_unsigned_rounding_mode_triple_gen_var_60() -> Generator<(Float, u64, RoundingMode)> {
+    Generator::new(
+        &|| {
+            Box::new(
+                exhaustive_float_unsigned_rounding_mode_triple_gen_var_39()
+                    .filter(|(x, u, rm)| tan_with_period_round_valid(x, *u, *rm)),
+            )
+        },
+        &|config| {
+            Box::new(
+                random_float_unsigned_rounding_mode_triple_gen_var_39(config)
+                    .filter(|(x, u, rm)| tan_with_period_round_valid(x, *u, *rm)),
+            )
+        },
+        &|config| {
+            Box::new(
+                special_random_float_unsigned_rounding_mode_triple_gen_var_39(config)
+                    .filter(|(x, u, rm)| tan_with_period_round_valid(x, *u, *rm)),
+            )
+        },
+    )
+}
+
+// All `(Float, u64, u64, RoundingMode)` that are valid inputs to
+// `Float::tan_with_period_prec_round` and `Float::cot_with_period_prec_round`: those of
+// `float_unsigned_unsigned_rounding_mode_quadruple_gen_var_17`, with `Exact` only when the tangent
+// (and so the cotangent) is exact.
+pub fn float_unsigned_unsigned_rounding_mode_quadruple_gen_var_32()
+-> Generator<(Float, u64, u64, RoundingMode)> {
+    Generator::new(
+        &|| {
+            Box::new(
+                exhaustive_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_17()
+                    .filter(|(x, u, p, rm)| tan_with_period_prec_round_valid(x, *u, *p, *rm)),
+            )
+        },
+        &|config| {
+            Box::new(
+                random_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_17(config)
+                    .filter(|(x, u, p, rm)| tan_with_period_prec_round_valid(x, *u, *p, *rm)),
+            )
+        },
+        &|config| {
+            Box::new(
+                special_random_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_17(config)
+                    .filter(|(x, u, p, rm)| tan_with_period_prec_round_valid(x, *u, *p, *rm)),
+            )
+        },
+    )
+}
+
+// All `(Rational, u64, u64, RoundingMode)` that are valid inputs to
+// `Float::tan_with_period_rational_prec_round` and `Float::cot_with_period_rational_prec_round`:
+// those of `rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_5`, with `Exact` only when
+// the tangent (and so the cotangent) is exact.
+pub fn rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_15()
+-> Generator<(Rational, u64, u64, RoundingMode)> {
+    Generator::new(
+        &|| {
+            Box::new(
+                exhaustive_rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_5().filter(
+                    |(x, u, p, rm)| tan_with_period_rational_prec_round_valid(x, *u, *p, *rm),
+                ),
+            )
+        },
+        &|config| {
+            Box::new(
+                random_rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_5(config).filter(
+                    |(x, u, p, rm)| tan_with_period_rational_prec_round_valid(x, *u, *p, *rm),
+                ),
+            )
+        },
+        &|config| {
+            Box::new(
+                special_random_rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_5(config)
+                    .filter(|(x, u, p, rm)| {
+                        tan_with_period_rational_prec_round_valid(x, *u, *p, *rm)
+                    }),
+            )
+        },
+    )
+}
+
+// All `(Float, u64, RoundingMode)` that are valid inputs to `Float::sec_with_period_round`: those
+// of `float_unsigned_rounding_mode_triple_gen_var_39`, with `Exact` only when the secant is exact.
+pub fn float_unsigned_rounding_mode_triple_gen_var_61() -> Generator<(Float, u64, RoundingMode)> {
+    Generator::new(
+        &|| {
+            Box::new(
+                exhaustive_float_unsigned_rounding_mode_triple_gen_var_39()
+                    .filter(|(x, u, rm)| sec_with_period_round_valid(x, *u, *rm)),
+            )
+        },
+        &|config| {
+            Box::new(
+                random_float_unsigned_rounding_mode_triple_gen_var_39(config)
+                    .filter(|(x, u, rm)| sec_with_period_round_valid(x, *u, *rm)),
+            )
+        },
+        &|config| {
+            Box::new(
+                special_random_float_unsigned_rounding_mode_triple_gen_var_39(config)
+                    .filter(|(x, u, rm)| sec_with_period_round_valid(x, *u, *rm)),
+            )
+        },
+    )
+}
+
+// All `(Float, u64, u64, RoundingMode)` that are valid inputs to
+// `Float::sec_with_period_prec_round`: those of
+// `float_unsigned_unsigned_rounding_mode_quadruple_gen_var_17`, with `Exact` only when the secant
+// is exact.
+pub fn float_unsigned_unsigned_rounding_mode_quadruple_gen_var_33()
+-> Generator<(Float, u64, u64, RoundingMode)> {
+    Generator::new(
+        &|| {
+            Box::new(
+                exhaustive_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_17()
+                    .filter(|(x, u, p, rm)| sec_with_period_prec_round_valid(x, *u, *p, *rm)),
+            )
+        },
+        &|config| {
+            Box::new(
+                random_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_17(config)
+                    .filter(|(x, u, p, rm)| sec_with_period_prec_round_valid(x, *u, *p, *rm)),
+            )
+        },
+        &|config| {
+            Box::new(
+                special_random_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_17(config)
+                    .filter(|(x, u, p, rm)| sec_with_period_prec_round_valid(x, *u, *p, *rm)),
+            )
+        },
+    )
+}
+
+// All `(Rational, u64, u64, RoundingMode)` that are valid inputs to
+// `Float::sec_with_period_rational_prec_round`: those of
+// `rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_5`, with `Exact` only when the secant
+// is exact.
+pub fn rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_16()
+-> Generator<(Rational, u64, u64, RoundingMode)> {
+    Generator::new(
+        &|| {
+            Box::new(
+                exhaustive_rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_5().filter(
+                    |(x, u, p, rm)| sec_with_period_rational_prec_round_valid(x, *u, *p, *rm),
+                ),
+            )
+        },
+        &|config| {
+            Box::new(
+                random_rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_5(config).filter(
+                    |(x, u, p, rm)| sec_with_period_rational_prec_round_valid(x, *u, *p, *rm),
+                ),
+            )
+        },
+        &|config| {
+            Box::new(
+                special_random_rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_5(config)
+                    .filter(|(x, u, p, rm)| {
+                        sec_with_period_rational_prec_round_valid(x, *u, *p, *rm)
+                    }),
+            )
+        },
+    )
+}
+
+// All `(Float, Float, RoundingMode)` that are valid inputs to `Float::atan2_round`: those of
+// `float_float_rounding_mode_triple_gen_var_43`, with `Exact` only when the result is exact.
+pub fn float_float_rounding_mode_triple_gen_var_45() -> Generator<(Float, Float, RoundingMode)> {
+    Generator::new(
+        &|| {
+            Box::new(
+                exhaustive_float_float_rounding_mode_triple_gen_var_43().filter(|(y, x, rm)| {
+                    *rm != RoundingMode::Exact
+                        || y.atan2_round_ref_ref(x, RoundingMode::Floor).1 == Ordering::Equal
+                }),
+            )
+        },
+        &|config| {
+            Box::new(
+                random_float_float_rounding_mode_triple_gen_var_43(config).filter(|(y, x, rm)| {
+                    *rm != RoundingMode::Exact
+                        || y.atan2_round_ref_ref(x, RoundingMode::Floor).1 == Ordering::Equal
+                }),
+            )
+        },
+        &|config| {
+            Box::new(
+                special_random_float_float_rounding_mode_triple_gen_var_43(config).filter(
+                    |(y, x, rm)| {
+                        *rm != RoundingMode::Exact
+                            || y.atan2_round_ref_ref(x, RoundingMode::Floor).1 == Ordering::Equal
+                    },
+                ),
+            )
+        },
+    )
+}
+
+// All `(Float, Float, RoundingMode)` that are valid inputs to `Float::atan2_with_period_round` with
+// a period of 360: those of `float_float_rounding_mode_triple_gen_var_43`, with `Exact` only when
+// the result is exact.
+pub fn float_float_rounding_mode_triple_gen_var_46() -> Generator<(Float, Float, RoundingMode)> {
+    Generator::new(
+        &|| {
+            Box::new(
+                exhaustive_float_float_rounding_mode_triple_gen_var_43().filter(|(y, x, rm)| {
+                    *rm != RoundingMode::Exact
+                        || y.atan2_with_period_round_ref_ref(x, 360, RoundingMode::Floor)
+                            .1
+                            == Ordering::Equal
+                }),
+            )
+        },
+        &|config| {
+            Box::new(
+                random_float_float_rounding_mode_triple_gen_var_43(config).filter(|(y, x, rm)| {
+                    *rm != RoundingMode::Exact
+                        || y.atan2_with_period_round_ref_ref(x, 360, RoundingMode::Floor)
+                            .1
+                            == Ordering::Equal
+                }),
+            )
+        },
+        &|config| {
+            Box::new(
+                special_random_float_float_rounding_mode_triple_gen_var_43(config).filter(
+                    |(y, x, rm)| {
+                        *rm != RoundingMode::Exact
+                            || y.atan2_with_period_round_ref_ref(x, 360, RoundingMode::Floor)
+                                .1
+                                == Ordering::Equal
+                    },
+                ),
+            )
+        },
+    )
+}
+
+// All `(Float, Float, RoundingMode)` that are valid inputs to `Float::atan2_pi_round`: those of
+// `float_float_rounding_mode_triple_gen_var_43`, with `Exact` only when the result is exact.
+pub fn float_float_rounding_mode_triple_gen_var_47() -> Generator<(Float, Float, RoundingMode)> {
+    Generator::new(
+        &|| {
+            Box::new(
+                exhaustive_float_float_rounding_mode_triple_gen_var_43().filter(|(y, x, rm)| {
+                    *rm != RoundingMode::Exact
+                        || y.atan2_pi_round_ref_ref(x, RoundingMode::Floor).1 == Ordering::Equal
+                }),
+            )
+        },
+        &|config| {
+            Box::new(
+                random_float_float_rounding_mode_triple_gen_var_43(config).filter(|(y, x, rm)| {
+                    *rm != RoundingMode::Exact
+                        || y.atan2_pi_round_ref_ref(x, RoundingMode::Floor).1 == Ordering::Equal
+                }),
+            )
+        },
+        &|config| {
+            Box::new(
+                special_random_float_float_rounding_mode_triple_gen_var_43(config).filter(
+                    |(y, x, rm)| {
+                        *rm != RoundingMode::Exact
+                            || y.atan2_pi_round_ref_ref(x, RoundingMode::Floor).1 == Ordering::Equal
+                    },
+                ),
+            )
+        },
+    )
+}
+
+// All `(Float, Float, u64, RoundingMode)` that are valid inputs to `Float::atan2_prec_round`: those
+// of `float_float_unsigned_rounding_mode_quadruple_gen_var_24`, with `Exact` only when the result
+// is exact.
+pub fn float_float_unsigned_rounding_mode_quadruple_gen_var_26()
+-> Generator<(Float, Float, u64, RoundingMode)> {
+    Generator::new(
+        &|| {
+            Box::new(
+                exhaustive_float_float_unsigned_rounding_mode_quadruple_gen_var_24().filter(
+                    |(y, x, p, rm)| {
+                        *rm != RoundingMode::Exact
+                            || y.atan2_prec_round_ref_ref(x, *p, RoundingMode::Floor).1
+                                == Ordering::Equal
+                    },
+                ),
+            )
+        },
+        &|config| {
+            Box::new(
+                random_float_float_unsigned_rounding_mode_quadruple_gen_var_24(config).filter(
+                    |(y, x, p, rm)| {
+                        *rm != RoundingMode::Exact
+                            || y.atan2_prec_round_ref_ref(x, *p, RoundingMode::Floor).1
+                                == Ordering::Equal
+                    },
+                ),
+            )
+        },
+        &|config| {
+            Box::new(
+                special_random_float_float_unsigned_rounding_mode_quadruple_gen_var_24(config)
+                    .filter(|(y, x, p, rm)| {
+                        *rm != RoundingMode::Exact
+                            || y.atan2_prec_round_ref_ref(x, *p, RoundingMode::Floor).1
+                                == Ordering::Equal
+                    }),
+            )
+        },
+    )
+}
+
+// All `(Float, Float, u64, RoundingMode)` that are valid inputs to
+// `Float::atan2_with_period_prec_round` with a period of 360: those of
+// `float_float_unsigned_rounding_mode_quadruple_gen_var_24`, with `Exact` only when the result is
+// exact.
+pub fn float_float_unsigned_rounding_mode_quadruple_gen_var_27()
+-> Generator<(Float, Float, u64, RoundingMode)> {
+    Generator::new(
+        &|| {
+            Box::new(
+                exhaustive_float_float_unsigned_rounding_mode_quadruple_gen_var_24().filter(
+                    |(y, x, p, rm)| {
+                        *rm != RoundingMode::Exact
+                            || y.atan2_with_period_prec_round_ref_ref(
+                                x,
+                                360,
+                                *p,
+                                RoundingMode::Floor,
+                            )
+                            .1 == Ordering::Equal
+                    },
+                ),
+            )
+        },
+        &|config| {
+            Box::new(
+                random_float_float_unsigned_rounding_mode_quadruple_gen_var_24(config).filter(
+                    |(y, x, p, rm)| {
+                        *rm != RoundingMode::Exact
+                            || y.atan2_with_period_prec_round_ref_ref(
+                                x,
+                                360,
+                                *p,
+                                RoundingMode::Floor,
+                            )
+                            .1 == Ordering::Equal
+                    },
+                ),
+            )
+        },
+        &|config| {
+            Box::new(
+                special_random_float_float_unsigned_rounding_mode_quadruple_gen_var_24(config)
+                    .filter(|(y, x, p, rm)| {
+                        *rm != RoundingMode::Exact
+                            || y.atan2_with_period_prec_round_ref_ref(
+                                x,
+                                360,
+                                *p,
+                                RoundingMode::Floor,
+                            )
+                            .1 == Ordering::Equal
+                    }),
+            )
+        },
+    )
+}
+
+// All `(Float, Float, u64, RoundingMode)` that are valid inputs to `Float::atan2_pi_prec_round`:
+// those of `float_float_unsigned_rounding_mode_quadruple_gen_var_24`, with `Exact` only when the
+// result is exact.
+pub fn float_float_unsigned_rounding_mode_quadruple_gen_var_28()
+-> Generator<(Float, Float, u64, RoundingMode)> {
+    Generator::new(
+        &|| {
+            Box::new(
+                exhaustive_float_float_unsigned_rounding_mode_quadruple_gen_var_24().filter(
+                    |(y, x, p, rm)| {
+                        *rm != RoundingMode::Exact
+                            || y.atan2_pi_prec_round_ref_ref(x, *p, RoundingMode::Floor).1
+                                == Ordering::Equal
+                    },
+                ),
+            )
+        },
+        &|config| {
+            Box::new(
+                random_float_float_unsigned_rounding_mode_quadruple_gen_var_24(config).filter(
+                    |(y, x, p, rm)| {
+                        *rm != RoundingMode::Exact
+                            || y.atan2_pi_prec_round_ref_ref(x, *p, RoundingMode::Floor).1
+                                == Ordering::Equal
+                    },
+                ),
+            )
+        },
+        &|config| {
+            Box::new(
+                special_random_float_float_unsigned_rounding_mode_quadruple_gen_var_24(config)
+                    .filter(|(y, x, p, rm)| {
+                        *rm != RoundingMode::Exact
+                            || y.atan2_pi_prec_round_ref_ref(x, *p, RoundingMode::Floor).1
+                                == Ordering::Equal
+                    }),
             )
         },
     )

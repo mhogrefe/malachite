@@ -33,10 +33,11 @@ use malachite_float::test_util::bench::bucketers::{
 use malachite_float::test_util::float::trigonometric::atan::{rug_atan, rug_atan_prec_round};
 use malachite_float::test_util::generators::{
     float_gen, float_gen_rm, float_gen_var_12, float_rounding_mode_pair_gen_var_47,
-    float_unsigned_pair_gen_var_1, float_unsigned_pair_gen_var_2, float_unsigned_pair_gen_var_4,
+    float_rounding_mode_pair_gen_var_54, float_unsigned_pair_gen_var_1,
+    float_unsigned_pair_gen_var_2, float_unsigned_pair_gen_var_4,
     float_unsigned_rounding_mode_triple_gen_var_36,
     float_unsigned_rounding_mode_triple_gen_var_36_rm,
-    float_unsigned_rounding_mode_triple_gen_var_40,
+    float_unsigned_rounding_mode_triple_gen_var_40, float_unsigned_rounding_mode_triple_gen_var_57,
     float_unsigned_unsigned_rounding_mode_quadruple_gen_var_19,
     float_unsigned_unsigned_rounding_mode_quadruple_gen_var_20,
     float_unsigned_unsigned_triple_gen_var_1, rational_unsigned_rounding_mode_triple_gen_var_10,
@@ -152,10 +153,14 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_atan_pi_prec_round);
     register_demo!(runner, demo_float_atan_pi_prec_round_debug);
     register_demo!(runner, demo_float_atan_pi_prec);
+    register_demo!(runner, demo_float_atan_pi_prec_debug);
     register_demo!(runner, demo_float_atan_pi_round);
+    register_demo!(runner, demo_float_atan_pi_round_debug);
     register_demo!(runner, demo_float_atan_pi_prec_round_assign);
     register_demo!(runner, demo_float_atan_pi_rational_prec_round);
+    register_demo!(runner, demo_float_atan_pi_rational_prec_round_debug);
     register_demo!(runner, demo_float_atan_pi_rational_prec);
+    register_demo!(runner, demo_float_atan_pi_rational_prec_debug);
     register_primitive_float_demos!(runner, demo_primitive_float_atan_pi);
     register_primitive_float_demos!(runner, demo_primitive_float_atan_pi_rational);
     register_demo!(runner, demo_float_atan_pi);
@@ -284,7 +289,7 @@ fn demo_float_atan_prec_assign(gm: GenMode, config: &GenConfig, limit: usize) {
 }
 
 fn demo_float_atan_round(gm: GenMode, config: &GenConfig, limit: usize) {
-    for (x, rm) in float_rounding_mode_pair_gen_var_47()
+    for (x, rm) in float_rounding_mode_pair_gen_var_54()
         .get(gm, config)
         .take(limit)
     {
@@ -294,7 +299,7 @@ fn demo_float_atan_round(gm: GenMode, config: &GenConfig, limit: usize) {
 }
 
 fn demo_float_atan_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
-    for (x, rm) in float_rounding_mode_pair_gen_var_47()
+    for (x, rm) in float_rounding_mode_pair_gen_var_54()
         .get(gm, config)
         .take(limit)
     {
@@ -311,7 +316,7 @@ fn demo_float_atan_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
 }
 
 fn demo_float_atan_round_ref(gm: GenMode, config: &GenConfig, limit: usize) {
-    for (x, rm) in float_rounding_mode_pair_gen_var_47()
+    for (x, rm) in float_rounding_mode_pair_gen_var_54()
         .get(gm, config)
         .take(limit)
     {
@@ -325,7 +330,7 @@ fn demo_float_atan_round_ref(gm: GenMode, config: &GenConfig, limit: usize) {
 }
 
 fn demo_float_atan_round_assign(gm: GenMode, config: &GenConfig, limit: usize) {
-    for (mut x, rm) in float_rounding_mode_pair_gen_var_47()
+    for (mut x, rm) in float_rounding_mode_pair_gen_var_54()
         .get(gm, config)
         .take(limit)
     {
@@ -336,7 +341,7 @@ fn demo_float_atan_round_assign(gm: GenMode, config: &GenConfig, limit: usize) {
 }
 
 fn demo_float_atan_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
-    for (x, prec, rm) in float_unsigned_rounding_mode_triple_gen_var_36()
+    for (x, prec, rm) in float_unsigned_rounding_mode_triple_gen_var_57()
         .get(gm, config)
         .take(limit)
     {
@@ -352,7 +357,7 @@ fn demo_float_atan_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
 }
 
 fn demo_float_atan_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
-    for (x, prec, rm) in float_unsigned_rounding_mode_triple_gen_var_36()
+    for (x, prec, rm) in float_unsigned_rounding_mode_triple_gen_var_57()
         .get(gm, config)
         .take(limit)
     {
@@ -370,7 +375,7 @@ fn demo_float_atan_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usiz
 }
 
 fn demo_float_atan_prec_round_ref(gm: GenMode, config: &GenConfig, limit: usize) {
-    for (x, prec, rm) in float_unsigned_rounding_mode_triple_gen_var_36()
+    for (x, prec, rm) in float_unsigned_rounding_mode_triple_gen_var_57()
         .get(gm, config)
         .take(limit)
     {
@@ -385,7 +390,7 @@ fn demo_float_atan_prec_round_ref(gm: GenMode, config: &GenConfig, limit: usize)
 }
 
 fn demo_float_atan_prec_round_assign(gm: GenMode, config: &GenConfig, limit: usize) {
-    for (mut x, prec, rm) in float_unsigned_rounding_mode_triple_gen_var_36()
+    for (mut x, prec, rm) in float_unsigned_rounding_mode_triple_gen_var_57()
         .get(gm, config)
         .take(limit)
     {
@@ -459,7 +464,7 @@ fn benchmark_float_atan_prec_round_evaluation_strategy(
     run_benchmark(
         "Float.atan_prec_round(u64, RoundingMode)",
         BenchmarkType::EvaluationStrategy,
-        float_unsigned_rounding_mode_triple_gen_var_36().get(gm, config),
+        float_unsigned_rounding_mode_triple_gen_var_57().get(gm, config),
         gm.name(),
         limit,
         file_name,
@@ -1430,6 +1435,19 @@ fn demo_float_atan_pi_prec(gm: GenMode, config: &GenConfig, limit: usize) {
     }
 }
 
+fn demo_float_atan_pi_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec) in float_unsigned_pair_gen_var_1().get(gm, config).take(limit) {
+        let (c, o) = x.clone().atan_pi_prec(prec);
+        println!(
+            "({:#x}).atan_pi_prec({}) = ({:#x}, {:?})",
+            ComparableFloat(x),
+            prec,
+            ComparableFloat(c),
+            o
+        );
+    }
+}
+
 fn demo_float_atan_pi_round(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, rm) in float_rounding_mode_pair_gen_var_47()
         .get(gm, config)
@@ -1440,6 +1458,22 @@ fn demo_float_atan_pi_round(gm: GenMode, config: &GenConfig, limit: usize) {
             x.clone(),
             rm,
             x.atan_pi_round(rm)
+        );
+    }
+}
+
+fn demo_float_atan_pi_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, rm) in float_rounding_mode_pair_gen_var_47()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (c, o) = x.clone().atan_pi_round(rm);
+        println!(
+            "({:#x}).atan_pi_round({}) = ({:#x}, {:?})",
+            ComparableFloat(x),
+            rm,
+            ComparableFloat(c),
+            o
         );
     }
 }
@@ -1470,6 +1504,23 @@ fn demo_float_atan_pi_rational_prec_round(gm: GenMode, config: &GenConfig, limit
     }
 }
 
+fn demo_float_atan_pi_rational_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec, rm) in rational_unsigned_rounding_mode_triple_gen_var_10()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (c, o) = Float::atan_pi_rational_prec_round(x.clone(), prec, rm);
+        println!(
+            "Float::atan_pi_rational_prec_round({}, {}, {}) = ({:#x}, {:?})",
+            x,
+            prec,
+            rm,
+            ComparableFloat(c),
+            o
+        );
+    }
+}
+
 fn demo_float_atan_pi_rational_prec(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, prec) in rational_unsigned_pair_gen_var_3()
         .get(gm, config)
@@ -1480,6 +1531,22 @@ fn demo_float_atan_pi_rational_prec(gm: GenMode, config: &GenConfig, limit: usiz
             x.clone(),
             prec,
             Float::atan_pi_rational_prec(x, prec)
+        );
+    }
+}
+
+fn demo_float_atan_pi_rational_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec) in rational_unsigned_pair_gen_var_3()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (c, o) = Float::atan_pi_rational_prec(x.clone(), prec);
+        println!(
+            "Float::atan_pi_rational_prec({}, {}) = ({:#x}, {:?})",
+            x,
+            prec,
+            ComparableFloat(c),
+            o
         );
     }
 }
