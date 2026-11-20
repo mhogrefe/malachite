@@ -11,6 +11,7 @@ use crate::integer_matrix::IntegerMatrix;
 use crate::integer_matrix::linear_algebra::determinant::determinant_helper;
 use crate::integer_vector::arithmetic::max_bits::vec_max_bits;
 use crate::natural::Natural;
+use alloc::vec::Vec;
 use core::cmp::Ordering::{self, *};
 use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::{Parity, PowerOf2, Sign};

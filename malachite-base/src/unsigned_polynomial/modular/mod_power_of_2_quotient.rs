@@ -23,6 +23,7 @@ use crate::unsigned_polynomial::UnsignedPolynomial;
 use crate::unsigned_polynomial::modular::mod_power_of_2_div_rem::{
     assert_reduced, leading_inverse, mod_power_of_2_quotient_dispatch, reduced,
 };
+use alloc::vec::Vec;
 
 fn checked_helper<T: PrimitiveUnsigned>(
     p: &UnsignedPolynomial<T>,

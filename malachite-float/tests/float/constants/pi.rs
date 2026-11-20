@@ -11,6 +11,8 @@ use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
     unsigned_gen_var_11, unsigned_rounding_mode_pair_gen_var_4,
 };
+use malachite_float::float::constants::cache::cached_constant_precisions;
+use malachite_float::float::constants::pi::pi_prec_round_uncached;
 use malachite_float::test_util::common::{
     assert_rounding_ordering_consistent, rug_round_try_from_rounding_mode, test_constant,
     to_hex_string,
@@ -381,4 +383,41 @@ fn pi_prec_round_properties() {
     });
 
     test_constant(Float::pi_prec_round, 10000);
+}
+
+// With the `std` feature, pi is kept in a per-thread cache. The cache does not change the results:
+// requests that it answers, after it holds an approximation computed for a higher or a lower
+// precision, agree with the computation that bypasses it. Each test runs in a thread of its own, so
+// the cache starts out empty here, apart from what this test puts in it.
+#[test]
+fn pi_prec_round_cache_properties() {
+    Float::clear_constant_cache();
+    assert_eq!(cached_constant_precisions().0, None);
+    unsigned_rounding_mode_pair_gen_var_4().test_properties(|(prec, rm)| {
+        let (x, o) = Float::pi_prec_round(prec, rm);
+        let (x_alt, o_alt) = pi_prec_round_uncached(prec, rm);
+        assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&x));
+        assert_eq!(o_alt, o);
+        // The cache now holds an approximation with at least `prec` correct bits.
+        let cached = cached_constant_precisions().0.unwrap();
+        assert!(cached >= prec);
+        // A request at a lower precision does not replace it.
+        let _ = Float::pi_prec_round(1, Floor);
+        assert_eq!(cached_constant_precisions().0, Some(cached));
+    });
+    // Requests at lower precisions, all answered from one approximation.
+    let _ = Float::pi_prec(2000);
+    unsigned_rounding_mode_pair_gen_var_4().test_properties(|(prec, rm)| {
+        if prec <= 2000 {
+            let (x, o) = Float::pi_prec_round(prec, rm);
+            let (x_alt, o_alt) = pi_prec_round_uncached(prec, rm);
+            assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&x));
+            assert_eq!(o_alt, o);
+        }
+    });
+    Float::clear_constant_cache();
+    assert_eq!(cached_constant_precisions().0, None);
+    // `Exact` still panics when the cache could answer the request.
+    let _ = Float::pi_prec(2000);
+    assert_panic!(Float::pi_prec_round(100, Exact));
 }

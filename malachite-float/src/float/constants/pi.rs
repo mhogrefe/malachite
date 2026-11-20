@@ -13,6 +13,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Float;
+#[cfg(feature = "std")]
+use crate::float::constants::cache::{pi_from_cache, pi_to_cache};
 use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::{Sqrt, Square};
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -36,7 +38,7 @@ const PI_CACHE_MIN_PREC: u64 = 1 << 20;
 static PI_CACHE: Mutex<Option<(Float, u64)>> = Mutex::new(None);
 
 #[cfg(feature = "test_build")]
-fn pi_from_cache(prec: u64, rm: RoundingMode) -> Option<(Float, Ordering)> {
+fn pi_from_test_cache(prec: u64, rm: RoundingMode) -> Option<(Float, Ordering)> {
     let cache = PI_CACHE.lock().unwrap_or_else(PoisonError::into_inner);
     let (pi, err_prec) = cache.as_ref()?;
     float_can_round(pi.significand_ref().unwrap(), *err_prec, prec, rm)
@@ -44,13 +46,87 @@ fn pi_from_cache(prec: u64, rm: RoundingMode) -> Option<(Float, Ordering)> {
 }
 
 #[cfg(feature = "test_build")]
-fn pi_to_cache(pi: &Float, err_prec: u64) {
+fn pi_to_test_cache(pi: Float, err_prec: u64) {
     let mut cache = PI_CACHE.lock().unwrap_or_else(PoisonError::into_inner);
     if cache
         .as_ref()
         .is_none_or(|&(_, cached_err_prec)| cached_err_prec < err_prec)
     {
-        *cache = Some((pi.clone(), err_prec));
+        *cache = Some((pi, err_prec));
+    }
+}
+
+// Keeps an unrounded approximation of pi with `err_prec` correct bits, computed for a request at
+// precision `prec`, for later requests: in the per-thread cache that the `std` feature provides,
+// and in test builds, for a huge precision, in the cache shared by all test threads instead.
+fn remember_pi(pi: Float, err_prec: u64, prec: u64) {
+    #[cfg(feature = "test_build")]
+    if prec >= PI_CACHE_MIN_PREC {
+        pi_to_test_cache(pi, err_prec);
+        return;
+    }
+    #[cfg(not(feature = "test_build"))]
+    let _ = prec;
+    #[cfg(feature = "std")]
+    pi_to_cache(pi, err_prec);
+    #[cfg(not(feature = "std"))]
+    let _ = (pi, err_prec);
+}
+
+// An unrounded approximation of pi whose rounding to `prec` bits with `rm` it determines, and the
+// number of its bits known to be correct.
+//
+// This is mpfr_const_pi_internal from const_pi.c, MPFR 4.2.0, without the final rounding.
+fn pi_approximation(prec: u64, rm: RoundingMode) -> (Float, u64) {
+    // we need 9 * 2 ^ kmax - 4 >= px + 2 * kmax + 8
+    let mut kmax = 2;
+    while ((prec + (kmax << 1) + 12) / 9) >> kmax != 0 {
+        kmax += 1;
+    }
+    // guarantees no recomputation for px <= 10000
+    let mut working_prec = prec + 3 * kmax + 14;
+    let mut increment = Limb::WIDTH;
+    loop {
+        let mut a = Float::one_prec(working_prec);
+        let mut big_a = a.clone();
+        let mut big_b = Float::one_half_prec(working_prec);
+        let mut big_d = Float::one_prec(working_prec) >> 2u32;
+        let mut k = 0;
+        loop {
+            let s = (&big_a + &big_b) >> 2u32;
+            a = (a + big_b.sqrt()) >> 1u32;
+            big_a = (&a).square();
+            big_b = (&big_a - s) << 1u32;
+            let mut s = &big_a - &big_b;
+            assert!(s < 1u32);
+            let ip = i64::exact_from(working_prec);
+            let cancel = if s == 0u32 {
+                ip
+            } else {
+                i64::from(-s.get_exponent().unwrap())
+            };
+            s <<= k;
+            big_d -= s;
+            // stop when |A_k - B_k| <= 2 ^ (k - p) i.e. cancel >= p - k
+            if cancel >= ip - i64::exact_from(k) {
+                break;
+            }
+            k += 1;
+        }
+        let pi: Float = big_b / big_d;
+        let err_prec = working_prec - (k << 1) - 8;
+        if float_can_round(pi.significand_ref().unwrap(), err_prec, prec, rm) {
+            return (pi, err_prec);
+        }
+        working_prec += kmax + increment;
+        increment = working_prec >> 1;
+    }
+}
+
+crate_test_fn! {
+    // pi rounded to `prec` bits with `rm`, computed without looking at any cache.
+    pi_prec_round_uncached(prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+        Float::from_float_prec_round(pi_approximation(prec, rm).0, prec, rm)
     }
 }
 
@@ -69,6 +145,11 @@ impl Float {
     /// The constant is irrational and transcendental.
     ///
     /// The output has precision `prec`.
+    ///
+    /// With the `std` feature, the most accurate approximation of $\pi$ that has been computed in
+    /// the current thread is kept, and a later call at the same or a lower precision is usually
+    /// answered by rounding it, in time linear in `prec`. [`Float::clear_constant_cache`] frees the
+    /// memory that it takes.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$
@@ -97,62 +178,24 @@ impl Float {
     /// assert_eq!(o, Greater);
     /// ```
     ///
-    // This is mpfr_const_pi_internal from const_pi.c, MPFR 4.2.0.
-    #[inline]
+    // This is mpfr_const_pi from const_pi.c, MPFR 4.2.0, which MPFR also answers from a cache
+    // (mpfr_cache from cache.c); the computation is in `pi_approximation`.
     pub fn pi_prec_round(prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        #[cfg(feature = "std")]
+        if let Some(result) = pi_from_cache(prec, rm) {
+            return result;
+        }
         #[cfg(feature = "test_build")]
         if prec >= PI_CACHE_MIN_PREC
-            && let Some(result) = pi_from_cache(prec, rm)
+            && let Some(result) = pi_from_test_cache(prec, rm)
         {
             return result;
         }
-        // we need 9 * 2 ^ kmax - 4 >= px + 2 * kmax + 8
-        let mut kmax = 2;
-        while ((prec + (kmax << 1) + 12) / 9) >> kmax != 0 {
-            kmax += 1;
-        }
-        // guarantees no recomputation for px <= 10000
-        let mut working_prec = prec + 3 * kmax + 14;
-        let mut increment = Limb::WIDTH;
-        loop {
-            let mut a = Self::one_prec(working_prec);
-            let mut big_a = a.clone();
-            let mut big_b = Self::one_half_prec(working_prec);
-            let mut big_d = Self::one_prec(working_prec) >> 2u32;
-            let mut k = 0;
-            loop {
-                let s = (&big_a + &big_b) >> 2u32;
-                a = (a + big_b.sqrt()) >> 1u32;
-                big_a = (&a).square();
-                big_b = (&big_a - s) << 1u32;
-                let mut s = &big_a - &big_b;
-                assert!(s < 1u32);
-                let ip = i64::exact_from(working_prec);
-                let cancel = if s == 0u32 {
-                    ip
-                } else {
-                    i64::from(-s.get_exponent().unwrap())
-                };
-                s <<= k;
-                big_d -= s;
-                // stop when |A_k - B_k| <= 2 ^ (k - p) i.e. cancel >= p - k
-                if cancel >= ip - i64::exact_from(k) {
-                    break;
-                }
-                k += 1;
-            }
-            let pi: Self = big_b / big_d;
-            let err_prec = working_prec - (k << 1) - 8;
-            if float_can_round(pi.significand_ref().unwrap(), err_prec, prec, rm) {
-                #[cfg(feature = "test_build")]
-                if prec >= PI_CACHE_MIN_PREC {
-                    pi_to_cache(&pi, err_prec);
-                }
-                return Self::from_float_prec_round(pi, prec, rm);
-            }
-            working_prec += kmax + increment;
-            increment = working_prec >> 1;
-        }
+        let (pi, err_prec) = pi_approximation(prec, rm);
+        let result = Self::from_float_prec_round_ref(&pi, prec, rm);
+        remember_pi(pi, err_prec, prec);
+        result
     }
 
     /// Returns an approximation of $\pi$, with the given precision and rounded to the nearest
@@ -168,6 +211,11 @@ impl Float {
     /// The constant is irrational and transcendental.
     ///
     /// The output has precision `prec`.
+    ///
+    /// With the `std` feature, the most accurate approximation of $\pi$ that has been computed in
+    /// the current thread is kept, and a later call at the same or a lower precision is usually
+    /// answered by rounding it, in time linear in `prec`. [`Float::clear_constant_cache`] frees the
+    /// memory that it takes.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$

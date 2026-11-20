@@ -13,6 +13,8 @@
 use crate::Rational;
 use crate::rational_polynomial::RationalPolynomial;
 use crate::rational_polynomial::arithmetic::make_monic::monic_from_primitive_part;
+use alloc::vec;
+use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{
     Content, DivExact, ExtendedGcd, Gcd, PrimitivePart, Reciprocal, UnsignedAbs,
 };

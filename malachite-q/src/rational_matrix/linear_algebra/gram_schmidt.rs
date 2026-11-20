@@ -9,6 +9,7 @@
 use crate::Rational;
 use crate::rational_matrix::RationalMatrix;
 use crate::rational_matrix::linear_algebra::similarity_transform::RationalRing;
+use alloc::vec;
 use alloc::vec::Vec;
 use core::mem::take;
 use malachite_base::num::arithmetic::traits::{

@@ -13,6 +13,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::big_exponent_float::exponential::exp::finite_can_round;
+#[cfg(feature = "std")]
+use crate::float::constants::cache::{ln_2_from_cache, ln_2_to_cache};
 use crate::{BigExponentFloat, Float};
 use alloc::vec;
 use core::cmp::Ordering;
@@ -82,6 +84,55 @@ fn sum(t: &mut [Integer], p: &mut [Integer], q: &mut [Integer], n1: u64, n2: u64
     }
 }
 
+// An unrounded approximation of ln 2 whose rounding to `prec` bits with `rm` it determines, with
+// the number of its bits known to be correct and the working precision it was computed with.
+//
+// This is mpfr_const_log2_internal from const_log2.c, MPFR 4.2.0, without the final rounding.
+fn ln_2_approximation(prec: u64, rm: RoundingMode) -> (BigExponentFloat, u64, u64) {
+    let mut working_prec = prec + prec.ceiling_log_base_2() + 3;
+    let mut increment = Limb::WIDTH;
+    loop {
+        let big_n = working_prec / 3 + 1;
+        // the following are needed for error analysis (see algorithms.tex)
+        assert!(working_prec >= 3 && big_n >= 2);
+        let lg_big_n = usize::wrapping_from(big_n.ceiling_log_base_2()) + 1;
+        let mut scratch = vec![Integer::ZERO; 3 * lg_big_n];
+        split_into_chunks_mut!(scratch, lg_big_n, [t, p], q);
+        sum(t, p, q, 0, big_n, false);
+        let mut t0 = Integer::ZERO;
+        let mut q0 = Integer::ZERO;
+        swap(&mut t0, &mut t[0]);
+        swap(&mut q0, &mut q[0]);
+        // ln(2) = t0 / q0 ~ 0.69. For large `working_prec`, t0 and q0 each have more than
+        // `MAX_EXPONENT` bits, so `Float::from_integer_prec` would overflow them to infinity. Round
+        // each into a `BigExponentFloat`, whose exponent is unbounded, and divide there; the
+        // in-range quotient then converts back to a `Float`. First shift off the bits below
+        // `working_prec` (the same shift for both, so the ratio is preserved), so that the
+        // conversions work on ~`working_prec` bits rather than on t0 and q0 themselves (up to ~1 GB
+        // each).
+        let extra = t0
+            .significant_bits()
+            .max(q0.significant_bits())
+            .saturating_sub(working_prec + Limb::WIDTH);
+        let (t0, q0) = (t0 >> extra, q0 >> extra);
+        let t0 = BigExponentFloat::from_integer_prec(t0, working_prec).0;
+        let q0 = BigExponentFloat::from_integer_prec(q0, working_prec).0;
+        let ln_2 = t0.div_prec_val_ref(&q0, working_prec).0;
+        if finite_can_round(&ln_2, working_prec - 2, working_prec, prec, rm) {
+            return (ln_2, working_prec - 2, working_prec);
+        }
+        working_prec += increment;
+        increment = working_prec >> 1;
+    }
+}
+
+crate_test_fn! {
+    // ln 2 rounded to `prec` bits with `rm`, computed without looking at any cache.
+    ln_2_prec_round_uncached(prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+        Float::from_big_exponent_float_prec_round(ln_2_approximation(prec, rm).0, prec, rm)
+    }
+}
+
 impl Float {
     /// Returns an approximation of the natural logarithm of 2, with the given precision and rounded
     /// using the given [`RoundingMode`]. An [`Ordering`] is also returned, indicating whether the
@@ -97,6 +148,11 @@ impl Float {
     /// The constant is irrational and transcendental.
     ///
     /// The output has precision `prec`.
+    ///
+    /// With the `std` feature, the most accurate approximation of $\ln 2$ that has been computed in
+    /// the current thread is kept, and a later call at the same or a lower precision is usually
+    /// answered by rounding it, in time linear in `prec`. [`Float::clear_constant_cache`] frees the
+    /// memory that it takes.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$
@@ -123,43 +179,21 @@ impl Float {
     /// assert_eq!(o, Greater);
     /// ```
     ///
-    /// This is mpfr_const_log2_internal from const_log2.c, MPFR 4.2.0.
+    /// This is mpfr_const_log2 from const_log2.c, MPFR 4.2.0, which MPFR also answers from a cache
+    /// (mpfr_cache from cache.c); the computation is in `ln_2_approximation`.
     pub fn ln_2_prec_round(prec: u64, rm: RoundingMode) -> (Self, Ordering) {
-        let mut working_prec = prec + prec.ceiling_log_base_2() + 3;
-        let mut increment = Limb::WIDTH;
-        loop {
-            let big_n = working_prec / 3 + 1;
-            // the following are needed for error analysis (see algorithms.tex)
-            assert!(working_prec >= 3 && big_n >= 2);
-            let lg_big_n = usize::wrapping_from(big_n.ceiling_log_base_2()) + 1;
-            let mut scratch = vec![Integer::ZERO; 3 * lg_big_n];
-            split_into_chunks_mut!(scratch, lg_big_n, [t, p], q);
-            sum(t, p, q, 0, big_n, false);
-            let mut t0 = Integer::ZERO;
-            let mut q0 = Integer::ZERO;
-            swap(&mut t0, &mut t[0]);
-            swap(&mut q0, &mut q[0]);
-            // ln(2) = t0 / q0 ~ 0.69. For large `working_prec`, t0 and q0 each have more than
-            // `MAX_EXPONENT` bits, so `Float::from_integer_prec` would overflow them to infinity.
-            // Round each into a `BigExponentFloat`, whose exponent is unbounded, and divide there;
-            // the in-range quotient then converts back to a `Float`. First shift off the bits below
-            // `working_prec` (the same shift for both, so the ratio is preserved), so that the
-            // conversions work on ~`working_prec` bits rather than on t0 and q0 themselves (up to
-            // ~1 GB each).
-            let extra = t0
-                .significant_bits()
-                .max(q0.significant_bits())
-                .saturating_sub(working_prec + Limb::WIDTH);
-            let (t0, q0) = (t0 >> extra, q0 >> extra);
-            let t0 = BigExponentFloat::from_integer_prec(t0, working_prec).0;
-            let q0 = BigExponentFloat::from_integer_prec(q0, working_prec).0;
-            let ln_2 = t0.div_prec_val_ref(&q0, working_prec).0;
-            if finite_can_round(&ln_2, working_prec - 2, working_prec, prec, rm) {
-                return Self::from_big_exponent_float_prec_round(ln_2, prec, rm);
-            }
-            working_prec += increment;
-            increment = working_prec >> 1;
+        assert_ne!(prec, 0);
+        #[cfg(feature = "std")]
+        if let Some(result) = ln_2_from_cache(prec, rm) {
+            return result;
         }
+        let (ln_2, err_prec, working_prec) = ln_2_approximation(prec, rm);
+        let result = Self::from_big_exponent_float_prec_round_ref(&ln_2, prec, rm);
+        #[cfg(feature = "std")]
+        ln_2_to_cache(ln_2, err_prec, working_prec);
+        #[cfg(not(feature = "std"))]
+        let _ = (err_prec, working_prec);
+        result
     }
 
     /// Returns an approximation of the natural logarithm of 2, with the given precision and rounded
@@ -175,6 +209,11 @@ impl Float {
     /// The constant is irrational and transcendental.
     ///
     /// The output has precision `prec`.
+    ///
+    /// With the `std` feature, the most accurate approximation of $\ln 2$ that has been computed in
+    /// the current thread is kept, and a later call at the same or a lower precision is usually
+    /// answered by rounding it, in time linear in `prec`. [`Float::clear_constant_cache`] frees the
+    /// memory that it takes.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$

@@ -1301,6 +1301,13 @@ documented by git history.
   memory grow with the exponent of the argument. Where Azurite's loop has an iteration limit,
   Malachite's has none: no argument is known or expected at which $\Gamma(x)$ is exactly a rounding
   boundary, but if there were one, the function would not terminate on it.
+- With the `std` feature, `Float::pi_prec_round` and `Float::ln_2_prec_round` keep, per thread, the
+  most accurate approximation of their constant computed so far, and answer later requests at the
+  same or a lower precision by rounding it, as MPFR does. The logarithms, the exponentials, and the
+  trigonometric functions take these constants on every call, so they are faster: `ln` by a factor
+  of 2.3 to 3, `exp` by 2 to 4, and `sin` by 1.5 to 2, at precisions from 53 to 5000 bits. Results
+  do not change. The new `Float::clear_constant_cache` frees the memory that the cache takes;
+  without `std` it does nothing, and nothing is cached.
 - `Float`'s internal `ExtendedFloat` type, which carried an extra exponent offset through the
   logarithms, the arithmetic-geometric mean, and $\log 2$, has been replaced by
   `BigExponentFloat`. Results and running times are unchanged.

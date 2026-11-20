@@ -12,6 +12,7 @@
 
 use crate::Rational;
 use crate::rational_polynomial::RationalPolynomial;
+use alloc::vec;
 use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{AddMulAssign, DivExact, FloorSqrt, Reciprocal};
 use malachite_base::num::basic::traits::{One, Zero};

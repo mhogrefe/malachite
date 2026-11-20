@@ -6,6 +6,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+/// A per-thread cache of $\pi$ and $\ln 2$, and
+/// [`clear_constant_cache`](super::Float::clear_constant_cache), which frees it.
+pub mod cache;
 /// Functions for approximating Catalan's constant, $G=\sum_{k=0}^\infty \frac{(-1)^k}{(2k+1)^2}$.
 pub mod catalans_constant;
 /// Functions for approximating $\sqrt\[3\]{2}$.
