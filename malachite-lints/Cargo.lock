@@ -770,6 +770,7 @@ name = "malachite-float"
 version = "0.14.0"
 dependencies = [
  "itertools 0.14.0",
+ "libm",
  "malachite-base",
  "malachite-nz",
  "malachite-q",

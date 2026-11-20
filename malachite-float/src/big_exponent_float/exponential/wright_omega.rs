@@ -15,8 +15,6 @@ use crate::big_exponent_float::bracket::{
 use crate::big_exponent_float::exponential::lambert_w0::{
     LambertTarget, apriori_w0_pos, exponent_size, lambert_bracket, log_seed_step, max_of, min_of,
 };
-use crate::float::exponential::exp::primitive_float_exp;
-use crate::float::exponential::ln::primitive_float_ln;
 use core::cmp::Ordering::{self, *};
 use core::cmp::max;
 use core::mem::swap;
@@ -39,10 +37,15 @@ const OMEGA_SEED_MIN: f64 = -700.0;
 
 // `OMEGA_SEED_STEPS` steps of Newton's iteration for y + ln y = x in `f64`, from a start value.
 //
+// The seed only has to be close: it is refined and then checked at the working precision, so its
+// accuracy affects the number of steps taken, never the result. The exponential and the logarithm
+// are therefore libm's, which are within a few ulps and a thousand times faster than Malachite's
+// correctly rounded `primitive_float_exp` and `primitive_float_ln`.
+//
 // This is equivalent to `omegaFloat` from `AzFloat/WrightOmegaBracket.lean`, Azurite.
 fn omega_float(x: f64, mut y: f64) -> f64 {
     for _ in 0..OMEGA_SEED_STEPS {
-        y -= (y + primitive_float_ln(y) - x) * y / (1.0 + y);
+        y -= (y + libm::log(y) - x) * y / (1.0 + y);
     }
     y
 }
@@ -50,18 +53,19 @@ fn omega_float(x: f64, mut y: f64) -> f64 {
 // A seed for the candidate, with about 48 bits: Newton steps in `f64` from e^x (x < -1), from the
 // tangent of omega at 0 (-1 <= x <= 2), or from x - ln x (x > 2). Outside the range of `f64`, and
 // below `OMEGA_SEED_MIN`, the same start values at 64 bits: they are within a relative e^x,
-// respectively (ln x) / x, of omega(x).
+// respectively (ln x) / x, of omega(x). As in `omega_float`, the exponential and the logarithm are
+// libm's.
 //
 // This is equivalent to `omegaSeed` from `AzFloat/WrightOmegaBracket.lean`, Azurite.
 fn omega_seed(x: &BigExponentFloat) -> BigExponentFloat {
     let xf = f64::rounding_from(x, Nearest).0;
     if xf.is_finite() && xf >= OMEGA_SEED_MIN {
         let start = if xf < -1.0 {
-            primitive_float_exp(xf)
+            libm::exp(xf)
         } else if xf <= 2.0 {
             0.5671432904097838 + 0.36 * xf
         } else {
-            xf - primitive_float_ln(xf)
+            xf - libm::log(xf)
         };
         let y = omega_float(xf, start);
         if y.is_finite() && y > 0.0 {

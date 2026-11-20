@@ -1562,6 +1562,7 @@ version = "0.14.0"
 dependencies = [
  "gmp-mpfr-sys",
  "itertools 0.14.0",
+ "libm",
  "malachite-base",
  "malachite-float",
  "malachite-nz",

@@ -22,6 +22,7 @@ path = "src/bin.rs"
 
 [dependencies]
 itertools = { version = "0.14.0", default-features = false, features = ["use_alloc"] }
+libm = { version = "0.2.16", default-features = false }
 malachite-base = { version = "0.14.0", default-features = false, path = "../malachite-base" }
 malachite-nz = { version = "0.14.0", default-features = false, features = ["float_helpers"], path = "../malachite-nz" }
 malachite-q = { version = "0.14.0", default-features = false, path = "../malachite-q" }

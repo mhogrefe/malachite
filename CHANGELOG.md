@@ -1308,6 +1308,11 @@ documented by git history.
   of 2.3 to 3, `exp` by 2 to 4, and `sin` by 1.5 to 2, at precisions from 53 to 5000 bits. Results
   do not change. The new `Float::clear_constant_cache` frees the memory that the cache takes;
   without `std` it does nothing, and nothing is cached.
+- The `f64` seeds of the Lambert $W$ and Wright omega functions now use the `libm` crate's `exp` and
+  `log` instead of Malachite's correctly rounded `f64` functions, which are about a thousand times
+  slower; a seed only steers the iteration, so results do not change. `lambert_w0`,
+  `lambert_w_minus_1`, the tree functions, and `wright_omega` are about twice as fast at 53 bits.
+  `libm`, already a dependency of the other crates, is now one of malachite-float too.
 - `Float`'s internal `ExtendedFloat` type, which carried an extra exponent offset through the
   logarithms, the arithmetic-geometric mean, and $\log 2$, has been replaced by
   `BigExponentFloat`. Results and running times are unchanged.

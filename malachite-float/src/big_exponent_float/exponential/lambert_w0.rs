@@ -15,8 +15,6 @@ use crate::big_exponent_float::bracket::{
     ziv_loop_certified,
 };
 use crate::big_exponent_float::exponential::exp::power_of_2_integer;
-use crate::float::exponential::exp::primitive_float_exp;
-use crate::float::exponential::ln::primitive_float_ln;
 use alloc::borrow::Cow;
 use core::cmp::{
     Ordering::{self, *},
@@ -536,10 +534,15 @@ fn halley_refine(
 
 // `SEED_STEPS` steps of Halley's iteration in `f64` from a start value.
 //
+// The seed only has to be close: it is refined and then checked at the working precision, so its
+// accuracy affects the number of steps taken, never the result. The exponential and the logarithm
+// are therefore libm's, which are within a few ulps and a thousand times faster than Malachite's
+// correctly rounded `primitive_float_exp` and `primitive_float_ln`.
+//
 // This is equivalent to `halleyFloat` from `AzFloat/LambertWBracket.lean`, Azurite.
 fn halley_float(x: f64, mut w: f64) -> f64 {
     for _ in 0..SEED_STEPS {
-        let e = primitive_float_exp(w);
+        let e = libm::exp(w);
         let f = w * e - x;
         let w1 = w + 1.0;
         let den = e * w1 - (w + 2.0) * f / (2.0 * w1);
@@ -550,7 +553,8 @@ fn halley_float(x: f64, mut w: f64) -> f64 {
 
 // An `f64` seed for the branch. There is none when `f64` cannot represent the problem: when the
 // argument is below the normal range, where the conversion keeps only a few bits of the argument
-// and the seed would have as few, or when it is above `SEED_MAX`.
+// and the seed would have as few, or when it is above `SEED_MAX`. As in `halley_float`, the
+// exponential and the logarithm are libm's.
 //
 // This is equivalent to `seedFloat` from `AzFloat/LambertWBracket.lean`, Azurite.
 fn seed_float(branch0: bool, x: &BigExponentFloat) -> Option<BigExponentFloat> {
@@ -558,21 +562,21 @@ fn seed_float(branch0: bool, x: &BigExponentFloat) -> Option<BigExponentFloat> {
     if !(f64::MIN_POSITIVE..=SEED_MAX).contains(&x.abs()) {
         return None;
     }
-    let q = 1.0 + primitive_float_exp(1.0) * x;
+    let q = 1.0 + core::f64::consts::E * x;
     let start = if branch0 {
         if x < 0.0 {
             -1.0 + Sqrt::sqrt(2.0 * q) - 2.0 * q / 3.0
         } else if x < 1.0 {
             x
         } else {
-            let ln_x = primitive_float_ln(x);
-            ln_x - primitive_float_ln(1.0 + ln_x)
+            let ln_x = libm::log(x);
+            ln_x - libm::log(1.0 + ln_x)
         }
     } else if q < 0.3 {
         -1.0 - Sqrt::sqrt(2.0 * q) - 2.0 * q / 3.0
     } else {
-        let ln_y = primitive_float_ln(-x);
-        ln_y - primitive_float_ln(-ln_y)
+        let ln_y = libm::log(-x);
+        ln_y - libm::log(-ln_y)
     };
     let w = halley_float(x, start);
     if w.is_finite() {
