@@ -290,6 +290,8 @@ pub mod exhaustive;
 /// Exponential and logarithmic functions of [`Float`]s: `exp`, `ln`, logarithms to various bases,
 /// powers of 2 and 10, and compound interest.
 pub mod exponential;
+/// The gamma function of [`Float`]s and functions related to it.
+pub mod gamma;
 /// Hyperbolic functions of [`Float`]s and their inverses.
 pub mod hyperbolic;
 /// Number-theoretic functions of [`Float`]s.

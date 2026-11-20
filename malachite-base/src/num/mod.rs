@@ -29,6 +29,8 @@ pub mod exponential;
 pub mod factorization;
 /// [`NiceFloat`](float::NiceFloat), a wrapper around primitive floats.
 pub mod float;
+/// The gamma function and functions related to it.
+pub mod gamma;
 /// Hyperbolic functions and their inverses.
 pub mod hyperbolic;
 /// Iterators related to numbers.

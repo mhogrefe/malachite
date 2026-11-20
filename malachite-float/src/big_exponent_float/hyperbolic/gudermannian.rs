@@ -10,8 +10,8 @@ use crate::big_exponent_float::BigExponentFloat;
 use crate::big_exponent_float::InnerBigExponentFloat::{Finite, Infinity, NaN, Zero};
 use crate::big_exponent_float::arithmetic::add::significand_prec;
 use crate::big_exponent_float::bracket::{
-    Bracket, ZIV_GUARD_BITS, floor_bracket, rational_exponent_bound, rounding_possible,
-    ziv_loop_certified,
+    Bracket, ZIV_GUARD_BITS, encl_add, encl_mul, encl_sub, floor_bracket, rational_exponent_bound,
+    rounding_possible, ziv_loop_certified,
 };
 use crate::big_exponent_float::exponential::exp::power_of_2_integer;
 use core::cmp::Ordering::{self, *};
@@ -40,16 +40,6 @@ fn pi_over_2_bracket(prec: u64) -> Bracket {
     floor_bracket(BigExponentFloat::pi_over_2_prec_round(prec, Floor).0, prec)
 }
 
-// The product of two enclosures of nonnegative numbers, rounded outward at precision `prec`.
-//
-// This is equivalent to `Encl.mul` from `AzFloat/Interval.lean`, Azurite.
-fn encl_mul(prec: u64, a: &Bracket, b: &Bracket) -> Bracket {
-    (
-        a.0.mul_prec_round_ref_ref(&b.0, prec, Floor).0,
-        a.1.mul_prec_round_ref_ref(&b.1, prec, Ceiling).0,
-    )
-}
-
 // An enclosure of a nonnegative number divided by a positive integer, rounded outward at precision
 // `prec`.
 //
@@ -59,26 +49,6 @@ fn encl_div_unsigned(prec: u64, a: &Bracket, n: u64) -> Bracket {
     (
         a.0.div_prec_round_ref_ref(&n, prec, Floor).0,
         a.1.div_prec_round_ref_val(n, prec, Ceiling).0,
-    )
-}
-
-// The sum of two enclosures, rounded outward at precision `prec`.
-//
-// This is equivalent to `Encl.add` from `AzFloat/Interval.lean`, Azurite.
-fn encl_add(prec: u64, a: &Bracket, b: &Bracket) -> Bracket {
-    (
-        a.0.add_prec_round_ref_ref(&b.0, prec, Floor).0,
-        a.1.add_prec_round_ref_ref(&b.1, prec, Ceiling).0,
-    )
-}
-
-// The difference of two enclosures, rounded outward at precision `prec`.
-//
-// This is equivalent to `Encl.sub` from `AzFloat/Interval.lean`, Azurite.
-fn encl_sub(prec: u64, a: &Bracket, b: &Bracket) -> Bracket {
-    (
-        a.0.sub_prec_round_ref_ref(&b.1, prec, Floor).0,
-        a.1.sub_prec_round_ref_ref(&b.0, prec, Ceiling).0,
     )
 }
 

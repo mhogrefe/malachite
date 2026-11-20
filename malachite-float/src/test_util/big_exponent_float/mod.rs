@@ -487,3 +487,59 @@ pub fn wright_omega_rational_prec_round_naive(
         working_prec <<= 1;
     }
 }
+
+// The reciprocal gamma function of a finite nonzero `BigExponentFloat` that is not an integer less
+// than 4, so that the result is nonzero and inexact, from the gamma function: the gamma function is
+// rounded down and up, and its reciprocal up and down, at a working precision that doubles until
+// the two results round alike.
+pub fn reciprocal_gamma_prec_round_naive(
+    x: &BigExponentFloat,
+    prec: u64,
+    rm: RoundingMode,
+) -> (BigExponentFloat, Ordering) {
+    assert!(x.is_finite() && !x.is_zero());
+    assert_ne!(rm, Exact);
+    let mut working_prec = prec + 64;
+    loop {
+        let lo = x
+            .gamma_prec_round_ref(working_prec, Ceiling)
+            .0
+            .reciprocal_prec_round(working_prec, Floor)
+            .0;
+        let hi = x
+            .gamma_prec_round_ref(working_prec, Floor)
+            .0
+            .reciprocal_prec_round(working_prec, Ceiling)
+            .0;
+        if let Some(r) = round_between(&lo, &hi, prec, rm) {
+            return r;
+        }
+        working_prec <<= 1;
+    }
+}
+
+// The reciprocal gamma function of a nonzero `Rational` that is not an integer less than 4,
+// computed like `reciprocal_gamma_prec_round_naive`.
+pub fn reciprocal_gamma_rational_prec_round_naive(
+    x: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> (BigExponentFloat, Ordering) {
+    assert_ne!(*x, 0u32);
+    assert_ne!(rm, Exact);
+    let mut working_prec = prec + 64;
+    loop {
+        let lo = BigExponentFloat::gamma_rational_prec_round_ref(x, working_prec, Ceiling)
+            .0
+            .reciprocal_prec_round(working_prec, Floor)
+            .0;
+        let hi = BigExponentFloat::gamma_rational_prec_round_ref(x, working_prec, Floor)
+            .0
+            .reciprocal_prec_round(working_prec, Ceiling)
+            .0;
+        if let Some(r) = round_between(&lo, &hi, prec, rm) {
+            return r;
+        }
+        working_prec <<= 1;
+    }
+}

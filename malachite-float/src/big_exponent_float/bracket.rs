@@ -37,6 +37,47 @@ pub(crate) fn floor_bracket(lo: BigExponentFloat, prec: u64) -> Bracket {
     (lo, hi)
 }
 
+// The product of two enclosures of nonnegative numbers, rounded outward at precision `prec`.
+//
+// This is equivalent to `Encl.mul` from `AzFloat/Interval.lean`, Azurite.
+pub(crate) fn encl_mul(prec: u64, a: &Bracket, b: &Bracket) -> Bracket {
+    (
+        a.0.mul_prec_round_ref_ref(&b.0, prec, Floor).0,
+        a.1.mul_prec_round_ref_ref(&b.1, prec, Ceiling).0,
+    )
+}
+
+// The sum of two enclosures, rounded outward at precision `prec`.
+//
+// This is equivalent to `Encl.add` from `AzFloat/Interval.lean`, Azurite.
+pub(crate) fn encl_add(prec: u64, a: &Bracket, b: &Bracket) -> Bracket {
+    (
+        a.0.add_prec_round_ref_ref(&b.0, prec, Floor).0,
+        a.1.add_prec_round_ref_ref(&b.1, prec, Ceiling).0,
+    )
+}
+
+// The difference of two enclosures, rounded outward at precision `prec`.
+//
+// This is equivalent to `Encl.sub` from `AzFloat/Interval.lean`, Azurite.
+pub(crate) fn encl_sub(prec: u64, a: &Bracket, b: &Bracket) -> Bracket {
+    (
+        a.0.sub_prec_round_ref_ref(&b.1, prec, Floor).0,
+        a.1.sub_prec_round_ref_ref(&b.0, prec, Ceiling).0,
+    )
+}
+
+// The quotient of an enclosure of a nonnegative number by an enclosure of a positive number,
+// rounded outward at precision `prec`.
+//
+// This is equivalent to `Encl.div` from `AzFloat/Interval.lean`, Azurite.
+pub(crate) fn encl_div(prec: u64, a: &Bracket, b: &Bracket) -> Bracket {
+    (
+        a.0.div_prec_round_ref_ref(&b.1, prec, Floor).0,
+        a.1.div_prec_round_ref_ref(&b.0, prec, Ceiling).0,
+    )
+}
+
 // When the exact value lies in (l, h] (or is l = h), its rounding to precision `prec` is determined
 // as soon as the two ends have the same (`prec` + 1)-bit truncation; the rounding is then that of
 // h.

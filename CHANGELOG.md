@@ -71,6 +71,8 @@ documented by git history.
 - The `Gudermannian`, `GudermannianAssign`, `InverseGudermannian`, and
   `InverseGudermannianAssign` traits, in `num::hyperbolic::traits`, for the Gudermannian function
   and its inverse.
+- The `Gamma`, `GammaAssign`, `ReciprocalGamma`, and `ReciprocalGammaAssign` traits, in the new
+  `num::gamma::traits` module, for the gamma function and its reciprocal.
 - The `ShrRoundWithOrdering` and `ShrRoundWithOrderingAssign` traits, in
   `num::arithmetic::traits`, for right-shifting a number that is itself an approximation of an
   exact value, given its `Ordering` against that value, and rounding the result.
@@ -1220,6 +1222,7 @@ documented by git history.
   - the trigonometric functions, their inverses, and `atan2`, each with `_pi` and `_with_period`
     forms and `Rational` forms, the hyperbolic functions and their inverses, and the Gudermannian
     function and its inverse (`gudermannian` and `inverse_gudermannian`, with `Rational` forms);
+  - the gamma function and its reciprocal (`gamma` and `reciprocal_gamma`, with `Rational` forms);
     and
   - the constants of `Float`, from $\pi$ and $e$ to the Gelfond–Schneider constant.
 
@@ -1280,6 +1283,24 @@ documented by git history.
   argument, and otherwise a sine and cosine computed together and one logarithm. Whether
   $|x| < \pi/2$ is decided exactly; outside the domain, which includes $\pm\infty$, the result
   is `NaN`, and $\operatorname{gd}^{-1}(\pm0.0) = \pm0.0$.
+- The gamma function $\Gamma(x)$ and its reciprocal $1/\Gamma(x)$, correctly rounded, in the new
+  `float::gamma` and `big_exponent_float::gamma` modules: `gamma` and `reciprocal_gamma`, with the
+  same forms as `gudermannian` on `Float` (including the `Gamma`, `GammaAssign`, `ReciprocalGamma`,
+  and `ReciprocalGammaAssign` traits and the `primitive_float_gamma`,
+  `primitive_float_gamma_rational`, `primitive_float_reciprocal_gamma`, and
+  `primitive_float_reciprocal_gamma_rational` functions) and on `BigExponentFloat`. They are ports
+  of the ones in Azurite: the exact factorial for a positive integer that is not too large, one
+  rounding test for a tiny argument, and otherwise the exponential of an enclosure of $\ln\Gamma$
+  from Stirling's series, whose coefficients come from the tangent numbers, with the reflection
+  formula for a negative argument. The special cases: $\Gamma(\pm0.0) = \pm\infty$ (as in MPFR),
+  $\Gamma(\infty) = \infty$, and `NaN` at the negative integers and at $-\infty$; $1/\Gamma(\pm0.0)
+  = \pm0.0$, $1/\Gamma(\infty) = 0.0$, and $1/\Gamma(x) = 0.0$ at the negative integers. A `Float`
+  result overflows or underflows for an argument beyond about $\pm4.5\times10^7$; from $\pm2^{26}$
+  on, that is decided without computing the value. A `BigExponentFloat` has no negative zero, so
+  $\Gamma(0)$ is `NaN` there, and its functions never overflow or underflow, but their time and
+  memory grow with the exponent of the argument. Where Azurite's loop has an iteration limit,
+  Malachite's has none: no argument is known or expected at which $\Gamma(x)$ is exactly a rounding
+  boundary, but if there were one, the function would not terminate on it.
 - `Float`'s internal `ExtendedFloat` type, which carried an extra exponent offset through the
   logarithms, the arithmetic-geometric mean, and $\log 2$, has been replaced by
   `BigExponentFloat`. Results and running times are unchanged.

@@ -2788,6 +2788,68 @@ const AZURITE_FLOAT_STAGES: &[(&str, &str)] = &[
         "demo_float_inverse_gudermannian_round_debug",
         "az_float_inverse_gudermannian",
     ),
+    ("demo_float_gamma_assign_debug", "az_float_gamma"),
+    ("demo_float_gamma_debug", "az_float_gamma"),
+    ("demo_float_gamma_prec_debug", "az_float_gamma"),
+    ("demo_float_gamma_prec_round_debug", "az_float_gamma"),
+    (
+        "demo_float_gamma_rational_prec_debug",
+        "az_float_gamma_rational",
+    ),
+    (
+        "demo_float_gamma_rational_prec_ref_debug",
+        "az_float_gamma_rational",
+    ),
+    (
+        "demo_float_gamma_rational_prec_round_debug",
+        "az_float_gamma_rational",
+    ),
+    (
+        "demo_float_gamma_rational_prec_round_ref_debug",
+        "az_float_gamma_rational",
+    ),
+    ("demo_float_gamma_ref_debug", "az_float_gamma"),
+    ("demo_float_gamma_round_debug", "az_float_gamma"),
+    (
+        "demo_float_reciprocal_gamma_assign_debug",
+        "az_float_reciprocal_gamma",
+    ),
+    (
+        "demo_float_reciprocal_gamma_debug",
+        "az_float_reciprocal_gamma",
+    ),
+    (
+        "demo_float_reciprocal_gamma_prec_debug",
+        "az_float_reciprocal_gamma",
+    ),
+    (
+        "demo_float_reciprocal_gamma_prec_round_debug",
+        "az_float_reciprocal_gamma",
+    ),
+    (
+        "demo_float_reciprocal_gamma_rational_prec_debug",
+        "az_float_reciprocal_gamma_rational",
+    ),
+    (
+        "demo_float_reciprocal_gamma_rational_prec_ref_debug",
+        "az_float_reciprocal_gamma_rational",
+    ),
+    (
+        "demo_float_reciprocal_gamma_rational_prec_round_debug",
+        "az_float_reciprocal_gamma_rational",
+    ),
+    (
+        "demo_float_reciprocal_gamma_rational_prec_round_ref_debug",
+        "az_float_reciprocal_gamma_rational",
+    ),
+    (
+        "demo_float_reciprocal_gamma_ref_debug",
+        "az_float_reciprocal_gamma",
+    ),
+    (
+        "demo_float_reciprocal_gamma_round_debug",
+        "az_float_reciprocal_gamma",
+    ),
     ("demo_float_lambert_w0_assign_debug", "az_float_lambert_w0"),
     ("demo_float_lambert_w0_debug", "az_float_lambert_w0"),
     ("demo_float_lambert_w0_extreme_debug", "az_float_lambert_w0"),
@@ -7300,6 +7362,38 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
     (
         "demo_big_exponent_float_inverse_gudermannian_rational_prec_round_debug",
         "az_big_exponent_float_inverse_gudermannian_rational",
+    ),
+    (
+        "demo_big_exponent_float_gamma_prec_debug",
+        "az_big_exponent_float_gamma",
+    ),
+    (
+        "demo_big_exponent_float_gamma_prec_round_debug",
+        "az_big_exponent_float_gamma",
+    ),
+    (
+        "demo_big_exponent_float_gamma_rational_prec_debug",
+        "az_big_exponent_float_gamma_rational",
+    ),
+    (
+        "demo_big_exponent_float_gamma_rational_prec_round_debug",
+        "az_big_exponent_float_gamma_rational",
+    ),
+    (
+        "demo_big_exponent_float_reciprocal_gamma_prec_debug",
+        "az_big_exponent_float_reciprocal_gamma",
+    ),
+    (
+        "demo_big_exponent_float_reciprocal_gamma_prec_round_debug",
+        "az_big_exponent_float_reciprocal_gamma",
+    ),
+    (
+        "demo_big_exponent_float_reciprocal_gamma_rational_prec_debug",
+        "az_big_exponent_float_reciprocal_gamma_rational",
+    ),
+    (
+        "demo_big_exponent_float_reciprocal_gamma_rational_prec_round_debug",
+        "az_big_exponent_float_reciprocal_gamma_rational",
     ),
     (
         "demo_big_exponent_float_lambert_w0_prec_debug",

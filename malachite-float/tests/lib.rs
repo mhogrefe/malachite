@@ -232,6 +232,11 @@ pub mod big_exponent_float {
     pub mod elliptic {
         pub mod agm;
     }
+    pub mod gamma {
+        #[allow(clippy::module_inception)]
+        pub mod gamma;
+        pub mod reciprocal_gamma;
+    }
     pub mod hyperbolic {
         pub mod acosh;
         pub mod acoth;
@@ -539,6 +544,11 @@ pub mod float {
         pub mod tree_t0;
         pub mod tree_t_minus_1;
         pub mod wright_omega;
+    }
+    pub mod gamma {
+        #[allow(clippy::module_inception)]
+        pub mod gamma;
+        pub mod reciprocal_gamma;
     }
     pub mod hyperbolic {
         pub mod acosh;
