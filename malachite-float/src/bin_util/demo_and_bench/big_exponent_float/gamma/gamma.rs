@@ -10,6 +10,7 @@ use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
 use malachite_float::BigExponentFloat;
+use malachite_float::big_exponent_float::gamma::gamma::gamma_prec_round_enclosures;
 use malachite_float::test_util::bench::bucketers::*;
 use malachite_float::test_util::generators::*;
 use malachite_q::test_util::bench::bucketers::triple_1_2_rational_bit_u64_max_bucketer;
@@ -27,6 +28,10 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_gamma_rational_prec);
     register_demo!(runner, demo_big_exponent_float_gamma_rational_prec_debug);
 
+    register_bench!(
+        runner,
+        benchmark_big_exponent_float_gamma_prec_round_algorithms
+    );
     register_bench!(
         runner,
         benchmark_big_exponent_float_gamma_prec_round_evaluation_strategy
@@ -300,6 +305,31 @@ fn benchmark_big_exponent_float_gamma_rational_prec_evaluation_strategy(
                     no_out!(BigExponentFloat::gamma_rational_prec_ref(&x, prec));
                 },
             ),
+        ],
+    );
+}
+
+fn benchmark_big_exponent_float_gamma_prec_round_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "BigExponentFloat.gamma_prec_round(u64, RoundingMode)",
+        BenchmarkType::Algorithms,
+        big_exponent_float_unsigned_rounding_mode_triple_gen_var_9().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &max_triple_1_big_exponent_float_complexity_triple_2_bucketer("x", "prec"),
+        &mut [
+            ("single values and error bounds", &mut |(x, prec, rm)| {
+                no_out!(x.gamma_prec_round_ref(prec, rm));
+            }),
+            ("enclosures", &mut |(x, prec, rm)| {
+                no_out!(gamma_prec_round_enclosures(false, &x, prec, rm));
+            }),
         ],
     );
 }

@@ -15,12 +15,18 @@ use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_float::big_exponent_float::ComparableBigExponentFloatRef;
+use malachite_float::big_exponent_float::gamma::gamma::{
+    gamma_positive_bracket, gamma_prec_round_enclosures, gamma_rational_prec_round_enclosures,
+    ln_gamma_bracket, tangent_numbers_one_at_a_time,
+};
 use malachite_float::test_util::big_exponent_float::float_to_big_exponent_float;
 use malachite_float::test_util::generators::{
     big_exponent_float_unsigned_rounding_mode_triple_gen_var_9, float_unsigned_pair_gen_var_1,
     rational_unsigned_rounding_mode_triple_gen_var_10,
 };
 use malachite_float::{BigExponentFloat, Float};
+use malachite_nz::integer::Integer;
+use malachite_nz::natural::number_theory::tangent_numbers::tangent_numbers_prefix;
 use malachite_q::Rational;
 use std::cmp::Ordering::{self, *};
 
@@ -1914,6 +1920,23 @@ fn test_gamma_prec_round() {
         "0x1.0E+22",
         Greater,
     );
+    // - ln_gamma_shift_threshold at a high level, for a short argument
+    test(
+        "1.5",
+        "0x1.8",
+        1300,
+        Nearest,
+        "0.8862269254527580136490837416705725913987747280611935641069038949264556422955160906874753\
+        2836927233270811341181214128533311807643286221130126254685480139353423101884932655256142496\
+        2586514475413114466047689633981400087319507675739860258350095092617009292723487247456320156\
+        9608877629531082027096662504531992038068667387375767168339948946829259182043977255825808693\
+        80029533696715895666404927423",
+        "0x0.e2dfc48da77b553ce1d82906aedc9c1ff1c90aa37b1d9296e50805e9f50a3a376bb7feb7ca0f8edd66c73b\
+        0a0f063ba3b6290a236ee1ac28a9224861a5210ba6e5d7ef884e8d9d67daa9d6f232df53628195545088d313716\
+        381789268b7d9d485c58b8bc1ae270f64e047a051edb6c091ba0e53c451c73d30cffdadd75fbd8b36f945ae9674\
+        4df31b60205da04b4027e966c9c097dd84c845a0572f76f2448acb6",
+        Less,
+    );
 }
 
 #[test]
@@ -2756,6 +2779,38 @@ fn test_gamma_rational_prec_round() {
         "0x1.8E+19",
         Greater,
     );
+    // - ln_gamma_shift_threshold at a high level, for a long argument
+    test(
+        "1/3",
+        1300,
+        Nearest,
+        "2.6789385347077476336556929409746776441286893779573011009504283275904176101677438195409828\
+        8904118878941915904920007226333571908456950447225997771336770846976816728982305000321834255\
+        0322247156941817555449952728784394779441305765828401612319141596466526033727584020580635513\
+        9432410320158394153827008552405210323387989550693638926386839167072816915423096273318811864\
+        7749652229105564440907800963410",
+        "0x2.adceea72905e2ceec8d3e92cd58046d84b46a6b2ed5b94301b7936769e5c95914f4f8c1caf9fad727162c4\
+        b282703fed488cb1813e246e7ba271d46e508ccef667470b87c67d0c409a241ffb811bf1bebd4aa63684415a19f\
+        c7448f3e90ce688c016f36f864c957c34935630003b0637895117817c22d7dfcbecc9328287e856faefa8fc9e50\
+        ad3e579d69044e6c68cffe1f222763148d573f3b7309a39be21b03ea8",
+        Less,
+    );
+    // - ln_gamma_shift_threshold at a high level, for a long argument, below zero
+    test(
+        "-1/3",
+        1300,
+        Floor,
+        "-4.062353818279201250835864084463541356557981798170381095182067403891348896205227625027502\
+        4438589187333193044708300991765624267846577586354798215734443429685003024677468627525170477\
+        7709957015563573257403450531046085107156183610495326379920951246779207415268410386828814845\
+        1099497041539179433963792610252059771999797259658156468981712747002661782973677861983702736\
+        85718994548183696161233054974581",
+        "-0x4.0ff66b7a4a36a6018defc2508173cb1efee7c9352637ca3c24aea5c170d12596eaa03e769b631ef278b75\
+        914829e0928fd289df05474871b3975b3dc3fab36cc18e981090a220039d403e5da7091ddc8bb376d7c807ce2e8\
+        559263321eced9959b675dfebc15bffaf8d4904268c0aafb99e1af25830074ec17b093f9cd3b45be27890608c72\
+        eeaf11fce97d4c9d1fbe320991691192c58aaeea870e2c461464cacbc8",
+        Less,
+    );
 }
 
 #[test]
@@ -2897,6 +2952,152 @@ fn gamma_rational_prec_round_float_agreement_properties() {
             let r = gamma_rational_prec_round_all(x, prec, rm);
             assert!(same(&r.0, &float_to_big_exponent_float(&f)));
             assert_eq!(r.1, fo);
+        }
+    });
+}
+
+#[test]
+fn test_tangent_numbers_one_at_a_time() {
+    for len in [0, 1, 2, 3, 10, 150] {
+        assert_eq!(
+            tangent_numbers_one_at_a_time(len),
+            tangent_numbers_prefix(len)
+        );
+    }
+}
+
+// The gamma function encloses the gamma function of a positive number with single values and error
+// bounds. Computing with enclosures throughout, as in Azurite, gives the same results.
+#[test]
+fn gamma_prec_round_enclosures_properties() {
+    big_exponent_float_unsigned_rounding_mode_triple_gen_var_9().test_properties(
+        |(x, prec, rm)| {
+            for recip in [false, true] {
+                if rm == Exact && gamma_prec_round_enclosures(recip, &x, prec, Floor).1 != Equal {
+                    continue;
+                }
+                let r = if recip {
+                    x.reciprocal_gamma_prec_round_ref(prec, rm)
+                } else {
+                    x.gamma_prec_round_ref(prec, rm)
+                };
+                assert!(same_pair(
+                    &gamma_prec_round_enclosures(recip, &x, prec, rm),
+                    &r
+                ));
+            }
+        },
+    );
+
+    rational_unsigned_rounding_mode_triple_gen_var_10().test_properties(|(x, prec, rm)| {
+        for recip in [false, true] {
+            if rm == Exact
+                && gamma_rational_prec_round_enclosures(recip, &x, prec, Floor).1 != Equal
+            {
+                continue;
+            }
+            let r = if recip {
+                BigExponentFloat::reciprocal_gamma_rational_prec_round_ref(&x, prec, rm)
+            } else {
+                BigExponentFloat::gamma_rational_prec_round_ref(&x, prec, rm)
+            };
+            assert!(same_pair(
+                &gamma_rational_prec_round_enclosures(recip, &x, prec, rm),
+                &r
+            ));
+        }
+    });
+}
+
+// Checks the bracket of ln Gamma(x) at Ziv level `w` that is computed with single values and error
+// bounds (which the logarithm of the gamma function will use) against the one that is computed with
+// enclosures at a level more than twice as high, for a positive number less than 2^e whose
+// enclosure at a level is given by `x`. The second bracket is far narrower than the first one's
+// margin, so it lies inside the first unless the first one's error bound is wrong. Then checks the
+// enclosures of Gamma(x) and 1 / Gamma(x) that the gamma function uses in the same way.
+fn check_ln_gamma_bracket(
+    x: &dyn Fn(u64) -> (BigExponentFloat, BigExponentFloat),
+    e: &Integer,
+    w: u64,
+) {
+    let (lo, hi) = ln_gamma_bracket(false, &x(w), e, w).unwrap();
+    let fine = (w << 1) + 64;
+    let (fine_lo, fine_hi) = ln_gamma_bracket(true, &x(fine), e, fine).unwrap();
+    assert!(lo <= fine_lo && fine_lo <= fine_hi && fine_hi <= hi);
+    // The bracket is not much wider than the one computed with enclosures at the same level.
+    let (encl_lo, encl_hi) = ln_gamma_bracket(true, &x(w), e, w).unwrap();
+    assert!(hi - lo <= (encl_hi - encl_lo) << 8u32);
+    // The first level of the enclosure of the gamma function, at which the argument is enclosed,
+    // may be any number that is at least the second.
+    let w_ln = w + 16 + if *e > 0u32 { u64::exact_from(e) } else { 0 };
+    let fine_ln = (w_ln << 1) + 64;
+    for recip in [false, true] {
+        let (lo, hi) = gamma_positive_bracket(false, recip, &x(w_ln), e, w_ln, w).unwrap();
+        let (fine_lo, fine_hi) =
+            gamma_positive_bracket(true, recip, &x(fine_ln), e, fine_ln, fine).unwrap();
+        assert!(lo <= fine_lo && fine_lo <= fine_hi && fine_hi <= hi);
+        let (encl_lo, encl_hi) = gamma_positive_bracket(true, recip, &x(w_ln), e, w_ln, w).unwrap();
+        assert!(hi - lo <= (encl_hi - encl_lo) << 8u32);
+    }
+}
+
+// The bracket is valid whatever exponent bound it is given; the bound only chooses the shift and
+// the number of terms. With a bound that is far too large, an argument near 1 is not shifted, and
+// Stirling's series is used where it hardly converges, so the bracket is wide; it still contains
+// the narrow one that the true exponent gives.
+#[test]
+fn test_ln_gamma_bracket() {
+    let test = |s: &str| {
+        // - ln y < 1
+        // - ln y exact, for the argument 1
+        let x = hex(s);
+        let x = (x.clone(), x);
+        let e = x.0.get_exponent().unwrap();
+        let (fine_lo, fine_hi) = ln_gamma_bracket(true, &x, e, 256).unwrap();
+        let loose = Integer::from(100);
+        for enclosures in [false, true] {
+            let (lo, hi) = ln_gamma_bracket(enclosures, &x, &loose, 64).unwrap();
+            assert!(lo <= fine_lo && fine_hi <= hi);
+        }
+    };
+    test("0x1.0");
+    test("0x1.8");
+    test("0x2.0");
+    test("0x2.8");
+}
+
+#[test]
+fn ln_gamma_bracket_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_precision_n", 512);
+    config.insert("mean_stripe_n", 128);
+    config.insert("mean_small_n", 512);
+    for config in [GenConfig::new(), config] {
+        big_exponent_float_unsigned_rounding_mode_triple_gen_var_9().test_properties_with_config(
+            &config,
+            |(x, prec, _)| {
+                if x.is_finite() && x > 0u32 {
+                    let e = x.get_exponent().unwrap();
+                    check_ln_gamma_bracket(&|_| (x.clone(), x.clone()), e, prec + 64);
+                }
+            },
+        );
+    }
+
+    rational_unsigned_rounding_mode_triple_gen_var_10().test_properties(|(q, prec, _)| {
+        if q > 0u32 {
+            let encl = |w: u64| {
+                (
+                    BigExponentFloat::from_rational_prec_round_ref(&q, w + 32, Floor).0,
+                    BigExponentFloat::from_rational_prec_round_ref(&q, w + 32, Ceiling).0,
+                )
+            };
+            let e = BigExponentFloat::from_rational_prec_round_ref(&q, 32, Up)
+                .0
+                .get_exponent()
+                .unwrap()
+                .clone();
+            check_ln_gamma_bracket(&encl, &e, prec + 64);
         }
     });
 }
