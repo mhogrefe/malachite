@@ -202,6 +202,14 @@ string in a unit file is printed bare, exactly as the demo would print it.
 | `mag_cmp` | `mag_cmp`, `mag_max`, and `mag_min` | `demo_mag_cmp`, `demo_mag_max`, and `demo_mag_min` (malachite-nz) |
 | `mag_mul` | `mag_mul` | `demo_mag_mul` (malachite-nz) |
 | `mag_mul_ui` | `mag_mul_ui` | `demo_mag_mul_u64` (malachite-nz) |
+| `arf_gamma` | arb ball arithmetic (`arb_gamma`, `arb_rgamma`, `arb_gamma_fmpq`), bracketing the result between neighbors with one more bit; positive integers exactly, as $(n-1)!$ and $1/(n-1)!$ | `demo_big_exponent_float_gamma` and `_reciprocal_gamma`, and their `_rational` versions, each in `_prec_round` and `_prec` forms (malachite-float), plus unit rows |
+| `arith_bernoulli_number` | `arith_bernoulli_number` | `demo_rational_bernoulli_number` (malachite-q), plus unit rows |
+| `arith_bernoulli_number_vec` | `arith_bernoulli_number_vec`; for the even prefix, every other entry from $B_2$ on | `demo_bernoulli_numbers_prefix` and `demo_even_bernoulli_numbers_prefix` (malachite-q), plus unit rows |
+| `arith_bernoulli_number_denom` | `arith_bernoulli_number_denom` | `demo_natural_bernoulli_number_denominator` (malachite-nz), plus unit rows |
+| `arith_bernoulli_polynomial` | `arith_bernoulli_polynomial` | `demo_rational_polynomial_bernoulli_polynomial` (malachite-q), plus unit rows |
+| `arith_euler_number` | `arith_euler_number` | `demo_integer_euler_number` (malachite-nz), plus unit rows |
+| `arith_euler_number_vec` | `arith_euler_number_vec` | `demo_integer_euler_numbers_prefix` (malachite-nz), plus unit rows |
+| `arith_euler_polynomial` | `arith_euler_polynomial` | `demo_rational_polynomial_euler_polynomial` (malachite-q), plus unit rows |
 | `mag_fast_addmul` | `mag_fast_addmul` | `demo_mag_add_mul_assign` (malachite-nz) |
 | `mag_div_ui` | `mag_div_ui` | `demo_mag_div_u64` (malachite-nz) |
 | `mag_sqrt` | `mag_sqrt` | `demo_mag_sqrt` (malachite-nz) |
@@ -271,7 +279,9 @@ comparison), `cmp` and `eq` against `Rational`, `Natural`, `Integer`, and the ma
 `to_string`, `from_str` (Malachite's grammar, with its `+` signs and nonzero denominator),
 `from_sci_string` in any base, `to_sci`, `to_sci_with_options` (the `ToSciOptions` `Debug` text is
 parsed into Azurite's `SciOptions`; `Exact` is Azurite's `toSciExact` predicate), `fmt_sci_valid`,
-and `length_after_point_in_small_base`. They live in `Azurite/Oracle/AzRat.lean`, and they run
+`length_after_point_in_small_base`, and the Bernoulli numbers (`bernoulli_number` against
+`bernoulli`, `even_bernoulli_numbers_prefix` against `bernoulliEvens`, and
+`bernoulli_numbers_prefix` against `bernoulliEvens` with the odd entries filled in). They live in `Azurite/Oracle/AzRat.lean`, and they run
 with the other Azurite stages.
 
 The `az_float_*` modes check the `Float` demos of `malachite-float` listed in

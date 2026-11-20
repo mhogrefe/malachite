@@ -16,6 +16,7 @@ pub(crate) fn register(runner: &mut Runner) {
     conversion::register(runner);
     logic::register(runner);
     series::register(runner);
+    special::register(runner);
 }
 
 mod arithmetic;
@@ -25,3 +26,4 @@ mod comparison;
 mod conversion;
 mod logic;
 mod series;
+mod special;

@@ -13,8 +13,8 @@ use malachite_base::rounding_modes::RoundingMode;
 
 // The exact value is represented by `x - sign(o) / 4`, which lies strictly between `x` and its
 // neighbor on the side `o` indicates, and is close enough to `x` that no rounding boundary falls
-// between them. Scaled by 4 it is the integer `4x - sign(o)`, so the result is an ordinary
-// rounded shift of that integer by two more bits.
+// between them. Scaled by 4 it is the integer `4x - sign(o)`, so the result is an ordinary rounded
+// shift of that integer by two more bits.
 pub fn integer_shr_round_with_ordering_naive(
     x: &Integer,
     bits: u64,

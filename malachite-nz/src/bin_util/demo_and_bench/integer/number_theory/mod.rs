@@ -10,6 +10,7 @@ use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
     binomial_coefficient::register(runner);
+    euler_number::register(runner);
     extended_gcd::register(runner);
     falling_factorial::register(runner);
     gcd::register(runner);
@@ -19,6 +20,7 @@ pub(crate) fn register(runner: &mut Runner) {
 }
 
 mod binomial_coefficient;
+mod euler_number;
 mod extended_gcd;
 mod falling_factorial;
 mod gcd;

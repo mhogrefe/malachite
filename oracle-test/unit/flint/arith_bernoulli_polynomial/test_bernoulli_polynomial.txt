@@ -1,0 +1,9 @@
+bernoulli_polynomial(0) = 1
+bernoulli_polynomial(1) = x-1/2
+bernoulli_polynomial(2) = x^2-x+1/6
+bernoulli_polynomial(3) = x^3-3/2*x^2+1/2*x
+bernoulli_polynomial(4) = x^4-2*x^3+x^2-1/30
+bernoulli_polynomial(5) = x^5-5/2*x^4+5/3*x^3-1/6*x
+bernoulli_polynomial(6) = x^6-3*x^5+5/2*x^4-1/2*x^2+1/42
+bernoulli_polynomial(7) = x^7-7/2*x^6+7/2*x^5-7/6*x^3+1/6*x
+bernoulli_polynomial(20) = x^20-10*x^19+95/3*x^18-323/2*x^16+6460/7*x^14-4199*x^12+41990/3*x^10-223193/7*x^8+45220*x^6-68723/2*x^4+219335/21*x^2-174611/330

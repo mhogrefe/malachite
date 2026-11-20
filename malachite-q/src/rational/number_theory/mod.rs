@@ -10,6 +10,8 @@
 /// [`ApproximateAssign`](traits::ApproximateAssign), traits for approximating a
 /// [`Rational`](super::Rational) by a [`Rational`](super::Rational) with a bounded denominator.
 pub mod approximate;
+/// Functions for computing the Bernoulli numbers.
+pub mod bernoulli_number;
 /// A function for computing Dedekind sums.
 pub mod dedekind_sum;
 /// Getting all denominators of [`Rational`](super::Rational)s that appear in a given closed

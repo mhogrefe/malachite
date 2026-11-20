@@ -10,6 +10,7 @@ use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
     bell_number::register(runner);
+    bernoulli_number_denominator::register(runner);
     binomial_coefficient::register(runner);
     coprime_with::register(runner);
     factorial::register(runner);
@@ -27,6 +28,7 @@ pub(crate) fn register(runner: &mut Runner) {
 }
 
 mod bell_number;
+mod bernoulli_number_denominator;
 mod binomial_coefficient;
 mod coprime_with;
 mod factorial;

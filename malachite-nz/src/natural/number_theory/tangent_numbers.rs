@@ -21,13 +21,13 @@ use malachite_base::num::conversion::traits::ExactFrom;
 /// \tan x = \sum_{j=1}^\infty T_j \frac{x^{2j-1}}{(2j-1)!}.
 /// $$
 ///
-/// $T_j$ is at index $j - 1$ of the result. The Bernoulli numbers are related to them by
-/// $B_{2j} = (-1)^{j-1} 2j T_j / (4^{2j} - 2^{2j})$.
+/// $T_j$ is at index $j - 1$ of the result. The Bernoulli numbers are related to them by $B_{2j} =
+/// (-1)^{j-1} 2j T_j / (4^{2j} - 2^{2j})$.
 ///
 /// The algorithm starts from $T_j = (j - 1)!$ and makes $\mathrm{len} - 1$ passes over the table,
-/// replacing $T_j$ by $(j - k) T_{j-1} + (j - k + 2) T_j$ for $j$ from $k$ to `len` in pass $k$,
-/// so it uses only additions and multiplications by small numbers, and no cancellation occurs.
-/// $T_j$ has $\Theta(j \log j)$ bits.
+/// replacing $T_j$ by $(j - k) T_{j-1} + (j - k + 2) T_j$ for $j$ from $k$ to `len` in pass $k$, so
+/// it uses only additions and multiplications by small numbers, and no cancellation occurs. $T_j$
+/// has $\Theta(j \log j)$ bits.
 ///
 /// # Worst-case complexity
 /// $T(n) = O(n^3 \log n)$

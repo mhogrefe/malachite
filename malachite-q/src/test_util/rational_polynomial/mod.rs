@@ -10,3 +10,4 @@ pub mod arithmetic;
 pub mod calculus;
 pub mod comparison;
 pub mod series;
+pub mod special;

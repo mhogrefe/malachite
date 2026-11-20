@@ -315,6 +315,7 @@ pub mod integer {
     }
     pub mod number_theory {
         pub mod binomial_coefficient;
+        pub mod euler_number;
         pub mod extended_gcd;
         pub mod falling_factorial;
         pub mod gcd;
@@ -892,6 +893,7 @@ pub mod natural {
     }
     pub mod number_theory {
         pub mod bell_number;
+        pub mod bernoulli_number_denominator;
         pub mod binomial_coefficient;
         pub mod coprime_with;
         pub mod factorial;

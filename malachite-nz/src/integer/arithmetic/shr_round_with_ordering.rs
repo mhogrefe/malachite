@@ -66,12 +66,12 @@ impl ShrRoundWithOrdering for Integer {
     /// [`Ordering`] compares $x$ with $t$, then for $k > 0$ the result is exactly what rounding
     /// $t/2^k$ once would have produced, with no double-rounding error.
     ///
-    /// When the passed-in [`Ordering`] is `Less`, $f(x, k, \mathrm{Floor}) = \lfloor x/2^k
-    /// \rfloor$ and $f(x, k, \mathrm{Ceiling}) = \lfloor x/2^k \rfloor + 1$. When it is `Greater`,
-    /// $f(x, k, \mathrm{Floor}) = \lceil x/2^k \rceil - 1$ and $f(x, k, \mathrm{Ceiling}) = \lceil
-    /// x/2^k \rceil$. `Down` and `Up` round toward and away from zero, according to the sign of the
-    /// exact value, and $\mathrm{Nearest}$ rounds $x/2^k$ to the closer integer, an exact half
-    /// rounding up if the passed-in [`Ordering`] is `Less` and down if it is `Greater`.
+    /// When the passed-in [`Ordering`] is `Less`, $f(x, k, \mathrm{Floor}) = \lfloor x/2^k \rfloor$
+    /// and $f(x, k, \mathrm{Ceiling}) = \lfloor x/2^k \rfloor + 1$. When it is `Greater`, $f(x, k,
+    /// \mathrm{Floor}) = \lceil x/2^k \rceil - 1$ and $f(x, k, \mathrm{Ceiling}) = \lceil x/2^k
+    /// \rceil$. `Down` and `Up` round toward and away from zero, according to the sign of the exact
+    /// value, and $\mathrm{Nearest}$ rounds $x/2^k$ to the closer integer, an exact half rounding
+    /// up if the passed-in [`Ordering`] is `Less` and down if it is `Greater`.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$

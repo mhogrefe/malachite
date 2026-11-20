@@ -2218,6 +2218,15 @@ const AZURITE_RATIONAL_STAGES_NO_SPECIAL: &[(&str, &str)] = &[
         "demo_rational_from_sci_string_with_options_targeted",
         "az_rat_from_sci_string",
     ),
+    ("demo_rational_bernoulli_number", "az_rat_bernoulli_number"),
+    (
+        "demo_bernoulli_numbers_prefix",
+        "az_rat_bernoulli_numbers_prefix",
+    ),
+    (
+        "demo_even_bernoulli_numbers_prefix",
+        "az_rat_even_bernoulli_numbers_prefix",
+    ),
 ];
 
 // The Float demos (in malachite-float) checked against Azurite's `AzFloat`, with the oracle mode
@@ -11615,6 +11624,19 @@ fn test_against_flint() {
     ] {
         check_demo_against_flint(&oracle, "../malachite-float", demo_name, "arf_exponential");
     }
+    // `BigExponentFloat`'s gamma functions, checked with FLINT's arb ball arithmetic.
+    for demo_name in [
+        "demo_big_exponent_float_gamma_prec_round_debug",
+        "demo_big_exponent_float_gamma_prec_debug",
+        "demo_big_exponent_float_gamma_rational_prec_round_debug",
+        "demo_big_exponent_float_gamma_rational_prec_debug",
+        "demo_big_exponent_float_reciprocal_gamma_prec_round_debug",
+        "demo_big_exponent_float_reciprocal_gamma_prec_debug",
+        "demo_big_exponent_float_reciprocal_gamma_rational_prec_round_debug",
+        "demo_big_exponent_float_reciprocal_gamma_rational_prec_debug",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-float", demo_name, "arf_gamma");
+    }
     // `BigExponentFloat`'s forward trigonometric functions, checked with FLINT's arb ball arithmetic.
     for demo_name in [
         "demo_big_exponent_float_cos_pi_prec_debug",
@@ -12092,6 +12114,54 @@ fn test_against_flint() {
         "../malachite-nz",
         "demo_natural_bell_numbers_prefix",
         "arith_bell_number_vec",
+    );
+    check_demo_against_flint_no_special(
+        &oracle,
+        "../malachite-nz",
+        "demo_natural_bernoulli_number_denominator",
+        "arith_bernoulli_number_denom",
+    );
+    check_demo_against_flint_no_special(
+        &oracle,
+        "../malachite-q",
+        "demo_rational_bernoulli_number",
+        "arith_bernoulli_number",
+    );
+    check_demo_against_flint_no_special(
+        &oracle,
+        "../malachite-q",
+        "demo_bernoulli_numbers_prefix",
+        "arith_bernoulli_number_vec",
+    );
+    check_demo_against_flint_no_special(
+        &oracle,
+        "../malachite-q",
+        "demo_even_bernoulli_numbers_prefix",
+        "arith_bernoulli_number_vec",
+    );
+    check_demo_against_flint_no_special(
+        &oracle,
+        "../malachite-q",
+        "demo_rational_polynomial_bernoulli_polynomial",
+        "arith_bernoulli_polynomial",
+    );
+    check_demo_against_flint_no_special(
+        &oracle,
+        "../malachite-nz",
+        "demo_integer_euler_number",
+        "arith_euler_number",
+    );
+    check_demo_against_flint_no_special(
+        &oracle,
+        "../malachite-nz",
+        "demo_integer_euler_numbers_prefix",
+        "arith_euler_number_vec",
+    );
+    check_demo_against_flint_no_special(
+        &oracle,
+        "../malachite-q",
+        "demo_rational_polynomial_euler_polynomial",
+        "arith_euler_polynomial",
     );
     check_demo_against_flint_no_special(
         &oracle,

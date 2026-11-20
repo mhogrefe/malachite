@@ -410,6 +410,10 @@ pub mod rational_polynomial {
         pub mod square_truncated;
         pub mod sub_truncated;
     }
+    pub mod special {
+        pub mod bernoulli_polynomial;
+        pub mod euler_polynomial;
+    }
 }
 pub mod rational {
     pub mod arithmetic {
@@ -560,6 +564,7 @@ pub mod rational {
     }
     pub mod number_theory {
         pub mod approximate;
+        pub mod bernoulli_number;
         pub mod dedekind_sum;
         pub mod denominators_in_closed_interval;
         pub mod farey_neighbors;

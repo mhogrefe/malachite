@@ -45,6 +45,8 @@ pub mod conversion;
 pub mod logic;
 /// Operations on [`RationalPolynomial`]s as power series, truncated to a given number of terms.
 pub mod series;
+/// Special [`RationalPolynomial`]s, such as the Bernoulli and Euler polynomials.
+pub mod special;
 
 /// A polynomial in one variable whose coefficients are [`Rational`]s.
 ///

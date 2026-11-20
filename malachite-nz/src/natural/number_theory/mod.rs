@@ -9,6 +9,8 @@
 /// An implementation of [`BellNumber`](malachite_base::num::number_theory::traits::BellNumber), a
 /// trait for computing the number of ways to partition a set.
 pub mod bell_number;
+/// A function for computing the denominators of the Bernoulli numbers.
+pub mod bernoulli_number_denominator;
 /// Implementations of
 /// [`BinomialCoefficient`](malachite_base::num::number_theory::traits::BinomialCoefficient), a
 /// trait for computing the binomial coefficient of two numbers.
@@ -67,3 +69,8 @@ pub mod tangent_numbers;
 /// malachite_base::num::number_theory::traits::UnsignedStirlingNumberOfTheFirstKind), a trait for
 /// computing unsigned Stirling numbers of the first kind.
 pub mod unsigned_stirling_number_of_the_first_kind;
+/// Rigorous enclosures of $\pi$ and of the zeta and Dirichlet beta functions at integers, computed
+/// with integer arithmetic, and the Bernoulli and Euler numbers that they give; used by
+/// malachite-q.
+#[doc(hidden)]
+pub mod zeta_helpers;

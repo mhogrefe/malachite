@@ -128,8 +128,8 @@ fn shr_round_with_ordering_properties() {
                 // An inexact input never gives an exact result.
                 assert_ne!(o_q, Equal);
             }
-            // The result compares with the shifted exact value as its shift back compares with
-            // `n`, or as `n` does when they are equal.
+            // The result compares with the shifted exact value as its shift back compares with `n`,
+            // or as `n` does when they are equal.
             let c = (&q << bits).cmp(&n);
             assert_eq!(o_q, if c == Equal { o } else { c });
             // Negating the input, the rounding mode, and the input's `Ordering` negates the result

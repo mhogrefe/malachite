@@ -39,8 +39,8 @@ impl<I: Iterator<Item = u64>> Iterator for RandomPositiveMags<I> {
 // Generates random positive `Mag`s, whose mantissas are uniformly distributed among the `MAG_BITS`-
 // bit values and whose exponents have a geometric distribution, with the mean absolute value given
 // by `mean_exponent_abs_numerator / mean_exponent_abs_denominator` (approximately, since the
-// distribution is truncated to the range of an `i64`). A `Mag` with exponent e lies in
-// [2^(e - 1), 2^e).
+// distribution is truncated to the range of an `i64`). A `Mag` with exponent e lies in [2^(e - 1),
+// 2^e).
 //
 // # Panics
 // Panics if `mean_exponent_abs_numerator` or `mean_exponent_abs_denominator` is zero, or if their

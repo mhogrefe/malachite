@@ -10,6 +10,8 @@
 /// [`BinomialCoefficient`](malachite_base::num::number_theory::traits::BinomialCoefficient), a
 /// trait for computing the binomial coefficient of two numbers.
 pub mod binomial_coefficient;
+/// Functions for computing the Euler numbers.
+pub mod euler_number;
 /// Implementations of [`ExtendedGcd`](malachite_base::num::number_theory::traits::ExtendedGcd), a
 /// trait for computing the extended GCD of two numbers.
 pub mod extended_gcd;

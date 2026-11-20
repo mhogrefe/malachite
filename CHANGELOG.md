@@ -1114,6 +1114,14 @@ documented by git history.
   `len` tangent numbers $T_1, \ldots, T_{\mathrm{len}}$, the coefficients of the Taylor series of
   the tangent, as a `Vec<Natural>`. It uses Algorithm 4.3 of Brent and Zimmermann's _Modern
   Computer Arithmetic_, which needs only additions and multiplications by small numbers.
+- `Natural::bernoulli_number_denominator`, the denominator of the Bernoulli number $B_n$, by the
+  von Staudt–Clausen theorem (FLINT's `arith_bernoulli_number_denom`).
+- `Integer::euler_number`, the Euler number $E_n$ (FLINT's `arith_euler_number`): for an even
+  $n \geq 36$, the integer nearest to an enclosure of $2^{n+2} n!\, \beta(n+1) / \pi^{n+1}$, with
+  Dirichlet's $\beta$ enclosed by its Euler product and $\pi$ by the Chudnovsky series, at a
+  precision raised until only one integer fits. `euler_numbers_prefix`, in
+  `integer::number_theory::euler_number`, returns $E_0, \ldots, E_{\mathrm{len}-1}$ by FLINT's
+  multimodular algorithm (`arith_euler_number_vec`).
 
 ### malachite-q
 
@@ -1180,6 +1188,16 @@ documented by git history.
   coefficients of $1/2!$, $1/3!$, and so on, as a lazy iterator, `RationalFactoradicDigits`. Every
   expansion is finite, but it ends only at the least $k$ whose factorial the denominator divides,
   which may be very large. `Rational::from_factoradic_digits` reads such digits back.
+- `Rational::bernoulli_number`, the Bernoulli number $B_n$ with $B_1 = -1/2$ (FLINT's
+  `arith_bernoulli_number`): from a table below 35, and otherwise from the denominator and the
+  integer nearest to an enclosure of $2 n!\, \zeta(n) / (2\pi)^n$ times it, like
+  `Integer::euler_number`. `bernoulli_numbers_prefix`, in `rational::number_theory::bernoulli_number`,
+  returns $B_0, \ldots, B_{\mathrm{len}-1}$ (FLINT's `arith_bernoulli_number_vec`), by Ramanujan's
+  congruences below index 700 and by the multimodular algorithm above;
+  `even_bernoulli_numbers_prefix` returns $B_2, B_4, \ldots, B_{2\,\mathrm{len}}$.
+- `RationalPolynomial::bernoulli_polynomial` and `RationalPolynomial::euler_polynomial`, the
+  Bernoulli and Euler polynomials $B_n(x)$ and $E_n(x)$ (FLINT's `arith_bernoulli_polynomial` and
+  `arith_euler_polynomial`).
 
 ### malachite-float
 

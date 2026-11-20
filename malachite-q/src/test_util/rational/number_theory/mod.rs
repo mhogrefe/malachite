@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 pub mod approximate;
+pub mod bernoulli_number;
 pub mod dedekind_sum;
 pub mod harmonic_number;
 pub mod simplest_rational_in_interval;
