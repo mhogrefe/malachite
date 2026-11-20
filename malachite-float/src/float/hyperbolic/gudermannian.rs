@@ -109,39 +109,27 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (w, o) = Float::from_unsigned_prec(1u32, 100)
-    ///     .0
-    ///     .gudermannian_prec_round(5, Floor);
+    /// let (w, o) = Float::one_prec(100).gudermannian_prec_round(5, Floor);
     /// assert_eq!(w.to_string(), "0.844");
     /// assert_eq!(o, Less);
     ///
-    /// let (w, o) = Float::from_unsigned_prec(1u32, 100)
-    ///     .0
-    ///     .gudermannian_prec_round(5, Ceiling);
+    /// let (w, o) = Float::one_prec(100).gudermannian_prec_round(5, Ceiling);
     /// assert_eq!(w.to_string(), "0.875");
     /// assert_eq!(o, Greater);
     ///
-    /// let (w, o) = Float::from_unsigned_prec(1u32, 100)
-    ///     .0
-    ///     .gudermannian_prec_round(5, Nearest);
+    /// let (w, o) = Float::one_prec(100).gudermannian_prec_round(5, Nearest);
     /// assert_eq!(w.to_string(), "0.875");
     /// assert_eq!(o, Greater);
     ///
-    /// let (w, o) = Float::from_unsigned_prec(1u32, 100)
-    ///     .0
-    ///     .gudermannian_prec_round(20, Floor);
+    /// let (w, o) = Float::one_prec(100).gudermannian_prec_round(20, Floor);
     /// assert_eq!(w.to_string(), "0.86576939");
     /// assert_eq!(o, Less);
     ///
-    /// let (w, o) = Float::from_unsigned_prec(1u32, 100)
-    ///     .0
-    ///     .gudermannian_prec_round(20, Ceiling);
+    /// let (w, o) = Float::one_prec(100).gudermannian_prec_round(20, Ceiling);
     /// assert_eq!(w.to_string(), "0.86577034");
     /// assert_eq!(o, Greater);
     ///
-    /// let (w, o) = Float::from_unsigned_prec(1u32, 100)
-    ///     .0
-    ///     .gudermannian_prec_round(20, Nearest);
+    /// let (w, o) = Float::one_prec(100).gudermannian_prec_round(20, Nearest);
     /// assert_eq!(w.to_string(), "0.86576939");
     /// assert_eq!(o, Less);
     /// ```
@@ -211,39 +199,27 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (w, o) = Float::from_unsigned_prec(1u32, 100)
-    ///     .0
-    ///     .gudermannian_prec_round_ref(5, Floor);
+    /// let (w, o) = Float::one_prec(100).gudermannian_prec_round_ref(5, Floor);
     /// assert_eq!(w.to_string(), "0.844");
     /// assert_eq!(o, Less);
     ///
-    /// let (w, o) = Float::from_unsigned_prec(1u32, 100)
-    ///     .0
-    ///     .gudermannian_prec_round_ref(5, Ceiling);
+    /// let (w, o) = Float::one_prec(100).gudermannian_prec_round_ref(5, Ceiling);
     /// assert_eq!(w.to_string(), "0.875");
     /// assert_eq!(o, Greater);
     ///
-    /// let (w, o) = Float::from_unsigned_prec(1u32, 100)
-    ///     .0
-    ///     .gudermannian_prec_round_ref(5, Nearest);
+    /// let (w, o) = Float::one_prec(100).gudermannian_prec_round_ref(5, Nearest);
     /// assert_eq!(w.to_string(), "0.875");
     /// assert_eq!(o, Greater);
     ///
-    /// let (w, o) = Float::from_unsigned_prec(1u32, 100)
-    ///     .0
-    ///     .gudermannian_prec_round_ref(20, Floor);
+    /// let (w, o) = Float::one_prec(100).gudermannian_prec_round_ref(20, Floor);
     /// assert_eq!(w.to_string(), "0.86576939");
     /// assert_eq!(o, Less);
     ///
-    /// let (w, o) = Float::from_unsigned_prec(1u32, 100)
-    ///     .0
-    ///     .gudermannian_prec_round_ref(20, Ceiling);
+    /// let (w, o) = Float::one_prec(100).gudermannian_prec_round_ref(20, Ceiling);
     /// assert_eq!(w.to_string(), "0.86577034");
     /// assert_eq!(o, Greater);
     ///
-    /// let (w, o) = Float::from_unsigned_prec(1u32, 100)
-    ///     .0
-    ///     .gudermannian_prec_round_ref(20, Nearest);
+    /// let (w, o) = Float::one_prec(100).gudermannian_prec_round_ref(20, Nearest);
     /// assert_eq!(w.to_string(), "0.86576939");
     /// assert_eq!(o, Less);
     /// ```
@@ -306,11 +282,11 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (w, o) = Float::from_unsigned_prec(1u32, 100).0.gudermannian_prec(5);
+    /// let (w, o) = Float::one_prec(100).gudermannian_prec(5);
     /// assert_eq!(w.to_string(), "0.875");
     /// assert_eq!(o, Greater);
     ///
-    /// let (w, o) = Float::from_unsigned_prec(1u32, 100).0.gudermannian_prec(20);
+    /// let (w, o) = Float::one_prec(100).gudermannian_prec(20);
     /// assert_eq!(w.to_string(), "0.86576939");
     /// assert_eq!(o, Less);
     /// ```
@@ -373,15 +349,11 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (w, o) = Float::from_unsigned_prec(1u32, 100)
-    ///     .0
-    ///     .gudermannian_prec_ref(5);
+    /// let (w, o) = Float::one_prec(100).gudermannian_prec_ref(5);
     /// assert_eq!(w.to_string(), "0.875");
     /// assert_eq!(o, Greater);
     ///
-    /// let (w, o) = Float::from_unsigned_prec(1u32, 100)
-    ///     .0
-    ///     .gudermannian_prec_ref(20);
+    /// let (w, o) = Float::one_prec(100).gudermannian_prec_ref(20);
     /// assert_eq!(w.to_string(), "0.86576939");
     /// assert_eq!(o, Less);
     /// ```
@@ -444,21 +416,15 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (w, o) = Float::from_unsigned_prec(1u32, 100)
-    ///     .0
-    ///     .gudermannian_round(Floor);
+    /// let (w, o) = Float::one_prec(100).gudermannian_round(Floor);
     /// assert_eq!(w.to_string(), "0.86576948323965862428960184619172");
     /// assert_eq!(o, Less);
     ///
-    /// let (w, o) = Float::from_unsigned_prec(1u32, 100)
-    ///     .0
-    ///     .gudermannian_round(Ceiling);
+    /// let (w, o) = Float::one_prec(100).gudermannian_round(Ceiling);
     /// assert_eq!(w.to_string(), "0.86576948323965862428960184619251");
     /// assert_eq!(o, Greater);
     ///
-    /// let (w, o) = Float::from_unsigned_prec(1u32, 100)
-    ///     .0
-    ///     .gudermannian_round(Nearest);
+    /// let (w, o) = Float::one_prec(100).gudermannian_round(Nearest);
     /// assert_eq!(w.to_string(), "0.86576948323965862428960184619172");
     /// assert_eq!(o, Less);
     /// ```
@@ -522,21 +488,15 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (w, o) = Float::from_unsigned_prec(1u32, 100)
-    ///     .0
-    ///     .gudermannian_round_ref(Floor);
+    /// let (w, o) = Float::one_prec(100).gudermannian_round_ref(Floor);
     /// assert_eq!(w.to_string(), "0.86576948323965862428960184619172");
     /// assert_eq!(o, Less);
     ///
-    /// let (w, o) = Float::from_unsigned_prec(1u32, 100)
-    ///     .0
-    ///     .gudermannian_round_ref(Ceiling);
+    /// let (w, o) = Float::one_prec(100).gudermannian_round_ref(Ceiling);
     /// assert_eq!(w.to_string(), "0.86576948323965862428960184619251");
     /// assert_eq!(o, Greater);
     ///
-    /// let (w, o) = Float::from_unsigned_prec(1u32, 100)
-    ///     .0
-    ///     .gudermannian_round_ref(Nearest);
+    /// let (w, o) = Float::one_prec(100).gudermannian_round_ref(Nearest);
     /// assert_eq!(w.to_string(), "0.86576948323965862428960184619172");
     /// assert_eq!(o, Less);
     /// ```
@@ -594,27 +554,27 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// let mut x = Float::one_prec(100);
     /// assert_eq!(x.gudermannian_prec_round_assign(5, Floor), Less);
     /// assert_eq!(x.to_string(), "0.844");
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// let mut x = Float::one_prec(100);
     /// assert_eq!(x.gudermannian_prec_round_assign(5, Ceiling), Greater);
     /// assert_eq!(x.to_string(), "0.875");
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// let mut x = Float::one_prec(100);
     /// assert_eq!(x.gudermannian_prec_round_assign(5, Nearest), Greater);
     /// assert_eq!(x.to_string(), "0.875");
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// let mut x = Float::one_prec(100);
     /// assert_eq!(x.gudermannian_prec_round_assign(20, Floor), Less);
     /// assert_eq!(x.to_string(), "0.86576939");
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// let mut x = Float::one_prec(100);
     /// assert_eq!(x.gudermannian_prec_round_assign(20, Ceiling), Greater);
     /// assert_eq!(x.to_string(), "0.86577034");
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// let mut x = Float::one_prec(100);
     /// assert_eq!(x.gudermannian_prec_round_assign(20, Nearest), Less);
     /// assert_eq!(x.to_string(), "0.86576939");
     /// ```
@@ -671,11 +631,11 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// let mut x = Float::one_prec(100);
     /// assert_eq!(x.gudermannian_prec_assign(5), Greater);
     /// assert_eq!(x.to_string(), "0.875");
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// let mut x = Float::one_prec(100);
     /// assert_eq!(x.gudermannian_prec_assign(20), Less);
     /// assert_eq!(x.to_string(), "0.86576939");
     /// ```
@@ -734,15 +694,15 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// let mut x = Float::one_prec(100);
     /// assert_eq!(x.gudermannian_round_assign(Floor), Less);
     /// assert_eq!(x.to_string(), "0.86576948323965862428960184619172");
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// let mut x = Float::one_prec(100);
     /// assert_eq!(x.gudermannian_round_assign(Ceiling), Greater);
     /// assert_eq!(x.to_string(), "0.86576948323965862428960184619251");
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// let mut x = Float::one_prec(100);
     /// assert_eq!(x.gudermannian_round_assign(Nearest), Less);
     /// assert_eq!(x.to_string(), "0.86576948323965862428960184619172");
     /// ```
@@ -1153,10 +1113,7 @@ impl Gudermannian for Float {
     /// assert!(Float::NAN.gudermannian().is_nan());
     /// assert_eq!(Float::ZERO.gudermannian(), Float::ZERO);
     /// assert_eq!(
-    ///     Float::from_unsigned_prec(1u32, 100)
-    ///         .0
-    ///         .gudermannian()
-    ///         .to_string(),
+    ///     Float::one_prec(100).gudermannian().to_string(),
     ///     "0.86576948323965862428960184619172"
     /// );
     /// ```
@@ -1216,9 +1173,7 @@ impl Gudermannian for &Float {
     /// assert!((&Float::NAN).gudermannian().is_nan());
     /// assert_eq!((&Float::ZERO).gudermannian(), Float::ZERO);
     /// assert_eq!(
-    ///     (&Float::from_unsigned_prec(1u32, 100).0)
-    ///         .gudermannian()
-    ///         .to_string(),
+    ///     (&Float::one_prec(100)).gudermannian().to_string(),
     ///     "0.86576948323965862428960184619172"
     /// );
     /// ```
@@ -1275,7 +1230,7 @@ impl GudermannianAssign for Float {
     /// x.gudermannian_assign();
     /// assert_eq!(x, Float::ZERO);
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// let mut x = Float::one_prec(100);
     /// x.gudermannian_assign();
     /// assert_eq!(x.to_string(), "0.86576948323965862428960184619172");
     /// ```

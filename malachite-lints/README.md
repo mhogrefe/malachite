@@ -366,6 +366,19 @@ shorter and also handles `x == 0`, where the unguarded spelling panics on the ze
 machine-applicable suggestion spells the type `Self` inside an `impl Float` so it does not trip
 `use_self`. `BigExponentFloat`'s constructors of the same names are flagged in the same way.
 
+### `manual_float_power_of_2`
+
+Flags building a power of 2 as a [`Float`] or a [`BigExponentFloat`] the long way: converting a
+power-of-2 literal (`Float::from_unsigned_prec(1u32, p).0`, `from_signed_prec`, and the `_round`
+variants), or shifting such a value, `one_prec(p)`, `two_prec(p)`, `one_half_prec(p)`, or the
+constants `ONE`, `TWO`, and `ONE_HALF` (`Float::from_unsigned_prec(1u32, 100).0 >> 1u32`). A
+`Float` power of 2 is `Float::one_prec(p)`, `two_prec(p)`, or `one_half_prec(p)` when it is 1, 2, or
+1/2 and `Float::power_of_2_prec(k, p).0` otherwise, and at precision 1 `ONE`, `TWO`, `ONE_HALF`, or `Float::power_of_2(k)`; a
+`BigExponentFloat` has no precision, so it is `ONE`, `TWO`, `ONE_HALF`, or
+`BigExponentFloat::power_of_2(k)`. A shift by a variable becomes an `i64` exponent, through
+`i64::from` or `i64::exact_from`. The definitions of those constructors, and test code that
+checks them against each other, are exempt.
+
 ### `manual_from_sign_and_abs`
 
 Flags building a signed [`Integer`] as a magnitude and then conditionally negating it in place:

@@ -90,7 +90,7 @@ fn pi_approximation(prec: u64, rm: RoundingMode) -> (Float, u64) {
         let mut a = Float::one_prec(working_prec);
         let mut big_a = a.clone();
         let mut big_b = Float::one_half_prec(working_prec);
-        let mut big_d = Float::one_prec(working_prec) >> 2u32;
+        let mut big_d = Float::power_of_2_prec(-2, working_prec).0;
         let mut k = 0;
         loop {
             let s = (&big_a + &big_b) >> 2u32;

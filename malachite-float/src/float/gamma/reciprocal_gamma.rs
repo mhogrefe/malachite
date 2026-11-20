@@ -104,33 +104,27 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (g, o) =
-    ///     (Float::from_unsigned_prec(1u32, 100).0 >> 1u32).reciprocal_gamma_prec_round(5, Floor);
+    /// let (g, o) = Float::one_half_prec(100).reciprocal_gamma_prec_round(5, Floor);
     /// assert_eq!(g.to_string(), "0.562");
     /// assert_eq!(o, Less);
     ///
-    /// let (g, o) = (Float::from_unsigned_prec(1u32, 100).0 >> 1u32)
-    ///     .reciprocal_gamma_prec_round(5, Ceiling);
+    /// let (g, o) = Float::one_half_prec(100).reciprocal_gamma_prec_round(5, Ceiling);
     /// assert_eq!(g.to_string(), "0.594");
     /// assert_eq!(o, Greater);
     ///
-    /// let (g, o) = (Float::from_unsigned_prec(1u32, 100).0 >> 1u32)
-    ///     .reciprocal_gamma_prec_round(5, Nearest);
+    /// let (g, o) = Float::one_half_prec(100).reciprocal_gamma_prec_round(5, Nearest);
     /// assert_eq!(g.to_string(), "0.562");
     /// assert_eq!(o, Less);
     ///
-    /// let (g, o) =
-    ///     (Float::from_unsigned_prec(1u32, 100).0 >> 1u32).reciprocal_gamma_prec_round(20, Floor);
+    /// let (g, o) = Float::one_half_prec(100).reciprocal_gamma_prec_round(20, Floor);
     /// assert_eq!(g.to_string(), "0.56418896");
     /// assert_eq!(o, Less);
     ///
-    /// let (g, o) = (Float::from_unsigned_prec(1u32, 100).0 >> 1u32)
-    ///     .reciprocal_gamma_prec_round(20, Ceiling);
+    /// let (g, o) = Float::one_half_prec(100).reciprocal_gamma_prec_round(20, Ceiling);
     /// assert_eq!(g.to_string(), "0.56418991");
     /// assert_eq!(o, Greater);
     ///
-    /// let (g, o) = (Float::from_unsigned_prec(1u32, 100).0 >> 1u32)
-    ///     .reciprocal_gamma_prec_round(20, Nearest);
+    /// let (g, o) = Float::one_half_prec(100).reciprocal_gamma_prec_round(20, Nearest);
     /// assert_eq!(g.to_string(), "0.56418991");
     /// assert_eq!(o, Greater);
     /// ```
@@ -226,33 +220,27 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (g, o) = (Float::from_unsigned_prec(1u32, 100).0 >> 1u32)
-    ///     .reciprocal_gamma_prec_round_ref(5, Floor);
+    /// let (g, o) = Float::one_half_prec(100).reciprocal_gamma_prec_round_ref(5, Floor);
     /// assert_eq!(g.to_string(), "0.562");
     /// assert_eq!(o, Less);
     ///
-    /// let (g, o) = (Float::from_unsigned_prec(1u32, 100).0 >> 1u32)
-    ///     .reciprocal_gamma_prec_round_ref(5, Ceiling);
+    /// let (g, o) = Float::one_half_prec(100).reciprocal_gamma_prec_round_ref(5, Ceiling);
     /// assert_eq!(g.to_string(), "0.594");
     /// assert_eq!(o, Greater);
     ///
-    /// let (g, o) = (Float::from_unsigned_prec(1u32, 100).0 >> 1u32)
-    ///     .reciprocal_gamma_prec_round_ref(5, Nearest);
+    /// let (g, o) = Float::one_half_prec(100).reciprocal_gamma_prec_round_ref(5, Nearest);
     /// assert_eq!(g.to_string(), "0.562");
     /// assert_eq!(o, Less);
     ///
-    /// let (g, o) = (Float::from_unsigned_prec(1u32, 100).0 >> 1u32)
-    ///     .reciprocal_gamma_prec_round_ref(20, Floor);
+    /// let (g, o) = Float::one_half_prec(100).reciprocal_gamma_prec_round_ref(20, Floor);
     /// assert_eq!(g.to_string(), "0.56418896");
     /// assert_eq!(o, Less);
     ///
-    /// let (g, o) = (Float::from_unsigned_prec(1u32, 100).0 >> 1u32)
-    ///     .reciprocal_gamma_prec_round_ref(20, Ceiling);
+    /// let (g, o) = Float::one_half_prec(100).reciprocal_gamma_prec_round_ref(20, Ceiling);
     /// assert_eq!(g.to_string(), "0.56418991");
     /// assert_eq!(o, Greater);
     ///
-    /// let (g, o) = (Float::from_unsigned_prec(1u32, 100).0 >> 1u32)
-    ///     .reciprocal_gamma_prec_round_ref(20, Nearest);
+    /// let (g, o) = Float::one_half_prec(100).reciprocal_gamma_prec_round_ref(20, Nearest);
     /// assert_eq!(g.to_string(), "0.56418991");
     /// assert_eq!(o, Greater);
     /// ```
@@ -331,11 +319,11 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (g, o) = (Float::from_unsigned_prec(1u32, 100).0 >> 1u32).reciprocal_gamma_prec(5);
+    /// let (g, o) = Float::one_half_prec(100).reciprocal_gamma_prec(5);
     /// assert_eq!(g.to_string(), "0.562");
     /// assert_eq!(o, Less);
     ///
-    /// let (g, o) = (Float::from_unsigned_prec(1u32, 100).0 >> 1u32).reciprocal_gamma_prec(20);
+    /// let (g, o) = Float::one_half_prec(100).reciprocal_gamma_prec(20);
     /// assert_eq!(g.to_string(), "0.56418991");
     /// assert_eq!(o, Greater);
     /// ```
@@ -414,11 +402,11 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (g, o) = (Float::from_unsigned_prec(1u32, 100).0 >> 1u32).reciprocal_gamma_prec_ref(5);
+    /// let (g, o) = Float::one_half_prec(100).reciprocal_gamma_prec_ref(5);
     /// assert_eq!(g.to_string(), "0.562");
     /// assert_eq!(o, Less);
     ///
-    /// let (g, o) = (Float::from_unsigned_prec(1u32, 100).0 >> 1u32).reciprocal_gamma_prec_ref(20);
+    /// let (g, o) = Float::one_half_prec(100).reciprocal_gamma_prec_ref(20);
     /// assert_eq!(g.to_string(), "0.56418991");
     /// assert_eq!(o, Greater);
     /// ```
@@ -483,17 +471,15 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (g, o) = (Float::from_unsigned_prec(1u32, 100).0 >> 1u32).reciprocal_gamma_round(Floor);
+    /// let (g, o) = Float::one_half_prec(100).reciprocal_gamma_round(Floor);
     /// assert_eq!(g.to_string(), "0.56418958354775628694807945156018");
     /// assert_eq!(o, Less);
     ///
-    /// let (g, o) =
-    ///     (Float::from_unsigned_prec(1u32, 100).0 >> 1u32).reciprocal_gamma_round(Ceiling);
+    /// let (g, o) = Float::one_half_prec(100).reciprocal_gamma_round(Ceiling);
     /// assert_eq!(g.to_string(), "0.56418958354775628694807945156097");
     /// assert_eq!(o, Greater);
     ///
-    /// let (g, o) =
-    ///     (Float::from_unsigned_prec(1u32, 100).0 >> 1u32).reciprocal_gamma_round(Nearest);
+    /// let (g, o) = Float::one_half_prec(100).reciprocal_gamma_round(Nearest);
     /// assert_eq!(g.to_string(), "0.56418958354775628694807945156097");
     /// assert_eq!(o, Greater);
     /// ```
@@ -559,18 +545,15 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (g, o) =
-    ///     (Float::from_unsigned_prec(1u32, 100).0 >> 1u32).reciprocal_gamma_round_ref(Floor);
+    /// let (g, o) = Float::one_half_prec(100).reciprocal_gamma_round_ref(Floor);
     /// assert_eq!(g.to_string(), "0.56418958354775628694807945156018");
     /// assert_eq!(o, Less);
     ///
-    /// let (g, o) =
-    ///     (Float::from_unsigned_prec(1u32, 100).0 >> 1u32).reciprocal_gamma_round_ref(Ceiling);
+    /// let (g, o) = Float::one_half_prec(100).reciprocal_gamma_round_ref(Ceiling);
     /// assert_eq!(g.to_string(), "0.56418958354775628694807945156097");
     /// assert_eq!(o, Greater);
     ///
-    /// let (g, o) =
-    ///     (Float::from_unsigned_prec(1u32, 100).0 >> 1u32).reciprocal_gamma_round_ref(Nearest);
+    /// let (g, o) = Float::one_half_prec(100).reciprocal_gamma_round_ref(Nearest);
     /// assert_eq!(g.to_string(), "0.56418958354775628694807945156097");
     /// assert_eq!(o, Greater);
     /// ```
@@ -629,27 +612,27 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 100).0 >> 1u32;
+    /// let mut x = Float::one_half_prec(100);
     /// assert_eq!(x.reciprocal_gamma_prec_round_assign(5, Floor), Less);
     /// assert_eq!(x.to_string(), "0.562");
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 100).0 >> 1u32;
+    /// let mut x = Float::one_half_prec(100);
     /// assert_eq!(x.reciprocal_gamma_prec_round_assign(5, Ceiling), Greater);
     /// assert_eq!(x.to_string(), "0.594");
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 100).0 >> 1u32;
+    /// let mut x = Float::one_half_prec(100);
     /// assert_eq!(x.reciprocal_gamma_prec_round_assign(5, Nearest), Less);
     /// assert_eq!(x.to_string(), "0.562");
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 100).0 >> 1u32;
+    /// let mut x = Float::one_half_prec(100);
     /// assert_eq!(x.reciprocal_gamma_prec_round_assign(20, Floor), Less);
     /// assert_eq!(x.to_string(), "0.56418896");
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 100).0 >> 1u32;
+    /// let mut x = Float::one_half_prec(100);
     /// assert_eq!(x.reciprocal_gamma_prec_round_assign(20, Ceiling), Greater);
     /// assert_eq!(x.to_string(), "0.56418991");
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 100).0 >> 1u32;
+    /// let mut x = Float::one_half_prec(100);
     /// assert_eq!(x.reciprocal_gamma_prec_round_assign(20, Nearest), Greater);
     /// assert_eq!(x.to_string(), "0.56418991");
     /// ```
@@ -708,11 +691,11 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 100).0 >> 1u32;
+    /// let mut x = Float::one_half_prec(100);
     /// assert_eq!(x.reciprocal_gamma_prec_assign(5), Less);
     /// assert_eq!(x.to_string(), "0.562");
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 100).0 >> 1u32;
+    /// let mut x = Float::one_half_prec(100);
     /// assert_eq!(x.reciprocal_gamma_prec_assign(20), Greater);
     /// assert_eq!(x.to_string(), "0.56418991");
     /// ```
@@ -770,15 +753,15 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 100).0 >> 1u32;
+    /// let mut x = Float::one_half_prec(100);
     /// assert_eq!(x.reciprocal_gamma_round_assign(Floor), Less);
     /// assert_eq!(x.to_string(), "0.56418958354775628694807945156018");
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 100).0 >> 1u32;
+    /// let mut x = Float::one_half_prec(100);
     /// assert_eq!(x.reciprocal_gamma_round_assign(Ceiling), Greater);
     /// assert_eq!(x.to_string(), "0.56418958354775628694807945156097");
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 100).0 >> 1u32;
+    /// let mut x = Float::one_half_prec(100);
     /// assert_eq!(x.reciprocal_gamma_round_assign(Nearest), Greater);
     /// assert_eq!(x.to_string(), "0.56418958354775628694807945156097");
     /// ```
@@ -1274,9 +1257,7 @@ impl ReciprocalGamma for Float {
     /// assert_eq!(Float::INFINITY.reciprocal_gamma(), Float::ZERO);
     /// assert_eq!(Float::NEGATIVE_ONE.reciprocal_gamma(), Float::ZERO);
     /// assert_eq!(
-    ///     (Float::from_unsigned_prec(1u32, 100).0 >> 1u32)
-    ///         .reciprocal_gamma()
-    ///         .to_string(),
+    ///     Float::one_half_prec(100).reciprocal_gamma().to_string(),
     ///     "0.56418958354775628694807945156097"
     /// );
     /// ```
@@ -1341,9 +1322,7 @@ impl ReciprocalGamma for &Float {
     /// assert_eq!((&Float::INFINITY).reciprocal_gamma(), Float::ZERO);
     /// assert_eq!((&Float::NEGATIVE_ONE).reciprocal_gamma(), Float::ZERO);
     /// assert_eq!(
-    ///     (&(Float::from_unsigned_prec(1u32, 100).0 >> 1u32))
-    ///         .reciprocal_gamma()
-    ///         .to_string(),
+    ///     (&Float::one_half_prec(100)).reciprocal_gamma().to_string(),
     ///     "0.56418958354775628694807945156097"
     /// );
     /// ```
@@ -1405,7 +1384,7 @@ impl ReciprocalGammaAssign for Float {
     /// x.reciprocal_gamma_assign();
     /// assert_eq!(x, Float::ZERO);
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 100).0 >> 1u32;
+    /// let mut x = Float::one_half_prec(100);
     /// x.reciprocal_gamma_assign();
     /// assert_eq!(x.to_string(), "0.56418958354775628694807945156097");
     /// ```

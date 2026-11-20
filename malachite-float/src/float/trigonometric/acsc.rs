@@ -434,7 +434,7 @@ impl Float {
     /// assert_eq!(c.to_string(), "0.52344");
     /// assert_eq!(o, Less);
     ///
-    /// let (c, o) = Float::from_unsigned_prec(2u32, 100).0.acsc_prec(100);
+    /// let (c, o) = Float::two_prec(100).acsc_prec(100);
     /// assert_eq!(c.to_string(), "0.52359877559829887307710723054682");
     /// assert_eq!(o, Greater);
     /// ```
@@ -489,7 +489,7 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let x = Float::from_unsigned_prec(2u32, 100).0;
+    /// let x = Float::two_prec(100);
     /// let (c, o) = x.acsc_round(Floor);
     /// assert_eq!(c.to_string(), "0.52359877559829887307710723054603");
     /// assert_eq!(o, Less);
@@ -520,7 +520,7 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let x = Float::from_unsigned_prec(2u32, 100).0;
+    /// let x = Float::two_prec(100);
     /// let (c, o) = (&x).acsc_round_ref(Ceiling);
     /// assert_eq!(c.to_string(), "0.52359877559829887307710723054682");
     /// assert_eq!(o, Greater);
@@ -608,7 +608,7 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let mut x = Float::from_unsigned_prec(2u32, 100).0;
+    /// let mut x = Float::two_prec(100);
     /// let o = x.acsc_round_assign(Floor);
     /// assert_eq!(x.to_string(), "0.52359877559829887307710723054603");
     /// assert_eq!(o, Less);

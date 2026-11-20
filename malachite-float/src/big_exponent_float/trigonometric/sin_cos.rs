@@ -18,7 +18,7 @@ use core::cmp::Ordering::{self, *};
 use core::cmp::min;
 use malachite_base::num::arithmetic::traits::{DivisibleBy, Mod, ModPow, ModPowerOf2, Parity};
 use malachite_base::num::basic::traits::{
-    NaN as NaNTrait, NegativeOne, One, Two, Zero as ZeroTrait,
+    NaN as NaNTrait, NegativeOne, One, OneHalf, Two, Zero as ZeroTrait,
 };
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::exponential::traits::CeilingLogBase2;
@@ -82,8 +82,8 @@ impl TrigFunction {
         let cos_halves = |j| sin_halves((j + 6) % 24);
         let halves_to_value = |h: i32| match h {
             0 => BigExponentFloat::ZERO,
-            1 => BigExponentFloat::ONE >> 1u32,
-            -1 => -(BigExponentFloat::ONE >> 1u32),
+            1 => BigExponentFloat::ONE_HALF,
+            -1 => -BigExponentFloat::ONE_HALF,
             2 => BigExponentFloat::ONE,
             _ => BigExponentFloat::NEGATIVE_ONE,
         };

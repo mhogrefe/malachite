@@ -997,9 +997,8 @@ impl Float {
                     // The root is exactly representable iff |x| is 2 raised to a multiple of k.
                     let e = i64::from(self.get_exponent().unwrap()) - 1;
                     if self.significand_ref().unwrap().is_power_of_2() && e.divisible_by(k) {
-                        let (root, o) =
-                            Self::from_float_prec_round_ref(&(Self::ONE << (e / k)), prec, Exact);
-                        debug_assert_eq!(o, Equal);
+                        // A power of 2 is exact at every precision.
+                        let root = Self::power_of_2_prec(e / k, prec).0;
                         return if self.is_sign_negative() {
                             (-root, Equal)
                         } else {

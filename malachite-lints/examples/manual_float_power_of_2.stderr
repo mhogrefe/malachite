@@ -1,0 +1,139 @@
+error: this conversion builds a power of 2
+  --> $DIR/manual_float_power_of_2.rs:8:9
+   |
+LL |         Float::from_unsigned_prec(1u32, prec).0,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: build it directly: `Float::one_prec(prec)`
+   = note: `#[deny(manual_float_power_of_2)]` on by default
+
+error: this conversion builds a power of 2
+  --> $DIR/manual_float_power_of_2.rs:10:9
+   |
+LL |         Float::from_signed_prec(8i32, prec).0,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: build it directly: `Float::power_of_2_prec(3, prec).0`
+
+error: this conversion builds a power of 2
+  --> $DIR/manual_float_power_of_2.rs:12:9
+   |
+LL |         Float::from_unsigned_prec_round(1u32, prec, Floor).0,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: build it directly: `Float::one_prec(prec)`
+
+error: this shift builds a power of 2
+  --> $DIR/manual_float_power_of_2.rs:14:9
+   |
+LL |         Float::from_unsigned_prec(1u32, 100).0 >> 1u32,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: build it directly: `Float::one_half_prec(100)`
+
+error: this shift builds a power of 2
+  --> $DIR/manual_float_power_of_2.rs:16:9
+   |
+LL |         Float::one_prec(prec) << 2u32,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: build it directly: `Float::power_of_2_prec(2, prec).0`
+
+error: this shift builds a power of 2
+  --> $DIR/manual_float_power_of_2.rs:18:9
+   |
+LL |         Float::two_prec(prec) >> 1u32,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: build it directly: `Float::one_prec(prec)`
+
+error: this shift builds a power of 2
+  --> $DIR/manual_float_power_of_2.rs:20:9
+   |
+LL |         Float::one_prec(prec) >> k,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: build it directly: `Float::power_of_2_prec(-i64::from(k), prec).0`
+
+error: this shift builds a power of 2
+  --> $DIR/manual_float_power_of_2.rs:22:9
+   |
+LL |         Float::one_half_prec(prec) << j,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: build it directly: `Float::power_of_2_prec(-1 + i64::exact_from(j), prec).0`
+
+error: this shift builds a power of 2
+  --> $DIR/manual_float_power_of_2.rs:24:9
+   |
+LL |         Float::ONE >> 3u32,
+   |         ^^^^^^^^^^^^^^^^^^
+   |
+   = help: build it directly: `Float::power_of_2(-3i64)`
+
+error: this shift builds a power of 2
+  --> $DIR/manual_float_power_of_2.rs:27:9
+   |
+LL |         Float::ONE >> (k + 1),
+   |         ^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: build it directly: `Float::power_of_2(-i64::from(k + 1))`
+
+error: this shift builds a power of 2
+  --> $DIR/manual_float_power_of_2.rs:29:9
+   |
+LL |         Float::one_prec(1) >> 1u32,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: build it directly: `Float::ONE_HALF`
+
+error: use `Float::ONE` instead of `one_prec(..)`
+  --> $DIR/manual_float_power_of_2.rs:29:9
+   |
+LL |         Float::one_prec(1) >> 1u32,
+   |         ^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[deny(use_named_constant)]` on by default
+
+error: this shift builds a power of 2
+  --> $DIR/manual_float_power_of_2.rs:35:9
+   |
+LL |         Float::one_prec(prec) << 1u32,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: build it directly: `Float::two_prec(prec)`
+
+error: this conversion builds a power of 2
+  --> $DIR/manual_float_power_of_2.rs:45:9
+   |
+LL |         BigExponentFloat::from_unsigned_prec(1u32, 100).0,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: build it directly: `BigExponentFloat::ONE`
+
+error: this shift builds a power of 2
+  --> $DIR/manual_float_power_of_2.rs:47:9
+   |
+LL |         BigExponentFloat::from_unsigned_prec(1u32, 100).0 >> 1u32,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: build it directly: `BigExponentFloat::ONE_HALF`
+
+error: this shift builds a power of 2
+  --> $DIR/manual_float_power_of_2.rs:49:9
+   |
+LL |         BigExponentFloat::ONE >> 2u32,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: build it directly: `BigExponentFloat::power_of_2(-2i64)`
+
+error: this shift builds a power of 2
+  --> $DIR/manual_float_power_of_2.rs:51:9
+   |
+LL |         BigExponentFloat::TWO << k,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: build it directly: `BigExponentFloat::power_of_2(1 + i64::from(k))`
+
+error: aborting due to 17 previous errors
+

@@ -151,27 +151,27 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (c, o) = (Float::one_prec(100) >> 1u32).asech_prec_round(5, Floor);
+    /// let (c, o) = Float::one_half_prec(100).asech_prec_round(5, Floor);
     /// assert_eq!(c.to_string(), "1.31");
     /// assert_eq!(o, Less);
     ///
-    /// let (c, o) = (Float::one_prec(100) >> 1u32).asech_prec_round(5, Ceiling);
+    /// let (c, o) = Float::one_half_prec(100).asech_prec_round(5, Ceiling);
     /// assert_eq!(c.to_string(), "1.38");
     /// assert_eq!(o, Greater);
     ///
-    /// let (c, o) = (Float::one_prec(100) >> 1u32).asech_prec_round(5, Nearest);
+    /// let (c, o) = Float::one_half_prec(100).asech_prec_round(5, Nearest);
     /// assert_eq!(c.to_string(), "1.31");
     /// assert_eq!(o, Less);
     ///
-    /// let (c, o) = (Float::one_prec(100) >> 1u32).asech_prec_round(20, Floor);
+    /// let (c, o) = Float::one_half_prec(100).asech_prec_round(20, Floor);
     /// assert_eq!(c.to_string(), "1.3169575");
     /// assert_eq!(o, Less);
     ///
-    /// let (c, o) = (Float::one_prec(100) >> 1u32).asech_prec_round(20, Ceiling);
+    /// let (c, o) = Float::one_half_prec(100).asech_prec_round(20, Ceiling);
     /// assert_eq!(c.to_string(), "1.3169594");
     /// assert_eq!(o, Greater);
     ///
-    /// let (c, o) = (Float::one_prec(100) >> 1u32).asech_prec_round(20, Nearest);
+    /// let (c, o) = Float::one_half_prec(100).asech_prec_round(20, Nearest);
     /// assert_eq!(c.to_string(), "1.3169575");
     /// assert_eq!(o, Less);
     /// ```
@@ -236,27 +236,27 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (c, o) = (Float::one_prec(100) >> 1u32).asech_prec_round_ref(5, Floor);
+    /// let (c, o) = Float::one_half_prec(100).asech_prec_round_ref(5, Floor);
     /// assert_eq!(c.to_string(), "1.31");
     /// assert_eq!(o, Less);
     ///
-    /// let (c, o) = (Float::one_prec(100) >> 1u32).asech_prec_round_ref(5, Ceiling);
+    /// let (c, o) = Float::one_half_prec(100).asech_prec_round_ref(5, Ceiling);
     /// assert_eq!(c.to_string(), "1.38");
     /// assert_eq!(o, Greater);
     ///
-    /// let (c, o) = (Float::one_prec(100) >> 1u32).asech_prec_round_ref(5, Nearest);
+    /// let (c, o) = Float::one_half_prec(100).asech_prec_round_ref(5, Nearest);
     /// assert_eq!(c.to_string(), "1.31");
     /// assert_eq!(o, Less);
     ///
-    /// let (c, o) = (Float::one_prec(100) >> 1u32).asech_prec_round_ref(20, Floor);
+    /// let (c, o) = Float::one_half_prec(100).asech_prec_round_ref(20, Floor);
     /// assert_eq!(c.to_string(), "1.3169575");
     /// assert_eq!(o, Less);
     ///
-    /// let (c, o) = (Float::one_prec(100) >> 1u32).asech_prec_round_ref(20, Ceiling);
+    /// let (c, o) = Float::one_half_prec(100).asech_prec_round_ref(20, Ceiling);
     /// assert_eq!(c.to_string(), "1.3169594");
     /// assert_eq!(o, Greater);
     ///
-    /// let (c, o) = (Float::one_prec(100) >> 1u32).asech_prec_round_ref(20, Nearest);
+    /// let (c, o) = Float::one_half_prec(100).asech_prec_round_ref(20, Nearest);
     /// assert_eq!(c.to_string(), "1.3169575");
     /// assert_eq!(o, Less);
     /// ```
@@ -329,11 +329,11 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (c, o) = (Float::one_prec(100) >> 1u32).asech_prec(5);
+    /// let (c, o) = Float::one_half_prec(100).asech_prec(5);
     /// assert_eq!(c.to_string(), "1.31");
     /// assert_eq!(o, Less);
     ///
-    /// let (c, o) = (Float::one_prec(100) >> 1u32).asech_prec(20);
+    /// let (c, o) = Float::one_half_prec(100).asech_prec(20);
     /// assert_eq!(c.to_string(), "1.3169575");
     /// assert_eq!(o, Less);
     /// ```
@@ -394,11 +394,11 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (c, o) = (Float::one_prec(100) >> 1u32).asech_prec_ref(5);
+    /// let (c, o) = Float::one_half_prec(100).asech_prec_ref(5);
     /// assert_eq!(c.to_string(), "1.31");
     /// assert_eq!(o, Less);
     ///
-    /// let (c, o) = (Float::one_prec(100) >> 1u32).asech_prec_ref(20);
+    /// let (c, o) = Float::one_half_prec(100).asech_prec_ref(20);
     /// assert_eq!(c.to_string(), "1.3169575");
     /// assert_eq!(o, Less);
     /// ```
@@ -463,15 +463,15 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (c, o) = (Float::one_prec(100) >> 1u32).asech_round(Floor);
+    /// let (c, o) = Float::one_half_prec(100).asech_round(Floor);
     /// assert_eq!(c.to_string(), "1.3169578969248167086250463473073");
     /// assert_eq!(o, Less);
     ///
-    /// let (c, o) = (Float::one_prec(100) >> 1u32).asech_round(Ceiling);
+    /// let (c, o) = Float::one_half_prec(100).asech_round(Ceiling);
     /// assert_eq!(c.to_string(), "1.3169578969248167086250463473089");
     /// assert_eq!(o, Greater);
     ///
-    /// let (c, o) = (Float::one_prec(100) >> 1u32).asech_round(Nearest);
+    /// let (c, o) = Float::one_half_prec(100).asech_round(Nearest);
     /// assert_eq!(c.to_string(), "1.3169578969248167086250463473073");
     /// assert_eq!(o, Less);
     /// ```
@@ -537,15 +537,15 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (c, o) = (Float::one_prec(100) >> 1u32).asech_round_ref(Floor);
+    /// let (c, o) = Float::one_half_prec(100).asech_round_ref(Floor);
     /// assert_eq!(c.to_string(), "1.3169578969248167086250463473073");
     /// assert_eq!(o, Less);
     ///
-    /// let (c, o) = (Float::one_prec(100) >> 1u32).asech_round_ref(Ceiling);
+    /// let (c, o) = Float::one_half_prec(100).asech_round_ref(Ceiling);
     /// assert_eq!(c.to_string(), "1.3169578969248167086250463473089");
     /// assert_eq!(o, Greater);
     ///
-    /// let (c, o) = (Float::one_prec(100) >> 1u32).asech_round_ref(Nearest);
+    /// let (c, o) = Float::one_half_prec(100).asech_round_ref(Nearest);
     /// assert_eq!(c.to_string(), "1.3169578969248167086250463473073");
     /// assert_eq!(o, Less);
     /// ```
@@ -602,27 +602,27 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let mut x = Float::one_prec(100) >> 1u32;
+    /// let mut x = Float::one_half_prec(100);
     /// assert_eq!(x.asech_prec_round_assign(5, Floor), Less);
     /// assert_eq!(x.to_string(), "1.31");
     ///
-    /// let mut x = Float::one_prec(100) >> 1u32;
+    /// let mut x = Float::one_half_prec(100);
     /// assert_eq!(x.asech_prec_round_assign(5, Ceiling), Greater);
     /// assert_eq!(x.to_string(), "1.38");
     ///
-    /// let mut x = Float::one_prec(100) >> 1u32;
+    /// let mut x = Float::one_half_prec(100);
     /// assert_eq!(x.asech_prec_round_assign(5, Nearest), Less);
     /// assert_eq!(x.to_string(), "1.31");
     ///
-    /// let mut x = Float::one_prec(100) >> 1u32;
+    /// let mut x = Float::one_half_prec(100);
     /// assert_eq!(x.asech_prec_round_assign(20, Floor), Less);
     /// assert_eq!(x.to_string(), "1.3169575");
     ///
-    /// let mut x = Float::one_prec(100) >> 1u32;
+    /// let mut x = Float::one_half_prec(100);
     /// assert_eq!(x.asech_prec_round_assign(20, Ceiling), Greater);
     /// assert_eq!(x.to_string(), "1.3169594");
     ///
-    /// let mut x = Float::one_prec(100) >> 1u32;
+    /// let mut x = Float::one_half_prec(100);
     /// assert_eq!(x.asech_prec_round_assign(20, Nearest), Less);
     /// assert_eq!(x.to_string(), "1.3169575");
     /// ```
@@ -677,11 +677,11 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let mut x = Float::one_prec(100) >> 1u32;
+    /// let mut x = Float::one_half_prec(100);
     /// assert_eq!(x.asech_prec_assign(5), Less);
     /// assert_eq!(x.to_string(), "1.31");
     ///
-    /// let mut x = Float::one_prec(100) >> 1u32;
+    /// let mut x = Float::one_half_prec(100);
     /// assert_eq!(x.asech_prec_assign(20), Less);
     /// assert_eq!(x.to_string(), "1.3169575");
     /// ```
@@ -737,15 +737,15 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let mut x = Float::one_prec(100) >> 1u32;
+    /// let mut x = Float::one_half_prec(100);
     /// assert_eq!(x.asech_round_assign(Floor), Less);
     /// assert_eq!(x.to_string(), "1.3169578969248167086250463473073");
     ///
-    /// let mut x = Float::one_prec(100) >> 1u32;
+    /// let mut x = Float::one_half_prec(100);
     /// assert_eq!(x.asech_round_assign(Ceiling), Greater);
     /// assert_eq!(x.to_string(), "1.3169578969248167086250463473089");
     ///
-    /// let mut x = Float::one_prec(100) >> 1u32;
+    /// let mut x = Float::one_half_prec(100);
     /// assert_eq!(x.asech_round_assign(Nearest), Less);
     /// assert_eq!(x.to_string(), "1.3169578969248167086250463473073");
     /// ```
@@ -1161,11 +1161,11 @@ impl Asech for Float {
     /// assert!(Float::TWO.asech().is_nan());
     /// assert!(Float::NEGATIVE_ONE.asech().is_nan());
     /// assert_eq!(
-    ///     (Float::one_prec(100) >> 1u32).asech().to_string(),
+    ///     Float::one_half_prec(100).asech().to_string(),
     ///     "1.3169578969248167086250463473073"
     /// );
     /// assert_eq!(
-    ///     (Float::one_prec(100) >> 2u32).asech().to_string(),
+    ///     Float::power_of_2_prec(-2, 100).0.asech().to_string(),
     ///     "2.0634370688955605467272811726205"
     /// );
     /// ```
@@ -1231,11 +1231,11 @@ impl Asech for &Float {
     /// assert!((&Float::TWO).asech().is_nan());
     /// assert!((&Float::NEGATIVE_ONE).asech().is_nan());
     /// assert_eq!(
-    ///     (&(Float::one_prec(100) >> 1u32)).asech().to_string(),
+    ///     (&Float::one_half_prec(100)).asech().to_string(),
     ///     "1.3169578969248167086250463473073"
     /// );
     /// assert_eq!(
-    ///     (&(Float::one_prec(100) >> 2u32)).asech().to_string(),
+    ///     (&Float::power_of_2_prec(-2, 100).0).asech().to_string(),
     ///     "2.0634370688955605467272811726205"
     /// );
     /// ```
@@ -1307,11 +1307,11 @@ impl AsechAssign for Float {
     /// x.asech_assign();
     /// assert!(x.is_nan());
     ///
-    /// let mut x = Float::one_prec(100) >> 1u32;
+    /// let mut x = Float::one_half_prec(100);
     /// x.asech_assign();
     /// assert_eq!(x.to_string(), "1.3169578969248167086250463473073");
     ///
-    /// let mut x = Float::one_prec(100) >> 2u32;
+    /// let mut x = Float::power_of_2_prec(-2, 100).0;
     /// x.asech_assign();
     /// assert_eq!(x.to_string(), "2.0634370688955605467272811726205");
     /// ```

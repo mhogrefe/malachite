@@ -1036,25 +1036,19 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (s, c, o_s, o_c) = Float::from_unsigned_prec(1u32, 100)
-    ///     .0
-    ///     .sin_cos_prec_round(5, Floor);
+    /// let (s, c, o_s, o_c) = Float::one_prec(100).sin_cos_prec_round(5, Floor);
     /// assert_eq!(s.to_string(), "0.812");
     /// assert_eq!(c.to_string(), "0.531");
     /// assert_eq!(o_s, Less);
     /// assert_eq!(o_c, Less);
     ///
-    /// let (s, c, o_s, o_c) = Float::from_unsigned_prec(1u32, 100)
-    ///     .0
-    ///     .sin_cos_prec_round(5, Ceiling);
+    /// let (s, c, o_s, o_c) = Float::one_prec(100).sin_cos_prec_round(5, Ceiling);
     /// assert_eq!(s.to_string(), "0.844");
     /// assert_eq!(c.to_string(), "0.562");
     /// assert_eq!(o_s, Greater);
     /// assert_eq!(o_c, Greater);
     ///
-    /// let (s, c, o_s, o_c) = Float::from_unsigned_prec(1u32, 100)
-    ///     .0
-    ///     .sin_cos_prec_round(20, Nearest);
+    /// let (s, c, o_s, o_c) = Float::one_prec(100).sin_cos_prec_round(20, Nearest);
     /// assert_eq!(s.to_string(), "0.84147072");
     /// assert_eq!(c.to_string(), "0.54030228");
     /// assert_eq!(o_s, Less);
@@ -1087,7 +1081,7 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let x = Float::from_unsigned_prec(1u32, 100).0;
+    /// let x = Float::one_prec(100);
     /// let (s, c, o_s, o_c) = x.sin_cos_prec_round_ref(5, Floor);
     /// assert_eq!(s.to_string(), "0.812");
     /// assert_eq!(c.to_string(), "0.531");
@@ -1138,13 +1132,13 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (s, c, o_s, o_c) = Float::from_unsigned_prec(1u32, 100).0.sin_cos_prec(5);
+    /// let (s, c, o_s, o_c) = Float::one_prec(100).sin_cos_prec(5);
     /// assert_eq!(s.to_string(), "0.844");
     /// assert_eq!(c.to_string(), "0.531");
     /// assert_eq!(o_s, Greater);
     /// assert_eq!(o_c, Less);
     ///
-    /// let (s, c, o_s, o_c) = Float::from_unsigned_prec(1u32, 100).0.sin_cos_prec(20);
+    /// let (s, c, o_s, o_c) = Float::one_prec(100).sin_cos_prec(20);
     /// assert_eq!(s.to_string(), "0.84147072");
     /// assert_eq!(c.to_string(), "0.54030228");
     /// assert_eq!(o_s, Less);
@@ -1171,7 +1165,7 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (s, c, o_s, o_c) = Float::from_unsigned_prec(1u32, 100).0.sin_cos_prec_ref(5);
+    /// let (s, c, o_s, o_c) = Float::one_prec(100).sin_cos_prec_ref(5);
     /// assert_eq!(s.to_string(), "0.844");
     /// assert_eq!(c.to_string(), "0.531");
     /// assert_eq!(o_s, Greater);
@@ -1205,13 +1199,13 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (s, c, o_s, o_c) = Float::from_unsigned_prec(1u32, 5).0.sin_cos_round(Floor);
+    /// let (s, c, o_s, o_c) = Float::one_prec(5).sin_cos_round(Floor);
     /// assert_eq!(s.to_string(), "0.812");
     /// assert_eq!(c.to_string(), "0.531");
     /// assert_eq!(o_s, Less);
     /// assert_eq!(o_c, Less);
     ///
-    /// let (s, c, o_s, o_c) = Float::from_unsigned_prec(1u32, 5).0.sin_cos_round(Ceiling);
+    /// let (s, c, o_s, o_c) = Float::one_prec(5).sin_cos_round(Ceiling);
     /// assert_eq!(s.to_string(), "0.844");
     /// assert_eq!(c.to_string(), "0.562");
     /// assert_eq!(o_s, Greater);
@@ -1241,9 +1235,7 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (s, c, o_s, o_c) = Float::from_unsigned_prec(1u32, 5)
-    ///     .0
-    ///     .sin_cos_round_ref(Floor);
+    /// let (s, c, o_s, o_c) = Float::one_prec(5).sin_cos_round_ref(Floor);
     /// assert_eq!(s.to_string(), "0.812");
     /// assert_eq!(c.to_string(), "0.531");
     /// assert_eq!(o_s, Less);
@@ -1278,7 +1270,7 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// let mut x = Float::one_prec(100);
     /// let mut c = Float::NAN;
     /// assert_eq!(x.sin_cos_prec_round_assign(&mut c, 5, Floor), (Less, Less));
     /// assert_eq!(x.to_string(), "0.812");
@@ -1314,7 +1306,7 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// let mut x = Float::one_prec(100);
     /// let mut c = Float::NAN;
     /// assert_eq!(x.sin_cos_prec_assign(&mut c, 5), (Greater, Less));
     /// assert_eq!(x.to_string(), "0.844");
@@ -1344,7 +1336,7 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 5).0;
+    /// let mut x = Float::one_prec(5);
     /// let mut c = Float::NAN;
     /// assert_eq!(x.sin_cos_round_assign(&mut c, Floor), (Less, Less));
     /// assert_eq!(x.to_string(), "0.812");
@@ -1900,17 +1892,13 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (s, c, o_s, o_c) = Float::from_unsigned_prec(1u32, 10)
-    ///     .0
-    ///     .sin_cos_with_period_round(7, Floor);
+    /// let (s, c, o_s, o_c) = Float::one_prec(10).sin_cos_with_period_round(7, Floor);
     /// assert_eq!(s.to_string(), "0.78125");
     /// assert_eq!(c.to_string(), "0.62305");
     /// assert_eq!(o_s, Less);
     /// assert_eq!(o_c, Less);
     ///
-    /// let (s, c, o_s, o_c) = Float::from_unsigned_prec(1u32, 10)
-    ///     .0
-    ///     .sin_cos_with_period_round(7, Ceiling);
+    /// let (s, c, o_s, o_c) = Float::one_prec(10).sin_cos_with_period_round(7, Ceiling);
     /// assert_eq!(s.to_string(), "0.78223");
     /// assert_eq!(c.to_string(), "0.62402");
     /// assert_eq!(o_s, Greater);
@@ -1947,9 +1935,7 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (s, c, o_s, o_c) = Float::from_unsigned_prec(1u32, 10)
-    ///     .0
-    ///     .sin_cos_with_period_round_ref(7, Floor);
+    /// let (s, c, o_s, o_c) = Float::one_prec(10).sin_cos_with_period_round_ref(7, Floor);
     /// assert_eq!(s.to_string(), "0.78125");
     /// assert_eq!(c.to_string(), "0.62305");
     /// assert_eq!(o_s, Less);
@@ -1985,7 +1971,7 @@ impl Float {
     /// ```
     /// use malachite_float::Float;
     ///
-    /// let (s, c) = Float::from_unsigned_prec(1u32, 10).0.sin_cos_with_period(7);
+    /// let (s, c) = Float::one_prec(10).sin_cos_with_period(7);
     /// assert_eq!(s.to_string(), "0.78223");
     /// assert_eq!(c.to_string(), "0.62305");
     /// ```
@@ -2017,7 +2003,7 @@ impl Float {
     /// ```
     /// use malachite_float::Float;
     ///
-    /// let (s, c) = (&Float::from_unsigned_prec(1u32, 10).0).sin_cos_with_period_ref(7);
+    /// let (s, c) = (&Float::one_prec(10)).sin_cos_with_period_ref(7);
     /// assert_eq!(s.to_string(), "0.78223");
     /// assert_eq!(c.to_string(), "0.62305");
     /// ```
@@ -2137,7 +2123,7 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 10).0;
+    /// let mut x = Float::one_prec(10);
     /// let mut c = Float::NAN;
     /// assert_eq!(
     ///     x.sin_cos_with_period_round_assign(&mut c, 7, Floor),
@@ -2180,7 +2166,7 @@ impl Float {
     /// use malachite_base::num::basic::traits::NaN;
     /// use malachite_float::Float;
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 10).0;
+    /// let mut x = Float::one_prec(10);
     /// let mut c = Float::NAN;
     /// x.sin_cos_with_period_assign(&mut c, 7);
     /// assert_eq!(x.to_string(), "0.78223");
@@ -3106,7 +3092,7 @@ impl SinCos for Float {
     /// assert_eq!(s.to_string(), "-0.0");
     /// assert_eq!(c.to_string(), "1.0");
     ///
-    /// let (s, c) = Float::from_unsigned_prec(1u32, 100).0.sin_cos();
+    /// let (s, c) = Float::one_prec(100).sin_cos();
     /// assert_eq!(s.to_string(), "0.84147098480789650665250232163005");
     /// assert_eq!(c.to_string(), "0.54030230586813971740093660744335");
     /// ```
@@ -3131,7 +3117,7 @@ impl SinCos for &Float {
     /// use malachite_base::num::trigonometric::traits::SinCos;
     /// use malachite_float::Float;
     ///
-    /// let (s, c) = (&Float::from_unsigned_prec(1u32, 100).0).sin_cos();
+    /// let (s, c) = (&Float::one_prec(100)).sin_cos();
     /// assert_eq!(s.to_string(), "0.84147098480789650665250232163005");
     /// assert_eq!(c.to_string(), "0.54030230586813971740093660744335");
     /// ```
@@ -3154,7 +3140,7 @@ impl SinCosAssign for Float {
     /// use malachite_base::num::trigonometric::traits::SinCosAssign;
     /// use malachite_float::Float;
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// let mut x = Float::one_prec(100);
     /// let mut c = Float::NAN;
     /// x.sin_cos_assign(&mut c);
     /// assert_eq!(x.to_string(), "0.84147098480789650665250232163005");

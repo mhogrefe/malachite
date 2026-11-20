@@ -35,6 +35,7 @@ mod hoist_shifts;
 mod let_tuple_underscore_to_field;
 mod long_lines;
 mod manual_float_from_primitive;
+mod manual_float_power_of_2;
 mod manual_fractional_part;
 mod manual_from_sign_and_abs;
 mod manual_half_functions;
@@ -611,6 +612,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         let_tuple_underscore_to_field::LET_TUPLE_UNDERSCORE_TO_FIELD,
         long_lines::LONG_LINES,
         manual_float_from_primitive::MANUAL_FLOAT_FROM_PRIMITIVE,
+        manual_float_power_of_2::MANUAL_FLOAT_POWER_OF_2,
         manual_fractional_part::MANUAL_FRACTIONAL_PART,
         manual_from_sign_and_abs::MANUAL_FROM_SIGN_AND_ABS,
         manual_half_functions::MANUAL_HALF_FUNCTIONS,
@@ -685,6 +687,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
     lint_store.register_late_pass(|_| Box::new(long_lines::LongLines));
     lint_store
         .register_late_pass(|_| Box::new(manual_float_from_primitive::ManualFloatFromPrimitive));
+    lint_store.register_late_pass(|_| Box::new(manual_float_power_of_2::ManualFloatPowerOf2));
     lint_store.register_late_pass(|_| Box::new(manual_from_sign_and_abs::ManualFromSignAndAbs));
     lint_store.register_late_pass(|_| Box::new(manual_half_functions::ManualHalfFunctions));
     lint_store.register_late_pass(|_| Box::new(manual_lexicographic_cmp::ManualLexicographicCmp));

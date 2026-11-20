@@ -794,39 +794,27 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (c, o) = Float::from_unsigned_prec(1u32, 100)
-    ///     .0
-    ///     .atan_prec_round(5, Floor);
+    /// let (c, o) = Float::one_prec(100).atan_prec_round(5, Floor);
     /// assert_eq!(c.to_string(), "0.781");
     /// assert_eq!(o, Less);
     ///
-    /// let (c, o) = Float::from_unsigned_prec(1u32, 100)
-    ///     .0
-    ///     .atan_prec_round(5, Ceiling);
+    /// let (c, o) = Float::one_prec(100).atan_prec_round(5, Ceiling);
     /// assert_eq!(c.to_string(), "0.812");
     /// assert_eq!(o, Greater);
     ///
-    /// let (c, o) = Float::from_unsigned_prec(1u32, 100)
-    ///     .0
-    ///     .atan_prec_round(5, Nearest);
+    /// let (c, o) = Float::one_prec(100).atan_prec_round(5, Nearest);
     /// assert_eq!(c.to_string(), "0.781");
     /// assert_eq!(o, Less);
     ///
-    /// let (c, o) = Float::from_unsigned_prec(1u32, 100)
-    ///     .0
-    ///     .atan_prec_round(20, Floor);
+    /// let (c, o) = Float::one_prec(100).atan_prec_round(20, Floor);
     /// assert_eq!(c.to_string(), "0.78539753");
     /// assert_eq!(o, Less);
     ///
-    /// let (c, o) = Float::from_unsigned_prec(1u32, 100)
-    ///     .0
-    ///     .atan_prec_round(20, Ceiling);
+    /// let (c, o) = Float::one_prec(100).atan_prec_round(20, Ceiling);
     /// assert_eq!(c.to_string(), "0.78539848");
     /// assert_eq!(o, Greater);
     ///
-    /// let (c, o) = Float::from_unsigned_prec(1u32, 100)
-    ///     .0
-    ///     .atan_prec_round(20, Nearest);
+    /// let (c, o) = Float::one_prec(100).atan_prec_round(20, Nearest);
     /// assert_eq!(c.to_string(), "0.78539848");
     /// assert_eq!(o, Greater);
     /// ```
@@ -905,27 +893,27 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (c, o) = (&Float::from_unsigned_prec(1u32, 100).0).atan_prec_round_ref(5, Floor);
+    /// let (c, o) = (&Float::one_prec(100)).atan_prec_round_ref(5, Floor);
     /// assert_eq!(c.to_string(), "0.781");
     /// assert_eq!(o, Less);
     ///
-    /// let (c, o) = (&Float::from_unsigned_prec(1u32, 100).0).atan_prec_round_ref(5, Ceiling);
+    /// let (c, o) = (&Float::one_prec(100)).atan_prec_round_ref(5, Ceiling);
     /// assert_eq!(c.to_string(), "0.812");
     /// assert_eq!(o, Greater);
     ///
-    /// let (c, o) = (&Float::from_unsigned_prec(1u32, 100).0).atan_prec_round_ref(5, Nearest);
+    /// let (c, o) = (&Float::one_prec(100)).atan_prec_round_ref(5, Nearest);
     /// assert_eq!(c.to_string(), "0.781");
     /// assert_eq!(o, Less);
     ///
-    /// let (c, o) = (&Float::from_unsigned_prec(1u32, 100).0).atan_prec_round_ref(20, Floor);
+    /// let (c, o) = (&Float::one_prec(100)).atan_prec_round_ref(20, Floor);
     /// assert_eq!(c.to_string(), "0.78539753");
     /// assert_eq!(o, Less);
     ///
-    /// let (c, o) = (&Float::from_unsigned_prec(1u32, 100).0).atan_prec_round_ref(20, Ceiling);
+    /// let (c, o) = (&Float::one_prec(100)).atan_prec_round_ref(20, Ceiling);
     /// assert_eq!(c.to_string(), "0.78539848");
     /// assert_eq!(o, Greater);
     ///
-    /// let (c, o) = (&Float::from_unsigned_prec(1u32, 100).0).atan_prec_round_ref(20, Nearest);
+    /// let (c, o) = (&Float::one_prec(100)).atan_prec_round_ref(20, Nearest);
     /// assert_eq!(c.to_string(), "0.78539848");
     /// assert_eq!(o, Greater);
     /// ```
@@ -1008,11 +996,11 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (c, o) = Float::from_unsigned_prec(1u32, 100).0.atan_prec(5);
+    /// let (c, o) = Float::one_prec(100).atan_prec(5);
     /// assert_eq!(c.to_string(), "0.781");
     /// assert_eq!(o, Less);
     ///
-    /// let (c, o) = Float::from_unsigned_prec(1u32, 100).0.atan_prec(20);
+    /// let (c, o) = Float::one_prec(100).atan_prec(20);
     /// assert_eq!(c.to_string(), "0.78539848");
     /// assert_eq!(o, Greater);
     /// ```
@@ -1078,11 +1066,11 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (c, o) = (&Float::from_unsigned_prec(1u32, 100).0).atan_prec_ref(5);
+    /// let (c, o) = (&Float::one_prec(100)).atan_prec_ref(5);
     /// assert_eq!(c.to_string(), "0.781");
     /// assert_eq!(o, Less);
     ///
-    /// let (c, o) = (&Float::from_unsigned_prec(1u32, 100).0).atan_prec_ref(20);
+    /// let (c, o) = (&Float::one_prec(100)).atan_prec_ref(20);
     /// assert_eq!(c.to_string(), "0.78539848");
     /// assert_eq!(o, Greater);
     /// ```
@@ -1158,15 +1146,15 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (c, o) = Float::from_unsigned_prec(1u32, 100).0.atan_round(Floor);
+    /// let (c, o) = Float::one_prec(100).atan_round(Floor);
     /// assert_eq!(c.to_string(), "0.78539816339744830961566084581983");
     /// assert_eq!(o, Less);
     ///
-    /// let (c, o) = Float::from_unsigned_prec(1u32, 100).0.atan_round(Ceiling);
+    /// let (c, o) = Float::one_prec(100).atan_round(Ceiling);
     /// assert_eq!(c.to_string(), "0.78539816339744830961566084582062");
     /// assert_eq!(o, Greater);
     ///
-    /// let (c, o) = Float::from_unsigned_prec(1u32, 100).0.atan_round(Nearest);
+    /// let (c, o) = Float::one_prec(100).atan_round(Nearest);
     /// assert_eq!(c.to_string(), "0.78539816339744830961566084581983");
     /// assert_eq!(o, Less);
     /// ```
@@ -1243,15 +1231,15 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (c, o) = (&Float::from_unsigned_prec(1u32, 100).0).atan_round_ref(Floor);
+    /// let (c, o) = (&Float::one_prec(100)).atan_round_ref(Floor);
     /// assert_eq!(c.to_string(), "0.78539816339744830961566084581983");
     /// assert_eq!(o, Less);
     ///
-    /// let (c, o) = (&Float::from_unsigned_prec(1u32, 100).0).atan_round_ref(Ceiling);
+    /// let (c, o) = (&Float::one_prec(100)).atan_round_ref(Ceiling);
     /// assert_eq!(c.to_string(), "0.78539816339744830961566084582062");
     /// assert_eq!(o, Greater);
     ///
-    /// let (c, o) = (&Float::from_unsigned_prec(1u32, 100).0).atan_round_ref(Nearest);
+    /// let (c, o) = (&Float::one_prec(100)).atan_round_ref(Nearest);
     /// assert_eq!(c.to_string(), "0.78539816339744830961566084581983");
     /// assert_eq!(o, Less);
     /// ```
@@ -1310,27 +1298,27 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// let mut x = Float::one_prec(100);
     /// assert_eq!(x.atan_prec_round_assign(5, Floor), Less);
     /// assert_eq!(x.to_string(), "0.781");
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// let mut x = Float::one_prec(100);
     /// assert_eq!(x.atan_prec_round_assign(5, Ceiling), Greater);
     /// assert_eq!(x.to_string(), "0.812");
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// let mut x = Float::one_prec(100);
     /// assert_eq!(x.atan_prec_round_assign(5, Nearest), Less);
     /// assert_eq!(x.to_string(), "0.781");
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// let mut x = Float::one_prec(100);
     /// assert_eq!(x.atan_prec_round_assign(20, Floor), Less);
     /// assert_eq!(x.to_string(), "0.78539753");
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// let mut x = Float::one_prec(100);
     /// assert_eq!(x.atan_prec_round_assign(20, Ceiling), Greater);
     /// assert_eq!(x.to_string(), "0.78539848");
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// let mut x = Float::one_prec(100);
     /// assert_eq!(x.atan_prec_round_assign(20, Nearest), Greater);
     /// assert_eq!(x.to_string(), "0.78539848");
     /// ```
@@ -1386,11 +1374,11 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// let mut x = Float::one_prec(100);
     /// assert_eq!(x.atan_prec_assign(5), Less);
     /// assert_eq!(x.to_string(), "0.781");
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// let mut x = Float::one_prec(100);
     /// assert_eq!(x.atan_prec_assign(20), Greater);
     /// assert_eq!(x.to_string(), "0.78539848");
     /// ```
@@ -1446,15 +1434,15 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// let mut x = Float::one_prec(100);
     /// assert_eq!(x.atan_round_assign(Floor), Less);
     /// assert_eq!(x.to_string(), "0.78539816339744830961566084581983");
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// let mut x = Float::one_prec(100);
     /// assert_eq!(x.atan_round_assign(Ceiling), Greater);
     /// assert_eq!(x.to_string(), "0.78539816339744830961566084582062");
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// let mut x = Float::one_prec(100);
     /// assert_eq!(x.atan_round_assign(Nearest), Less);
     /// assert_eq!(x.to_string(), "0.78539816339744830961566084581983");
     /// ```
@@ -1722,9 +1710,7 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// // the output takes the input's precision, here 10 bits
-    /// let (t, o) = Float::from_unsigned_prec(2u32, 10)
-    ///     .0
-    ///     .atan_with_period_round(360, Floor);
+    /// let (t, o) = Float::two_prec(10).atan_with_period_round(360, Floor);
     /// assert_eq!(t.to_string(), "63.375");
     /// assert_eq!(o, Less);
     /// ```
@@ -1755,7 +1741,7 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// // the output takes the input's precision, here 10 bits
-    /// let x = Float::from_unsigned_prec(2u32, 10).0;
+    /// let x = Float::two_prec(10);
     /// let (t, o) = (&x).atan_with_period_round_ref(360, Floor);
     /// assert_eq!(t.to_string(), "63.375");
     /// assert_eq!(o, Less);
@@ -1786,7 +1772,7 @@ impl Float {
     /// ```
     /// use malachite_float::Float;
     ///
-    /// let t = Float::from_unsigned_prec(2u32, 10).0.atan_with_period(360);
+    /// let t = Float::two_prec(10).atan_with_period(360);
     /// assert_eq!(t.to_string(), "63.438");
     /// ```
     #[inline]
@@ -1816,7 +1802,7 @@ impl Float {
     /// ```
     /// use malachite_float::Float;
     ///
-    /// let t = (&Float::from_unsigned_prec(2u32, 10).0).atan_with_period_ref(360);
+    /// let t = (&Float::two_prec(10)).atan_with_period_ref(360);
     /// assert_eq!(t.to_string(), "63.438");
     /// ```
     #[inline]
@@ -1909,7 +1895,7 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// // the output takes the input's precision, here 10 bits
-    /// let mut x = Float::from_unsigned_prec(2u32, 10).0;
+    /// let mut x = Float::two_prec(10);
     /// let o = x.atan_with_period_round_assign(360, Floor);
     /// assert_eq!(x.to_string(), "63.375");
     /// assert_eq!(o, Less);
@@ -1941,7 +1927,7 @@ impl Float {
     /// ```
     /// use malachite_float::Float;
     ///
-    /// let mut x = Float::from_unsigned_prec(2u32, 10).0;
+    /// let mut x = Float::two_prec(10);
     /// x.atan_with_period_assign(360);
     /// assert_eq!(x.to_string(), "63.438");
     /// ```
@@ -3107,7 +3093,7 @@ impl Atan for Float {
     /// assert_eq!(Float::ZERO.atan().to_string(), "0.0");
     /// assert_eq!(Float::NEGATIVE_ZERO.atan().to_string(), "-0.0");
     /// assert_eq!(
-    ///     Float::from_unsigned_prec(1u32, 100).0.atan().to_string(),
+    ///     Float::one_prec(100).atan().to_string(),
     ///     "0.78539816339744830961566084581983"
     /// );
     /// assert_eq!(
@@ -3176,7 +3162,7 @@ impl Atan for &Float {
     /// assert_eq!(Float::ZERO.atan().to_string(), "0.0");
     /// assert_eq!(Float::NEGATIVE_ZERO.atan().to_string(), "-0.0");
     /// assert_eq!(
-    ///     (&Float::from_unsigned_prec(1u32, 100).0).atan().to_string(),
+    ///     (&Float::one_prec(100)).atan().to_string(),
     ///     "0.78539816339744830961566084581983"
     /// );
     /// assert_eq!(
@@ -3253,7 +3239,7 @@ impl AtanAssign for Float {
     /// x.atan_assign();
     /// assert_eq!(x.to_string(), "-0.0");
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// let mut x = Float::one_prec(100);
     /// x.atan_assign();
     /// assert_eq!(x.to_string(), "0.78539816339744830961566084581983");
     ///

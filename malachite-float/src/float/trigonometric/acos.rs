@@ -530,7 +530,7 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let x = Float::from_unsigned_prec(1u32, 100).0 >> 1u32;
+    /// let x = Float::one_half_prec(100);
     /// let (c, o) = x.clone().acos_round(Floor);
     /// assert_eq!(c.to_string(), "1.0471975511965977461542144610921");
     /// assert_eq!(o, Less);
@@ -564,7 +564,7 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let x = Float::from_unsigned_prec(1u32, 100).0 >> 1u32;
+    /// let x = Float::one_half_prec(100);
     /// let (c, o) = (&x).acos_round_ref(Floor);
     /// assert_eq!(c.to_string(), "1.0471975511965977461542144610921");
     /// assert_eq!(o, Less);
@@ -650,7 +650,7 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 100).0 >> 1u32;
+    /// let mut x = Float::one_half_prec(100);
     /// let o = x.acos_round_assign(Floor);
     /// assert_eq!(x.to_string(), "1.0471975511965977461542144610921");
     /// assert_eq!(o, Less);
@@ -1100,7 +1100,7 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let x = Float::from_unsigned_prec(1u32, 10).0 >> 2u32;
+    /// let x = Float::power_of_2_prec(-2, 10).0;
     /// let (c, o) = x.acos_with_period_round(360, Floor);
     /// assert_eq!(c.to_string(), "75.500");
     /// assert_eq!(o, Less);
@@ -1131,7 +1131,7 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let x = Float::from_unsigned_prec(1u32, 10).0 >> 2u32;
+    /// let x = Float::power_of_2_prec(-2, 10).0;
     /// let (c, o) = (&x).acos_with_period_round_ref(360, Floor);
     /// assert_eq!(c.to_string(), "75.500");
     /// assert_eq!(o, Less);
@@ -1160,7 +1160,7 @@ impl Float {
     /// ```
     /// use malachite_float::Float;
     ///
-    /// let x = Float::from_unsigned_prec(1u32, 10).0 >> 2u32;
+    /// let x = Float::power_of_2_prec(-2, 10).0;
     /// assert_eq!(x.acos_with_period(360).to_string(), "75.500");
     /// ```
     #[inline]
@@ -1180,7 +1180,7 @@ impl Float {
     /// ```
     /// use malachite_float::Float;
     ///
-    /// let x = Float::from_unsigned_prec(1u32, 10).0 >> 2u32;
+    /// let x = Float::power_of_2_prec(-2, 10).0;
     /// assert_eq!((&x).acos_with_period_ref(360).to_string(), "75.500");
     /// ```
     #[inline]
@@ -1271,7 +1271,7 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 10).0 >> 2u32;
+    /// let mut x = Float::power_of_2_prec(-2, 10).0;
     /// let o = x.acos_with_period_round_assign(360, Floor);
     /// assert_eq!(x.to_string(), "75.500");
     /// assert_eq!(o, Less);
@@ -1300,7 +1300,7 @@ impl Float {
     /// ```
     /// use malachite_float::Float;
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 10).0 >> 2u32;
+    /// let mut x = Float::power_of_2_prec(-2, 10).0;
     /// x.acos_with_period_assign(360);
     /// assert_eq!(x.to_string(), "75.500");
     /// ```
@@ -1695,7 +1695,7 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let x = Float::from_unsigned_prec(1u32, 10).0 >> 2u32;
+    /// let x = Float::power_of_2_prec(-2, 10).0;
     /// let (c, o) = x.acos_pi_round(Floor);
     /// assert_eq!(c.to_string(), "0.41943");
     /// assert_eq!(o, Less);
@@ -1729,7 +1729,7 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let x = Float::from_unsigned_prec(1u32, 10).0 >> 2u32;
+    /// let x = Float::power_of_2_prec(-2, 10).0;
     /// let (c, o) = (&x).acos_pi_round_ref(Ceiling);
     /// assert_eq!(c.to_string(), "0.41992");
     /// assert_eq!(o, Greater);
@@ -1762,7 +1762,7 @@ impl Float {
     /// ```
     /// use malachite_float::Float;
     ///
-    /// let x = Float::from_unsigned_prec(1u32, 10).0 >> 2u32;
+    /// let x = Float::power_of_2_prec(-2, 10).0;
     /// assert_eq!(x.acos_pi().to_string(), "0.41943");
     /// ```
     #[inline]
@@ -1781,7 +1781,7 @@ impl Float {
     /// ```
     /// use malachite_float::Float;
     ///
-    /// let x = Float::from_unsigned_prec(1u32, 10).0 >> 2u32;
+    /// let x = Float::power_of_2_prec(-2, 10).0;
     /// assert_eq!((&x).acos_pi_ref().to_string(), "0.41943");
     /// ```
     #[inline]
@@ -1869,7 +1869,7 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 10).0 >> 2u32;
+    /// let mut x = Float::power_of_2_prec(-2, 10).0;
     /// let o = x.acos_pi_round_assign(Floor);
     /// assert_eq!(x.to_string(), "0.41943");
     /// assert_eq!(o, Less);
@@ -1893,7 +1893,7 @@ impl Float {
     /// ```
     /// use malachite_float::Float;
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 10).0 >> 2u32;
+    /// let mut x = Float::power_of_2_prec(-2, 10).0;
     /// x.acos_pi_assign();
     /// assert_eq!(x.to_string(), "0.41943");
     /// ```
@@ -2090,7 +2090,7 @@ impl Acos for Float {
     /// assert!(Float::NEGATIVE_INFINITY.acos().is_nan());
     /// assert_eq!(Float::ONE.acos().to_string(), "0.0");
     ///
-    /// let x = Float::from_unsigned_prec(1u32, 100).0 >> 1u32;
+    /// let x = Float::one_half_prec(100);
     /// assert_eq!(x.acos().to_string(), "1.0471975511965977461542144610936");
     /// ```
     #[inline]
@@ -2153,7 +2153,7 @@ impl Acos for &Float {
     /// assert!((&Float::NAN).acos().is_nan());
     /// assert_eq!((&Float::ONE).acos().to_string(), "0.0");
     ///
-    /// let x = Float::from_unsigned_prec(1u32, 100).0 >> 1u32;
+    /// let x = Float::one_half_prec(100);
     /// assert_eq!((&x).acos().to_string(), "1.0471975511965977461542144610936");
     /// ```
     #[inline]
@@ -2210,7 +2210,7 @@ impl AcosAssign for Float {
     /// x.acos_assign();
     /// assert_eq!(x.to_string(), "0.0");
     ///
-    /// let mut x = Float::from_unsigned_prec(1u32, 100).0 >> 1u32;
+    /// let mut x = Float::one_half_prec(100);
     /// x.acos_assign();
     /// assert_eq!(x.to_string(), "1.0471975511965977461542144610936");
     /// ```
