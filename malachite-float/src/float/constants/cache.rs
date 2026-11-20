@@ -21,6 +21,7 @@ use crate::Float;
 use crate::big_exponent_float::BigExponentFloat;
 #[cfg(feature = "std")]
 use crate::big_exponent_float::exponential::exp::finite_can_round;
+use crate::big_exponent_float::gamma::gamma::clear_tangent_number_cache;
 #[cfg(feature = "std")]
 use core::cell::RefCell;
 #[cfg(feature = "std")]
@@ -120,7 +121,8 @@ crate_test_fn! {
 }
 
 impl Float {
-    /// Frees the memory that this thread uses to remember approximations of $\pi$ and $\ln 2$.
+    /// Frees the memory that this thread uses to remember approximations of $\pi$ and $\ln 2$, and
+    /// the coefficients of the gamma function's series.
     ///
     /// With the `std` feature, [`Float::pi_prec_round`] and [`Float::ln_2_prec_round`] keep, for
     /// each thread, the most accurate approximation of their constant that they have computed, and
@@ -128,6 +130,10 @@ impl Float {
     /// these constants, such as the logarithm and the trigonometric functions, then avoid
     /// recomputing them on every call. The memory that this takes is about that of the most precise
     /// constant requested so far; this function frees it. Results do not depend on the cache.
+    ///
+    /// The gamma function and the functions related to it likewise keep the tangent numbers, from
+    /// which the coefficients of Stirling's series are made; they are exact integers, and as many
+    /// are kept as the most precise of those calls needed. This function frees them too.
     ///
     /// Without the `std` feature, nothing is remembered and this function does nothing.
     ///
@@ -148,5 +154,6 @@ impl Float {
             let _ = PI.try_with(|cache| cache.borrow_mut().take());
             let _ = LN_2.try_with(|cache| cache.borrow_mut().take());
         }
+        clear_tangent_number_cache();
     }
 }

@@ -11,7 +11,7 @@ use crate::big_exponent_float::InnerBigExponentFloat::{Finite, Infinity, NaN, Ze
 use crate::big_exponent_float::arithmetic::add::significand_prec;
 use crate::big_exponent_float::bracket::{
     Bracket, ZIV_GUARD_BITS, encl_add, encl_div, encl_mul, encl_sub, floor_bracket,
-    rounding_possible, ziv_loop_certified_from,
+    rounding_possible, strict_bracket, ziv_loop_certified_from,
 };
 use crate::big_exponent_float::exponential::exp::power_of_2_integer;
 use alloc::vec::Vec;
@@ -187,7 +187,7 @@ fn stirling_mu_encl(prec: u64, m: u64, y: &Bracket, tol: &BigExponentFloat) -> B
 //
 // This is equivalent to `lnOfEncl` from `AzFloat/LnEncl.lean`, Azurite, with the correctly rounded
 // logarithm in place of Azurite's bracket.
-fn ln_of_encl(y: &Bracket, prec: u64) -> Bracket {
+pub(crate) fn ln_of_encl(y: &Bracket, prec: u64) -> Bracket {
     let (lo, mut hi) = floor_bracket(y.0.ln_prec_round_ref(prec, Floor).0, prec);
     if y.0 != y.1 {
         let width =
@@ -447,6 +447,62 @@ impl TangentNumbers {
             self.ts.push(self.column[c - 1].clone());
         }
         &self.ts[j - 1]
+    }
+}
+
+// With the `std` feature, the tangent numbers that this thread has computed are kept from one call
+// to the next: `LnGammaState` takes the table when it is made and puts it back when it is dropped.
+// The numbers are exact, so the results do not depend on the cache.
+#[cfg(feature = "std")]
+std::thread_local! {
+    static TANGENT_NUMBERS: RefCell<TangentNumbers> = const { RefCell::new(TangentNumbers::new()) };
+}
+
+// The table of tangent numbers that this thread has kept, which is left empty.
+fn take_cached_tangent_numbers() -> TangentNumbers {
+    #[cfg(feature = "std")]
+    {
+        // `try_with` fails only while the thread is being torn down; then nothing is cached.
+        TANGENT_NUMBERS
+            .try_with(|cache| core::mem::replace(&mut *cache.borrow_mut(), TangentNumbers::new()))
+            .unwrap_or_else(|_| TangentNumbers::new())
+    }
+    #[cfg(not(feature = "std"))]
+    {
+        TangentNumbers::new()
+    }
+}
+
+// Keeps a table of tangent numbers for this thread, unless a longer one is kept already.
+#[allow(clippy::needless_pass_by_value)]
+fn cache_tangent_numbers(tangents: TangentNumbers) {
+    #[cfg(feature = "std")]
+    {
+        let _ = TANGENT_NUMBERS.try_with(|cache| {
+            let mut cache = cache.borrow_mut();
+            if cache.ts.len() < tangents.ts.len() {
+                *cache = tangents;
+            }
+        });
+    }
+    #[cfg(not(feature = "std"))]
+    {
+        let _ = tangents;
+    }
+}
+
+// Frees the tangent numbers that this thread has kept.
+pub(crate) fn clear_tangent_number_cache() {
+    drop(take_cached_tangent_numbers());
+}
+
+crate_test_fn! {
+    // The number of tangent numbers that this thread has kept.
+    cached_tangent_number_count() -> usize {
+        let tangents = take_cached_tangent_numbers();
+        let count = tangents.ts.len();
+        cache_tangent_numbers(tangents);
+        count
     }
 }
 
@@ -738,7 +794,8 @@ fn gamma_positive_approx(
 }
 
 // How the enclosure of the gamma function of a positive number is computed, with what is kept from
-// one Ziv level to the next.
+// one Ziv level to the next: the tangent numbers, which are taken from this thread's cache and put
+// back into it at the end.
 pub(crate) struct LnGammaState {
     // Whether to compute with enclosures throughout, which is slower. Only the tests and the
     // benchmarks do.
@@ -747,10 +804,10 @@ pub(crate) struct LnGammaState {
 }
 
 impl LnGammaState {
-    pub(crate) const fn new(enclosures: bool) -> Self {
+    pub(crate) fn new(enclosures: bool) -> Self {
         Self {
             enclosures,
-            tangents: RefCell::new(TangentNumbers::new()),
+            tangents: RefCell::new(take_cached_tangent_numbers()),
         }
     }
 
@@ -772,6 +829,25 @@ impl LnGammaState {
             gamma_positive_approx(recip, x, e, w_ln, w, &self.tangents)
         }
     }
+
+    // The bracket of ln Gamma(x) at Ziv level `w` >= 64, from an enclosure `x` of x > 0, with a
+    // positive lower end, where x < 2^e. `None` when there is no bracket at this level.
+    pub(crate) fn ln_gamma_bracket(&self, x: &Bracket, e: &Integer, w: u64) -> Option<Bracket> {
+        if self.enclosures {
+            Some(ln_gamma_bracket_enclosures(x, e, w))
+        } else {
+            ln_gamma_bracket_approx(x, e, w, &self.tangents)
+        }
+    }
+}
+
+impl Drop for LnGammaState {
+    fn drop(&mut self) {
+        cache_tangent_numbers(core::mem::replace(
+            self.tangents.get_mut(),
+            TangentNumbers::new(),
+        ));
+    }
 }
 
 crate_test_fn! {
@@ -783,11 +859,7 @@ crate_test_fn! {
         e: &Integer,
         w: u64
     ) -> Option<Bracket> {
-        if enclosures {
-            Some(ln_gamma_bracket_enclosures(x, e, w))
-        } else {
-            ln_gamma_bracket_approx(x, e, w, &RefCell::new(TangentNumbers::new()))
-        }
+        LnGammaState::new(enclosures).ln_gamma_bracket(x, e, w)
     }
 }
 
@@ -853,7 +925,7 @@ impl GammaTarget<'_> {
     //
     // This is equivalent to `lnGammaRatEncl` from `AzFloat/LnGammaBracket.lean`, Azurite, for a
     // `Rational`.
-    fn shifted_encl(&self, pos: bool, w: u64) -> Bracket {
+    pub(crate) fn shifted_encl(&self, pos: bool, w: u64) -> Bracket {
         let prec = w + 32;
         match self {
             Self::BigExponentFloat(x) => {
@@ -936,7 +1008,7 @@ impl GammaTarget<'_> {
     // `AzFloat/GammaBracket.lean` and `gammaRatSinEncl` from `AzFloat/GammaRatBracket.lean`,
     // Azurite, with the correctly rounded sine, whose accuracy is relative, in place of Azurite's
     // bracket, whose accuracy is absolute.
-    fn sin_encl(&self, prec: u64) -> Option<(bool, Bracket)> {
+    pub(crate) fn sin_encl(&self, prec: u64) -> Option<(bool, Bracket)> {
         let (negative, k_odd, a) = self.fractional_encl(prec);
         let pi = floor_bracket(BigExponentFloat::pi_prec_round(prec, Floor).0, prec);
         let y = encl_mul(prec, &a, &pi);
@@ -1005,12 +1077,12 @@ fn gamma_core(
     ))
 }
 
-// The bracket of Gamma(x) or 1 / Gamma(x) at Ziv level `w`, strict on both sides: the end nearer to
-// zero is moved towards zero, and the other one away from it, by a 2^(-2w)-th of themselves. When
-// `gamma_core` gives nothing it is the dummy bracket [-1, 1], which Ziv's loop never accepts.
+// The bracket of Gamma(x) or 1 / Gamma(x) at Ziv level `w`, strict on both sides (see
+// `strict_bracket`). When `gamma_core` gives nothing it is the dummy bracket [-1, 1], which Ziv's
+// loop never accepts.
 //
-// This is equivalent to `gammaApprox`, `gammaApproxOf`, and `gammaStrict` from
-// `AzFloat/GammaBracket.lean` and `gammaRatApprox` from `AzFloat/GammaRatBracket.lean`, Azurite.
+// This is equivalent to `gammaApprox` from `AzFloat/GammaBracket.lean` and `gammaRatApprox` from
+// `AzFloat/GammaRatBracket.lean`, Azurite.
 fn gamma_approx(
     recip: bool,
     target: &GammaTarget,
@@ -1019,16 +1091,11 @@ fn gamma_approx(
     w: u64,
     state: &LnGammaState,
 ) -> Bracket {
-    let Some((neg, (mut lo, mut hi))) = gamma_core(recip, target, e, pos, w, state) else {
-        return (BigExponentFloat::NEGATIVE_ONE, BigExponentFloat::ONE);
-    };
-    let prec = (w << 1) + 64;
-    let shift = w << 1;
-    let lo_margin = &lo >> shift;
-    lo.sub_prec_round_assign(lo_margin, prec, Floor);
-    let hi_margin = &hi >> shift;
-    hi.add_prec_round_assign(hi_margin, prec, Ceiling);
-    if neg { (-hi, -lo) } else { (lo, hi) }
+    strict_bracket(
+        gamma_core(recip, target, e, pos, w, state)
+            .map(|(neg, (lo, hi))| if neg { (-hi, -lo) } else { (lo, hi) }),
+        w,
+    )
 }
 
 // The largest integer argument whose gamma function is taken as an exact factorial at precision
@@ -1037,7 +1104,7 @@ fn gamma_approx(
 // about where the factorial stops being cheaper than the loop.
 //
 // This is equivalent to `gammaIntBound` from `AzFloat/GammaBracket.lean`, Azurite.
-const fn gamma_int_bound(prec: u64) -> u64 {
+pub(crate) const fn gamma_int_bound(prec: u64) -> u64 {
     prec.saturating_mul(8).saturating_add(2048)
 }
 

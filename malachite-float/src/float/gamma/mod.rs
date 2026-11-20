@@ -11,6 +11,14 @@
 /// function of [`Float`](super::Float)s.
 #[allow(clippy::module_inception)]
 pub mod gamma;
+/// Implementations of [`LnAbsGamma`](malachite_base::num::gamma::traits::LnAbsGamma) and
+/// [`LnAbsGammaAssign`](malachite_base::num::gamma::traits::LnAbsGammaAssign), traits for computing
+/// the logarithm of the absolute value of the gamma function of [`Float`](super::Float)s.
+pub mod ln_abs_gamma;
+/// Implementations of [`LnGamma`](malachite_base::num::gamma::traits::LnGamma) and
+/// [`LnGammaAssign`](malachite_base::num::gamma::traits::LnGammaAssign), traits for computing the
+/// logarithm of the gamma function of [`Float`](super::Float)s.
+pub mod ln_gamma;
 /// Implementations of [`ReciprocalGamma`](malachite_base::num::gamma::traits::ReciprocalGamma) and
 /// [`ReciprocalGammaAssign`](malachite_base::num::gamma::traits::ReciprocalGammaAssign), traits for
 /// computing the reciprocal gamma function of [`Float`](super::Float)s.

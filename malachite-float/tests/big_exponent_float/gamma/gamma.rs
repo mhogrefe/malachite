@@ -16,8 +16,8 @@ use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_float::big_exponent_float::ComparableBigExponentFloatRef;
 use malachite_float::big_exponent_float::gamma::gamma::{
-    gamma_positive_bracket, gamma_prec_round_enclosures, gamma_rational_prec_round_enclosures,
-    ln_gamma_bracket, tangent_numbers_one_at_a_time,
+    cached_tangent_number_count, gamma_positive_bracket, gamma_prec_round_enclosures,
+    gamma_rational_prec_round_enclosures, ln_gamma_bracket, tangent_numbers_one_at_a_time,
 };
 use malachite_float::test_util::big_exponent_float::float_to_big_exponent_float;
 use malachite_float::test_util::generators::{
@@ -3100,4 +3100,29 @@ fn ln_gamma_bracket_properties() {
             check_ln_gamma_bracket(&encl, &e, prec + 64);
         }
     });
+}
+
+// With the `std` feature, the tangent numbers that Stirling's series takes are kept by each thread
+// from one call to the next. The results do not depend on what is kept.
+#[test]
+fn test_tangent_number_cache() {
+    let x = hex("0x3.4cccccccccccc");
+    let run = || [1000, 10, 100].map(|prec| x.gamma_prec_round_ref(prec, Nearest));
+    Float::clear_constant_cache();
+    assert_eq!(cached_tangent_number_count(), 0);
+    let cold = run();
+    let count = cached_tangent_number_count();
+    assert_ne!(count, 0);
+    // Nothing more is computed the second time.
+    let warm = run();
+    assert_eq!(cached_tangent_number_count(), count);
+    for (c, w) in cold.iter().zip(warm.iter()) {
+        assert!(same_pair(c, w));
+    }
+    // A higher precision extends the table.
+    let high = x.gamma_prec_round_ref(2000, Nearest);
+    assert!(cached_tangent_number_count() > count);
+    Float::clear_constant_cache();
+    assert_eq!(cached_tangent_number_count(), 0);
+    assert!(same_pair(&x.gamma_prec_round_ref(2000, Nearest), &high));
 }

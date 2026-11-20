@@ -12,7 +12,8 @@
 use crate::big_exponent_float::BigExponentFloat;
 use crate::big_exponent_float::exponential::exp::power_of_2_integer;
 use core::cmp::Ordering;
-use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::arithmetic::traits::Abs;
+use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::integer::Integer;
@@ -76,6 +77,26 @@ pub(crate) fn encl_div(prec: u64, a: &Bracket, b: &Bracket) -> Bracket {
         a.0.div_prec_round_ref_ref(&b.1, prec, Floor).0,
         a.1.div_prec_round_ref_ref(&b.0, prec, Ceiling).0,
     )
+}
+
+// A bracket at Ziv level `w` made strict on both sides: each end is moved outward by a 2^(-2w)-th
+// of itself. When there is no bracket it is the dummy bracket [-1, 1], which Ziv's loop never
+// accepts.
+//
+// This is equivalent to `gammaStrict` and `gammaApproxOf` from `AzFloat/GammaBracket.lean`,
+// Azurite; it also stands in for `lnGammaApproxOf` from `AzFloat/LnGammaBracket.lean` and
+// `lnAbsGammaApproxOf` from `AzFloat/LnGamma.lean`, which lower the lower end by 2^(-4w) instead.
+pub(crate) fn strict_bracket(b: Option<Bracket>, w: u64) -> Bracket {
+    let Some((mut lo, mut hi)) = b else {
+        return (BigExponentFloat::NEGATIVE_ONE, BigExponentFloat::ONE);
+    };
+    let prec = (w << 1) + 64;
+    let shift = w << 1;
+    let lo_margin = (&lo).abs() >> shift;
+    lo.sub_prec_round_assign(lo_margin, prec, Floor);
+    let hi_margin = (&hi).abs() >> shift;
+    hi.add_prec_round_assign(hi_margin, prec, Ceiling);
+    (lo, hi)
 }
 
 // When the exact value lies in (l, h] (or is l = h), its rounding to precision `prec` is determined

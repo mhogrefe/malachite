@@ -8,3 +8,5 @@
 
 #[allow(clippy::module_inception)]
 pub mod gamma;
+pub mod ln_abs_gamma;
+pub mod ln_gamma;

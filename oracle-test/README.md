@@ -202,7 +202,7 @@ string in a unit file is printed bare, exactly as the demo would print it.
 | `mag_cmp` | `mag_cmp`, `mag_max`, and `mag_min` | `demo_mag_cmp`, `demo_mag_max`, and `demo_mag_min` (malachite-nz) |
 | `mag_mul` | `mag_mul` | `demo_mag_mul` (malachite-nz) |
 | `mag_mul_ui` | `mag_mul_ui` | `demo_mag_mul_u64` (malachite-nz) |
-| `arf_gamma` | arb ball arithmetic (`arb_gamma`, `arb_rgamma`, `arb_gamma_fmpq`), bracketing the result between neighbors with one more bit; positive integers exactly, as $(n-1)!$ and $1/(n-1)!$ | `demo_big_exponent_float_gamma` and `_reciprocal_gamma`, and their `_rational` versions, each in `_prec_round` and `_prec` forms (malachite-float), plus unit rows |
+| `arf_gamma` | arb ball arithmetic (`arb_gamma`, `arb_rgamma`, `arb_gamma_fmpq`, and, for the logarithms, `arb_lgamma` and the reflection formula with `arb_sin_pi` or `arb_sin_pi_fmpq`), bracketing the result between neighbors with one more bit; positive integers exactly, as $(n-1)!$ and $1/(n-1)!$; the logarithms' zeros at 1 and 2 and the sign of the gamma function exactly | `demo_big_exponent_float_gamma`, `_reciprocal_gamma`, `_ln_gamma`, and `_ln_abs_gamma`, and their `_rational` versions, each in `_prec_round` and `_prec` forms (malachite-float), plus unit rows |
 | `arith_bernoulli_number` | `arith_bernoulli_number` | `demo_rational_bernoulli_number` (malachite-q), plus unit rows |
 | `arith_bernoulli_number_vec` | `arith_bernoulli_number_vec`; for the even prefix, every other entry from $B_2$ on | `demo_bernoulli_numbers_prefix` and `demo_even_bernoulli_numbers_prefix` (malachite-q), plus unit rows |
 | `arith_bernoulli_number_denom` | `arith_bernoulli_number_denom` | `demo_natural_bernoulli_number_denominator` (malachite-nz), plus unit rows |

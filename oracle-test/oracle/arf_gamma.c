@@ -11,14 +11,16 @@
     Diffs BigExponentFloat's gamma functions against FLINT's arb ball arithmetic. The mode
     `arf_gamma` accepts lines of the forms
 
-    - `X.op_prec_round(p, rm) = (Z, O)` and `X.op_prec(p) = (Z, O)`, for op one of gamma and
-      reciprocal_gamma;
+    - `X.op_prec_round(p, rm) = (Z, O)` and `X.op_prec(p) = (Z, O)`, for op one of gamma,
+      reciprocal_gamma, and ln_gamma;
     - `BigExponentFloat::op_prec_round(Q, p, rm) = (Z, O)` and
-      `BigExponentFloat::op_prec(Q, p) = (Z, O)`, for op one of gamma_rational and
-      reciprocal_gamma_rational;
+      `BigExponentFloat::op_prec(Q, p) = (Z, O)`, for op one of gamma_rational,
+      reciprocal_gamma_rational, and ln_gamma_rational;
+    - the same forms with the result `(Z, S, O)`, for the ops ln_abs_gamma and
+      ln_abs_gamma_rational;
 
-    where X and Z are BigExponentFloats in Malachite's exact hexadecimal format and Q is a Rational
-    written as `a/b` or `a`.
+    where X and Z are BigExponentFloats in Malachite's exact hexadecimal format, Q is a Rational
+    written as `a/b` or `a`, and S is `true` or `false`: whether Gamma is positive.
 
     Gamma(x) and 1/Gamma(x) are evaluated with arb_gamma and arb_rgamma (arb_gamma_fmpq and its
     reciprocal for a rational x); arb_t exponents are unbounded, like a BigExponentFloat's, so no
@@ -35,6 +37,13 @@
     The special cases follow Malachite's documentation: Gamma is NaN at 0, at the negative integers,
     and at -infinity, and infinity at infinity; 1/Gamma is 0 at 0, at the negative integers, and at
     infinity, and NaN at -infinity. NaN maps to NaN.
+
+    ln Gamma(x) is evaluated with arb_lgamma for x > 0; it is infinity at 0 and at infinity, exactly
+    0 at 1 and 2, and NaN for x < 0 and at -infinity. ln |Gamma(x)| is the same for x >= 0, infinity
+    at the negative integers and at -infinity, and for any other x < 0 it is evaluated by the
+    reflection formula, as ln(pi / |sin(pi x)|) - ln Gamma(1 - x), with arb_sin_pi or
+    arb_sin_pi_fmpq, which reduce their arguments exactly. Its sign S is `false` for a negative x
+    that is not an integer and whose truncation is even, and `true` otherwise.
 
     Any other nonempty line is an error, as is an input with no lines at all.
 */
@@ -137,18 +146,26 @@ parse_rational(fmpq_t q, const char * s)
     return ok ? 0 : -1;
 }
 
+/* `ln` marks the logarithm of Gamma, and `abs` (with `ln`) the logarithm of |Gamma|, whose result
+   comes with a sign. */
 typedef struct
 {
     const char * name;
     int reciprocal;
     int rational;
+    int ln;
+    int abs;
 } op_t;
 
 static const op_t OPS[] = {
-    {"gamma", 0, 0},
-    {"reciprocal_gamma", 1, 0},
-    {"gamma_rational", 0, 1},
-    {"reciprocal_gamma_rational", 1, 1},
+    {"gamma", 0, 0, 0, 0},
+    {"reciprocal_gamma", 1, 0, 0, 0},
+    {"gamma_rational", 0, 1, 0, 0},
+    {"reciprocal_gamma_rational", 1, 1, 0, 0},
+    {"ln_gamma", 0, 0, 1, 0},
+    {"ln_abs_gamma", 0, 0, 1, 1},
+    {"ln_gamma_rational", 0, 1, 1, 0},
+    {"ln_abs_gamma_rational", 0, 1, 1, 1},
 };
 
 /* Rounds the exact rational v, which is an integer or 1/k for an integer k > 0, to `prec` bits,
@@ -202,11 +219,55 @@ exact_at_positive_integer(fmpq_t v, const op_t * op, const fmpz_t n)
     return 1;
 }
 
-/* Whether x is so close to 0 that f(x) is compared with the forms of `sign_near_zero_ball`. */
+/* Whether x is so close to 0 that f(x) is compared with the forms of `sign_near_zero_ball`. The
+   logarithms are far from every number that they could be confused with there. */
 static int
-near_zero(const arf_t xa, slong wp)
+near_zero(const op_t * op, const arf_t xa, slong wp)
 {
-    return xa != NULL && !arf_is_zero(xa) && arf_cmpabs_2exp_si(xa, -wp - 64) < 0;
+    return !op->ln && xa != NULL && !arf_is_zero(xa) && arf_cmpabs_2exp_si(xa, -wp - 64) < 0;
+}
+
+/* Sets y to a ball containing ln Gamma(x) for x > 0, or ln |Gamma(x)| for an x < 0 that is not an
+   integer, with working precision wp. */
+static void
+eval_ln(arb_t y, const arf_t xa, const fmpq_t xq, slong wp)
+{
+    arb_t x;
+    arb_init(x);
+    int negative;
+    if (xa != NULL)
+    {
+        arb_set_arf(x, xa);
+        negative = arf_sgn(xa) < 0;
+    }
+    else
+    {
+        arb_set_fmpq(x, xq, wp);
+        negative = fmpq_sgn(xq) < 0;
+    }
+    if (!negative)
+        arb_lgamma(y, x, wp);
+    else
+    {
+        arb_t s, t;
+        arb_init(s);
+        arb_init(t);
+        if (xa != NULL)
+            arb_sin_pi(s, x, wp);
+        else
+            arb_sin_pi_fmpq(s, xq, wp);
+        arb_abs(s, s);
+        arb_const_pi(t, wp);
+        arb_div(s, t, s, wp);
+        arb_log(s, s, wp);
+        arb_sub_ui(t, x, 1, wp);
+        arb_neg(t, t);
+        arb_lgamma(t, t, wp);
+        arb_sub(y, s, t, wp);
+        arb_clear(s);
+        arb_clear(t);
+    }
+    arb_clear(x);
 }
 
 /* Adds the error bound c * |x|^k to y. */
@@ -281,7 +342,9 @@ sign_near_zero_ball(arb_t d, const op_t * op, const arf_t x, const arf_t w, slon
 static void
 eval(arb_t y, const op_t * op, const arf_t xa, const fmpq_t xq, slong wp)
 {
-    if (near_zero(xa, wp))
+    if (op->ln)
+        eval_ln(y, xa, xq, wp);
+    else if (near_zero(op, xa, wp))
         sign_near_zero_ball(y, op, xa, NULL, wp);
     else if (xa != NULL)
     {
@@ -309,7 +372,7 @@ sign_of_difference(const arb_t y, const op_t * op, const arf_t xa, const arf_t w
 {
     arb_t d;
     arb_init(d);
-    if (near_zero(xa, wp))
+    if (near_zero(op, xa, wp))
         sign_near_zero_ball(d, op, xa, w, wp);
     else
     {
@@ -354,9 +417,9 @@ neighbor(arf_t r, const arf_t a, slong q, int up)
    between a and b rounds like their midpoint c, and the rounded value is outside (a, b), so its
    ordering is its comparison with c. The working precision starts at the target precision plus
    twice the size of x's integer part plus 64 bits, since an absolute error in log Gamma(x), which
-   is about x log x, becomes a relative error in Gamma(x); it doubles while the comparisons are
-   undecided. Returns the ordering, or 2 if the working
-   precision grew too large. */
+   is about x log x, becomes a relative error in Gamma(x) (the logarithms themselves need no such
+   allowance); it doubles while the comparisons are undecided. Returns the ordering, or 2 if the
+   working precision grew too large. */
 static int
 round_function(arf_t z, const op_t * op, const arf_t xa, const fmpq_t xq, slong prec,
                arf_rnd_t rnd)
@@ -374,7 +437,7 @@ round_function(arf_t z, const op_t * op, const arf_t xa, const fmpq_t xq, slong 
         e = fmpz_bits(t) + 1;
         fmpz_clear(t);
     }
-    if (e < 0)
+    if (e < 0 || op->ln)
         e = 0;
     if (e > MAX_PREC)
         return 2;
@@ -427,11 +490,76 @@ round_function(arf_t z, const op_t * op, const arf_t xa, const fmpq_t xq, slong 
     return result;
 }
 
+/* Whether Gamma(x) is positive, where x is the arf_t `xa` or, if `xa` is NULL, the fmpq_t `xq`:
+   it is negative only at a negative x that is not an integer and whose truncation is even. Where
+   Gamma has no sign the answer is 1. */
+static int
+gamma_is_positive(const arf_t xa, const fmpq_t xq)
+{
+    if (xa != NULL ? !arf_is_finite(xa) || arf_sgn(xa) >= 0 || arf_is_int(xa)
+                   : fmpq_sgn(xq) >= 0 || fmpz_is_one(fmpq_denref(xq)))
+        return 1;
+    fmpz_t n;
+    fmpz_init(n);
+    if (xa != NULL)
+        arf_get_fmpz(n, xa, ARF_RND_DOWN);
+    else
+        fmpz_tdiv_q(n, fmpq_numref(xq), fmpq_denref(xq));
+    int positive = fmpz_is_odd(n);
+    fmpz_clear(n);
+    return positive;
+}
+
+/* The expected result of ln Gamma or ln |Gamma| at x where it is exact: see the comment at the top
+   of the file. Returns 0 if z was set, and 2 otherwise. */
+static int
+expected_ln_special(arf_t z, const op_t * op, const arf_t xa, const fmpq_t xq)
+{
+    int sign, integer, one_or_two;
+    if (xa != NULL)
+    {
+        if (arf_is_nan(xa) || (arf_is_neg_inf(xa) && !op->abs))
+        {
+            arf_nan(z);
+            return 0;
+        }
+        if (arf_is_inf(xa))
+        {
+            arf_pos_inf(z);
+            return 0;
+        }
+        sign = arf_sgn(xa);
+        integer = arf_is_int(xa);
+        one_or_two = arf_cmp_si(xa, 1) == 0 || arf_cmp_si(xa, 2) == 0;
+    }
+    else
+    {
+        sign = fmpq_sgn(xq);
+        integer = fmpz_is_one(fmpq_denref(xq));
+        one_or_two = integer
+                     && (fmpz_equal_si(fmpq_numref(xq), 1) || fmpz_equal_si(fmpq_numref(xq), 2));
+    }
+    if (sign == 0 || (sign < 0 && op->abs && integer))
+        arf_pos_inf(z);
+    else if (sign < 0 && !op->abs)
+        arf_nan(z);
+    else if (one_or_two)
+        arf_zero(z);
+    else
+        return 2;
+    return 0;
+}
+
 /* Computes the expected result of `op` at x, which is the arf_t `xa` or, if `xa` is NULL, the
    fmpq_t `xq`. Returns the ordering, or 2 if it could not be determined. */
 static int
 expected(arf_t z, const op_t * op, const arf_t xa, const fmpq_t xq, slong prec, arf_rnd_t rnd)
 {
+    if (op->ln)
+    {
+        int special = expected_ln_special(z, op, xa, xq);
+        return special != 2 ? special : round_function(z, op, xa, xq, prec, rnd);
+    }
     if (xa != NULL)
     {
         if (arf_is_nan(xa))
@@ -578,9 +706,10 @@ check_line(char * line, int line_number)
     if (res == 0)
     {
         int o = expected(z, op, op->rational ? NULL : x, q, prec, rnd);
-        /* `(Z, O)` */
+        /* `(Z, O)`, or `(Z, S, O)` for ln_abs_gamma */
         char * value = result;
         char * ordering = NULL;
+        char * sign = NULL;
         size_t rl = strlen(value);
         if (rl < 2 || value[0] != '(' || value[rl - 1] != ')')
             res = report(line_number, "unrecognized result");
@@ -589,9 +718,20 @@ check_line(char * line, int line_number)
             value[rl - 1] = '\0';
             value++;
             ordering = split(value, ", ");
+            if (op->abs && ordering != NULL)
+            {
+                sign = ordering;
+                ordering = split(sign, ", ");
+            }
         }
         if (res != 0)
             ;
+        else if (op->abs && (ordering == NULL
+                             || (strcmp(sign, "true") != 0 && strcmp(sign, "false") != 0)))
+            res = report(line_number, "unreadable sign");
+        else if (op->abs
+                 && (strcmp(sign, "true") == 0) != gamma_is_positive(op->rational ? NULL : x, q))
+            res = report(line_number, "wrong sign");
         else if (o == 2)
             res = report(line_number, "working precision limit reached");
         else if (exact && o != 0)

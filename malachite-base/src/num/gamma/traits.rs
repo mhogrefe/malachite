@@ -18,6 +18,32 @@ pub trait GammaAssign {
     fn gamma_assign(&mut self);
 }
 
+/// Computes $\ln |\Gamma(x)|$, the logarithm of the absolute value of the gamma function of a
+/// number, along with the sign of $\Gamma(x)$: `true` if it is positive.
+pub trait LnAbsGamma {
+    type Output;
+
+    fn ln_abs_gamma(self) -> (Self::Output, bool);
+}
+
+/// Replaces a number $x$ with $\ln |\Gamma(x)|$, the logarithm of the absolute value of its gamma
+/// function, and returns the sign of $\Gamma(x)$: `true` if it is positive.
+pub trait LnAbsGammaAssign {
+    fn ln_abs_gamma_assign(&mut self) -> bool;
+}
+
+/// Computes $\ln \Gamma(x)$, the logarithm of the gamma function of a number.
+pub trait LnGamma {
+    type Output;
+
+    fn ln_gamma(self) -> Self::Output;
+}
+
+/// Replaces a number $x$ with $\ln \Gamma(x)$, the logarithm of its gamma function.
+pub trait LnGammaAssign {
+    fn ln_gamma_assign(&mut self);
+}
+
 /// Computes the reciprocal gamma function $1/\Gamma(x)$ of a number.
 pub trait ReciprocalGamma {
     type Output;

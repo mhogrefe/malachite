@@ -11,6 +11,12 @@
 /// it.
 #[allow(clippy::module_inception)]
 pub mod gamma;
+/// Functions for computing the logarithm of the absolute value of the gamma function of
+/// [`BigExponentFloat`](super::BigExponentFloat)s and [`Rational`](malachite_q::Rational)s.
+pub mod ln_abs_gamma;
+/// Functions for computing the logarithm of the gamma function of
+/// [`BigExponentFloat`](super::BigExponentFloat)s and [`Rational`](malachite_q::Rational)s.
+pub mod ln_gamma;
 /// Functions for computing the reciprocal gamma function of
 /// [`BigExponentFloat`](super::BigExponentFloat)s and [`Rational`](malachite_q::Rational)s.
 pub mod reciprocal_gamma;

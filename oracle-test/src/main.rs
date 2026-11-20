@@ -2859,6 +2859,66 @@ const AZURITE_FLOAT_STAGES: &[(&str, &str)] = &[
         "demo_float_reciprocal_gamma_round_debug",
         "az_float_reciprocal_gamma",
     ),
+    // `demo_float_ln_abs_gamma_extreme_debug` is not run against Azurite, whose `lnAbsGamma`
+    // takes about |e| bits of working precision for a negative argument near -2^e with e far below
+    // 0.
+    (
+        "demo_float_ln_abs_gamma_assign_debug",
+        "az_float_ln_abs_gamma",
+    ),
+    ("demo_float_ln_abs_gamma_debug", "az_float_ln_abs_gamma"),
+    (
+        "demo_float_ln_abs_gamma_prec_debug",
+        "az_float_ln_abs_gamma",
+    ),
+    (
+        "demo_float_ln_abs_gamma_prec_round_debug",
+        "az_float_ln_abs_gamma",
+    ),
+    (
+        "demo_float_ln_abs_gamma_rational_prec_debug",
+        "az_float_ln_abs_gamma_rational",
+    ),
+    (
+        "demo_float_ln_abs_gamma_rational_prec_ref_debug",
+        "az_float_ln_abs_gamma_rational",
+    ),
+    (
+        "demo_float_ln_abs_gamma_rational_prec_round_debug",
+        "az_float_ln_abs_gamma_rational",
+    ),
+    (
+        "demo_float_ln_abs_gamma_rational_prec_round_ref_debug",
+        "az_float_ln_abs_gamma_rational",
+    ),
+    ("demo_float_ln_abs_gamma_ref_debug", "az_float_ln_abs_gamma"),
+    (
+        "demo_float_ln_abs_gamma_round_debug",
+        "az_float_ln_abs_gamma",
+    ),
+    ("demo_float_ln_gamma_assign_debug", "az_float_ln_gamma"),
+    ("demo_float_ln_gamma_debug", "az_float_ln_gamma"),
+    ("demo_float_ln_gamma_extreme_debug", "az_float_ln_gamma"),
+    ("demo_float_ln_gamma_prec_debug", "az_float_ln_gamma"),
+    ("demo_float_ln_gamma_prec_round_debug", "az_float_ln_gamma"),
+    (
+        "demo_float_ln_gamma_rational_prec_debug",
+        "az_float_ln_gamma_rational",
+    ),
+    (
+        "demo_float_ln_gamma_rational_prec_ref_debug",
+        "az_float_ln_gamma_rational",
+    ),
+    (
+        "demo_float_ln_gamma_rational_prec_round_debug",
+        "az_float_ln_gamma_rational",
+    ),
+    (
+        "demo_float_ln_gamma_rational_prec_round_ref_debug",
+        "az_float_ln_gamma_rational",
+    ),
+    ("demo_float_ln_gamma_ref_debug", "az_float_ln_gamma"),
+    ("demo_float_ln_gamma_round_debug", "az_float_ln_gamma"),
     ("demo_float_lambert_w0_assign_debug", "az_float_lambert_w0"),
     ("demo_float_lambert_w0_debug", "az_float_lambert_w0"),
     ("demo_float_lambert_w0_extreme_debug", "az_float_lambert_w0"),
@@ -7404,6 +7464,33 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
         "demo_big_exponent_float_reciprocal_gamma_rational_prec_round_debug",
         "az_big_exponent_float_reciprocal_gamma_rational",
     ),
+    // `demo_big_exponent_float_ln_abs_gamma_prec_debug` and `_prec_round_debug` are not run
+    // against Azurite, whose `lnAbsGamma` takes about |e| bits of working precision for a negative
+    // argument near -2^e with e far below 0, which the generators produce; FLINT checks them.
+    (
+        "demo_big_exponent_float_ln_abs_gamma_rational_prec_debug",
+        "az_big_exponent_float_ln_abs_gamma_rational",
+    ),
+    (
+        "demo_big_exponent_float_ln_abs_gamma_rational_prec_round_debug",
+        "az_big_exponent_float_ln_abs_gamma_rational",
+    ),
+    (
+        "demo_big_exponent_float_ln_gamma_prec_debug",
+        "az_big_exponent_float_ln_gamma",
+    ),
+    (
+        "demo_big_exponent_float_ln_gamma_prec_round_debug",
+        "az_big_exponent_float_ln_gamma",
+    ),
+    (
+        "demo_big_exponent_float_ln_gamma_rational_prec_debug",
+        "az_big_exponent_float_ln_gamma_rational",
+    ),
+    (
+        "demo_big_exponent_float_ln_gamma_rational_prec_round_debug",
+        "az_big_exponent_float_ln_gamma_rational",
+    ),
     (
         "demo_big_exponent_float_lambert_w0_prec_debug",
         "az_big_exponent_float_lambert_w0",
@@ -11634,6 +11721,14 @@ fn test_against_flint() {
         "demo_big_exponent_float_reciprocal_gamma_prec_debug",
         "demo_big_exponent_float_reciprocal_gamma_rational_prec_round_debug",
         "demo_big_exponent_float_reciprocal_gamma_rational_prec_debug",
+        "demo_big_exponent_float_ln_abs_gamma_prec_round_debug",
+        "demo_big_exponent_float_ln_abs_gamma_prec_debug",
+        "demo_big_exponent_float_ln_abs_gamma_rational_prec_round_debug",
+        "demo_big_exponent_float_ln_abs_gamma_rational_prec_debug",
+        "demo_big_exponent_float_ln_gamma_prec_round_debug",
+        "demo_big_exponent_float_ln_gamma_prec_debug",
+        "demo_big_exponent_float_ln_gamma_rational_prec_round_debug",
+        "demo_big_exponent_float_ln_gamma_rational_prec_debug",
     ] {
         check_demo_against_flint(&oracle, "../malachite-float", demo_name, "arf_gamma");
     }

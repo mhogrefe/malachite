@@ -72,7 +72,10 @@ documented by git history.
   `InverseGudermannianAssign` traits, in `num::hyperbolic::traits`, for the Gudermannian function
   and its inverse.
 - The `Gamma`, `GammaAssign`, `ReciprocalGamma`, and `ReciprocalGammaAssign` traits, in the new
-  `num::gamma::traits` module, for the gamma function and its reciprocal.
+  `num::gamma::traits` module, for the gamma function and its reciprocal, and the `LnGamma`,
+  `LnGammaAssign`, `LnAbsGamma`, and `LnAbsGammaAssign` traits, in the same module, for the
+  logarithm of the gamma function and of its absolute value; the last two also return the sign of
+  the gamma function.
 - The `ShrRoundWithOrdering` and `ShrRoundWithOrderingAssign` traits, in
   `num::arithmetic::traits`, for right-shifting a number that is itself an approximation of an
   exact value, given its `Ordering` against that value, and rounding the result.
@@ -1240,8 +1243,9 @@ documented by git history.
   - the trigonometric functions, their inverses, and `atan2`, each with `_pi` and `_with_period`
     forms and `Rational` forms, the hyperbolic functions and their inverses, and the Gudermannian
     function and its inverse (`gudermannian` and `inverse_gudermannian`, with `Rational` forms);
-  - the gamma function and its reciprocal (`gamma` and `reciprocal_gamma`, with `Rational` forms);
-    and
+  - the gamma function, its reciprocal, and the logarithms of the gamma function and of its
+    absolute value (`gamma`, `reciprocal_gamma`, `ln_gamma`, and `ln_abs_gamma`, with `Rational`
+    forms); and
   - the constants of `Float`, from $\pi$ and $e$ to the Gelfond–Schneider constant.
 
   Huge exponents are always computed, never refused, but for some functions the time and memory grow
@@ -1319,6 +1323,25 @@ documented by git history.
   memory grow with the exponent of the argument. Where Azurite's loop has an iteration limit,
   Malachite's has none: no argument is known or expected at which $\Gamma(x)$ is exactly a rounding
   boundary, but if there were one, the function would not terminate on it.
+- The logarithm of the gamma function, $\ln\Gamma(x)$ for $x > 0$, and the logarithm of its absolute
+  value, $\ln|\Gamma(x)|$ for every $x$, together with the sign of $\Gamma(x)$, correctly rounded:
+  `ln_gamma` and `ln_abs_gamma`, with the same forms as `gamma` on `Float` (including the `LnGamma`,
+  `LnGammaAssign`, `LnAbsGamma`, and `LnAbsGammaAssign` traits and the `primitive_float_ln_gamma`,
+  `primitive_float_ln_gamma_rational`, `primitive_float_ln_abs_gamma`, and
+  `primitive_float_ln_abs_gamma_rational` functions) and on `BigExponentFloat`. The `ln_abs_gamma`
+  functions return the sign as a `bool`, `true` for a positive $\Gamma(x)$, between the value and
+  the `Ordering`. They are ports of the ones in Azurite, on the enclosure of $\ln\Gamma$ from
+  Stirling's series that the gamma function already uses, with extra working precision next to the
+  zeros 1 and 2 and the reflection formula $\ln|\Gamma(x)| = \ln(\pi/|\sin \pi x|) - \ln\Gamma(1-x)$
+  for a negative argument; unlike Azurite's, they take the logarithm of the exact factorial for a
+  positive integer up to the bound that the gamma function uses. The special cases: $\ln\Gamma(1) = \ln\Gamma(2) = 0$ exactly;
+  $\ln\Gamma(\pm0.0) = \ln\Gamma(\infty) = \infty$; `ln_gamma` is `NaN` for a negative argument and
+  at $-\infty$, even where $\Gamma$ is positive (MPFR's `mpfr_lngamma` gives a value there);
+  `ln_abs_gamma` is $\infty$ at the negative integers and at $\pm\infty$, and agrees with MPFR's
+  `mpfr_lgamma` everywhere, including the sign at $-0.0$, which is negative. Unlike the gamma
+  function, these functions take a large argument cheaply: a `Float` result overflows only for an
+  argument above about $2^{2^{30}-30.5}$. Like the gamma function's, their loops have no iteration
+  limit.
 - With the `std` feature, `Float::pi_prec_round` and `Float::ln_2_prec_round` keep, per thread, the
   most accurate approximation of their constant computed so far, and answer later requests at the
   same or a lower precision by rounding it, as MPFR does. The logarithms, the exponentials, and the
@@ -1326,6 +1349,10 @@ documented by git history.
   of 2.3 to 3, `exp` by 2 to 4, and `sin` by 1.5 to 2, at precisions from 53 to 5000 bits. Results
   do not change. The new `Float::clear_constant_cache` frees the memory that the cache takes;
   without `std` it does nothing, and nothing is cached.
+- With the `std` feature, the gamma function and the functions related to it keep, per thread, the
+  tangent numbers from which they make the coefficients of Stirling's series, instead of computing
+  them again on every call. They are exact integers, so results do not change;
+  `Float::clear_constant_cache` frees them too.
 - The `f64` seeds of the Lambert $W$ and Wright omega functions now use the `libm` crate's `exp` and
   `log` instead of Malachite's correctly rounded `f64` functions, which are about a thousand times
   slower; a seed only steers the iteration, so results do not change. `lambert_w0`,

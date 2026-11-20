@@ -21,7 +21,8 @@ use crate::natural::Natural;
 use alloc::vec::Vec;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    AddMul, DivRound, FloorSqrt, ModPowerOf2, MulAddMul, Parity, Pow, ShrRound, ShrRoundAssign,
+    AddMul, Ceiling, DivRound, FloorSqrt, ModPowerOf2, MulAddMul, Parity, Pow, ShrRound,
+    ShrRoundAssign,
 };
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::ExactFrom;
@@ -348,7 +349,7 @@ pub fn euler_number_size(n: u64) -> f64 {
 fn working_bits(size: f64, n: u64) -> u64 {
     // `size` is positive and far below 2^53
     #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
-    let size = size.ceil() as u64;
+    let size = size.ceiling() as u64;
     size + (n.significant_bits() << 1) + 32
 }
 
@@ -412,7 +413,7 @@ const MULTI_MOD_PRIME_FLOOR: u64 = 1 << MULTI_MOD_PRIME_BITS;
 fn multi_mod_prime_count(size: f64) -> usize {
     // `size` is positive and far below 2^53
     #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
-    let size = size.ceil() as u64;
+    let size = size.ceiling() as u64;
     usize::exact_from(size.div_ceil(MULTI_MOD_PRIME_BITS))
 }
 
