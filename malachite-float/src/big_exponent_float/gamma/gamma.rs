@@ -1101,11 +1101,18 @@ fn gamma_approx(
 // The largest integer argument whose gamma function is taken as an exact factorial at precision
 // `prec`. Any bound of at least `prec` + 65 would do for the loop beyond it (the odd part of (n -
 // 1)! then has more than `prec` + 1 bits, so the value is not a rounding boundary); this one is
-// about where the factorial stops being cheaper than the loop.
+// about where the factorial stops being cheaper than the loop. The logarithm of the gamma function
+// takes the logarithm of the factorial up to the same bound.
 //
-// This is equivalent to `gammaIntBound` from `AzFloat/GammaBracket.lean`, Azurite.
+// Timed on 2026-11-20, the factorial and the loop cost the same at n = 1650, 2000, 2350, 3500,
+// 5900, 12000, and 53000 for 53, 113, 200, 500, 1000, 2000, and 5000 bits, for the gamma function
+// and for its reciprocal (and at 1600, 2000, 5000, and 46000 for 53, 200, 1000, and 5000 bits for
+// the logarithm). The bound follows that up to 1000 bits, and stays below it beyond.
+//
+// This replaces `gammaIntBound` from `AzFloat/GammaBracket.lean`, Azurite, which is 8 * `prec` +
+// 2048.
 pub(crate) const fn gamma_int_bound(prec: u64) -> u64 {
-    prec.saturating_mul(8).saturating_add(2048)
+    prec.saturating_mul(4).saturating_add(1500)
 }
 
 // Gamma(n) = (n - 1)! or its reciprocal for a positive integer n, rounded once.

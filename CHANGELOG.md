@@ -1334,7 +1334,8 @@ documented by git history.
   Stirling's series that the gamma function already uses, with extra working precision next to the
   zeros 1 and 2 and the reflection formula $\ln|\Gamma(x)| = \ln(\pi/|\sin \pi x|) - \ln\Gamma(1-x)$
   for a negative argument; unlike Azurite's, they take the logarithm of the exact factorial for a
-  positive integer up to the bound that the gamma function uses. The special cases: $\ln\Gamma(1) = \ln\Gamma(2) = 0$ exactly;
+  positive integer up to $4p + 1500$ at precision $p$, the bound up to which the gamma function
+  takes the factorial itself, which is several times as fast there. The special cases: $\ln\Gamma(1) = \ln\Gamma(2) = 0$ exactly;
   $\ln\Gamma(\pm0.0) = \ln\Gamma(\infty) = \infty$; `ln_gamma` is `NaN` for a negative argument and
   at $-\infty$, even where $\Gamma$ is positive (MPFR's `mpfr_lngamma` gives a value there);
   `ln_abs_gamma` is $\infty$ at the negative integers and at $\pm\infty$, and agrees with MPFR's
