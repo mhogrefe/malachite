@@ -321,7 +321,8 @@ pub mod primitive_float_from_big_exponent_float;
 pub mod primitive_int_from_big_exponent_float;
 /// Functions for converting a [`BigExponentFloat`] to a [`Rational`](malachite_q::Rational).
 pub mod rational_from_big_exponent_float;
-#[cfg(feature = "serde")]
+/// Implementations of traits for serialization and deserialization using
+/// [serde](https://serde.rs/).
 pub mod serde;
 /// Functions for converting a [`BigExponentFloat`] to a string, and for parsing one, in a
 /// power-of-2 base.

@@ -200,7 +200,7 @@ The `malachite` crate re-exports four sub-crates.
     the lower-level MPFR-style entry points).
 
   These implement all the elementary functions, thoroughly tested and documented; only some special
-  functions, such as the gamma, zeta, and error functions, are still to come.
+  functions, such as the zeta and error functions, are still to come.
 
   If you need to explicitly include this crate as a dependency of the `malachite` crate, use the
   `floats` or `malachite-float` feature.

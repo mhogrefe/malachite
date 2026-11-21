@@ -22,7 +22,7 @@ use malachite_nz::platform::Limb;
 /// A floating-point number.
 ///
 /// `Float`s implement all the elementary functions, thoroughly tested and documented; only some
-/// special functions, such as the gamma, zeta, and error functions, are still to come.
+/// special functions, such as the zeta and error functions, are still to come.
 ///
 /// `Float`s are similar to the primitive floats defined by the IEEE 754 standard. They include NaN,
 /// $\infty$ and $-\infty$, and positive and negative zero. There is only one NaN; there is no

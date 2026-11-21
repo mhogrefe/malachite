@@ -11,8 +11,8 @@ documented by git history.
 ### Breaking and behavioral changes
 
 - The `arithmetic` modules are being split up, since they had become catch-alls. The traits of
-  `malachite_base::num::arithmetic::traits` now live in six modules: `num::arithmetic::traits`
-  keeps the ring operations, rounding, shifts, roots, powers, and the `checked_`/`wrapping_`/
+  `malachite_base::num::arithmetic::traits` now live in six modules: `num::arithmetic::traits` keeps
+  the ring operations, rounding, shifts, roots, powers, and the `checked_`/`wrapping_`/
   `saturating_`/`overflowing_` variants; `num::modular::traits` has every `Mod*` and `ModPowerOf2*`
   trait along with reduction (`Mod`, `ModPowerOf2`, `NegMod`, `CeilingMod`, `RemPowerOf2`,
   `BalancedMod*`), divisibility (`DivisibleBy*`, `EqMod*`), and `Crt`; `num::number_theory::traits`
@@ -22,43 +22,41 @@ documented by git history.
   the integer `FloorLogBase*`, `CeilingLogBase*`, and `CheckedLogBase*` ones, `PowerOf10`,
   `PowerOf2XMinus1`, and `Compound`; `num::elliptic::traits` has `Agm`, the first of the
   elliptic-integral functions; and `num::trigonometric::traits` and `num::hyperbolic::traits` have
-  the trigonometric and hyperbolic functions and their inverses.
-  Every moved trait is still re-exported from `num::arithmetic::traits` in this release, so
-  existing imports keep compiling; the re-exports will be removed in the next release. The
-  implementing modules moved the same way: in malachite-base, `num::modular`,
-  `num::number_theory`, and `num::exponential` hold the primitive-integer implementations that
-  were in `num::arithmetic`; in malachite-nz, `natural::modular`, `natural::number_theory`, and
-  `natural::exponential` hold the corresponding `Natural` implementations, and `integer::modular` and
-  `integer::number_theory` the `Integer` ones; in malachite-q, `rational::modular`,
-  `rational::number_theory`, `rational::exponential`, and a new `rational::factorization` (for
-  `express_as_power`) hold the `Rational` ones, and malachite-q's own traits (`Approximate`,
-  `SimplestRationalInInterval`, `DenominatorsInClosedInterval`) moved from
+  the trigonometric and hyperbolic functions and their inverses. Every moved trait is still
+  re-exported from `num::arithmetic::traits` in this release, so existing imports keep compiling;
+  the re-exports will be removed in the next release. The implementing modules moved the same way:
+  in malachite-base, `num::modular`, `num::number_theory`, and `num::exponential` hold the
+  primitive-integer implementations that were in `num::arithmetic`; in malachite-nz,
+  `natural::modular`, `natural::number_theory`, and `natural::exponential` hold the corresponding
+  `Natural` implementations, and `integer::modular` and `integer::number_theory` the `Integer` ones;
+  in malachite-q, `rational::modular`, `rational::number_theory`, `rational::exponential`, and a new
+  `rational::factorization` (for `express_as_power`) hold the `Rational` ones, and malachite-q's own
+  traits (`Approximate`, `SimplestRationalInInterval`, `DenominatorsInClosedInterval`) moved from
   `rational::arithmetic::traits` to `rational::number_theory::traits`, with the same one-release
-  re-export; in malachite-float, `float::arithmetic` keeps the ring operations,
-  rounding, shifts, and roots, while `float::exponential`, `float::elliptic` (for `agm`),
-  `float::trigonometric`, `float::hyperbolic`, and `float::number_theory` (for `factorial`) hold the
-  rest. The
-  implementing modules matter for docs.rs paths and for `crate_test_fn` users.
+  re-export; in malachite-float, `float::arithmetic` keeps the ring operations, rounding, shifts,
+  and roots, while `float::exponential`, `float::elliptic` (for `agm`), `float::trigonometric`,
+  `float::hyperbolic`, and `float::number_theory` (for `factorial`) hold the rest. The implementing
+  modules matter for docs.rs paths and for `crate_test_fn` users.
 - The polynomial, vector, and matrix types and their traits are split the same way. In
   `malachite_base::polynomial`, the traits now live in `polynomial::arithmetic::traits` (the ring
   operations, division, composition, evaluation, and Taylor shifts), `polynomial::modular::traits`
   (operations with coefficients modulo $m$ or $2^k$, including modular division and composition),
   `polynomial::series::traits` (every `*Truncated` trait, including the modular ones and the
-  compositional inverses), `polynomial::mod_polynomial::traits` (every `*ModPolynomial*` trait),
-  and `polynomial::calculus::traits` (derivatives and integrals, including the modular ones); the
+  compositional inverses), `polynomial::mod_polynomial::traits` (every `*ModPolynomial*` trait), and
+  `polynomial::calculus::traits` (derivatives and integrals, including the modular ones); the
   `Polynomial` trait stays at `malachite_base::polynomial`, and `ModPolynomialData` and
-  `ModComposeModPolynomialData` moved to `polynomial::modular` and `polynomial::mod_polynomial`.
-  The linear-algebra traits (`Determinant`, `Rank`, `Nullspace`, `Solve`, `CharacteristicPolynomial`,
-  `Permanent`, `Trace`, the LU decompositions, the echelon, Howell, Hermite, and Smith normal
-  forms, `ElementaryDivisors`, and their `Mod*` and `ModPowerOf2*` versions) moved to the new
+  `ModComposeModPolynomialData` moved to `polynomial::modular` and `polynomial::mod_polynomial`. The
+  linear-algebra traits (`Determinant`, `Rank`, `Nullspace`, `Solve`, `CharacteristicPolynomial`,
+  `Permanent`, `Trace`, the LU decompositions, the echelon, Howell, Hermite, and Smith normal forms,
+  `ElementaryDivisors`, and their `Mod*` and `ModPowerOf2*` versions) moved to the new
   `num::linear_algebra::traits`, and the modular vector and matrix traits (`ModDot`, `ModCross`,
-  `ModEntrywiseMul`, `ModKroneckerProduct`, `ModElementSum`, ...) to `num::modular::traits`. The
-  old paths keep resolving for this release. The implementing modules of `UnsignedPolynomial`,
+  `ModEntrywiseMul`, `ModKroneckerProduct`, `ModElementSum`, ...) to `num::modular::traits`. The old
+  paths keep resolving for this release. The implementing modules of `UnsignedPolynomial`,
   `NaturalPolynomial`, `IntegerPolynomial`, and `RationalPolynomial` split into `arithmetic`,
-  `modular`, `series`, `mod_polynomial`, and `calculus`; those of the vector types into
-  `arithmetic` and `modular`; and those of the matrix types into `arithmetic`, `modular`, and
-  `linear_algebra`. When a name has both a coefficient modulus and an operation kind, the kind
-  decides, so `mod_mul_truncated` is in `series` and `mod_determinant` in `linear_algebra`.
+  `modular`, `series`, `mod_polynomial`, and `calculus`; those of the vector types into `arithmetic`
+  and `modular`; and those of the matrix types into `arithmetic`, `modular`, and `linear_algebra`.
+  When a name has both a coefficient modulus and an operation kind, the kind decides, so
+  `mod_mul_truncated` is in `series` and `mod_determinant` in `linear_algebra`.
 
 ### malachite-base
 
@@ -152,9 +150,6 @@ documented by git history.
   amounts) round every element with any rounding mode; `entrywise_shr_round(k, Down)` is FLINT's
   `fmpz_mat_scalar_tdiv_q_2exp`. `UnsignedMatrix<T>` gets `>>` and `EntrywiseShrRound` by any
   primitive unsigned type, as `UnsignedVector<T>` has.
-- `<<` and `>>` (`Shl`, `ShlAssign`, `Shr`, and `ShrAssign`) by any primitive unsigned or signed
-  type for malachite-q's `RationalMatrix`, with the matrix by value or by reference, multiplying or
-  dividing every element by a power of 2 exactly; a negative amount shifts the other way.
 - `ModPowerOf2Shl` and `ModPowerOf2ShlAssign` by any primitive unsigned type for
   `UnsignedMatrix<T>` (and, in malachite-nz, for `NaturalMatrix`), left-shifting every element
   modulo $2^k$ and keeping the shape; the elements must already be reduced.
@@ -178,9 +173,9 @@ documented by git history.
   malachite-nz, for `NaturalMatrix`, with the modulus by value or by reference), adding or
   subtracting element by element modulo $m$; the elements must be reduced and the shapes must
   match.
-- `ModIsReduced`, `%` (`Rem` and `RemAssign`), `Mod`, and `ModAssign` for `UnsignedMatrix<T>` (and, in
-  malachite-nz, for `NaturalMatrix`, with the modulus by value or by reference, plus `NaturalMatrix
-  % T` giving an `UnsignedMatrix<T>`), reducing every element and keeping the shape.
+- `ModIsReduced`, `%` (`Rem` and `RemAssign`), `Mod`, and `ModAssign` for `UnsignedMatrix<T>` (and,
+  in malachite-nz, for `NaturalMatrix`, with the modulus by value or by reference, plus
+  `NaturalMatrix % T` giving an `UnsignedMatrix<T>`), reducing every element and keeping the shape.
 - `row_iter`, `row_iter_mut`, `column_iter`, and `column_iter_mut` for `UnsignedMatrix<T>` (and, in
   malachite-nz and malachite-q, for `NaturalMatrix`, `IntegerMatrix`, and `RationalMatrix`),
   iterating over the elements of one row or column, immutably or mutably. The iterators are
@@ -295,13 +290,16 @@ documented by git history.
   `random_unsigned_matrices_from_elementary_operations_mod`, which applies random row and column
   additions and subtractions modulo $m$ to the matrices of another iterator. They are the
   counterparts of FLINT's `nmod_mat_randpermdiag`, `randrank`, `randtril`, `randtriu`, and
-  `randops`.  
+  `randops`.
 - The `FactoradicDigits` trait, for the factorial number system: `to_factoradic_digits_asc` and
   `to_factoradic_digits_desc` express a number as digits $d_i$ with $x = \sum_i d_i i!$ and
   $0 \leq d_i \leq i$ (the always-zero $0!$ place omitted), and `from_factoradic_digits_asc` and
   `from_factoradic_digits_desc` read such digits back, returning `None` for a digit too large for
   its place or a value too large for the type. Digits are `u64`. Implemented for the unsigned
   primitive types.
+- In malachite-base's `test_util`, `run_benchmark` now interleaves the timed calls of its series,
+  rotating which series goes first in each round, after an untimed call; the first series of a
+  benchmark had been timed about 10% slower than an identical later one.
 
 ### malachite-nz
 - Generators of `IntegerMatrix`s with a given structure, in `integer_matrix::random`:
@@ -343,8 +341,8 @@ documented by git history.
   `random_integer_matrices_with_dimensions`, and their striped and `_from_iterator` forms. Random
   shapes have independent geometric heights and widths.
 - `Index<(usize, usize)>` and `IndexMut<(usize, usize)>` for `IntegerMatrix`, so `m[(i, j)]` is the
-  element in row `i` and column `j`, and `get(i, j)` and `get_mut(i, j)` (taking `u64`s), which return
-  `None` instead of panicking. Each index is checked against its own dimension.
+  element in row `i` and column `j`, and `get(i, j)` and `get_mut(i, j)` (taking `u64`s), which
+  return `None` instead of panicking. Each index is checked against its own dimension.
 - `Display` and `Debug` for `IntegerMatrix` (identical): `[1, 2; 3, 4]`, with rows separated by
   `; `. A matrix with no rows or no columns is written with its dimensions, as in `[]_{4,0}`.
 - `ToLatex` for `IntegerMatrix`, a `pmatrix` environment such as
@@ -382,8 +380,8 @@ documented by git history.
 - `Cross` and `CrossAssign` for 3-dimensional `IntegerVector`s.
 - `CheckedAbs` for `NaturalVector` and `IntegerVector`, returning the Euclidean norm as a `Natural`
   when the sum of the squares of the elements is a perfect square, and `None` otherwise.
-- `ModPowerOf2Cross` and `ModPowerOf2CrossAssign` for 3-dimensional `NaturalVector`s, using limbs when
-  $2^k$ fits in one.
+- `ModPowerOf2Cross` and `ModPowerOf2CrossAssign` for 3-dimensional `NaturalVector`s, using limbs
+  when $2^k$ fits in one.
 - `ModCross` and `ModCrossAssign` for 3-dimensional `NaturalVector`s modulo a `Natural`, using limbs
   when $m$ fits in one.
 - `AddDot`, `SubDot`, `AddDotReversed`, `SubDotReversed`, and their `Assign` forms for `Integer`
@@ -454,9 +452,9 @@ documented by git history.
   the trace modulo $2^k$, for `UnsignedMatrix<T>` and `NaturalMatrix`. Every element must be reduced
   modulo $2^k$, and the matrix must be square.
 - `ModTrace`, a new trait with `to_mod_trace` and `into_mod_trace`, the trace modulo $m$, for
-  `UnsignedMatrix<T>` and for `NaturalMatrix` with the modulus by value or by reference, like FLINT's
-  `nmod_mat_trace` and `fmpz_mod_mat_trace`. Every element must be reduced modulo $m$, and the
-  matrix must be square.
+  `UnsignedMatrix<T>` and for `NaturalMatrix` with the modulus by value or by reference, like
+  FLINT's `nmod_mat_trace` and `fmpz_mod_mat_trace`. Every element must be reduced modulo $m$, and
+  the matrix must be square.
 - `Mul` and `MulAssign` for `IntegerMatrix` and `NaturalMatrix`, the matrix product, with each
   operand by value or by reference, like FLINT's `fmpz_mat_mul`, choosing among FLINT's kernels for
   elements that fit in one or two words, Waksman's and Strassen's algorithms, a multimodular
@@ -556,8 +554,8 @@ documented by git history.
   and the rank panic only at a non-invertible pivot.
 - New `FractionFreeLuDecomposition` trait in malachite-base, implemented in malachite-nz for
   `IntegerMatrix`, by value or by reference: a permutation $P$, a lower triangular $L$, a row
-  echelon $U$, and the last pivot $d$, with $PA = LD^{-1}U$ for the diagonal matrix $D$ of products of
-  consecutive pivots, computed by Bareiss's fraction-free elimination with FLINT's pivots, like
+  echelon $U$, and the last pivot $d$, with $PA = LD^{-1}U$ for the diagonal matrix $D$ of products
+  of consecutive pivots, computed by Bareiss's fraction-free elimination with FLINT's pivots, like
   `fmpz_mat_fflu`.
 - New `ModSolve` trait in malachite-base, implemented for `UnsignedMatrix<T>` with matrix and
   `UnsignedVector<T>` right-hand sides and, in malachite-nz, `NaturalMatrix` with matrix and
@@ -697,11 +695,6 @@ documented by git history.
   is multiplied by it exactly, and strict diagonal dominance of the product proves the sign. The
   determinant is computed only for small elements, or when the matrix is singular or too
   ill-conditioned for the certificate.
-- In `test_util`, `run_benchmark` now interleaves the timed calls of its series, rotating which
-  series goes first in each round, after an untimed call; the first series of a benchmark had been
-  timed about 10% slower than an identical later one.
-
-### malachite-nz
 
 - `ShrRoundWithOrdering` and `ShrRoundWithOrderingAssign` for `Natural` and `Integer`, by value
   and by reference. Each takes, along with the shift and the rounding mode, the value's `Ordering`
@@ -859,7 +852,8 @@ documented by git history.
   a `RationalPolynomial` divisor may be any nonzero polynomial, and its remainders are in lowest
   terms. Dividends at least twice as long as the divisor are reduced with the powers too.
 - New `ModComposeModPolynomial`, `ModComposeModPolynomialAssign`,
-  `ModComposeModPolynomialPrecomputed`, `ModComposeModPolynomialPrecomputedAssign`, `ModComposeModPolynomialPrecomputedPowers`, and
+  `ModComposeModPolynomialPrecomputed`, `ModComposeModPolynomialPrecomputedAssign`,
+  `ModComposeModPolynomialPrecomputedPowers`, and
   `ModComposeModPolynomialPrecomputedPowersAssign` traits in malachite-base, and their `ModPowerOf2`
   counterparts, implemented for `UnsignedPolynomial<T>` and `NaturalPolynomial` with every
   combination of arguments by value or by reference: composing polynomials modulo a polynomial
@@ -881,10 +875,10 @@ documented by git history.
   of $x$ is a unit (1 or $-1$ over the integers), where FLINT throws. The fast Lagrange algorithm
   and Newton's iteration are both available; Newton's iteration is chosen at once when a modulus has
   a prime factor less than $n$ (always modulo $2^k$), and the cutoffs were measured: 2500 terms for
-  words and integers, 8192 for multi-limb moduli, and, for rationals, Newton's iteration only from 10
-  to 19 terms. Rational reversion keeps a common denominator as FLINT does, and integer inputs with
-  coefficient of $x$ equal to $\pm 1$ are reverted over the integers. Moduli and powers of 2 that fit
-  in two limbs are handled in word arithmetic.
+  words and integers, 8192 for multi-limb moduli, and, for rationals, Newton's iteration only from
+  10 to 19 terms. Rational reversion keeps a common denominator as FLINT does, and integer inputs
+  with coefficient of $x$ equal to $\pm 1$ are reverted over the integers. Moduli and powers of 2
+  that fit in two limbs are handled in word arithmetic.
 - Fast multipoint evaluation and products of linear factors. New `ModEvaluateManyPrecomputed` and
   `ModPowerOf2EvaluateManyPrecomputed` traits in malachite-base evaluate polynomials modulo $m$ or
   $2^k$ at a fixed set of points, using a subproduct tree of the points precomputed once, as FLINT's
@@ -896,11 +890,11 @@ documented by git history.
   polynomial's length, the number of points, and the modulus, and was measured. Modulo a word-sized
   $m$, FLINT's switch at a polynomial length of 32 is much too early, since Horner's rule with
   Shoup's multiplication, several points at a time, stays faster up to lengths in the thousands
-  unless the top bit of $m$ is set. Modulo $2^k$, Horner's rule now runs several points at a time
-  as well, which is about 1.4 times as fast for long polynomials. For `NaturalPolynomial`s, a modulus
-  that fits in one or two limbs now goes through the word-sized code, where `Natural` arithmetic
-  had been used. New `FromRoots`, `FromRationalRoots`, `ModFromRoots`, and `ModPowerOf2FromRoots`
-  traits build the monic polynomial with given roots, like FLINT's `nmod_poly_product_roots_nmod_vec`,
+  unless the top bit of $m$ is set. Modulo $2^k$, Horner's rule now runs several points at a time as
+  well, which is about 1.4 times as fast for long polynomials. For `NaturalPolynomial`s, a modulus
+  that fits in one or two limbs now goes through the word-sized code, where `Natural` arithmetic had
+  been used. New `FromRoots`, `FromRationalRoots`, `ModFromRoots`, and `ModPowerOf2FromRoots` traits
+  build the monic polynomial with given roots, like FLINT's `nmod_poly_product_roots_nmod_vec`,
   `fmpz_mod_poly_product_roots_fmpz_vec`, and `fmpz_poly_product_roots_fmpz_vec`: they are
   implemented for `UnsignedPolynomial<T>` and `NaturalPolynomial` modulo $m$ and $2^k$, for
   `IntegerPolynomial` from `Integer` roots, and, in malachite-q, for `RationalPolynomial` from
@@ -922,8 +916,8 @@ documented by git history.
   `ExtendedGcd`, `Lcm`, and `LcmAssign` for `RationalPolynomial`, like `fmpq_poly_gcd`,
   `fmpq_poly_xgcd`, and `fmpq_poly_lcm`; the rational extended GCD uses a multimodular extended GCD
   over the integers that also yields the resultant, which is not exposed yet. The new oracle-test
-  modes `mod_gcd`, `mod_power_of_2_gcd`, `polynomial_gcd`, and `rational_polynomial_gcd` check all of
-  these against FLINT.
+  modes `mod_gcd`, `mod_power_of_2_gcd`, `polynomial_gcd`, and `rational_polynomial_gcd` check all
+  of these against FLINT.
 - Coprimality tests for polynomials, which FLINT does not have. New `ModCoprimeWith` and
   `ModPowerOf2CoprimeWith` traits in malachite-base are implemented for `UnsignedPolynomial<T>` and
   `NaturalPolynomial`: two polynomials are coprime modulo $m$ when $sa + tb \equiv 1$ for some $s$
@@ -957,10 +951,11 @@ documented by git history.
   implementations of existing traits: `ModComposeModPolynomial` and
   `ModComposeModPolynomialPrecomputed`, and their `ModPowerOf2` counterparts, for slices of
   `UnsignedPolynomial<T>` and of `NaturalPolynomial`, returning a `Vec`, like FLINT's
-  `nmod_poly_compose_mod_brent_kung_vec_preinv` and `fmpz_mod_poly_compose_mod_brent_kung_vec_preinv`.
-  The polynomials share the powers of the inner polynomial and a single matrix product, with a block
-  size chosen from their total length; a single polynomial, or a few short ones, are composed one at
-  a time, and, unlike FLINT, outer polynomials may be at least as long as the modulus polynomial.
+  `nmod_poly_compose_mod_brent_kung_vec_preinv` and
+  `fmpz_mod_poly_compose_mod_brent_kung_vec_preinv`. The polynomials share the powers of the inner
+  polynomial and a single matrix product, with a block size chosen from their total length; a single
+  polynomial, or a few short ones, are composed one at a time, and, unlike FLINT, outer polynomials
+  may be at least as long as the modulus polynomial.
 - Touchard polynomials, whose coefficients are the Stirling numbers of the second kind. New
   `TouchardPolynomial` and `TouchardPolynomialTruncated` traits in malachite-base, in a new
   `polynomial::special` module, are implemented for `NaturalPolynomial`, like FLINT's
@@ -1128,6 +1123,9 @@ documented by git history.
 
 ### malachite-q
 
+- `<<` and `>>` (`Shl`, `ShlAssign`, `Shr`, and `ShrAssign`) by any primitive unsigned or signed
+  type for `RationalMatrix`, with the matrix by value or by reference, multiplying or
+  dividing every element by a power of 2 exactly; a negative amount shifts the other way.
 - `RationalMatrix`, a matrix of `Rational`s with the same layout and interface as `IntegerMatrix`
   (FLINT's `fmpq_mat_t` layout, without the stride): the element and row/column constructors,
   `height`, `width`, `transpose`, `transpose_assign`, `Index`/`IndexMut` by `(row, column)`, `get`,
@@ -1146,8 +1144,9 @@ documented by git history.
 - `rational_matrix::exhaustive` and `rational_matrix::random`, with the same generators as
   `IntegerMatrix`'s, including the `_from_iterator` forms.
 - `Cross` and `CrossAssign` for 3-dimensional `RationalVector`s.
-- `CheckedAbs` for `RationalVector`, returning the Euclidean norm as a `Rational` when it is rational,
-  that is, when the numerator and denominator of the sum of the squares are both perfect squares.
+- `CheckedAbs` for `RationalVector`, returning the Euclidean norm as a `Rational` when it is
+  rational, that is, when the numerator and denominator of the sum of the squares are both perfect
+  squares.
 - `Compose` and `ComposeAssign` for `RationalPolynomial`, like FLINT's `fmpq_poly_compose`: the
   outer polynomial is rescaled so that the inner one has an integer numerator, and the work is one
   integer composition, with reductions to lowest terms before and after it.
@@ -1194,10 +1193,10 @@ documented by git history.
 - `Rational::bernoulli_number`, the Bernoulli number $B_n$ with $B_1 = -1/2$ (FLINT's
   `arith_bernoulli_number`): from a table below 35, and otherwise from the denominator and the
   integer nearest to an enclosure of $2 n!\, \zeta(n) / (2\pi)^n$ times it, like
-  `Integer::euler_number`. `bernoulli_numbers_prefix`, in `rational::number_theory::bernoulli_number`,
-  returns $B_0, \ldots, B_{\mathrm{len}-1}$ (FLINT's `arith_bernoulli_number_vec`), by Ramanujan's
-  congruences below index 700 and by the multimodular algorithm above;
-  `even_bernoulli_numbers_prefix` returns $B_2, B_4, \ldots, B_{2\,\mathrm{len}}$.
+  `Integer::euler_number`. `bernoulli_numbers_prefix`, in
+  `rational::number_theory::bernoulli_number`, returns $B_0, \ldots, B_{\mathrm{len}-1}$ (FLINT's
+  `arith_bernoulli_number_vec`), by Ramanujan's congruences below index 700 and by the multimodular
+  algorithm above; `even_bernoulli_numbers_prefix` returns $B_2, B_4, \ldots, B_{2\,\mathrm{len}}$.
 - `RationalPolynomial::bernoulli_polynomial` and `RationalPolynomial::euler_polynomial`, the
   Bernoulli and Euler polynomials $B_n(x)$ and $E_n(x)$ (FLINT's `arith_bernoulli_polynomial` and
   `arith_euler_polynomial`).
@@ -1333,16 +1332,16 @@ documented by git history.
   the `Ordering`. They are ports of the ones in Azurite, on the enclosure of $\ln\Gamma$ from
   Stirling's series that the gamma function already uses, with extra working precision next to the
   zeros 1 and 2 and the reflection formula $\ln|\Gamma(x)| = \ln(\pi/|\sin \pi x|) - \ln\Gamma(1-x)$
-  for a negative argument; unlike Azurite's, they take the logarithm of the exact factorial for a
+  for a negative argument. Unlike Azurite's, they take the logarithm of the exact factorial for a
   positive integer up to $4p + 1500$ at precision $p$, the bound up to which the gamma function
-  takes the factorial itself, which is several times as fast there. The special cases: $\ln\Gamma(1) = \ln\Gamma(2) = 0$ exactly;
-  $\ln\Gamma(\pm0.0) = \ln\Gamma(\infty) = \infty$; `ln_gamma` is `NaN` for a negative argument and
-  at $-\infty$, even where $\Gamma$ is positive (MPFR's `mpfr_lngamma` gives a value there);
-  `ln_abs_gamma` is $\infty$ at the negative integers and at $\pm\infty$, and agrees with MPFR's
-  `mpfr_lgamma` everywhere, including the sign at $-0.0$, which is negative. Unlike the gamma
-  function, these functions take a large argument cheaply: a `Float` result overflows only for an
-  argument above about $2^{2^{30}-30.5}$. Like the gamma function's, their loops have no iteration
-  limit.
+  takes the factorial itself; that is several times as fast there. The special cases:
+  $\ln\Gamma(1) = \ln\Gamma(2) = 0$ exactly; $\ln\Gamma(\pm0.0) = \ln\Gamma(\infty) = \infty$;
+  `ln_gamma` is `NaN` for a negative argument and at $-\infty$, even where $\Gamma$ is positive
+  (MPFR's `mpfr_lngamma` gives a value there); `ln_abs_gamma` is $\infty$ at the negative integers
+  and at $\pm\infty$, and agrees with MPFR's `mpfr_lgamma` everywhere, including the sign at $-0.0$,
+  which is negative. Unlike the gamma function, these functions take a large argument cheaply: a
+  `Float` result overflows only for an argument above about $2^{2^{30}-30.5}$. Like the gamma
+  function's, their loops have no iteration limit.
 - With the `std` feature, `Float::pi_prec_round` and `Float::ln_2_prec_round` keep, per thread, the
   most accurate approximation of their constant computed so far, and answer later requests at the
   same or a lower precision by rounding it, as MPFR does. The logarithms, the exponentials, and the
@@ -1362,7 +1361,6 @@ documented by git history.
 - `Float`'s internal `ExtendedFloat` type, which carried an extra exponent offset through the
   logarithms, the arithmetic-geometric mean, and $\log 2$, has been replaced by
   `BigExponentFloat`. Results and running times are unchanged.
-
 - `Float::reciprocal_sqrt_rational_prec_round` and its `_ref` form now compute $\sqrt{1/x}$ with
   `sqrt_rational_prec_round`, since inverting a `Rational` is exact; results are unchanged, and the
   duplicated implementation is gone.

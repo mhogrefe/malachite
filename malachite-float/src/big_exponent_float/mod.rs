@@ -40,10 +40,11 @@ use malachite_nz::platform::Limb;
 )]
 pub struct BigExponentFloat(pub(crate) InnerBigExponentFloat);
 
-// The serialized form of a `BigExponentFloat`: its exact hexadecimal string.
-#[cfg(feature = "serde")]
-#[derive(Serialize, Deserialize)]
-#[serde(transparent)]
+// The serialized form of a `BigExponentFloat`: its exact hexadecimal string. As for `Float`'s
+// `SerdeFloat`, the type and its conversions exist without the `serde` feature too, so that the
+// `serde` module is always documented.
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature = "serde", serde(transparent))]
 pub(crate) struct SerdeBigExponentFloat(alloc::string::String);
 
 // Every value has a single representation, so structural equality and hashing are value equality
