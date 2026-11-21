@@ -23,7 +23,7 @@ path = "src/bin.rs"
 [dependencies]
 itertools = { version = "0.14.0", default-features = false, features = ["use_alloc"] }
 libm = { version = "0.2.16", default-features = false }
-malachite-base = { version = "0.14.0", default-features = false, path = "../malachite-base" }
+malachite-base = { workspace = true }
 serde = { version = "1.0.228", optional = true, default-features = false, features = ["alloc", "derive"] }
 wide = { version = "1.7.1", default-features = false }
 

@@ -9,8 +9,8 @@ description = "A drop-in num-bigint replacement based on malachite"
 repository = "https://github.com/mhogrefe/malachite"
 
 [dependencies]
-malachite-base = { version = "0.14.0", path = "../malachite-base", default-features = false }
-malachite-nz = { version = "0.14.0", path = "../malachite-nz", default-features = false }
+malachite-base = { workspace = true }
+malachite-nz = { workspace = true }
 
 num-traits = { version = "0.2.19", default-features = false, features = ["i128"] }
 num-integer = { version = "0.1.46", default-features = false, features = ["i128"] }
