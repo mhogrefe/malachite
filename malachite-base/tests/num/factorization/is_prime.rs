@@ -10,9 +10,13 @@ use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::exhaustive::exhaustive_unsigneds;
+use malachite_base::num::factorization::is_prime::test_is_prime_tables;
 use malachite_base::num::factorization::traits::IsPrime;
 use malachite_base::test_util::generators::{unsigned_gen, unsigned_pair_gen_var_50};
 use malachite_base::test_util::num::factorization::is_prime::is_prime_naive;
+use malachite_base::test_util::num::factorization::is_prime_flint_3_1_2::{
+    u32_is_prime_flint_3_1_2, u64_is_prime_flint_3_1_2,
+};
 
 fn is_prime_helper<T: IsPrime + PrimitiveUnsigned>() {
     let test = |n: u64, out| {
@@ -496,6 +500,64 @@ fn is_prime_helper<T: IsPrime + PrimitiveUnsigned>() {
 }
 
 #[test]
+fn test_test_is_prime_tables() {
+    test_is_prime_tables();
+}
+
+#[test]
+fn test_is_prime_strong_pseudoprimes() {
+    // The smallest composite numbers that pass the strong probable prime test to each of the first
+    // k prime bases, for k from 1 to 9 (the last two are equal), and to the first 12.
+    for n in [
+        2047u64,
+        1373653,
+        25326001,
+        3215031751,
+        2152302898747,
+        3474749660383,
+        341550071728321,
+        3825123056546413051,
+    ] {
+        assert!(!n.is_prime());
+        assert!(!u64_is_prime_flint_3_1_2(n));
+    }
+}
+
+// Compares the primality test with the one that it replaced, on every input below 2^22 and on
+// windows around the powers of 2 where the algorithm changes.
+#[test]
+fn test_is_prime_against_flint_3_1_2() {
+    for n in 0..1u32 << 22 {
+        let out = u32_is_prime_flint_3_1_2(n);
+        assert_eq!(n.is_prime(), out, "{n}");
+        assert_eq!(u64::from(n).is_prime(), out, "{n}");
+    }
+    for center in [1u64 << 31, 1 << 32, 1 << 62, 1 << 63] {
+        for n in center - 100000..center + 100000 {
+            assert_eq!(n.is_prime(), u64_is_prime_flint_3_1_2(n), "{n}");
+            if let Ok(n) = u32::try_from(n) {
+                assert_eq!(n.is_prime(), u32_is_prime_flint_3_1_2(n), "{n}");
+            }
+        }
+    }
+    for n in (u64::MAX - 200000)..=u64::MAX {
+        assert_eq!(n.is_prime(), u64_is_prime_flint_3_1_2(n), "{n}");
+    }
+    for n in (u32::MAX - 200000)..=u32::MAX {
+        assert_eq!(n.is_prime(), u32_is_prime_flint_3_1_2(n), "{n}");
+    }
+    // products (a + 1)(ka + 1), which the test handles separately
+    for a in (1u64 << 30..(1 << 30) + 20000).chain(3000000000..3000020000) {
+        for k in 2..=12 {
+            if let Some(n) = (a + 1).checked_mul(k * a + 1) {
+                assert_eq!(n.is_prime(), u64_is_prime_flint_3_1_2(n), "{n}");
+                assert!(!n.is_prime());
+            }
+        }
+    }
+}
+
+#[test]
 fn test_is_prime() {
     is_prime_helper::<u8>();
     is_prime_helper::<u16>();
@@ -527,6 +589,20 @@ fn is_prime_properties_helper_1<T: IsPrime + PrimitiveUnsigned>() {
 fn is_prime_properties_helper_2<T: PrimitiveUnsigned, DT: From<T> + IsPrime + PrimitiveUnsigned>() {
     unsigned_pair_gen_var_50::<T>().test_properties(|(a, b)| {
         assert!(!(DT::from(a) * DT::from(b)).is_prime());
+    });
+}
+
+#[test]
+fn is_prime_properties_against_flint_3_1_2() {
+    unsigned_gen::<u32>().test_properties(|n| {
+        assert_eq!(n.is_prime(), u32_is_prime_flint_3_1_2(n));
+    });
+    unsigned_gen::<u64>().test_properties(|n| {
+        assert_eq!(n.is_prime(), u64_is_prime_flint_3_1_2(n));
+    });
+    unsigned_pair_gen_var_50::<u32>().test_properties(|(a, b)| {
+        let n = u64::from(a) * u64::from(b);
+        assert_eq!(n.is_prime(), u64_is_prime_flint_3_1_2(n));
     });
 }
 

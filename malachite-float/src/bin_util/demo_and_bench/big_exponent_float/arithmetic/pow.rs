@@ -345,10 +345,6 @@ fn demo_big_exponent_float_pow_u_prec_debug(gm: GenMode, config: &GenConfig, lim
     }
 }
 
-
-
-
-
 fn demo_big_exponent_float_pow_prec_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, prec, _) in
         big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_18()

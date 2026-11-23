@@ -37,4 +37,3 @@ fn demo_big_exponent_float_canonicalize_unit_ref(gm: GenMode, config: &GenConfig
         println!("(&{x}).canonicalize_unit() = {}", (&x).canonicalize_unit());
     }
 }
-

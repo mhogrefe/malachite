@@ -78,7 +78,6 @@ fn demo_big_exponent_float_average_prec_debug(gm: GenMode, config: &GenConfig, l
     }
 }
 
-
 fn demo_big_exponent_float_average_prec_round_assign(
     gm: GenMode,
     config: &GenConfig,

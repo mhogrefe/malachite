@@ -8,12 +8,12 @@
 
 pub mod bench;
 pub mod common;
-pub mod oracle_rows;
 pub mod extra_variadic;
 pub mod generators;
 pub mod hash;
 pub mod maps;
 pub mod num;
+pub mod oracle_rows;
 pub mod rounding_modes;
 pub mod runner;
 pub mod sets;

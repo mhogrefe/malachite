@@ -440,7 +440,6 @@ fn demo_big_exponent_float_atan2_prec_round_assign(gm: GenMode, config: &GenConf
     }
 }
 
-
 fn benchmark_big_exponent_float_atan2_prec_round_evaluation_strategy(
     gm: GenMode,
     config: &GenConfig,

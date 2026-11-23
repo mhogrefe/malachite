@@ -34,4 +34,3 @@ fn demo_big_exponent_float_abs_squared_ref(gm: GenMode, config: &GenConfig, limi
         println!("|&{x}|^2 = {}", (&x).abs_squared());
     }
 }
-

@@ -223,7 +223,6 @@ fn demo_big_exponent_float_min_val_ref(gm: GenMode, config: &GenConfig, limit: u
     }
 }
 
-
 fn demo_big_exponent_float_min_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y) in big_exponent_float_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
@@ -232,7 +231,6 @@ fn demo_big_exponent_float_min_ref_val(gm: GenMode, config: &GenConfig, limit: u
     }
 }
 
-
 fn demo_big_exponent_float_min_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y) in big_exponent_float_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
@@ -240,7 +238,6 @@ fn demo_big_exponent_float_min_ref_ref(gm: GenMode, config: &GenConfig, limit: u
         println!("({x_old}).min_ref_ref({y_old}) = {:?}", x.min_ref_ref(&y));
     }
 }
-
 
 fn demo_big_exponent_float_min_prec_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, prec) in big_exponent_float_big_exponent_float_unsigned_triple_gen_var_1()
@@ -430,7 +427,6 @@ fn demo_big_exponent_float_max_val_ref(gm: GenMode, config: &GenConfig, limit: u
     }
 }
 
-
 fn demo_big_exponent_float_max_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y) in big_exponent_float_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
@@ -439,7 +435,6 @@ fn demo_big_exponent_float_max_ref_val(gm: GenMode, config: &GenConfig, limit: u
     }
 }
 
-
 fn demo_big_exponent_float_max_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y) in big_exponent_float_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
@@ -447,7 +442,6 @@ fn demo_big_exponent_float_max_ref_ref(gm: GenMode, config: &GenConfig, limit: u
         println!("({x_old}).max_ref_ref({y_old}) = {:?}", x.max_ref_ref(&y));
     }
 }
-
 
 fn demo_big_exponent_float_max_prec_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y, prec) in big_exponent_float_big_exponent_float_unsigned_triple_gen_var_1()

@@ -34,4 +34,3 @@ fn demo_big_exponent_float_conjugate_ref(gm: GenMode, config: &GenConfig, limit:
         println!("conjugate(&{x}) = {}", (&x).conjugate());
     }
 }
-

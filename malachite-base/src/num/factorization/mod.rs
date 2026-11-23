@@ -53,6 +53,7 @@ pub mod factor;
 pub mod is_power;
 /// [`IsPrime`](traits::IsPrime), a trait for testing a number for primality.
 pub mod is_prime;
+pub(crate) mod is_prime_tables;
 /// [`IsSquare`](traits::IsSquare), a trait for testing if a number if a perfect square.
 ///
 /// # is_square
