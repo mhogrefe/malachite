@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::modular::traits::{ModPowerOf2, ModPowerOf2IsReduced};
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::arithmetic::traits::Evaluate;
 use malachite_base::polynomial::modular::traits::ModPowerOf2Evaluate;
@@ -21,6 +22,12 @@ use malachite_nz::test_util::natural_polynomial::modular::mod_power_of_2_evaluat
 #[test]
 fn test_mod_power_of_2_evaluate() {
     let test = |s, x, pow, out| {
+        oracle_row!(
+            "flint",
+            "fmpz_mod_poly_evaluate_fmpz",
+            "(&({s})).mod_power_of_2_evaluate({x}, {pow}) = {out}"
+        );
+
         let p = NaturalPolynomial::from_str(s).unwrap();
         let x = Natural::from_str(x).unwrap();
         let y = (&p).mod_power_of_2_evaluate(&x, pow);

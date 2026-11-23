@@ -11,6 +11,7 @@ use malachite_base::matrix::Matrix;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::linear_algebra::traits::ModDeterminant;
 use malachite_base::num::modular::traits::{ModMul, ModNeg};
+use malachite_base::oracle_row;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural_matrix::NaturalMatrix;
 use malachite_nz::test_util::generators::{
@@ -35,6 +36,11 @@ fn verify_det(a: &NaturalMatrix, m: &Natural) -> Natural {
 }
 
 fn test(a: &str, m: &str, out: &str) {
+    oracle_row!(
+        "flint",
+        "fmpz_mod_mat_det",
+        "{a}.mod_determinant({m}) = {out}"
+    );
     let a = NaturalMatrix::from_str(a).unwrap();
     let m = Natural::from_str(m).unwrap();
     assert_eq!(verify_det(&a, &m).to_string(), out);

@@ -9,6 +9,7 @@
 use malachite_base::num::arithmetic::traits::{CheckedSqrt, PowerOf2, Square, SquareAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::exponential::traits::{CheckedLogBase, CheckedLogBase2};
+use malachite_base::oracle_row;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_base::test_util::common::rle_decode;
 use malachite_base::test_util::generators::common::GenConfig;
@@ -3493,6 +3494,8 @@ fn limbs_square_to_out_toom_8_fail_2() {
 #[test]
 fn test_square() {
     let test = |s, out| {
+        oracle_row!("azurite", "az_nat_square", "{s} ^ 2 = {out}");
+
         let x = Natural::from_str(s).unwrap();
         assert_eq!(x.clone().square().to_string(), out);
 

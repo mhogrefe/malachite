@@ -8,6 +8,7 @@
 
 use core::str::FromStr;
 use malachite_base::num::basic::traits::{NaN, One, OneHalf, Zero};
+use malachite_base::oracle_row;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_float::big_exponent_float::ComparableBigExponentFloatRef;
 use malachite_float::test_util::big_exponent_float::{
@@ -37,6 +38,9 @@ fn test_min_max() {
     let pi = parse_big_exponent_float_hex("0x3.243f6a8885a30#53");
     let test =
         |s: &str, s_hex: &str, t: &str, t_hex: &str, u: &str, u_hex: &str, v: &str, v_hex: &str| {
+            oracle_row!("flint", "arf_min_max", "{s_hex}.min({t_hex}) = {u_hex}");
+            oracle_row!("flint", "arf_min_max", "{s_hex}.max({t_hex}) = {v_hex}");
+
             let x = &parse_big_exponent_float_hex(s_hex);
             assert_eq!(x.to_string(), s);
             let y = &parse_big_exponent_float_hex(t_hex);
@@ -152,37 +156,86 @@ fn test_min_max() {
 
     // - rounding the selected operand
     let (x, o) = pi.min_prec_round_ref_ref(&huge, 5, Floor);
+    oracle_row!(
+        "flint",
+        "arf_min_max",
+        "{pi:?}.min_prec_round({huge:?}, 5, Floor) = ({x:?}, {o:?})"
+    );
     assert_eq!(format!("{x:?}"), "0x3.2");
     assert_eq!(o, Less);
     let (x, o) = pi.max_prec_round_ref_ref(&huge, 5, Floor);
+    oracle_row!(
+        "flint",
+        "arf_min_max",
+        "{pi:?}.max_prec_round({huge:?}, 5, Floor) = ({x:?}, {o:?})"
+    );
     assert!(same(&x, &huge));
     assert_eq!(o, Equal);
     let (x, o) = nan.min_prec_ref_ref(&nan, 5);
+    oracle_row!(
+        "flint",
+        "arf_min_max",
+        "{nan:?}.min_prec({nan:?}, 5) = ({x:?}, {o:?})"
+    );
     assert!(x.is_nan());
     assert_eq!(o, Equal);
 
     // - a Rational
     let third = Rational::from_signeds(1, 3);
     let (x, o) = tiny.min_rational_prec_round_ref_ref(&third, 10, Floor);
+    oracle_row!(
+        "flint",
+        "arf_min_max",
+        "{tiny:?}.min_rational_prec_round({third}, 10, Floor) = ({x:?}, {o:?})"
+    );
     assert!(same(&x, &tiny));
     assert_eq!(o, Equal);
     let (x, o) = tiny.max_rational_prec_round_ref_ref(&third, 10, Floor);
+    oracle_row!(
+        "flint",
+        "arf_min_max",
+        "{tiny:?}.max_rational_prec_round({third}, 10, Floor) = ({x:?}, {o:?})"
+    );
     assert_eq!(format!("{x:?}"), "0x0.554");
     assert_eq!(o, Less);
     let (x, o) = nan.max_rational_prec_ref_ref(&third, 10);
+    oracle_row!(
+        "flint",
+        "arf_min_max",
+        "{nan:?}.max_rational_prec({third}, 10) = ({x:?}, {o:?})"
+    );
     assert_eq!(format!("{x:?}"), "0x0.556");
     assert_eq!(o, Greater);
     let (x, o) = huge.min_rational_prec_ref_ref(&-third.clone(), 10);
+    oracle_row!(
+        "flint",
+        "arf_min_max",
+        "{huge:?}.min_rational_prec({}, 10) = ({x:?}, {o:?})",
+        -&third
+    );
     assert_eq!(format!("{x:?}"), "-0x0.556");
     assert_eq!(o, Less);
     // - a tie selects the BigExponentFloat
     let (x, o) =
         BigExponentFloat::ONE_HALF.min_rational_prec_round_ref_ref(&Rational::ONE_HALF, 1, Exact);
+    oracle_row!(
+        "flint",
+        "arf_min_max",
+        "{:?}.min_rational_prec_round({}, 1, Exact) = ({x:?}, {o:?})",
+        BigExponentFloat::ONE_HALF,
+        Rational::ONE_HALF
+    );
     assert!(same(&x, &BigExponentFloat::ONE_HALF));
     assert_eq!(o, Equal);
     // - the comparison is exact: 0x0.554 is the 10-bit Floor of 1/3, but less than it
     let x = parse_big_exponent_float_hex("0x0.554#10");
     let y = x.max_rational_prec_round_ref_ref(&third, 64, Nearest).0;
+    oracle_row!(
+        "flint",
+        "arf_min_max",
+        "{x:?}.max_rational_prec_round({third}, 64, Nearest) = ({y:?}, {:?})",
+        x.max_rational_prec_round_ref_ref(&third, 64, Nearest).1
+    );
     assert_eq!(format!("{y:?}"), "0x0.55555555555555558");
 }
 

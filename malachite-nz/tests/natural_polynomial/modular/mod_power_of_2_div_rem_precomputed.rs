@@ -8,6 +8,7 @@
 
 use core::str::FromStr;
 use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::modular::traits::{
     ModPowerOf2DivAssignRemPrecomputed, ModPowerOf2DivRem, ModPowerOf2DivRemPrecomputed,
@@ -63,6 +64,14 @@ fn verify(
 #[test]
 fn test_mod_power_of_2_div_rem_precomputed() {
     let test = |p, q, pow: u64, out: (&str, &str)| {
+        oracle_row!(
+            "flint",
+            "mod_power_of_2_div_rem",
+            "({p}).mod_power_of_2_div_rem_precomputed({q}, {pow}, &data) = ({}, {})",
+            out.0,
+            out.1
+        );
+
         let p = NaturalPolynomial::from_str(p).unwrap();
         let q = NaturalPolynomial::from_str(q).unwrap();
         let (s, t) = verify(&p, &q, pow);

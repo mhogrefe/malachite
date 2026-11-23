@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::modular::traits::Mod;
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::modular::traits::ModEvaluate;
 use malachite_nz::integer::Integer;
@@ -20,6 +21,12 @@ use malachite_nz::test_util::integer_polynomial::modular::mod_evaluate::mod_eval
 #[test]
 fn test_mod_evaluate_u64() {
     let test = |s, x: u64, m: u64, out: u64| {
+        oracle_row!(
+            "flint",
+            "fmpz_poly_evaluate_mod",
+            "(&({s})).mod_evaluate({x}, {m}) = {out}"
+        );
+
         let p = IntegerPolynomial::from_str(s).unwrap();
         assert_eq!((&p).mod_evaluate(x, m), out);
         assert_eq!(mod_evaluate_u64_naive(&p, x, m), out);

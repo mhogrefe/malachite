@@ -8,6 +8,7 @@
 
 use core::str::FromStr;
 use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::modular::traits::{
     ModDivAssignRemPrecomputed, ModDivRem, ModDivRemPrecomputed, ModQuotientPrecomputed,
@@ -55,6 +56,14 @@ fn verify(
 #[test]
 fn test_mod_div_rem_precomputed() {
     let test = |p, q, m: &str, out: (&str, &str)| {
+        oracle_row!(
+            "flint",
+            "mod_div_rem",
+            "({p}).mod_div_rem_precomputed({q}, {m}, &data) = ({}, {})",
+            out.0,
+            out.1
+        );
+
         let p = NaturalPolynomial::from_str(p).unwrap();
         let q = NaturalPolynomial::from_str(q).unwrap();
         let m = Natural::from_str(m).unwrap();

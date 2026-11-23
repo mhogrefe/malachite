@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::modular::traits::{
     ModDivAssignRemPrecomputed, ModDivRem, ModDivRemPrecomputed, ModQuotientPrecomputed,
@@ -46,6 +47,14 @@ fn verify<T: PrimitiveUnsigned>(
 
 fn test_mod_div_rem_precomputed_helper<T: PrimitiveUnsigned>() {
     let test = |p, q, m: u8, out: (&str, &str)| {
+        oracle_row!(
+            "flint",
+            "mod_div_rem",
+            "({p}).mod_div_rem_precomputed({q}, {m}, &data) = ({}, {})",
+            out.0,
+            out.1
+        );
+
         let p = UnsignedPolynomial::<T>::from_str(p).unwrap();
         let q = UnsignedPolynomial::<T>::from_str(q).unwrap();
         let (s, t) = verify(&p, &q, T::from(m));

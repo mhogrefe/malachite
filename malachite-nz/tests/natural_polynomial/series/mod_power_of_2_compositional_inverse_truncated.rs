@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::oracle_row;
 use malachite_base::num::modular::traits::ModPowerOf2IsReduced;
 use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::polynomial::series::traits::ModPowerOf2ComposeTruncated;
@@ -51,6 +52,12 @@ fn show(p: Option<NaturalPolynomial>) -> String {
 #[test]
 fn test_mod_power_of_2_compositional_inverse_truncated() {
     let test = |p, len, pow, out| {
+        oracle_row!(
+            "flint",
+            "mod_power_of_2_revert_series",
+            "({p}).mod_power_of_2_compositional_inverse_truncated({len}, {pow}) = {out}"
+        );
+
         let p = NaturalPolynomial::from_str(p).unwrap();
         assert_eq!(show(verify(&p, len, pow)), out);
     };

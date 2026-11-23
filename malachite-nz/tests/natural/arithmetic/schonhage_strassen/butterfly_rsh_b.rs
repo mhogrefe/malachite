@@ -8,6 +8,8 @@
 
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::modular::traits::{ModAdd, ModSub};
+#[cfg(not(feature = "32_bit_limbs"))]
+use malachite_base::oracle_row;
 use malachite_nz::natural::arithmetic::mul::schonhage_strassen::butterfly_rsh_b::*;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::large_type_gen_var_36;
@@ -23,6 +25,13 @@ fn test_limbs_butterfly_rsh_b() {
                 y: usize,
                 t_out: &[Limb],
                 u_out: &[Limb]| {
+        oracle_row!(
+            "flint",
+            "butterfly_rshB",
+            "limbs_butterfly_rsh_b(_, _, {i1:?}, {i2:?}, {limbs}, {x}, {y}) = ({t_out:?}, \
+            {u_out:?}, _, _)"
+        );
+
         let mut t = vec![0; limbs + 1];
         let mut u = vec![0; limbs + 1];
         let mut i1 = i1.to_vec();

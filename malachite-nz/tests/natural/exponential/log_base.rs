@@ -12,6 +12,7 @@ use malachite_base::num::exponential::traits::{
     CeilingLogBase, CeilingLogBase2, CheckedLogBase, CheckedLogBase2, FloorLogBase, FloorLogBase2,
 };
 use malachite_base::num::float::NiceFloat;
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::unsigned_pair_gen_var_24;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -53,6 +54,12 @@ fn approx_ln_fail() {
 #[test]
 fn test_floor_log_base() {
     let test = |n, base, out| {
+        oracle_row!(
+            "azurite",
+            "az_nat_log_base",
+            "floor_log_base({n}, {base}) = {out}"
+        );
+
         assert_eq!(
             Natural::from_str(n)
                 .unwrap()
@@ -111,6 +118,12 @@ fn floor_log_base_fail_3() {
 #[test]
 fn test_ceiling_log_base() {
     let test = |n, base, out| {
+        oracle_row!(
+            "azurite",
+            "az_nat_log_base",
+            "ceiling_log_base({n}, {base}) = {out}"
+        );
+
         assert_eq!(
             Natural::from_str(n)
                 .unwrap()
@@ -169,6 +182,12 @@ fn ceiling_log_base_fail_3() {
 #[test]
 fn test_checked_log_base() {
     let test = |n, base, out| {
+        oracle_row!(
+            "azurite",
+            "az_nat_log_base",
+            "checked_log_base({n}, {base}) = {}",
+            malachite_base::test_util::oracle_rows::option(out)
+        );
         assert_eq!(
             Natural::from_str(n)
                 .unwrap()

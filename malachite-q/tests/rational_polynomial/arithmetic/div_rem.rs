@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{DivAssignRem, DivRem};
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::arithmetic::traits::CheckedDivRem;
 use malachite_q::rational_polynomial::RationalPolynomial;
@@ -20,6 +21,12 @@ use malachite_q::test_util::rational_polynomial::arithmetic::div_rem::div_rem_na
 #[test]
 fn test_div_rem() {
     let test = |s, t, q_out, r_out| {
+        oracle_row!(
+            "flint",
+            "fmpq_poly_divrem",
+            "(&({s})).div_rem(&({t})) = ({q_out}, {r_out})"
+        );
+
         let p = RationalPolynomial::from_str(s).unwrap();
         let q = RationalPolynomial::from_str(t).unwrap();
         let (quotient, remainder) = (&p).div_rem(&q);
@@ -83,6 +90,20 @@ fn test_checked_div_rem() {
             .checked_div_rem(RationalPolynomial::ZERO),
         None
     );
+    #[cfg(feature = "oracle")]
+    {
+        let p = RationalPolynomial::from_str("x").unwrap();
+        oracle_row!(
+            "flint",
+            "fmpq_poly_divrem",
+            "(&({p})).checked_div_rem(&({})) = {}",
+            RationalPolynomial::ZERO,
+            malachite_base::test_util::oracle_rows::option(
+                (&p).checked_div_rem(&RationalPolynomial::ZERO)
+                    .map(|(q, r)| format!("({q}, {r})"))
+            )
+        );
+    }
 }
 
 #[test]

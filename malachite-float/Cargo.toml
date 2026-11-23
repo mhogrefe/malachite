@@ -44,6 +44,7 @@ random = ["malachite-base/random", "malachite-nz/random", "malachite-q/random"]
 32_bit_limbs = ["malachite-nz/32_bit_limbs", "malachite-q/32_bit_limbs"]
 test_build = ["malachite-base/test_build", "malachite-nz/test_build", "malachite-q/test_build", "random", "serde", "serde_json", "num", "rug", "gmp-mpfr-sys"]
 bin_build = ["test_build"]
+oracle = ["test_build", "malachite-base/oracle"]
 
 [package.metadata.docs.rs]
 features = ["random"]

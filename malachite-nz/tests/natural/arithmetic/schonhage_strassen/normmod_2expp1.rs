@@ -6,6 +6,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+#[cfg(not(feature = "32_bit_limbs"))]
+use malachite_base::oracle_row;
 use malachite_nz::natural::arithmetic::mul::schonhage_strassen::normmod_2expp1::*;
 #[cfg(not(feature = "32_bit_limbs"))]
 use malachite_nz::platform::Limb;
@@ -16,6 +18,12 @@ use malachite_nz::test_util::natural::arithmetic::schonhage_strassen::*;
 #[test]
 fn test_limbs_norm_mod_2expp1() {
     let test = |t: &[Limb], limbs: usize, out: &[Limb]| {
+        oracle_row!(
+            "flint",
+            "mpn_normmod_2expp1",
+            "limbs_norm_mod_2expp1({t:?}, {limbs}) = {out:?}"
+        );
+
         let mut t = t.to_vec();
         limbs_norm_mod_2expp1(&mut t, limbs);
         assert_eq!(t, out);

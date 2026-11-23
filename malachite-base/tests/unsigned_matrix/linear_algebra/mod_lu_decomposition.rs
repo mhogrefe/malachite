@@ -13,6 +13,7 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::linear_algebra::traits::ModLuDecomposition;
 use malachite_base::num::modular::traits::{ModIsReduced, ModMul};
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::unsigned_matrix_unsigned_pair_gen_var_10;
 use malachite_base::test_util::unsigned_matrix::linear_algebra::mod_lu_decomposition::*;
 use malachite_base::test_util::unsigned_matrix::linear_algebra::mod_rank::*;
@@ -94,6 +95,11 @@ fn test<T: PrimitiveUnsigned>(a: &str, m: T, p: &[u64], l: &str, u: &str)
 where
     <UnsignedMatrix<T> as FromStr>::Err: Debug,
 {
+    oracle_row!(
+        "flint",
+        "nmod_mat_lu",
+        "{a}.mod_lu_decomposition({m}) = ({p:?}, {l}, {u})"
+    );
     let a = UnsignedMatrix::<T>::from_str(a).unwrap();
     let (p_out, l_out, u_out) = (&a).mod_lu_decomposition(m);
     assert_eq!(p_out, p);

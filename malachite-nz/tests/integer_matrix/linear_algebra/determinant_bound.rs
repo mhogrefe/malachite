@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use malachite_base::matrix::Matrix;
 use malachite_base::num::basic::traits::Two;
+use malachite_base::oracle_row;
 use malachite_nz::integer_matrix::IntegerMatrix;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::integer_matrix_gen_var_1;
@@ -26,6 +27,12 @@ fn assert_close_above(bound: &Natural, exact: &Natural) {
 #[test]
 fn test_determinant_bound() {
     let test = |s, out| {
+        oracle_row!(
+            "flint",
+            "fmpz_mat_det_bound",
+            "{s}.determinant_bound() = {out}"
+        );
+
         let a = IntegerMatrix::from_str(s).unwrap();
         let bound = a.determinant_bound();
         assert_eq!(bound.to_string(), out);

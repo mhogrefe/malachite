@@ -11,6 +11,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::modular::traits::DivisibleBy;
+use malachite_base::oracle_row;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
@@ -32,6 +33,12 @@ use std::str::FromStr;
 #[test]
 fn test_div_round() {
     let test = |s, t, rm, quotient, o| {
+        oracle_row!(
+            "azurite",
+            "az_nat_div_round",
+            "{s}.div_round({t}, {rm}) = ({quotient}, {o:?})"
+        );
+
         let u = Natural::from_str(s).unwrap();
         let v = Natural::from_str(t).unwrap();
 

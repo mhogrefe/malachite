@@ -14,6 +14,7 @@ use malachite_base::num::modular::traits::{
     ModPowerOf2, ModPowerOf2Add, ModPowerOf2IsReduced, ModPowerOf2Neg, ModPowerOf2Sub,
     ModPowerOf2SubAssign, ModSub,
 };
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::unsigned_triple_gen_var_11;
 use malachite_nz::integer::Integer;
@@ -173,6 +174,17 @@ fn test_limbs_mod_power_of_2_sub_in_place_either() {
 #[test]
 fn test_mod_power_of_2_sub() {
     let test = |s, t, pow, out| {
+        oracle_row!(
+            "azurite",
+            "az_nat_mod_power_of_2_sub",
+            "{s} - {t} ≡ {out} mod 2^{pow}"
+        );
+        oracle_row!(
+            "azurite",
+            "az_zmod_pow2_sub",
+            "{s} - {t} ≡ {out} mod 2^{pow}"
+        );
+
         let u = Natural::from_str(s).unwrap();
         let v = Natural::from_str(t).unwrap();
 

@@ -11,6 +11,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::exponential::traits::{CeilingLogBase2, CheckedLogBase2, FloorLogBase2};
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{unsigned_gen_var_1, unsigned_vec_gen_var_1};
 use malachite_nz::natural::Natural;
@@ -136,6 +137,12 @@ fn limbs_checked_log_base_2_properties() {
 #[test]
 fn test_floor_log_base_2() {
     let test = |n, out| {
+        oracle_row!(
+            "azurite",
+            "az_nat_log_base_2",
+            "floor_log_base_2({n}) = {out}"
+        );
+
         assert_eq!(Natural::from_str(n).unwrap().floor_log_base_2(), out);
     };
     test("1", 0);
@@ -156,6 +163,12 @@ fn floor_log_base_2_fail() {
 #[test]
 fn test_ceiling_log_base_2() {
     let test = |n, out| {
+        oracle_row!(
+            "azurite",
+            "az_nat_log_base_2",
+            "ceiling_log_base_2({n}) = {out}"
+        );
+
         assert_eq!(Natural::from_str(n).unwrap().ceiling_log_base_2(), out);
     };
     test("1", 0);
@@ -178,6 +191,12 @@ fn ceiling_log_base_2_fail() {
 #[test]
 fn test_checked_log_base_2() {
     let test = |n, out| {
+        oracle_row!(
+            "azurite",
+            "az_nat_log_base_2",
+            "checked_log_base_2({n}) = {}",
+            malachite_base::test_util::oracle_rows::option(out)
+        );
         assert_eq!(Natural::from_str(n).unwrap().checked_log_base_2(), out);
     };
     test("1", Some(0));

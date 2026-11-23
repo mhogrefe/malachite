@@ -13,6 +13,7 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
     ConvertibleFrom, Digits, ExactFrom, PowerOf2Digits, SaturatingFrom, WrappingFrom,
 };
+use malachite_base::oracle_row;
 use malachite_base::slices::{slice_leading_zeros, slice_trailing_zeros};
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
@@ -1576,6 +1577,11 @@ fn from_digits_asc_unsigned_properties() {
 #[test]
 fn from_digits_desc_unsigned() {
     fn test_ok(xs: &[Limb], base: Limb, n: &str) {
+        oracle_row!(
+            "azurite",
+            "az_nat_from_digits",
+            "Natural::from_digits_desc({base}, &{xs:?}) = Some({n})"
+        );
         let n = Natural::from_str(n).unwrap();
         assert_eq!(
             Natural::from_digits_desc(&base, xs.iter().copied()).unwrap(),
@@ -1622,6 +1628,11 @@ fn from_digits_desc_unsigned() {
     );
 
     fn test_err(xs: &[Limb], base: Limb) {
+        oracle_row!(
+            "azurite",
+            "az_nat_from_digits",
+            "Natural::from_digits_desc({base}, &{xs:?}) = None"
+        );
         assert!(Natural::from_digits_desc(&base, xs.iter().copied()).is_none());
         assert!(from_digits_desc_naive_primitive(xs, base).is_none());
     }
@@ -1862,6 +1873,12 @@ fn from_digits_asc_properties() {
 #[test]
 fn from_digits_desc() {
     fn test_ok(xs: &[&str], base: &str, n: &str) {
+        oracle_row!(
+            "azurite",
+            "az_nat_from_digits",
+            "Natural::from_digits_desc({base}, &[{}]) = Some({n})",
+            xs.join(", ")
+        );
         let xs = xs.iter().map(|x| Natural::from_str(x).unwrap());
         let base = Natural::from_str(base).unwrap();
         let n = Natural::from_str(n).unwrap();
@@ -1985,6 +2002,12 @@ fn from_digits_desc() {
     );
 
     fn test_err(xs: &[&str], base: &str) {
+        oracle_row!(
+            "azurite",
+            "az_nat_from_digits",
+            "Natural::from_digits_desc({base}, &[{}]) = None",
+            xs.join(", ")
+        );
         let xs = xs.iter().map(|x| Natural::from_str(x).unwrap());
         let base = Natural::from_str(base).unwrap();
         assert!(Natural::from_digits_desc(&base, xs.clone()).is_none());

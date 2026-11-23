@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::conversion::traits::{ExactFrom, FromStringBase, ToStringBase};
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::exhaustive::valid_digit_chars;
 use malachite_base::test_util::generators::{
@@ -23,6 +24,11 @@ use std::str::FromStr;
 #[test]
 fn test_from_str() {
     let test_ok = |s, n| {
+        oracle_row!(
+            "azurite",
+            "az_int_from_str",
+            "Integer::from_str({s}) = Ok({n})"
+        );
         assert_eq!(Integer::from_str(s).unwrap().to_string(), n);
         assert_eq!(BigInt::from_str(s).unwrap().to_string(), n);
         assert_eq!(rug::Integer::from_str(s).unwrap().to_string(), n);
@@ -37,6 +43,11 @@ fn test_from_str() {
     test_ok("-1000000000000000000000000", "-1000000000000000000000000");
 
     let test_err = |s, rug_err| {
+        oracle_row!(
+            "azurite",
+            "az_int_from_str",
+            "Integer::from_str({s}) = Err(())"
+        );
         assert!(Integer::from_str(s).is_err());
         assert!(BigInt::from_str(s).is_err());
         let rn = rug::Integer::from_str(s);
@@ -113,6 +124,11 @@ fn from_str_properties() {
 #[test]
 fn test_from_string_base() {
     let test_ok = |base, s, n| {
+        oracle_row!(
+            "azurite",
+            "az_int_from_string_base",
+            "Integer::from_string_base({base}, {s}) = Some({n})"
+        );
         assert_eq!(Integer::from_string_base(base, s).unwrap().to_string(), n);
         assert_eq!(
             BigInt::from_str_radix(s, u32::exact_from(base))
@@ -163,6 +179,11 @@ fn test_from_string_base() {
     test_ok(36, "-helloworld", "-1767707668033969");
 
     let test_err = |base, s, rug_err| {
+        oracle_row!(
+            "azurite",
+            "az_int_from_string_base",
+            "Integer::from_string_base({base}, {s}) = None"
+        );
         assert!(Integer::from_string_base(base, s).is_none());
         assert!(BigInt::from_str_radix(s, u32::exact_from(base)).is_err());
         assert_eq!(
@@ -246,6 +267,12 @@ fn from_string_base_properties() {
 #[test]
 fn test_from_string_base_large_integer() {
     fn test(base: u8, s: &str, out: Option<i64>) {
+        oracle_row!(
+            "azurite",
+            "az_int_from_string_base",
+            "Integer::from_string_base({base}, {s}) = {out:?}"
+        );
+
         assert_eq!(
             Integer::from_string_base(base, s),
             out.map(Integer::from),

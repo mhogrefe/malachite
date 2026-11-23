@@ -14,6 +14,7 @@ use malachite_base::num::conversion::traits::{
 };
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::num::modular::traits::ModPowerOf2;
+use malachite_base::oracle_row;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::conversion::primitive_int_from_natural::{
     SignedFromNaturalError, UnsignedFromNaturalError,
@@ -160,6 +161,12 @@ fn u64_exact_from_natural_fail_2() {
 #[test]
 fn test_u64_wrapping_from_natural() {
     let test = |n, out| {
+        oracle_row!(
+            "azurite",
+            "az_nat_wrapping_from",
+            "u64::wrapping_from(&{n}) = {out}"
+        );
+
         assert_eq!(u64::wrapping_from(&Natural::from_str(n).unwrap()), out);
         assert_eq!(rug::Integer::from_str(n).unwrap().to_u64_wrapping(), out);
     };
@@ -342,6 +349,11 @@ fn i64_exact_from_natural_fail_2() {
 #[test]
 fn test_i64_wrapping_from_natural() {
     let test = |n, out| {
+        oracle_row!(
+            "azurite",
+            "az_nat_wrapping_from",
+            "i64::wrapping_from(&{n}) = {out}"
+        );
         assert_eq!(i64::wrapping_from(&Natural::from_str(n).unwrap()), out);
         assert_eq!(rug::Integer::from_str(n).unwrap().to_i64_wrapping(), out);
     };

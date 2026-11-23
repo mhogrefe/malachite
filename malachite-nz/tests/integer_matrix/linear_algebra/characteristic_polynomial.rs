@@ -169,6 +169,33 @@ fn test_characteristic_polynomial() {
     );
 }
 
+#[cfg(feature = "oracle")]
+#[test]
+fn oracle_rows_characteristic_polynomial_examples() {
+    for s in [
+        "[]_{0,0}",
+        "[1, 2; 3, 4]",
+        "[3, -4; 4, 3]",
+        "[0, 0; 0, 0]",
+        "[1, 2, 3; 4, 5, 6; 7, 8, 10]",
+        "[0, -1; 1, 0]",
+    ] {
+        let a = IntegerMatrix::from_str(s).unwrap();
+        malachite_base::oracle_row!(
+            "flint",
+            "fmpz_mat_charpoly",
+            "{a}.characteristic_polynomial() = {}",
+            (&a).characteristic_polynomial()
+        );
+        malachite_base::oracle_row!(
+            "flint",
+            "fmpz_mat_charpoly_bound",
+            "{a}.characteristic_polynomial_bound() = {}",
+            a.characteristic_polynomial_bound()
+        );
+    }
+}
+
 #[test]
 fn characteristic_polynomial_fail() {
     let a = IntegerMatrix::from_str("[1, 2]").unwrap();

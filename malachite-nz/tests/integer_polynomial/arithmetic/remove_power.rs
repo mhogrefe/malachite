@@ -11,6 +11,7 @@ use malachite_base::num::arithmetic::traits::Pow;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::factorization::traits::{RemovePower, RemovePowerAssign};
 use malachite_base::num::modular::traits::DivisibleBy;
+use malachite_base::oracle_row;
 use malachite_nz::integer_polynomial::IntegerPolynomial;
 use malachite_nz::test_util::generators::*;
 use malachite_nz::test_util::integer_polynomial::arithmetic::pseudo_div_rem::*;
@@ -41,6 +42,17 @@ fn verify(p: &IntegerPolynomial, q: &IntegerPolynomial) -> (IntegerPolynomial, u
 #[test]
 fn test_remove_power() {
     let test = |p, q, out: &str, out_e| {
+        oracle_row!(
+            "flint",
+            "fmpz_poly_remove",
+            "({p}).remove_power({q}) = ({out}, {out_e})"
+        );
+        oracle_row!(
+            "flint",
+            "fmpz_poly_remove",
+            "p := {p}; p.remove_power_assign({q}) = {out_e}; p = {out}"
+        );
+
         let p = IntegerPolynomial::from_str(p).unwrap();
         let q = IntegerPolynomial::from_str(q).unwrap();
         let (s, e) = verify(&p, &q);

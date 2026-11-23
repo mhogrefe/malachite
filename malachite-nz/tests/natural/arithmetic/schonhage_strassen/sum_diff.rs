@@ -9,6 +9,8 @@
 use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
+#[cfg(not(feature = "32_bit_limbs"))]
+use malachite_base::oracle_row;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::mul::schonhage_strassen::limbs_sum_diff;
@@ -19,6 +21,13 @@ use malachite_nz::test_util::generators::large_type_gen_var_33;
 #[test]
 fn test_limbs_sum_diff() {
     let test = |x: &[Limb], y: &[Limb], carry: Limb, s_out: &[Limb], d_out: &[Limb]| {
+        oracle_row!(
+            "flint",
+            "flint_mpn_sumdiff_n",
+            "limbs_sum_diff(_, _, {x:?}, {y:?}, {}) = ({carry}, {s_out:?}, {d_out:?})",
+            x.len()
+        );
+
         let n = x.len();
         let mut s = vec![0; n];
         let mut d = vec![0; n];

@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::Pow;
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::arithmetic::traits::{Evaluate, TaylorShift, TaylorShiftAssign};
 use malachite_nz::integer::Integer;
@@ -45,6 +46,12 @@ fn check(p: &IntegerPolynomial, c: &Integer) -> IntegerPolynomial {
 #[test]
 fn test_taylor_shift() {
     let test = |s, c, out| {
+        oracle_row!(
+            "flint",
+            "fmpz_poly_taylor_shift",
+            "(&({s})).taylor_shift({c}) = {out}"
+        );
+
         let p = IntegerPolynomial::from_str(s).unwrap();
         let c = Integer::from_str(c).unwrap();
         let q = check(&p, &c);

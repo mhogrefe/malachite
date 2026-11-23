@@ -12,6 +12,7 @@ use malachite_base::num::logic::traits::LowMask;
 use malachite_base::num::modular::traits::{
     ModInverse, ModPowerOf2Inverse, ModPowerOf2IsReduced, ModPowerOf2Mul, ModPowerOf2Neg,
 };
+use malachite_base::oracle_row;
 use malachite_base::strings::ToDebugString;
 use malachite_base::test_util::generators::{unsigned_gen_var_11, unsigned_pair_gen_var_39};
 use malachite_nz::natural::Natural;
@@ -22,7 +23,18 @@ use std::str::FromStr;
 
 #[test]
 fn test_mod_power_of_2_inverse() {
-    let test = |s, pow, out| {
+    let test = |s, pow: u64, out: &str| {
+        oracle_row!(
+            "azurite",
+            "az_zmod_pow2_inverse",
+            "{}",
+            out.strip_prefix("Some(")
+                .and_then(|x| x.strip_suffix(')'))
+                .map_or_else(
+                    || format!("{s} is not invertible mod 2^{pow}"),
+                    |inverse| format!("{s}⁻¹ ≡ {inverse} mod 2^{pow}")
+                )
+        );
         let n = Natural::from_str(s).unwrap();
 
         let result = n.clone().mod_power_of_2_inverse(pow);

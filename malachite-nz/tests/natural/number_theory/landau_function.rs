@@ -35,6 +35,15 @@ fn test_landau_function_prefix() {
         landau_function_prefix(300)[299].to_string(),
         "179967741245412120"
     );
+    #[cfg(feature = "oracle")]
+    for n in [0, 1, 20] {
+        malachite_base::oracle_row!(
+            "azurite",
+            "az_nat_landau_function_prefix",
+            "landau_function_prefix({n}) = {:?}",
+            landau_function_prefix(n)
+        );
+    }
 }
 
 #[test]

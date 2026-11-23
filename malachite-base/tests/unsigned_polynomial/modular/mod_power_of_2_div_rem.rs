@@ -87,6 +87,46 @@ fn verify<T: PrimitiveUnsigned>(
 
 fn test_mod_power_of_2_div_rem_helper<T: PrimitiveUnsigned>() {
     let test = |p, q, pow: u64, out: Option<(&str, &str)>| {
+        #[cfg(feature = "oracle")]
+        if let Some((s, t)) = out {
+            malachite_base::oracle_row!(
+                "flint",
+                "mod_power_of_2_div_rem",
+                "({p}).mod_power_of_2_div_rem({q}, {pow}) = ({s}, {t})"
+            );
+            malachite_base::oracle_row!(
+                "flint",
+                "mod_power_of_2_div_rem",
+                "({p}).mod_power_of_2_quotient({q}, {pow}) = {s}"
+            );
+            malachite_base::oracle_row!(
+                "flint",
+                "mod_power_of_2_div_rem",
+                "({p}).mod_power_of_2_rem({q}, {pow}) = {t}"
+            );
+            malachite_base::oracle_row!(
+                "flint",
+                "mod_power_of_2_div_rem",
+                "p := {p}; p.mod_power_of_2_div_assign_rem({q}, {pow}) = {t}; p = {s}"
+            );
+        } else {
+            malachite_base::oracle_row!(
+                "flint",
+                "mod_power_of_2_div_rem",
+                "({p}).checked_mod_power_of_2_div_rem({q}, {pow}) = None"
+            );
+            malachite_base::oracle_row!(
+                "flint",
+                "mod_power_of_2_div_rem",
+                "({p}).checked_mod_power_of_2_quotient({q}, {pow}) = None"
+            );
+            malachite_base::oracle_row!(
+                "flint",
+                "mod_power_of_2_div_rem",
+                "({p}).checked_mod_power_of_2_rem({q}, {pow}) = None"
+            );
+        }
+
         let p = UnsignedPolynomial::<T>::from_str(p).unwrap();
         let q = UnsignedPolynomial::<T>::from_str(q).unwrap();
         assert_eq!(

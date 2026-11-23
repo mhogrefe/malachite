@@ -12,6 +12,7 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::modular::traits::{
     ModPowerOf2, ModPowerOf2IsReduced, ModPowerOf2Shl, ModPowerOf2Shr, ModPowerOf2ShrAssign,
 };
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::{
     signed_unsigned_pair_gen_var_14, unsigned_signed_unsigned_triple_gen_var_1,
 };
@@ -27,6 +28,11 @@ use std::str::FromStr;
 macro_rules! test_mod_power_of_2_shr {
     ($t:ident) => {
         let test = |s, v: $t, pow, out| {
+            oracle_row!(
+                "azurite",
+                "az_zmod_pow2_shr",
+                "{s}.mod_power_of_2_shr({v}, {pow}) = {out}"
+            );
             let u = Natural::from_str(s).unwrap();
 
             let mut n = u.clone();

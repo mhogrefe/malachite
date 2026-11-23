@@ -9,6 +9,7 @@
 use malachite_base::num::basic::traits::{Infinity, NegativeInfinity};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::float::NiceFloat;
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::primitive_float_pair_gen;
 use malachite_float::test_util::common::{ORDERED_FLOAT_HEX_STRINGS, parse_hex_string};
 use malachite_float::test_util::generators::{
@@ -58,6 +59,22 @@ fn test_partial_cmp() {
         let x = parse_hex_string(sx);
         for (sy, &e) in ORDERED_FLOAT_HEX_STRINGS.iter().zip(row.iter()) {
             let y = parse_hex_string(sy);
+            oracle_row!(
+                "azurite",
+                "az_float_partial_cmp",
+                "{}",
+                malachite_base::test_util::oracle_rows::partial_cmp_row(sx, sy, x.partial_cmp(&y))
+            );
+            oracle_row!(
+                "azurite",
+                "az_float_comparable_partial_cmp",
+                "{}",
+                malachite_base::test_util::oracle_rows::partial_cmp_row(
+                    sx,
+                    sy,
+                    ComparableFloatRef(&x).partial_cmp(&ComparableFloatRef(&y))
+                )
+            );
             assert_eq!(encode(x.partial_cmp(&y)), e);
             assert_eq!(
                 encode(rug::Float::exact_from(&x).partial_cmp(&rug::Float::exact_from(&y))),

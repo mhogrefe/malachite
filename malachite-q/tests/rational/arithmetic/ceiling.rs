@@ -9,6 +9,7 @@
 use malachite_base::num::arithmetic::traits::{Ceiling, CeilingAssign, Floor};
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::RoundingFrom;
+use malachite_base::oracle_row;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_nz::integer::Integer;
 use malachite_q::Rational;
@@ -19,6 +20,8 @@ use std::str::FromStr;
 #[test]
 fn test_ceiling() {
     let test = |s, out| {
+        oracle_row!("azurite", "az_rat_ceiling", "ceiling({s}) = {out}");
+
         let x = Rational::from_str(s).unwrap();
 
         let ceiling = x.clone().ceiling();

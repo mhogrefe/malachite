@@ -11,6 +11,7 @@ use malachite_base::num::arithmetic::traits::{Abs, UnsignedAbs};
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::num::modular::traits::DivisibleBy;
 use malachite_base::num::number_theory::traits::{ExtendedGcd, Gcd, GcdAssign};
+use malachite_base::oracle_row;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::{integer_gen, integer_pair_gen, integer_triple_gen};
@@ -18,6 +19,8 @@ use malachite_nz::test_util::generators::{integer_gen, integer_pair_gen, integer
 #[test]
 fn test_gcd() {
     let test = |s, t, out| {
+        oracle_row!("azurite", "az_int_gcd", "({s}).gcd({t}) = {out}");
+
         let u = Integer::from_str(s).unwrap();
         let v = Integer::from_str(t).unwrap();
 

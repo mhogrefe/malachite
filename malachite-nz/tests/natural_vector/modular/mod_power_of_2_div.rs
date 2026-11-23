@@ -12,6 +12,7 @@ use malachite_base::num::basic::traits::{Two, Zero};
 use malachite_base::num::modular::traits::{
     ModDiv, ModPowerOf2Div, ModPowerOf2IsReduced, ModPowerOf2Mul,
 };
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::unsigned_vector_unsigned_unsigned_triple_gen_var_1;
 use malachite_base::vector::Vector;
 use malachite_nz::natural::Natural;
@@ -22,6 +23,12 @@ use malachite_nz::test_util::natural_vector::modular::mod_power_of_2_div::*;
 #[test]
 fn test_mod_power_of_2_div() {
     let test = |s, c: Natural, pow, out: Option<&str>| {
+        oracle_row!(
+            "flint",
+            "_fmpz_mod_vec_scalar_div_fmpz_mod",
+            "{s}.mod_power_of_2_div({c}, {pow}) = {}",
+            malachite_base::test_util::oracle_rows::option(out)
+        );
         let v = NaturalVector::from_str(s).unwrap();
         let r = (&v).mod_power_of_2_div(&c, pow);
         assert_eq!(r.as_ref().map(ToString::to_string).as_deref(), out);

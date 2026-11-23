@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::modular::traits::ModPowerOf2;
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::modular::traits::ModPowerOf2Evaluate;
 use malachite_base::test_util::generators::unsigned_polynomial_unsigned_unsigned_triple_gen_var_1;
@@ -18,6 +19,12 @@ use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 #[test]
 fn test_mod_power_of_2_evaluate() {
     fn test<T: PrimitiveUnsigned>(s: &str, x: T, pow: u64, out: T) {
+        oracle_row!(
+            "flint",
+            "fmpz_mod_poly_evaluate_fmpz",
+            "(&({s})).mod_power_of_2_evaluate({x}, {pow}) = {out}"
+        );
+
         let p = UnsignedPolynomial::<T>::from_str(s).unwrap();
         assert_eq!((&p).mod_power_of_2_evaluate(x, pow), out);
         assert_eq!(p.mod_power_of_2_evaluate(x, pow), out);

@@ -11,6 +11,7 @@ use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeOne, One, OneHalf, Zero,
 };
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::oracle_row;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_float::big_exponent_float::{
     ComparableBigExponentFloat, ComparableBigExponentFloatRef,
@@ -55,19 +56,72 @@ fn test_partial_cmp() {
     ];
     for (i, x) in xs.iter().enumerate() {
         for (j, y) in xs.iter().enumerate() {
+            oracle_row!(
+                "flint",
+                "arf_cmp",
+                "{}",
+                malachite_base::test_util::oracle_rows::partial_cmp_row(
+                    format!("{x:?}"),
+                    format!("{y:?}"),
+                    x.partial_cmp(y)
+                )
+            );
+            oracle_row!(
+                "flint",
+                "arf_cmp_total",
+                "{x:?} {} {y:?}",
+                malachite_base::test_util::oracle_rows::cmp_symbol(
+                    ComparableBigExponentFloatRef(x).cmp(&ComparableBigExponentFloatRef(y))
+                )
+            );
             assert_eq!(x.partial_cmp(y), Some(i.cmp(&j)));
             assert_eq!(
                 ComparableBigExponentFloatRef(x).cmp(&ComparableBigExponentFloatRef(y)),
                 i.cmp(&j)
             );
         }
+        oracle_row!(
+            "flint",
+            "arf_cmp",
+            "{}",
+            malachite_base::test_util::oracle_rows::partial_cmp_row(
+                format!("{x:?}"),
+                "NaN",
+                x.partial_cmp(&BigExponentFloat::NAN)
+            )
+        );
+        oracle_row!(
+            "flint",
+            "arf_cmp",
+            "{}",
+            malachite_base::test_util::oracle_rows::partial_cmp_row(
+                "NaN",
+                format!("{x:?}"),
+                BigExponentFloat::NAN.partial_cmp(x)
+            )
+        );
         assert_eq!(x.partial_cmp(&BigExponentFloat::NAN), None);
         assert_eq!(BigExponentFloat::NAN.partial_cmp(x), None);
         // - NaN lies between the negative values and zero
         let nan_cmp = ComparableBigExponentFloat(BigExponentFloat::NAN)
             .cmp(&ComparableBigExponentFloat(x.clone()));
+        oracle_row!(
+            "flint",
+            "arf_cmp_total",
+            "NaN {} {x:?}",
+            malachite_base::test_util::oracle_rows::cmp_symbol(nan_cmp)
+        );
         assert_eq!(nan_cmp, if x.is_sign_negative() { Greater } else { Less });
     }
+    oracle_row!(
+        "flint",
+        "arf_cmp_total",
+        "NaN {} NaN",
+        malachite_base::test_util::oracle_rows::cmp_symbol(
+            ComparableBigExponentFloat(BigExponentFloat::NAN)
+                .cmp(&ComparableBigExponentFloat(BigExponentFloat::NAN))
+        )
+    );
     assert_eq!(
         ComparableBigExponentFloat(BigExponentFloat::NAN)
             .cmp(&ComparableBigExponentFloat(BigExponentFloat::NAN)),

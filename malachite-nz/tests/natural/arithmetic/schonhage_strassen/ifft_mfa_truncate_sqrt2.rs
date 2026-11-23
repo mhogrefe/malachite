@@ -8,6 +8,8 @@
 
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::modular::traits::{ModAdd, ModMul, ModSub};
+#[cfg(not(feature = "32_bit_limbs"))]
+use malachite_base::oracle_row;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::mul::schonhage_strassen::fft_mfa_truncate_sqrt2::*;
 use malachite_nz::natural::arithmetic::mul::schonhage_strassen::ifft_mfa_truncate_sqrt2::*;
@@ -25,16 +27,28 @@ fn column(ii: &[Vec<Limb>], n1: usize, c: usize) -> Vec<Vec<Limb>> {
 #[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_limbs_ifft_butterfly_twiddle() {
-    let test =
-        |s: &[Limb], t: &[Limb], limbs: usize, b1: u64, b2: u64, u_out: &[Limb], v_out: &[Limb]| {
-            let mut u = vec![0; limbs + 1];
-            let mut v = vec![0; limbs + 1];
-            let mut s = s.to_vec();
-            let mut t = t.to_vec();
-            limbs_ifft_butterfly_twiddle(&mut u, &mut v, &mut s, &mut t, limbs, b1, b2);
-            assert_eq!(u, u_out);
-            assert_eq!(v, v_out);
-        };
+    let test = |s: &[Limb],
+                t: &[Limb],
+                limbs: usize,
+                b1: u64,
+                b2: u64,
+                u_out: &[Limb],
+                v_out: &[Limb]| {
+        oracle_row!(
+            "flint",
+            "ifft_butterfly_twiddle",
+            "limbs_ifft_butterfly_twiddle(_, _, {s:?}, {t:?}, {limbs}, {b1}, {b2}) = ({u_out:?}, \
+            {v_out:?}, _, _)"
+        );
+
+        let mut u = vec![0; limbs + 1];
+        let mut v = vec![0; limbs + 1];
+        let mut s = s.to_vec();
+        let mut t = t.to_vec();
+        limbs_ifft_butterfly_twiddle(&mut u, &mut v, &mut s, &mut t, limbs, b1, b2);
+        assert_eq!(u, u_out);
+        assert_eq!(v, v_out);
+    };
     // - !negate1
     // - !negate2
     // - !negate1
@@ -101,6 +115,15 @@ fn limbs_ifft_butterfly_twiddle_properties() {
 #[test]
 fn test_ifft_radix2_twiddle() {
     let test = |ii: &[&[Limb]], n1: usize, n2: usize, w: u64, c: usize, out: &[Limb]| {
+        oracle_row!(
+            "flint",
+            "ifft_radix2_twiddle",
+            "ifft_radix2_twiddle({ii:?}, {c}, {n1}, {}, {}, _, _, {w}, 0, {c}, 1) = {:?}",
+            n2 >> 1,
+            w * u64::try_from(n1).unwrap(),
+            out.chunks(ii[0].len()).collect::<Vec<_>>()
+        );
+
         let mut ii: Vec<Vec<Limb>> = ii.iter().map(|x| x.to_vec()).collect();
         let limbs = ii[0].len() - 1;
         let mut t1 = vec![0; limbs + 1];
@@ -159,27 +182,42 @@ fn test_ifft_radix2_twiddle() {
 #[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_ifft_truncate1_twiddle() {
-    let test =
-        |ii: &[&[Limb]], n1: usize, n2: usize, w: u64, c: usize, trunc: usize, out: &[Limb]| {
-            let mut ii: Vec<Vec<Limb>> = ii.iter().map(|x| x.to_vec()).collect();
-            let limbs = ii[0].len() - 1;
-            let mut t1 = vec![0; limbs + 1];
-            let mut t2 = vec![0; limbs + 1];
-            ifft_truncate1_twiddle(
-                &mut ii[c..],
-                n1,
-                n2 >> 1,
-                w * u64::try_from(n1).unwrap(),
-                &mut t1,
-                &mut t2,
-                w,
-                0,
-                c,
-                1,
-                trunc,
-            );
-            assert_eq!(ii.concat(), out);
-        };
+    let test = |ii: &[&[Limb]],
+                n1: usize,
+                n2: usize,
+                w: u64,
+                c: usize,
+                trunc: usize,
+                out: &[Limb]| {
+        oracle_row!(
+            "flint",
+            "ifft_truncate1_twiddle",
+            "ifft_truncate1_twiddle({ii:?}, {c}, {n1}, {}, {}, _, _, {w}, 0, {c}, 1, {trunc}) = \
+            {:?}",
+            n2 >> 1,
+            w * u64::try_from(n1).unwrap(),
+            out.chunks(ii[0].len()).collect::<Vec<_>>()
+        );
+
+        let mut ii: Vec<Vec<Limb>> = ii.iter().map(|x| x.to_vec()).collect();
+        let limbs = ii[0].len() - 1;
+        let mut t1 = vec![0; limbs + 1];
+        let mut t2 = vec![0; limbs + 1];
+        ifft_truncate1_twiddle(
+            &mut ii[c..],
+            n1,
+            n2 >> 1,
+            w * u64::try_from(n1).unwrap(),
+            &mut t1,
+            &mut t2,
+            w,
+            0,
+            c,
+            1,
+            trunc,
+        );
+        assert_eq!(ii.concat(), out);
+    };
     // - trunc == n << 1
     test(
         &[&[1, 0], &[2, 0], &[3, 0], &[4, 0]],
@@ -284,6 +322,13 @@ fn test_ifft_truncate1_twiddle() {
 #[test]
 fn test_ifft_mfa_truncate_sqrt2_outer() {
     let test = |ii: &[&[Limb]], n: usize, w: u64, n1: usize, trunc: usize, out: &[Limb]| {
+        oracle_row!(
+            "flint",
+            "ifft_mfa_truncate_sqrt2_outer",
+            "ifft_mfa_truncate_sqrt2_outer({ii:?}, {n}, {w}, _, _, _, {n1}, {trunc}) = {:?}",
+            out.chunks(ii[0].len()).collect::<Vec<_>>()
+        );
+
         let mut ii: Vec<Vec<Limb>> = ii.iter().map(|x| x.to_vec()).collect();
         let limbs = ii[0].len() - 1;
         let mut t1 = vec![0; limbs + 1];

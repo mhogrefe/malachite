@@ -14,6 +14,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::modular::traits::{CeilingMod, Mod};
+use malachite_base::oracle_row;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::signed_pair_gen_var_4;
@@ -29,6 +30,12 @@ use std::str::FromStr;
 #[test]
 fn test_div_mod() {
     let test = |s, t, quotient, remainder| {
+        oracle_row!(
+            "azurite",
+            "az_int_div_mod",
+            "{s}.div_mod({t}) = ({quotient}, {remainder})"
+        );
+
         let u = Integer::from_str(s).unwrap();
         let v = Integer::from_str(t).unwrap();
 

@@ -12,6 +12,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::arithmetic::traits::{BitPack, BitUnpack};
 use malachite_nz::integer::Integer;
@@ -31,6 +32,12 @@ use malachite_nz::test_util::integer_polynomial::arithmetic::bit_unpack::bit_unp
 #[test]
 fn test_bit_unpack() {
     let test = |s, bits, out| {
+        oracle_row!(
+            "flint",
+            "fmpz_poly_bit_unpack",
+            "IntegerPolynomial::bit_unpack(&{s}, {bits}) = {out}"
+        );
+
         let n = Integer::from_str(s).unwrap();
         let p = IntegerPolynomial::bit_unpack(&n, bits);
         assert!(p.is_valid());

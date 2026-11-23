@@ -7,6 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::modular::traits::ModNeg;
+#[cfg(not(feature = "32_bit_limbs"))]
+use malachite_base::oracle_row;
 use malachite_nz::natural::arithmetic::mul::schonhage_strassen::negmod_2expp1::*;
 #[cfg(not(feature = "32_bit_limbs"))]
 use malachite_nz::platform::Limb;
@@ -17,6 +19,12 @@ use malachite_nz::test_util::natural::arithmetic::schonhage_strassen::*;
 #[test]
 fn test_limbs_neg_mod_2expp1_to_out() {
     let test = |a: &[Limb], limbs: usize, out: &[Limb]| {
+        oracle_row!(
+            "flint",
+            "mpn_negmod_2expp1",
+            "limbs_neg_mod_2expp1_to_out(_, {a:?}, {limbs}) = {out:?}"
+        );
+
         let mut z = vec![0; limbs + 1];
         limbs_neg_mod_2expp1_to_out(&mut z, a, limbs);
         assert_eq!(z, out);

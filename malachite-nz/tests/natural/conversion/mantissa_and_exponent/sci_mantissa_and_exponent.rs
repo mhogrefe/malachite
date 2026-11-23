@@ -11,6 +11,7 @@ use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::mantissa_and_exponent::sci_mantissa_and_exponent_round;
 use malachite_base::num::conversion::traits::SciMantissaAndExponent;
 use malachite_base::num::float::NiceFloat;
+use malachite_base::oracle_row;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
     primitive_float_unsigned_pair_gen_var_1, primitive_float_unsigned_pair_gen_var_2,
@@ -30,6 +31,12 @@ use std::str::FromStr;
 #[test]
 fn test_sci_mantissa_and_exponent() {
     let test = |s: &str, mantissa: f32, exponent: u64| {
+        oracle_row!(
+            "azurite",
+            "az_nat_sci_f32",
+            "sci_mantissa_and_exponent({s}) = ({}, {exponent})",
+            NiceFloat(mantissa)
+        );
         let n = Natural::from_str(s).unwrap();
         let (actual_mantissa, actual_exponent) = n.sci_mantissa_and_exponent();
         assert_eq!(NiceFloat(actual_mantissa), NiceFloat(mantissa));
@@ -77,6 +84,12 @@ fn test_sci_mantissa_and_exponent() {
 #[test]
 fn test_sci_mantissa_and_exponent_round() {
     let test = |n: &str, rm: RoundingMode, out: Option<(f32, u64, Ordering)>| {
+        oracle_row!(
+            "azurite",
+            "az_nat_sci_f32",
+            "sci_mantissa_and_exponent_round({n}, {rm}) = {out:?}"
+        );
+
         let actual_out = Natural::from_str(n)
             .unwrap()
             .sci_mantissa_and_exponent_round(rm);
@@ -358,6 +371,13 @@ fn test_sci_mantissa_and_exponent_round() {
 #[test]
 fn test_from_sci_mantissa_and_exponent() {
     let test = |mantissa: f32, exponent: u64, out: Option<&str>| {
+        oracle_row!(
+            "azurite",
+            "az_nat_sci_f32",
+            "Natural::from_sci_mantissa_and_exponent({}, {exponent}) = {}",
+            NiceFloat(mantissa),
+            malachite_base::test_util::oracle_rows::option(out)
+        );
         assert_eq!(
             <&Natural as SciMantissaAndExponent<_, _, _>>::from_sci_mantissa_and_exponent(
                 mantissa, exponent
@@ -396,6 +416,16 @@ fn from_sci_mantissa_and_exponent_fail() {
 #[test]
 fn test_from_sci_mantissa_and_exponent_round() {
     let test = |mantissa: f32, exponent: u64, rm: RoundingMode, out: Option<(&str, Ordering)>| {
+        oracle_row!(
+            "azurite",
+            "az_nat_sci_f32",
+            "Natural::from_sci_mantissa_and_exponent_round({}, {exponent}, {rm}) = {}",
+            NiceFloat(mantissa),
+            out.map_or_else(
+                || "None".to_string(),
+                |(s, o)| format!("Some(({s}, {o:?}))")
+            )
+        );
         assert_eq!(
             Natural::from_sci_mantissa_and_exponent_round(mantissa, exponent, rm),
             out.map(|(s, o)| (Natural::from_str(s).unwrap(), o))

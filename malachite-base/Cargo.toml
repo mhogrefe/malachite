@@ -45,6 +45,7 @@ random = ["sha3", "rand", "rand_chacha"]
 enable_serde = ["serde"]
 test_build = ["gnuplot", "clap", "random", "serde", "serde_json", "itertools/use_std"]
 bin_build = ["walkdir", "test_build"]
+oracle = ["test_build"]
 
 [dev-dependencies]
 malachite-base = { workspace = true, features = ["test_build"] }

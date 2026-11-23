@@ -10,6 +10,7 @@ use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::Pow;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::modular::traits::DivisibleBy;
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::arithmetic::traits::{
     PseudoDiv, PseudoDivAssign, PseudoDivAssignRem, PseudoDivRem, PseudoRem, PseudoRemAssign,
@@ -84,6 +85,37 @@ fn verify(
 #[test]
 fn test_pseudo_div_rem() {
     let test = |p, q, out_s, out_r, out_d| {
+        oracle_row!(
+            "flint",
+            "fmpz_poly_pseudo_divrem",
+            "({p}).pseudo_div_rem({q}) = ({out_s}, {out_r}, {out_d})"
+        );
+        oracle_row!(
+            "flint",
+            "fmpz_poly_pseudo_divrem",
+            "({p}).pseudo_div({q}) = ({out_s}, {out_d})"
+        );
+        oracle_row!(
+            "flint",
+            "fmpz_poly_pseudo_divrem",
+            "({p}).pseudo_rem({q}) = ({out_r}, {out_d})"
+        );
+        oracle_row!(
+            "flint",
+            "fmpz_poly_pseudo_divrem",
+            "p := {p}; p.pseudo_div_assign_rem({q}) = ({out_r}, {out_d}); p = {out_s}"
+        );
+        oracle_row!(
+            "flint",
+            "fmpz_poly_pseudo_divrem",
+            "p := {p}; p.pseudo_div_assign({q}) = {out_d}; p = {out_s}"
+        );
+        oracle_row!(
+            "flint",
+            "fmpz_poly_pseudo_divrem",
+            "p := {p}; p.pseudo_rem_assign({q}) = {out_d}; p = {out_r}"
+        );
+
         let p = IntegerPolynomial::from_str(p).unwrap();
         let q = IntegerPolynomial::from_str(q).unwrap();
         let (s, r, d) = verify(&p, &q);

@@ -12,6 +12,7 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::num::modular::traits::{
     ModPowerOf2, ModPowerOf2Neg, ModPowerOf2Sqrt, ModPowerOf2Square,
 };
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::unsigned_pair_gen_var_17;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::modular::mod_power_of_2_sqrt::mod_power_of_2_sqrt_natural;
@@ -25,6 +26,12 @@ use std::str::FromStr;
 #[test]
 fn test_mod_power_of_2_sqrt() {
     let test = |x, pow, out: Option<&str>| {
+        oracle_row!(
+            "azurite",
+            "az_zmod_pow2_sqrt",
+            "{x}.mod_power_of_2_sqrt({pow}) = {}",
+            malachite_base::test_util::oracle_rows::option(out)
+        );
         let x = Natural::from_str(x).unwrap();
         let out = out.map(|s| Natural::from_str(s).unwrap());
         assert_eq!((&x).mod_power_of_2_sqrt(pow), out);

@@ -11,6 +11,7 @@ use malachite_base::matrix::Matrix;
 use malachite_base::num::linear_algebra::traits::{
     Nullspace, Rank, ReducedRowEchelonForm, ReducedRowEchelonFormAssign,
 };
+use malachite_base::oracle_row;
 use malachite_q::rational_matrix::RationalMatrix;
 use malachite_q::rational_matrix::linear_algebra::reduced_row_echelon_form::*;
 use malachite_q::test_util::generators::{
@@ -56,6 +57,12 @@ fn verify_nullspace(a: &RationalMatrix) -> String {
 #[test]
 fn test_reduced_row_echelon_form() {
     let test = |s, out| {
+        oracle_row!(
+            "flint",
+            "fmpq_mat_rref",
+            "reduced_row_echelon_form({s}) = {out}"
+        );
+
         let a = RationalMatrix::from_str(s).unwrap();
         assert_eq!(verify_rref(&a), out);
     };
@@ -97,6 +104,8 @@ fn test_reduced_row_echelon_form() {
 #[test]
 fn test_rank() {
     let test = |s, out| {
+        oracle_row!("flint", "fmpq_mat_rank_via_rref", "rank({s}) = {out}");
+
         let a = RationalMatrix::from_str(s).unwrap();
         let rank = (&a).rank();
         assert_eq!(a.clone().rank(), rank);

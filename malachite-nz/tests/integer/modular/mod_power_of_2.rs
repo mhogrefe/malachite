@@ -14,6 +14,7 @@ use malachite_base::num::modular::traits::{
     CeilingModPowerOf2, CeilingModPowerOf2Assign, DivisibleByPowerOf2, ModPowerOf2,
     ModPowerOf2Assign, NegModPowerOf2, RemPowerOf2, RemPowerOf2Assign,
 };
+use malachite_base::oracle_row;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::generators::{
     signed_unsigned_pair_gen_var_1, signed_unsigned_pair_gen_var_10,
@@ -33,6 +34,12 @@ use std::str::FromStr;
 #[test]
 fn test_mod_power_of_2() {
     let test = |s, v: u64, out| {
+        oracle_row!(
+            "azurite",
+            "az_zmod_pow2_of_int",
+            "{s}.mod_power_of_2({v}) = {out}"
+        );
+
         let u = Integer::from_str(s).unwrap();
 
         let mut n = u.clone();

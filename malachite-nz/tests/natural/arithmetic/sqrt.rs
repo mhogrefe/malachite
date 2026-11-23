@@ -19,6 +19,7 @@ use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves};
 use malachite_base::num::logic::traits::BitAccess;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_base::num::logic::traits::LeadingZeros;
+use malachite_base::oracle_row;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
@@ -529,6 +530,8 @@ fn limbs_sqrt_rem_fail() {
 #[test]
 fn test_floor_sqrt() {
     let test = |s, out| {
+        oracle_row!("azurite", "az_nat_floor_sqrt", "{s}.floor_sqrt() = {out}");
+
         let n = Natural::from_str(s).unwrap();
         assert_eq!(n.clone().floor_sqrt().to_string(), out);
         assert_eq!((&n).floor_sqrt().to_string(), out);
@@ -563,6 +566,12 @@ fn test_floor_sqrt() {
 #[test]
 fn test_ceiling_sqrt() {
     let test = |s, out| {
+        oracle_row!(
+            "azurite",
+            "az_nat_sqrt_variants",
+            "{s}.ceiling_sqrt() = {out}"
+        );
+
         let n = Natural::from_str(s).unwrap();
         assert_eq!(n.clone().ceiling_sqrt().to_string(), out);
         assert_eq!((&n).ceiling_sqrt().to_string(), out);
@@ -598,6 +607,12 @@ fn test_ceiling_sqrt() {
 #[test]
 fn test_checked_sqrt() {
     let test = |s, out: Option<&str>| {
+        oracle_row!(
+            "azurite",
+            "az_nat_sqrt_variants",
+            "{s}.checked_sqrt() = {}",
+            malachite_base::test_util::oracle_rows::option(out)
+        );
         let n = Natural::from_str(s).unwrap();
         let out = out.map(|s| s.to_string());
 
@@ -627,6 +642,12 @@ fn test_checked_sqrt() {
 #[test]
 fn test_sqrt_rem() {
     let test = |s, sqrt_out, rem_out| {
+        oracle_row!(
+            "azurite",
+            "az_nat_sqrt_rem",
+            "{s}.sqrt_rem() = ({sqrt_out}, {rem_out})"
+        );
+
         let n = Natural::from_str(s).unwrap();
 
         let (sqrt, rem) = n.clone().sqrt_rem();

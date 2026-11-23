@@ -136,6 +136,26 @@ fn verify(
 #[test]
 fn test_mod_extended_gcd() {
     let test = |p, q, m, out: Option<(&str, &str, &str)>| {
+        #[cfg(feature = "oracle")]
+        {
+            let out_string = out.map_or_else(
+                || "None".to_string(),
+                |(g, s, t)| format!("({g}, {s}, {t})"),
+            );
+            malachite_base::oracle_row!(
+                "flint",
+                "mod_gcd",
+                "({p}).checked_mod_extended_gcd({q}, {m}) = {out_string}"
+            );
+            if out.is_some() && probably_prime(&Natural::from_str(m).unwrap()) {
+                malachite_base::oracle_row!(
+                    "flint",
+                    "mod_gcd",
+                    "({p}).mod_extended_gcd({q}, {m}) = {out_string}"
+                );
+            }
+        }
+
         let p = NaturalPolynomial::from_str(p).unwrap();
         let q = NaturalPolynomial::from_str(q).unwrap();
         let m = Natural::from_str(m).unwrap();

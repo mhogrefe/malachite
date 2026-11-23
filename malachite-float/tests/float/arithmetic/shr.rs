@@ -15,6 +15,7 @@ use malachite_base::num::basic::traits::{
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::oracle_row;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::generators::{
     signed_gen, signed_gen_var_5, unsigned_gen, unsigned_gen_var_5,
@@ -37,6 +38,8 @@ where
     for<'a> &'a Float: Shr<T, Output = Float>,
 {
     let test = |s, s_hex, v: u64, out: &str, out_hex: &str| {
+        oracle_row!("azurite", "az_float_shr", "{s_hex} >> {v} = {out_hex}");
+
         let x = parse_hex_string(s_hex);
         assert_eq!(x.to_string(), s);
         let v = T::exact_from(v);
@@ -242,6 +245,8 @@ where
     for<'a> &'a Float: Shr<T, Output = Float>,
 {
     let test = |s, s_hex, v: i64, out: &str, out_hex: &str| {
+        oracle_row!("azurite", "az_float_shr", "{s_hex} >> {v} = {out_hex}");
+
         let x = parse_hex_string(s_hex);
         assert_eq!(x.to_string(), s);
         let v = T::exact_from(v);

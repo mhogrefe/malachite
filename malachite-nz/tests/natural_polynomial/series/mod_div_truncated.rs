@@ -13,6 +13,7 @@ use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::num::modular::traits::{Mod, ModIsReduced};
 use malachite_base::num::number_theory::traits::CoprimeWith;
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::series::traits::{
     CheckedModDivTruncated, ModDivTruncated, ModDivTruncatedAssign, ModInverseTruncated,
@@ -91,6 +92,14 @@ fn verify(
 #[test]
 fn test_mod_div_truncated() {
     let test = |p, q, len, m, out: Option<&str>| {
+        oracle_row!(
+            "flint",
+            "mod_div_series",
+            "({p}).{}mod_div_truncated({q}, {len}, {m}) = {}",
+            if out.is_some() { "" } else { "checked_" },
+            out.unwrap_or("None")
+        );
+
         let p = NaturalPolynomial::from_str(p).unwrap();
         let q = NaturalPolynomial::from_str(q).unwrap();
         let m = Natural::from_str(m).unwrap();

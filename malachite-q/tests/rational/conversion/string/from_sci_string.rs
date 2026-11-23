@@ -12,6 +12,7 @@ use malachite_base::num::conversion::string::from_sci_string::preprocess_sci_str
 use malachite_base::num::conversion::string::options::{FromSciStringOptions, ToSciOptions};
 use malachite_base::num::conversion::traits::{ExactFrom, FromSciString, ToSci};
 use malachite_base::num::exponential::traits::FloorLogBase;
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::{
     string_from_sci_string_options_pair_gen_var_2, string_from_sci_string_options_pair_gen_var_3,
     string_gen_var_14, string_gen_var_15,
@@ -26,6 +27,12 @@ use std::str::FromStr;
 pub fn test_from_sci_string() {
     fn test(s: &str, out: Option<&'static str>) {
         let out = out.map(|s| Rational::from_str(s).unwrap());
+        oracle_row!(
+            "azurite",
+            "az_rat_from_sci_string",
+            "Rational::from_sci_string({s}) = {}",
+            malachite_base::test_util::oracle_rows::option(out.as_ref())
+        );
         assert_eq!(Rational::from_sci_string(s), out);
         assert_eq!(
             Rational::from_sci_string_with_options(s, FromSciStringOptions::default()),

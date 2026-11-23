@@ -11,6 +11,7 @@ use malachite_base::num::basic::traits::One;
 use malachite_base::num::modular::traits::{
     ModNeg, ModPowerOf2, ModPowerOf2Add, ModPowerOf2IsReduced, ModPowerOf2Neg, ModPowerOf2NegAssign,
 };
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::unsigned_pair_gen_var_17;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -21,6 +22,8 @@ use std::str::FromStr;
 #[test]
 fn test_mod_power_of_2_neg() {
     let test = |s, pow, out| {
+        oracle_row!("azurite", "az_zmod_pow2_neg", "-{s} ≡ {out} mod 2^{pow}");
+
         let u = Natural::from_str(s).unwrap();
 
         assert!(u.mod_power_of_2_is_reduced(pow));

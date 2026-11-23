@@ -8,6 +8,7 @@
 
 use core::str::FromStr;
 use malachite_base::num::modular::traits::{ModInverse, ModIsReduced};
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::series::traits::{
     ModComposeTruncated, ModCompositionalInverseTruncated,
@@ -48,6 +49,12 @@ fn show(p: Option<NaturalPolynomial>) -> String {
 #[test]
 fn test_mod_compositional_inverse_truncated() {
     let test = |p, len, m, out| {
+        oracle_row!(
+            "flint",
+            "mod_revert_series",
+            "({p}).mod_compositional_inverse_truncated({len}, {m}) = {out}"
+        );
+
         let p = NaturalPolynomial::from_str(p).unwrap();
         let m = Natural::from_str(m).unwrap();
         assert_eq!(show(verify(&p, len, &m)), out);

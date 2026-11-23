@@ -12,6 +12,7 @@ use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::modular::traits::{DivisibleBy, Mod, ModIsReduced, ModPowerOf2};
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;
 use malachite_nz::integer::Integer;
@@ -27,6 +28,12 @@ use malachite_nz::test_util::generators::{
 #[test]
 fn test_mod_op() {
     let test = |s, m, out| {
+        oracle_row!(
+            "flint",
+            "fmpz_poly_scalar_mod_fmpz",
+            "({s}).mod_op({m}) = {out}"
+        );
+
         let p = IntegerPolynomial::from_str(s).unwrap();
         let m = Natural::from_str(m).unwrap();
         // All four combinations of value and reference.
@@ -162,6 +169,23 @@ fn test_mod_op_unsigned() {
     where
         Natural: From<T>,
     {
+        // FLINT reduces modulo a word with `fmpz_poly_get_nmod_poly`, and modulo a wider modulus
+        // with `fmpz_poly_scalar_mod_fmpz`.
+        #[cfg(feature = "oracle")]
+        if T::WIDTH <= 64 {
+            malachite_base::oracle_row!(
+                "flint",
+                "fmpz_poly_get_nmod_poly",
+                "({s}).mod_op({m}) = {out}"
+            );
+        } else {
+            malachite_base::oracle_row!(
+                "flint",
+                "fmpz_poly_scalar_mod_fmpz",
+                "({s}).mod_op({m}) = {out}"
+            );
+        }
+
         let p = IntegerPolynomial::from_str(s).unwrap();
         let q: UnsignedPolynomial<T> = (&p).mod_op(m);
         assert!(q.is_valid());

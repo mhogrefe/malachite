@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{Square, SquareAssign};
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_nz::integer::Integer;
@@ -47,6 +48,11 @@ fn test_square_to_out_classical() {
         let xs = parse(xs);
         let mut result = vec![Integer::ZERO; (xs.len() << 1) - 1];
         square_to_out_classical(&mut result, &xs);
+        oracle_row!(
+            "flint",
+            "_fmpz_poly_sqr_classical",
+            "square_to_out_classical(_, {xs:?}) = {result:?}"
+        );
         assert!(result.iter().all(Integer::is_valid));
         assert_eq!(result, parse(out));
         assert_eq!(integers_mul_naive(&xs, &xs), result);
@@ -102,6 +108,11 @@ fn test_square_to_out_tiny_1() {
         let xs = parse(xs);
         let mut result = vec![Integer::ZERO; (xs.len() << 1) - 1];
         square_to_out_tiny_1(&mut result, &xs);
+        oracle_row!(
+            "flint",
+            "_fmpz_poly_sqr",
+            "square_to_out_tiny_1(_, {xs:?}) = {result:?}"
+        );
         assert!(result.iter().all(Integer::is_valid));
         assert_eq!(result, parse(out));
         assert_eq!(integers_mul_naive(&xs, &xs), result);
@@ -124,6 +135,11 @@ fn test_square_to_out_tiny_2() {
         let xs = parse(xs);
         let mut result = vec![Integer::ZERO; (xs.len() << 1) - 1];
         square_to_out_tiny_2(&mut result, &xs);
+        oracle_row!(
+            "flint",
+            "_fmpz_poly_sqr",
+            "square_to_out_tiny_2(_, {xs:?}) = {result:?}"
+        );
         assert!(result.iter().all(Integer::is_valid));
         assert_eq!(result, parse(out));
         assert_eq!(integers_mul_naive(&xs, &xs), result);
@@ -180,6 +196,11 @@ fn test_square_to_out() {
         let xs = parse(xs);
         let mut result = vec![Integer::ZERO; (xs.len() << 1) - 1];
         square_to_out(&mut result, &xs);
+        oracle_row!(
+            "flint",
+            "_fmpz_poly_sqr",
+            "square_to_out(_, {xs:?}) = {result:?}"
+        );
         assert!(result.iter().all(Integer::is_valid));
         assert_eq!(result, parse(out));
         assert_eq!(integers_mul_naive(&xs, &xs), result);
@@ -189,6 +210,11 @@ fn test_square_to_out() {
         let xs = coefficients(p);
         let mut result = vec![Integer::ZERO; (xs.len() << 1) - 1];
         square_to_out(&mut result, &xs);
+        oracle_row!(
+            "flint",
+            "_fmpz_poly_sqr",
+            "square_to_out(_, {xs:?}) = {result:?}"
+        );
         assert_eq!(integers_mul_naive(&xs, &xs), result);
         assert_eq!(
             IntegerPolynomial::from_coefficients_asc(result).to_string(),
@@ -288,6 +314,8 @@ fn test_square_to_out() {
 #[test]
 fn test_square() {
     let test = |s, out| {
+        oracle_row!("flint", "fmpz_poly_sqr", "(&({s})).square() = {out}");
+
         let p = IntegerPolynomial::from_str(s).unwrap();
         let r = (&p).square();
         assert!(r.is_valid());
@@ -412,6 +440,11 @@ fn test_square_to_out_karatsuba() {
         let xs = parse(xs);
         let mut result = vec![Integer::ZERO; (xs.len() << 1) - 1];
         square_to_out_karatsuba(&mut result, &xs);
+        oracle_row!(
+            "flint",
+            "_fmpz_poly_sqr_karatsuba",
+            "square_to_out_karatsuba(_, {xs:?}) = {result:?}"
+        );
         assert!(result.iter().all(Integer::is_valid));
         assert_eq!(result, parse(out));
         assert_eq!(integers_mul_naive(&xs, &xs), result);
@@ -515,6 +548,11 @@ fn test_square_to_out_kronecker() {
         let xs = parse(xs);
         let mut result = vec![Integer::ZERO; (xs.len() << 1) - 1];
         square_to_out_kronecker(&mut result, &xs);
+        oracle_row!(
+            "flint",
+            "_fmpz_poly_sqr_KS",
+            "square_to_out_kronecker(_, {xs:?}) = {result:?}"
+        );
         assert!(result.iter().all(Integer::is_valid));
         assert_eq!(result, parse(out));
         assert_eq!(integers_mul_naive(&xs, &xs), result);
@@ -550,6 +588,11 @@ fn test_square_to_out_schonhage_strassen() {
         let xs = parse(xs);
         let mut result = vec![Integer::ZERO; (xs.len() << 1) - 1];
         square_to_out_schonhage_strassen(&mut result, &xs);
+        oracle_row!(
+            "flint",
+            "_fmpz_poly_sqr_SS",
+            "square_to_out_schonhage_strassen(_, {xs:?}) = {result:?}"
+        );
         assert!(result.iter().all(Integer::is_valid));
         assert_eq!(result, parse(out));
         assert_eq!(integers_mul_naive(&xs, &xs), result);
@@ -609,4 +652,63 @@ fn square_to_out_schonhage_strassen_properties() {
     integer_vec_gen_var_1().test_properties(test);
     integer_vec_gen_var_1().test_properties_with_config(&config, test);
     integer_vec_gen_var_1().test_properties_with_config(&wide_config, test);
+}
+
+// Records, for the oracle, the squares of inputs that the tests above do not give these functions.
+#[cfg(feature = "oracle")]
+#[cfg(not(feature = "32_bit_limbs"))]
+#[test]
+fn oracle_rows_square_to_out() {
+    fn rows(name: &str, mode: &str, f: fn(&mut [Integer], &[Integer]), xss: &[&[&str]]) {
+        for &xs in xss {
+            let xs = parse(xs);
+            let mut result = vec![Integer::ZERO; (xs.len() << 1) - 1];
+            f(&mut result, &xs);
+            match mode {
+                "_fmpz_poly_sqr" => {
+                    oracle_row!("flint", "_fmpz_poly_sqr", "{name}(_, {xs:?}) = {result:?}");
+                }
+                "_fmpz_poly_sqr_classical" => oracle_row!(
+                    "flint",
+                    "_fmpz_poly_sqr_classical",
+                    "{name}(_, {xs:?}) = {result:?}"
+                ),
+                _ => panic!("unexpected mode {mode}"),
+            }
+        }
+    }
+    rows(
+        "square_to_out",
+        "_fmpz_poly_sqr",
+        square_to_out,
+        &[
+            &["-5", "7"],
+            &["1", "-1", "1", "-1"],
+            &["0", "0", "1"],
+            &["100000000000000000000", "-10000000000000000000000000", "7", "0", "3"],
+            &["9223372036854775808", "-9223372036854775807", "17", "-1"],
+            &["-7", "0", "11", "-13"],
+            &["536870912", "-536870912", "5"],
+            &["1", "1", "1", "1", "1", "1", "1", "1"],
+            &["-1099511627776", "5", "1125899906842624", "1"],
+        ],
+    );
+    rows(
+        "square_to_out_tiny_1",
+        "_fmpz_poly_sqr",
+        square_to_out_tiny_1,
+        &[&["3"], &["536870912", "-536870912", "5"]],
+    );
+    rows(
+        "square_to_out_tiny_2",
+        "_fmpz_poly_sqr",
+        square_to_out_tiny_2,
+        &[&["3"], &["1", "2", "3"]],
+    );
+    rows(
+        "square_to_out_classical",
+        "_fmpz_poly_sqr_classical",
+        square_to_out_classical,
+        &[&["0", "0", "1"]],
+    );
 }

@@ -8,6 +8,7 @@
 
 use core::str::FromStr;
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::arithmetic::traits::Compose;
 use malachite_base::polynomial::series::traits::{ComposeTruncated, ComposeTruncatedAssign};
@@ -51,6 +52,12 @@ fn verify(p: &IntegerPolynomial, q: &IntegerPolynomial, len: u64) -> IntegerPoly
 #[test]
 fn test_compose_truncated() {
     let test = |p, q, len, out| {
+        oracle_row!(
+            "flint",
+            "fmpz_poly_compose_series",
+            "({p}).compose_truncated({q}, {len}) = {out}"
+        );
+
         let p = IntegerPolynomial::from_str(p).unwrap();
         let q = IntegerPolynomial::from_str(q).unwrap();
         assert_eq!(verify(&p, &q, len).to_string(), out);

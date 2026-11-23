@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::basic::traits::ProuhetThueMorseConstant;
+use malachite_base::oracle_row;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
     unsigned_gen_var_11, unsigned_rounding_mode_pair_gen_var_4,
@@ -25,6 +26,12 @@ fn test_prouhet_thue_morse_constant_prec_helper(
     out_hex: &str,
     out_o: Ordering,
 ) {
+    oracle_row!(
+        "azurite",
+        "az_float_irrational_constant",
+        "prouhet_thue_morse_constant_prec({prec}) = ({out_hex}, {out_o:?})"
+    );
+
     let (x, o) = Float::prouhet_thue_morse_constant_prec(prec);
     assert!(x.is_valid());
     assert_eq!(x.to_string(), out);
@@ -156,6 +163,12 @@ fn test_prouhet_thue_morse_constant_prec_round_helper(
     out_hex: &str,
     out_o: Ordering,
 ) {
+    oracle_row!(
+        "azurite",
+        "az_float_irrational_constant",
+        "prouhet_thue_morse_constant_prec_round({prec}, {rm}) = ({out_hex}, {out_o:?})"
+    );
+
     let (x, o) = Float::prouhet_thue_morse_constant_prec_round(prec, rm);
     assert!(x.is_valid());
     assert_eq!(x.to_string(), out);

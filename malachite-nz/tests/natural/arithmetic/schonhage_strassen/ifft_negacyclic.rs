@@ -8,6 +8,8 @@
 
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::modular::traits::ModMul;
+#[cfg(not(feature = "32_bit_limbs"))]
+use malachite_base::oracle_row;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::mul::schonhage_strassen::fft_negacyclic::fft_negacyclic;
 use malachite_nz::natural::arithmetic::mul::schonhage_strassen::ifft_negacyclic::ifft_negacyclic;
@@ -19,6 +21,13 @@ use malachite_nz::test_util::natural::arithmetic::schonhage_strassen::*;
 #[test]
 fn test_ifft_negacyclic() {
     let test = |ii: &[&[Limb]], n: usize, w: u64, out: &[Limb]| {
+        oracle_row!(
+            "flint",
+            "ifft_negacyclic",
+            "ifft_negacyclic({ii:?}, {n}, {w}, _, _, _) = {:?}",
+            out.chunks(ii[0].len()).collect::<Vec<_>>()
+        );
+
         let mut ii: Vec<Vec<Limb>> = ii.iter().map(|x| x.to_vec()).collect();
         let limbs = ii[0].len() - 1;
         let mut t1 = vec![0; limbs + 1];

@@ -9,6 +9,7 @@
 use malachite_base::num::arithmetic::traits::{Abs, AbsAssign};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::primitive_float_gen;
 use malachite_float::test_util::common::{parse_hex_string, to_hex_string};
 use malachite_float::test_util::generators::{float_gen, float_gen_var_4, float_gen_var_12};
@@ -126,6 +127,8 @@ fn abs_negative_zero_properties() {
 #[test]
 fn test_abs() {
     let test = |s, s_hex, out: &str, out_hex: &str| {
+        oracle_row!("azurite", "az_float_abs", "|{s_hex}| = {out_hex}");
+
         let x = parse_hex_string(s_hex);
         assert_eq!(x.to_string(), s);
 

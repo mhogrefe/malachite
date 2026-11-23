@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::series::traits::{ComposeTruncated, CompositionalInverseTruncated};
 use malachite_nz::integer_polynomial::IntegerPolynomial;
@@ -36,6 +37,12 @@ fn show(p: Option<IntegerPolynomial>) -> String {
 #[test]
 fn test_compositional_inverse_truncated() {
     let test = |p, len, out| {
+        oracle_row!(
+            "flint",
+            "fmpz_poly_revert_series",
+            "({p}).compositional_inverse_truncated({len}) = {out}"
+        );
+
         let p = IntegerPolynomial::from_str(p).unwrap();
         assert_eq!(show(verify(&p, len)), out);
     };

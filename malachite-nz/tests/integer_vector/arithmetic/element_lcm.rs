@@ -11,6 +11,7 @@ use malachite_base::num::arithmetic::traits::ElementLcm;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::modular::traits::DivisibleBy;
 use malachite_base::num::number_theory::traits::Lcm;
+use malachite_base::oracle_row;
 use malachite_base::vector::Vector;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_vector::IntegerVector;
@@ -20,6 +21,8 @@ use malachite_nz::test_util::generators::{integer_vector_gen, integer_vector_pai
 #[test]
 fn test_element_lcm() {
     let test = |s, out| {
+        oracle_row!("flint", "_fmpz_vec_lcm", "{s}.to_element_lcm() = {out}");
+
         let v = IntegerVector::from_str(s).unwrap();
         let lcm = v.to_element_lcm();
         assert!(lcm.is_valid());

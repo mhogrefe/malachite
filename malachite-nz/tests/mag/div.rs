@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::unsigned_gen_var_1;
 use malachite_nz::mag::Mag;
 use malachite_nz::test_util::generators::mag_unsigned_pair_gen_var_1;
@@ -15,6 +16,8 @@ use std::str::FromStr;
 #[test]
 fn test_div_u64() {
     let test = |s, y: u64, out| {
+        oracle_row!("flint", "mag_div_ui", "({s}).div_u64({y}) = {out}");
+
         assert_eq!(Mag::from_str(s).unwrap().div_u64(y).to_string(), out);
     };
     test("0", 5, "0");

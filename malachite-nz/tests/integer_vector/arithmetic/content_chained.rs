@@ -11,6 +11,7 @@ use malachite_base::num::arithmetic::traits::{Content, ContentChained};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::modular::traits::DivisibleBy;
 use malachite_base::num::number_theory::traits::Gcd;
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::vector::Vector;
 use malachite_nz::integer::Integer;
@@ -24,6 +25,13 @@ use malachite_nz::test_util::integer_vector::arithmetic::content_chained::*;
 #[test]
 fn test_integers_content_chained() {
     let test = |xs: &[&str], x, out| {
+        oracle_row!(
+            "flint",
+            "_fmpz_vec_content_chained",
+            "({}).content_chained({x}) = {out}",
+            xs.join(", ")
+        );
+
         let xs: Vec<Integer> = xs.iter().map(|x| Integer::from_str(x).unwrap()).collect();
         let x = Natural::from_str(x).unwrap();
         let g = integers_content_chained(&xs, &x);
@@ -88,6 +96,12 @@ fn integers_content_chained_properties() {
 #[test]
 fn test_content_chained() {
     let test = |s, x, out| {
+        oracle_row!(
+            "flint",
+            "_fmpz_vec_content_chained",
+            "{s}.content_chained({x}) = {out}"
+        );
+
         let v = IntegerVector::from_str(s).unwrap();
         let x = Natural::from_str(x).unwrap();
         let g = (&v).content_chained(&x);

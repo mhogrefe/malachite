@@ -6,6 +6,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+#[cfg(not(feature = "32_bit_limbs"))]
+use malachite_base::oracle_row;
 use malachite_nz::natural::arithmetic::mul::schonhage_strassen::adjust::limbs_fft_adjust;
 #[cfg(not(feature = "32_bit_limbs"))]
 use malachite_nz::platform::Limb;
@@ -16,6 +18,12 @@ use malachite_nz::test_util::natural::arithmetic::schonhage_strassen::*;
 #[test]
 fn test_limbs_fft_adjust() {
     let test = |i1: &[Limb], i: usize, limbs: usize, w: u64, out: &[Limb]| {
+        oracle_row!(
+            "flint",
+            "fft_adjust",
+            "limbs_fft_adjust(_, {i1:?}, {i}, {limbs}, {w}) = {out:?}"
+        );
+
         let mut r = vec![0; limbs + 1];
         limbs_fft_adjust(&mut r, i1, i, limbs, w);
         assert_eq!(r, out);

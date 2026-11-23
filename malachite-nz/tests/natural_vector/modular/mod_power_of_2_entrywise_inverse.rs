@@ -13,6 +13,7 @@ use malachite_base::num::modular::traits::{
     ModEntrywiseInverse, ModPowerOf2, ModPowerOf2EntrywiseInverse, ModPowerOf2EntrywiseMul,
     ModPowerOf2IsReduced,
 };
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::unsigned_vector_unsigned_pair_gen_var_4;
 use malachite_base::vector::Vector;
 use malachite_nz::natural::Natural;
@@ -23,6 +24,12 @@ use malachite_nz::test_util::natural_vector::modular::mod_power_of_2_entrywise_i
 #[test]
 fn test_mod_power_of_2_entrywise_inverse() {
     let test = |s, pow, out: Option<&str>| {
+        oracle_row!(
+            "flint",
+            "_nmod_vec_invert",
+            "{s}.mod_power_of_2_entrywise_inverse({pow}) = {}",
+            malachite_base::test_util::oracle_rows::option(out)
+        );
         let v = NaturalVector::from_str(s).unwrap();
         let r = (&v).mod_power_of_2_entrywise_inverse(pow);
         assert_eq!(r.as_ref().map(ToString::to_string).as_deref(), out);

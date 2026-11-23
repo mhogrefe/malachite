@@ -11,6 +11,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::modular::traits::ModPowerOf2IsReduced;
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::modular::traits::{CheckedModPowerOf2Lcm, ModPowerOf2Rem};
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;
@@ -60,6 +61,13 @@ fn verify(p: &NaturalPolynomial, q: &NaturalPolynomial, pow: u64) -> Option<Natu
 #[test]
 fn test_checked_mod_power_of_2_lcm() {
     let test = |p, q, pow: u64, out: Option<&str>| {
+        oracle_row!(
+            "flint",
+            "mod_power_of_2_gcd",
+            "({p}).checked_mod_power_of_2_lcm({q}, {pow}) = {}",
+            out.unwrap_or("None")
+        );
+
         let p = NaturalPolynomial::from_str(p).unwrap();
         let q = NaturalPolynomial::from_str(q).unwrap();
         assert_eq!(

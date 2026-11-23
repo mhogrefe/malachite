@@ -10,6 +10,7 @@ use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::unsigned_gen_var_5;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer::number_theory::euler_number::{
@@ -24,6 +25,8 @@ use malachite_nz::test_util::integer::number_theory::euler_number::euler_numbers
 #[test]
 fn test_euler_number() {
     let test = |n, out| {
+        oracle_row!("flint", "arith_euler_number", "euler_number({n}) = {out}");
+
         assert_eq!(Integer::euler_number(n).to_string(), out);
     };
     // - n < EULER_NUMBER_BETA_LIMIT
@@ -88,6 +91,15 @@ fn test_euler_numbers_prefix() {
     );
     // - long enough for the entries to need different numbers of primes
     assert_eq!(euler_numbers_prefix(301), euler_numbers_prefix_naive(301));
+    #[cfg(feature = "oracle")]
+    for len in [0, 12, 301] {
+        oracle_row!(
+            "flint",
+            "arith_euler_number_vec",
+            "euler_numbers_prefix({len}) = {:?}",
+            euler_numbers_prefix(len)
+        );
+    }
 }
 
 // Checks that [lo * 2^exp, hi * 2^exp] contains the value whose floor times 2^400 is `reference`,

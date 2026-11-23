@@ -12,6 +12,7 @@ use malachite_base::matrix::Matrix;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::linear_algebra::traits::ModSolve;
 use malachite_base::num::modular::traits::{ModIsReduced, ModMul};
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::*;
 use malachite_base::test_util::unsigned_matrix::linear_algebra::mod_solve::*;
 use malachite_base::unsigned_matrix::UnsignedMatrix;
@@ -53,6 +54,12 @@ fn test<T: PrimitiveUnsigned>(a: &str, b: &str, m: T, out: Option<&str>)
 where
     <UnsignedMatrix<T> as FromStr>::Err: Debug,
 {
+    oracle_row!(
+        "flint",
+        "nmod_mat_can_solve",
+        "{a}.mod_solve({b}, {m}) = {}",
+        malachite_base::test_util::oracle_rows::option(out)
+    );
     let a = UnsignedMatrix::<T>::from_str(a).unwrap();
     let b = UnsignedMatrix::<T>::from_str(b).unwrap();
     let x = verify_solve(&a, &b, m);

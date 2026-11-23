@@ -37,6 +37,23 @@ fn test_mod_divisible_by() {
     );
     // - modulo 1
     assert!(UnsignedPolynomial::<u8>::ZERO.mod_divisible_by(UnsignedPolynomial::ZERO, 1));
+    #[cfg(feature = "oracle")]
+    for (p, q, m) in [
+        ("0", "0", 7u8),
+        ("x+1", "0", 7),
+        ("x^2+3*x+2", "x+1", 7),
+        ("x^3+2*x+1", "x^2+3", 7),
+        ("0", "0", 1),
+    ] {
+        let p = UnsignedPolynomial::<u8>::from_str(p).unwrap();
+        let q = UnsignedPolynomial::<u8>::from_str(q).unwrap();
+        let out = (&p).mod_divisible_by(&q, m);
+        malachite_base::oracle_row!(
+            "flint",
+            "mod_div_exact",
+            "({p}).mod_divisible_by({q}, {m}) = {out}"
+        );
+    }
 }
 
 #[test]

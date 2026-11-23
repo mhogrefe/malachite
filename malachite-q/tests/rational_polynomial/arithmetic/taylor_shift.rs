@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::Reciprocal;
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::arithmetic::traits::{Evaluate, TaylorShift, TaylorShiftAssign};
 use malachite_base::test_util::generators::common::SMALL_LIMIT;
@@ -39,6 +40,12 @@ fn check(p: &RationalPolynomial, c: &Rational) -> RationalPolynomial {
 #[test]
 fn test_taylor_shift() {
     let test = |s, c, out| {
+        oracle_row!(
+            "flint",
+            "fmpq_poly_taylor_shift",
+            "(&({s})).taylor_shift({c}) = {out}"
+        );
+
         let p = RationalPolynomial::from_str(s).unwrap();
         let c = Rational::from_str(c).unwrap();
         let q = check(&p, &c);

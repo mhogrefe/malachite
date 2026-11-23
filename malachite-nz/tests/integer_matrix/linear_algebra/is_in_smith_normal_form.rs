@@ -8,12 +8,19 @@
 
 use core::str::FromStr;
 use malachite_base::num::linear_algebra::traits::SmithNormalForm;
+use malachite_base::oracle_row;
 use malachite_nz::integer_matrix::IntegerMatrix;
 use malachite_nz::test_util::generators::integer_matrix_gen;
 
 #[test]
 fn test_is_in_smith_normal_form() {
     let test = |s, out| {
+        oracle_row!(
+            "flint",
+            "fmpz_mat_is_in_snf",
+            "is_in_smith_normal_form({s}) = {out}"
+        );
+
         let a = IntegerMatrix::from_str(s).unwrap();
         assert_eq!(a.is_in_smith_normal_form().to_string(), out);
     };

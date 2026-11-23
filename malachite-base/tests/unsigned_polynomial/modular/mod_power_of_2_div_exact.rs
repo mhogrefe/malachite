@@ -10,6 +10,7 @@ use core::str::FromStr;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::modular::traits::{ModPowerOf2, ModPowerOf2Mul};
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::modular::traits::{
     CheckedModPowerOf2DivExact, ModPowerOf2DivExact, ModPowerOf2DivExactAssign, ModPowerOf2DivRem,
@@ -95,6 +96,32 @@ fn verify_checked<T: PrimitiveUnsigned>(
 
 fn test_mod_power_of_2_div_exact_helper<T: PrimitiveUnsigned>() {
     let test = |p, q, pow: u64, out| {
+        oracle_row!(
+            "flint",
+            "mod_power_of_2_div_exact",
+            "({p}).mod_power_of_2_div_exact({q}, {pow}) = {out}"
+        );
+        oracle_row!(
+            "flint",
+            "mod_power_of_2_div_exact",
+            "p := {p}; p.mod_power_of_2_div_exact_assign({q}, {pow}); p = {out}"
+        );
+        oracle_row!(
+            "flint",
+            "mod_power_of_2_div_exact",
+            "({p}).checked_mod_power_of_2_div_exact({q}, {pow}) = {out}"
+        );
+        oracle_row!(
+            "flint",
+            "mod_power_of_2_div_exact",
+            "({p}).mod_power_of_2_divisible_by({q}, {pow}) = {}",
+            ModPowerOf2DivisibleBy::mod_power_of_2_divisible_by(
+                UnsignedPolynomial::<T>::from_str(p).unwrap(),
+                UnsignedPolynomial::<T>::from_str(q).unwrap(),
+                pow
+            )
+        );
+
         let p = UnsignedPolynomial::<T>::from_str(p).unwrap();
         let q = UnsignedPolynomial::<T>::from_str(q).unwrap();
         assert_eq!(verify_exact(&p, &q, pow).to_string(), out);
@@ -122,6 +149,19 @@ fn test_mod_power_of_2_div_exact() {
 
 fn test_checked_mod_power_of_2_div_exact_helper<T: PrimitiveUnsigned>() {
     let test = |p, q, pow: u64, out: Option<&str>| {
+        oracle_row!(
+            "flint",
+            "mod_power_of_2_div_exact",
+            "({p}).checked_mod_power_of_2_div_exact({q}, {pow}) = {}",
+            out.unwrap_or("None")
+        );
+        oracle_row!(
+            "flint",
+            "mod_power_of_2_div_exact",
+            "({p}).mod_power_of_2_divisible_by({q}, {pow}) = {}",
+            out.is_some()
+        );
+
         let p = UnsignedPolynomial::<T>::from_str(p).unwrap();
         let q = UnsignedPolynomial::<T>::from_str(q).unwrap();
         assert_eq!(

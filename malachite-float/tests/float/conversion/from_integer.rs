@@ -10,6 +10,7 @@ use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom};
+use malachite_base::oracle_row;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_float::test_util::common::{
     assert_rounding_ordering_consistent, rug_round_try_from_rounding_mode, to_hex_string,
@@ -27,6 +28,12 @@ use std::str::FromStr;
 #[test]
 fn test_from_integer_prec() {
     let test = |s, prec, out, out_hex, out_o| {
+        oracle_row!(
+            "azurite",
+            "az_float_from_integer",
+            "Float::from_integer_prec({s}, {prec}) = ({out_hex}, {out_o:?})"
+        );
+
         let u = Integer::from_str(s).unwrap();
 
         let (x, o) = Float::from_integer_prec(u.clone(), prec);
@@ -201,6 +208,12 @@ fn from_integer_prec_ref_fail() {
 #[test]
 fn test_from_integer_prec_round() {
     let test = |s, prec, rm, out, out_hex, out_o| {
+        oracle_row!(
+            "azurite",
+            "az_float_from_integer",
+            "Float::from_integer_prec_round({s}, {prec}, {rm}) = ({out_hex}, {out_o:?})"
+        );
+
         let u = Integer::from_str(s).unwrap();
 
         let (x, o) = Float::from_integer_prec_round(u.clone(), prec, rm);
@@ -1116,6 +1129,11 @@ fn from_integer_prec_round_ref_fail() {
 #[test]
 fn test_try_from_integer() {
     let test = |s, out, out_hex| {
+        oracle_row!(
+            "azurite",
+            "az_float_from_integer",
+            "Float::try_from({s}) = {out_hex:?}"
+        );
         let x = Integer::from_str(s).unwrap();
 
         let of = Float::try_from(x.clone());

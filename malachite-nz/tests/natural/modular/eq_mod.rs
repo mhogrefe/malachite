@@ -10,6 +10,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::modular::traits::{DivisibleBy, EqMod};
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
     unsigned_triple_gen_var_19, unsigned_triple_gen_var_21, unsigned_vec_triple_gen_var_36,
@@ -648,6 +649,12 @@ fn limbs_eq_mod_ref_ref_ref_fail_6() {
 #[test]
 fn test_eq_mod() {
     let test = |r, s, t, out| {
+        oracle_row!(
+            "azurite",
+            "az_zmod_eq",
+            "{r} is {}equal to {s} mod {t}",
+            malachite_base::test_util::oracle_rows::not(out)
+        );
         let x = Natural::from_str(r).unwrap();
         let y = Natural::from_str(s).unwrap();
         let m = Natural::from_str(t).unwrap();

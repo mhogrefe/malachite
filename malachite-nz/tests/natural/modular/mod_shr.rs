@@ -11,6 +11,7 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::modular::traits::{Mod, ModIsReduced, ModShl, ModShr, ModShrAssign};
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::{
     signed_gen_var_5, unsigned_signed_unsigned_triple_gen_var_2,
 };
@@ -26,6 +27,7 @@ use std::str::FromStr;
 macro_rules! test_mod_shr_signed {
     ($t:ident) => {
         let test = |s, v: $t, t, out| {
+            oracle_row!("azurite", "az_zmod_shr", "{s}.mod_shr({v}, {t}) = {out}");
             let u = Natural::from_str(s).unwrap();
             let m = Natural::from_str(t).unwrap();
 

@@ -13,6 +13,7 @@ use malachite_base::num::basic::traits::{Infinity, NegativeInfinity, One, Zero};
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::oracle_row;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_float::float::arithmetic::sum::primitive_float_sum;
@@ -42,6 +43,12 @@ fn parse_hex_strings(xs_hex: &[&str]) -> Vec<Float> {
 #[test]
 fn test_sum() {
     let test = |xs_hex: &[&str], out: &str, out_hex: &str| {
+        oracle_row!(
+            "azurite",
+            "az_float_sum",
+            "sum([{}]) = {out_hex}",
+            xs_hex.join(", ")
+        );
         let xs = parse_hex_strings(xs_hex);
 
         let sum = Float::sum(xs.iter().cloned());
@@ -92,6 +99,12 @@ fn test_sum() {
 #[test]
 fn test_sum_prec() {
     let test = |xs_hex: &[&str], prec: u64, out: &str, out_hex: &str, o_out: Ordering| {
+        oracle_row!(
+            "azurite",
+            "az_float_sum",
+            "Float::sum_prec(&[{}], {prec}) = ({out_hex}, {o_out:?})",
+            xs_hex.join(", ")
+        );
         let xs = parse_hex_strings(xs_hex);
 
         let (sum, o) = Float::sum_prec(&xs, prec);
@@ -155,6 +168,12 @@ fn sum_prec_fail() {
 #[test]
 fn test_sum_round() {
     let test = |xs_hex: &[&str], rm: RoundingMode, out: &str, out_hex: &str, o_out: Ordering| {
+        oracle_row!(
+            "azurite",
+            "az_float_sum",
+            "Float::sum_round(&[{}], {rm}) = ({out_hex}, {o_out:?})",
+            xs_hex.join(", ")
+        );
         let xs = parse_hex_strings(xs_hex);
 
         let (sum, o) = Float::sum_round(&xs, rm);
@@ -244,6 +263,12 @@ fn test_sum_prec_round() {
                 out: &str,
                 out_hex: &str,
                 o_out: Ordering| {
+        oracle_row!(
+            "azurite",
+            "az_float_sum",
+            "Float::sum_prec_round(&[{}], {prec}, {rm}) = ({out_hex}, {o_out:?})",
+            xs_hex.join(", ")
+        );
         let xs = parse_hex_strings(xs_hex);
 
         let (sum, o) = Float::sum_prec_round(&xs, prec, rm);

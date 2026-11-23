@@ -11,6 +11,7 @@ use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::conversion::from::UnsignedFromFloatError;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
+use malachite_base::oracle_row;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
     unsigned_gen, unsigned_gen_var_18, unsigned_rounding_mode_pair_gen_var_2,
@@ -28,6 +29,12 @@ use std::str::FromStr;
 #[test]
 fn test_f32_rounding_from_natural() {
     let test = |n: &str, rm: RoundingMode, out, o_out| {
+        oracle_row!(
+            "azurite",
+            "az_nat_to_float",
+            "f32::rounding_from(&{n}, {rm}) = ({}, {o_out:?})",
+            NiceFloat(out)
+        );
         let (x, o) = f32::rounding_from(&Natural::from_str(n).unwrap(), rm);
         assert_eq!(NiceFloat(x), NiceFloat(out));
         assert_eq!(o, o_out);
@@ -200,6 +207,12 @@ fn f32_rounding_from_natural_fail_4() {
 #[test]
 fn test_f64_rounding_from_natural() {
     let test = |n: &str, rm: RoundingMode, out, o_out| {
+        oracle_row!(
+            "azurite",
+            "az_nat_to_float",
+            "f64::rounding_from(&{n}, {rm}) = ({}, {o_out:?})",
+            NiceFloat(out)
+        );
         let (x, o) = f64::rounding_from(&Natural::from_str(n).unwrap(), rm);
         assert_eq!(NiceFloat(x), NiceFloat(out));
         assert_eq!(o, o_out);
@@ -361,6 +374,12 @@ fn f64_rounding_from_natural_fail_3() {
 #[test]
 fn test_f32_try_from_natural() {
     let test = |n: &str, out: Result<f32, PrimitiveFloatFromNaturalError>| {
+        oracle_row!(
+            "azurite",
+            "az_nat_to_float",
+            "f32::try_from(&{n}) = {:?}",
+            out.map(NiceFloat)
+        );
         assert_eq!(
             f32::try_from(&Natural::from_str(n).unwrap()).map(NiceFloat),
             out.map(NiceFloat)
@@ -396,6 +415,12 @@ fn test_f32_try_from_natural() {
 #[test]
 fn test_f64_try_from_natural() {
     let test = |n: &str, out: Result<f64, PrimitiveFloatFromNaturalError>| {
+        oracle_row!(
+            "azurite",
+            "az_nat_to_float",
+            "f64::try_from(&{n}) = {:?}",
+            out.map(NiceFloat)
+        );
         assert_eq!(
             f64::try_from(&Natural::from_str(n).unwrap()).map(NiceFloat),
             out.map(NiceFloat)
@@ -439,6 +464,12 @@ fn test_f64_try_from_natural() {
 #[test]
 fn test_f32_exact_from_natural() {
     let test = |n: &str, out| {
+        oracle_row!(
+            "azurite",
+            "az_nat_to_float",
+            "f32::exact_from(&{n}) = {}",
+            NiceFloat(out)
+        );
         assert_eq!(
             NiceFloat(f32::exact_from(&Natural::from_str(n).unwrap())),
             NiceFloat(out)
@@ -502,6 +533,12 @@ fn f32_exact_from_natural_fail_6() {
 #[test]
 fn test_f64_exact_from_natural() {
     let test = |n: &str, out| {
+        oracle_row!(
+            "azurite",
+            "az_nat_to_float",
+            "f64::exact_from(&{n}) = {}",
+            NiceFloat(out)
+        );
         assert_eq!(
             NiceFloat(f64::exact_from(&Natural::from_str(n).unwrap())),
             NiceFloat(out)
@@ -571,6 +608,12 @@ fn f64_exact_from_natural_fail_6() {
 #[test]
 fn test_f32_convertible_from_natural() {
     let test = |n: &str, out| {
+        oracle_row!(
+            "azurite",
+            "az_nat_to_float",
+            "{n} is {}convertible to an f32",
+            malachite_base::test_util::oracle_rows::not(out)
+        );
         assert_eq!(f32::convertible_from(&Natural::from_str(n).unwrap()), out);
     };
     test("3", true);
@@ -597,6 +640,12 @@ fn test_f32_convertible_from_natural() {
 #[test]
 fn test_f64_convertible_from_natural() {
     let test = |n: &str, out| {
+        oracle_row!(
+            "azurite",
+            "az_nat_to_float",
+            "{n} is {}convertible to an f64",
+            malachite_base::test_util::oracle_rows::not(out)
+        );
         assert_eq!(f64::convertible_from(&Natural::from_str(n).unwrap()), out);
     };
     test("3", true);

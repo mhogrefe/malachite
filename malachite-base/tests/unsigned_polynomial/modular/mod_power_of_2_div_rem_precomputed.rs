@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::modular::traits::{
     ModPowerOf2DivAssignRemPrecomputed, ModPowerOf2DivRem, ModPowerOf2DivRemPrecomputed,
@@ -62,6 +63,14 @@ fn verify<T: PrimitiveUnsigned>(
 
 fn test_mod_power_of_2_div_rem_precomputed_helper<T: PrimitiveUnsigned>() {
     let test = |p, q, pow, out: (&str, &str)| {
+        oracle_row!(
+            "flint",
+            "mod_power_of_2_div_rem",
+            "({p}).mod_power_of_2_div_rem_precomputed({q}, {pow}, &data) = ({}, {})",
+            out.0,
+            out.1
+        );
+
         let p = UnsignedPolynomial::<T>::from_str(p).unwrap();
         let q = UnsignedPolynomial::<T>::from_str(q).unwrap();
         let (s, t) = verify(&p, &q, pow);

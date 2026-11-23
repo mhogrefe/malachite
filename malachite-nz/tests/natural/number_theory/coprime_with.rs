@@ -8,6 +8,7 @@
 
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::number_theory::traits::{CoprimeWith, Gcd};
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::unsigned_pair_gen_var_27;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::number_theory::coprime_with::{
@@ -20,6 +21,12 @@ use std::str::FromStr;
 #[test]
 fn test_coprime_with() {
     let test = |s, t, out| {
+        oracle_row!(
+            "azurite",
+            "az_nat_coprime_with",
+            "{s} is {}coprime with {t}",
+            malachite_base::test_util::oracle_rows::not(out)
+        );
         let u = Natural::from_str(s).unwrap();
         let v = Natural::from_str(t).unwrap();
 

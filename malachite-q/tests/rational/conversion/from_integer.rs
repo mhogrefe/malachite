@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::oracle_row;
 use malachite_nz::integer::Integer;
 use malachite_nz::test_util::generators::integer_gen;
 use malachite_q::Rational;
@@ -14,6 +15,12 @@ use std::str::FromStr;
 #[test]
 fn test_from_integer() {
     let test = |s| {
+        oracle_row!(
+            "azurite",
+            "az_rat_from_integer",
+            "Rational::from({s}) = {s}"
+        );
+
         let u = Integer::from_str(s).unwrap();
 
         let x = Rational::from(u.clone());

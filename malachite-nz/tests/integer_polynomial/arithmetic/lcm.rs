@@ -48,6 +48,15 @@ fn verify(p: &IntegerPolynomial, q: &IntegerPolynomial) -> IntegerPolynomial {
 #[test]
 fn test_lcm() {
     let test = |p, q, out: Option<&str>| {
+        #[cfg(feature = "oracle")]
+        if let Some(out) = out {
+            malachite_base::oracle_row!("flint", "polynomial_gcd", "({p}).lcm({q}) = {out}");
+            malachite_base::oracle_row!(
+                "flint",
+                "polynomial_gcd",
+                "p := {p}; p.lcm_assign({q}); p = {out}"
+            );
+        }
         let p = IntegerPolynomial::from_str(p).unwrap();
         let q = IntegerPolynomial::from_str(q).unwrap();
         assert_eq!(

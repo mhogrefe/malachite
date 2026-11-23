@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::Inverse;
+use malachite_base::oracle_row;
 use malachite_q::rational_matrix::RationalMatrix;
 use malachite_q::rational_matrix::linear_algebra::solve::solve_nonsingular;
 use malachite_q::test_util::generators::{
@@ -37,6 +38,8 @@ fn verify_inverse(a: &RationalMatrix) -> String {
 #[test]
 fn test_inverse() {
     let test = |a, out| {
+        oracle_row!("flint", "fmpq_mat_inv", "inverse({a}) = {out}");
+
         let a = RationalMatrix::from_str(a).unwrap();
         assert_eq!(verify_inverse(&a), out);
     };

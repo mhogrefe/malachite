@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::modular::traits::{ModPowerOf2Add, ModPowerOf2IsReduced, ModPowerOf2Mul};
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::modular::traits::{
     CheckedModPowerOf2ExtendedGcd, CheckedModPowerOf2Gcd,
@@ -79,6 +80,16 @@ fn verify<T: PrimitiveUnsigned>(
 
 fn test_checked_mod_power_of_2_extended_gcd_helper<T: PrimitiveUnsigned>() {
     let test = |p, q, pow: u64, out: Option<(&str, &str, &str)>| {
+        oracle_row!(
+            "flint",
+            "mod_power_of_2_gcd",
+            "({p}).checked_mod_power_of_2_extended_gcd({q}, {pow}) = {}",
+            out.map_or_else(
+                || "None".to_string(),
+                |(g, s, t)| format!("({g}, {s}, {t})")
+            )
+        );
+
         let p = UnsignedPolynomial::<T>::from_str(p).unwrap();
         let q = UnsignedPolynomial::<T>::from_str(q).unwrap();
         assert_eq!(

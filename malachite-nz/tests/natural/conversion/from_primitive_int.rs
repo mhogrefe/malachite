@@ -9,6 +9,7 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, SaturatingFrom};
+use malachite_base::oracle_row;
 use malachite_base::strings::ToDebugString;
 use malachite_base::test_util::generators::{signed_gen, unsigned_gen};
 use malachite_nz::natural::Natural;
@@ -38,6 +39,11 @@ fn test_from_u32() {
 #[test]
 fn test_from_u64() {
     let test = |u: u64, out| {
+        oracle_row!(
+            "azurite",
+            "az_nat_from_unsigned",
+            "Natural::from({u}) = {out}"
+        );
         let x = Natural::from(u);
         assert!(x.is_valid());
         assert_eq!(x.to_string(), out);
@@ -136,6 +142,12 @@ fn test_try_from_i64() {
 #[test]
 fn test_saturating_from_i64() {
     let test = |i: i64, out| {
+        oracle_row!(
+            "azurite",
+            "az_nat_saturating_from_signed",
+            "Natural::saturating_from({i}) = {out}"
+        );
+
         let x = Natural::saturating_from(i);
         assert!(x.is_valid());
         assert_eq!(x.to_string(), out);

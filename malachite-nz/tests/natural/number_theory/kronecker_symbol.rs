@@ -14,6 +14,7 @@ use malachite_base::num::modular::traits::ModPowerOf2;
 use malachite_base::num::number_theory::traits::{
     CoprimeWith, JacobiSymbol, KroneckerSymbol, LegendreSymbol,
 };
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
     unsigned_pair_gen_var_27, unsigned_pair_gen_var_40, unsigned_vec_pair_gen_var_32,
@@ -3022,6 +3023,12 @@ fn legendre_symbol_fail() {
 #[test]
 fn test_jacobi_symbol() {
     fn test(u: &str, v: &str, s: i8) {
+        oracle_row!(
+            "azurite",
+            "az_nat_jacobi_symbol",
+            "{u}.jacobi_symbol({v}) = {s}"
+        );
+
         let a = Natural::from_str(u).unwrap();
         let n = Natural::from_str(v).unwrap();
 

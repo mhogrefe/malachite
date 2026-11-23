@@ -18,6 +18,7 @@ use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::{SignificantBits, TrailingZeros};
 use malachite_base::num::trigonometric::traits::{Atan2, Atan2Assign};
+use malachite_base::oracle_row;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::{
@@ -70,6 +71,11 @@ fn test_atan2_prec_round() {
         assert_eq!(t.to_string(), out);
         assert_eq!(to_hex_string(&t), out_hex);
         assert_eq!(o, o_out);
+        oracle_row!(
+            "azurite",
+            "az_float_atan2",
+            "({ysh}).atan2_prec_round({xsh}, {prec}, {rm}) = ({out_hex}, {o_out:?})"
+        );
 
         let (t_alt, o_alt) = y.clone().atan2_prec_round_val_ref(&x, prec, rm);
         assert!(t_alt.is_valid());
@@ -23450,6 +23456,11 @@ fn test_atan2_rational_prec_round() {
         assert_eq!(t.to_string(), out);
         assert_eq!(to_hex_string(&t), out_hex);
         assert_eq!(o, o_out);
+        oracle_row!(
+            "azurite",
+            "az_float_atan2_rational",
+            "Float::atan2_rational_prec_round({ys}, {xs}, {prec}, {rm}) = ({out_hex}, {o_out:?})"
+        );
 
         let (t_alt, o_alt) = Float::atan2_rational_prec_round_ref(&y, &x, prec, rm);
         assert!(t_alt.is_valid());
@@ -32349,6 +32360,12 @@ fn test_atan2_with_period_prec_round() {
         assert_eq!(t.to_string(), out);
         assert_eq!(to_hex_string(&t), out_hex);
         assert_eq!(o, o_out);
+        oracle_row!(
+            "azurite",
+            "az_float_atan2_with_period",
+            "({ysh}).atan2_with_period_prec_round({xsh}, {u}, {prec}, {rm}) = \
+             ({out_hex}, {o_out:?})"
+        );
 
         let (t_alt, o_alt) = y
             .clone()
@@ -48559,6 +48576,12 @@ fn test_atan2_with_period_rational_prec_round() {
         assert_eq!(t.to_string(), out);
         assert_eq!(to_hex_string(&t), out_hex);
         assert_eq!(o, o_out);
+        oracle_row!(
+            "azurite",
+            "az_float_atan2_with_period_rational",
+            "Float::atan2_with_period_rational_prec_round({ys}, {xs}, {u}, {prec}, {rm}) = \
+             ({out_hex}, {o_out:?})"
+        );
 
         let (t_alt, o_alt) = Float::atan2_with_period_rational_prec_round_ref(&y, &x, u, prec, rm);
         assert!(t_alt.is_valid());
@@ -57018,6 +57041,11 @@ fn test_atan2_pi_prec_round() {
         assert_eq!(t.to_string(), out);
         assert_eq!(to_hex_string(&t), out_hex);
         assert_eq!(o, o_out);
+        oracle_row!(
+            "azurite",
+            "az_float_atan2_pi",
+            "({ysh}).atan2_pi_prec_round({xsh}, {prec}, {rm}) = ({out_hex}, {o_out:?})"
+        );
 
         for (t_alt, o_alt) in [
             y.clone().atan2_pi_prec_round_val_ref(&x, prec, rm),
@@ -65321,6 +65349,11 @@ fn test_atan2_pi_rational_prec_round() {
         assert_eq!(t.to_string(), out);
         assert_eq!(to_hex_string(&t), out_hex);
         assert_eq!(o, o_out);
+        oracle_row!(
+            "azurite",
+            "az_float_atan2_pi_rational",
+            "Float::atan2_pi_rational_prec_round({ys}, {xs}, {prec}, {rm}) = ({out_hex}, {o_out:?})"
+        );
 
         for (t_alt, o_alt) in [
             Float::atan2_pi_rational_prec_round_ref(&y, &x, prec, rm),

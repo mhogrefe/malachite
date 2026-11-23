@@ -63,6 +63,15 @@ fn test_tangent_numbers_prefix() {
         6013614176175168527475441564167492361281869666015817474292341029438496520149457297105029485\
         86969216249495899499695789626698086604635236876027635257311232"
     );
+    #[cfg(feature = "oracle")]
+    for n in [0, 1, 2, 12, 100] {
+        malachite_base::oracle_row!(
+            "azurite",
+            "az_nat_tangent_numbers_prefix",
+            "tangent_numbers_prefix({n}) = {:?}",
+            tangent_numbers_prefix(n)
+        );
+    }
 }
 
 #[test]

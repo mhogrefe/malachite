@@ -8,6 +8,7 @@
 
 use malachite_base::assert_panic;
 use malachite_base::num::conversion::traits::{FromStringBase, ToStringBase};
+use malachite_base::oracle_row;
 use malachite_base::strings::{
     ToBinaryString, ToDebugString, ToLowerHexString, ToOctalString, ToUpperHexString,
     string_is_subset,
@@ -22,6 +23,7 @@ use std::str::FromStr;
 #[test]
 pub fn test_to_string() {
     fn test(u: &str) {
+        oracle_row!("azurite", "az_rat_to_string", "{u}");
         let x = Rational::from_str(u).unwrap();
         assert_eq!(x.to_string(), u);
         assert_eq!(x.to_debug_string(), u);

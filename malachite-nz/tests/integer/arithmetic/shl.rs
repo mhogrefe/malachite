@@ -12,6 +12,7 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::oracle_row;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::generators::{signed_gen, unsigned_gen_var_5};
 use malachite_nz::integer::Integer;
@@ -31,6 +32,8 @@ where
     for<'a> &'a Integer: Shl<T, Output = Integer>,
 {
     let test = |s, v: u8, out| {
+        oracle_row!("azurite", "az_int_shl", "{s} << {v} = {out}");
+
         let u = Integer::from_str(s).unwrap();
         let v = T::from(v);
 
@@ -122,6 +125,8 @@ where
     for<'a> &'a Integer: Shl<T, Output = Integer>,
 {
     let test = |s, v: i8, out| {
+        oracle_row!("azurite", "az_int_shl", "{s} << {v} = {out}");
+
         let u = Integer::from_str(s).unwrap();
         let v = T::from(v);
 

@@ -8,6 +8,7 @@
 
 use core::str::FromStr;
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::series::traits::{
     AddTruncated, AddTruncatedAssign, EqTruncated, SubTruncated,
@@ -20,6 +21,12 @@ use malachite_q::test_util::rational_polynomial::series::add_truncated::*;
 #[test]
 fn test_add_truncated() {
     let test = |s, t, len, out| {
+        oracle_row!(
+            "flint",
+            "fmpq_poly_add_series",
+            "(&({s})).add_truncated(&({t}), {len}) = {out}"
+        );
+
         let p = RationalPolynomial::from_str(s).unwrap();
         let q = RationalPolynomial::from_str(t).unwrap();
         // All four combinations of value and reference, and in place with both.
@@ -64,6 +71,12 @@ fn test_add_truncated() {
 fn test_add_truncated_self() {
     // A polynomial combined with itself, through the same reference.
     let test = |s, len, out| {
+        oracle_row!(
+            "flint",
+            "fmpq_poly_add_series",
+            "(&({s})).add_truncated(&({s}), {len}) = {out}"
+        );
+
         let p = RationalPolynomial::from_str(s).unwrap();
         let r = (&p).add_truncated(&p, len);
         assert!(r.is_valid());

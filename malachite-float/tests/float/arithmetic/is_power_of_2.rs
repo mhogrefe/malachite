@@ -8,6 +8,7 @@
 
 use malachite_base::num::arithmetic::traits::IsPowerOf2;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::primitive_float_gen;
 use malachite_float::Float;
 use malachite_float::test_util::common::parse_hex_string;
@@ -17,6 +18,12 @@ use malachite_q::Rational;
 #[test]
 fn test_is_power_of_2() {
     let test = |s, s_hex, out| {
+        oracle_row!(
+            "azurite",
+            "az_float_is_power_of_2",
+            "{s_hex} is {}a power of 2",
+            malachite_base::test_util::oracle_rows::not(out)
+        );
         let x = parse_hex_string(s_hex);
         assert_eq!(x.to_string(), s);
 

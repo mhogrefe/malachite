@@ -85,6 +85,27 @@ fn verify(
 #[test]
 fn test_div_rem() {
     let test = |p, q, out: Option<(&str, &str)>| {
+        #[cfg(feature = "oracle")]
+        if let Some((s, r)) = out {
+            malachite_base::oracle_row!(
+                "flint",
+                "fmpz_poly_divrem",
+                "({p}).div_rem({q}) = ({s}, {r})"
+            );
+            malachite_base::oracle_row!("flint", "fmpz_poly_divrem", "({p}) / ({q}) = {s}");
+            malachite_base::oracle_row!("flint", "fmpz_poly_divrem", "({p}) % ({q}) = {r}");
+            malachite_base::oracle_row!(
+                "flint",
+                "fmpz_poly_divrem",
+                "p := {p}; p.div_assign_rem({q}) = {r}; p = {s}"
+            );
+            malachite_base::oracle_row!("flint", "fmpz_poly_divrem", "p := {p}; p /= {q}; p = {s}");
+            malachite_base::oracle_row!("flint", "fmpz_poly_divrem", "p := {p}; p %= {q}; p = {r}");
+        } else {
+            for op in ["checked_div_rem", "checked_div", "checked_rem"] {
+                malachite_base::oracle_row!("flint", "fmpz_poly_divrem", "({p}).{op}({q}) = None");
+            }
+        }
         let p = IntegerPolynomial::from_str(p).unwrap();
         let q = IntegerPolynomial::from_str(q).unwrap();
         assert_eq!(

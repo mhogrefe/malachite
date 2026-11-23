@@ -12,6 +12,7 @@ use malachite_base::num::modular::traits::{
     ModIsReduced, ModMul, ModNeg, ModPowPrecomputed, ModSquare, ModSquareAssign,
     ModSquarePrecomputed, ModSquarePrecomputedAssign,
 };
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::unsigned_pair_gen_var_16;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -24,6 +25,13 @@ use std::str::FromStr;
 #[test]
 fn test_mod_square() {
     let test = |s, t, out| {
+        oracle_row!("azurite", "az_zmod_square", "{s}.square() ≡ {out} mod {t}");
+        oracle_row!(
+            "azurite",
+            "az_zmod_square_precomputed",
+            "{s}.mod_square_precomputed({t}, &data) = {out}"
+        );
+
         let u = Natural::from_str(s).unwrap();
         let m = Natural::from_str(t).unwrap();
 

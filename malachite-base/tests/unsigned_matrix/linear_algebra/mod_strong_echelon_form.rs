@@ -13,6 +13,7 @@ use malachite_base::num::linear_algebra::traits::{
     ModHowellForm, ModStrongEchelonForm, ModStrongEchelonFormAssign,
 };
 use malachite_base::num::modular::traits::ModIsReduced;
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::unsigned_matrix_unsigned_pair_gen_var_9;
 use malachite_base::test_util::unsigned_matrix::linear_algebra::mod_strong_echelon_form::*;
 use malachite_base::unsigned_matrix::UnsignedMatrix;
@@ -27,6 +28,12 @@ fn a_is_small(a: &UnsignedMatrix<u64>, m: u64) -> bool {
 #[test]
 fn test_mod_strong_echelon_form() {
     let test = |s, m, out| {
+        oracle_row!(
+            "flint",
+            "nmod_mat_strong_echelon_form",
+            "{s}.mod_strong_echelon_form({m}) = {out}"
+        );
+
         let a = UnsignedMatrix::<u64>::from_str(s).unwrap();
         let b = (&a).mod_strong_echelon_form(m);
         assert!(b.is_valid());

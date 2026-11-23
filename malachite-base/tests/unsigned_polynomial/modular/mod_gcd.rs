@@ -11,6 +11,7 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::factorization::traits::IsPrime;
 use malachite_base::num::modular::traits::{ModIsReduced, ModMul};
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::modular::traits::{
     CheckedModGcd, ModDivRem, ModGcd, ModGcdAssign, ModMakeMonic, ModRem,
@@ -73,6 +74,22 @@ fn verify<T: PrimitiveUnsigned>(
 
 fn test_mod_gcd_helper<T: PrimitiveUnsigned>() {
     let test = |p, q, m: u8, out: Option<&str>| {
+        oracle_row!(
+            "flint",
+            "mod_gcd",
+            "({p}).checked_mod_gcd({q}, {m}) = {}",
+            out.unwrap_or("None")
+        );
+        #[cfg(feature = "oracle")]
+        if let Some(out) = out.filter(|_| u64::from(m).is_prime()) {
+            oracle_row!("flint", "mod_gcd", "({p}).mod_gcd({q}, {m}) = {out}");
+            oracle_row!(
+                "flint",
+                "mod_gcd",
+                "p := {p}; p.mod_gcd_assign({q}, {m}); p = {out}"
+            );
+        }
+
         let p = UnsignedPolynomial::<T>::from_str(p).unwrap();
         let q = UnsignedPolynomial::<T>::from_str(q).unwrap();
         let prime = u64::from(m).is_prime();

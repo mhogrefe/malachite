@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{CheckedDiv, DivRem};
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::oracle_row;
 use malachite_q::rational_polynomial::RationalPolynomial;
 use malachite_q::test_util::generators::{
     rational_polynomial_pair_gen, rational_polynomial_pair_gen_var_3,
@@ -17,6 +18,8 @@ use malachite_q::test_util::generators::{
 #[test]
 fn test_div() {
     let test = |s, t, out| {
+        oracle_row!("flint", "fmpq_poly_divrem", "&({s}) / &({t}) = {out}");
+
         let p = RationalPolynomial::from_str(s).unwrap();
         let q = RationalPolynomial::from_str(t).unwrap();
         let quotient = &p / &q;
@@ -51,6 +54,19 @@ fn test_checked_div() {
             .checked_div(RationalPolynomial::ZERO),
         None
     );
+    #[cfg(feature = "oracle")]
+    {
+        let p = RationalPolynomial::from_str("x").unwrap();
+        oracle_row!(
+            "flint",
+            "fmpq_poly_divrem",
+            "(&({p})).checked_div(&({})) = {}",
+            RationalPolynomial::ZERO,
+            malachite_base::test_util::oracle_rows::option(
+                (&p).checked_div(&RationalPolynomial::ZERO)
+            )
+        );
+    }
 }
 
 #[test]

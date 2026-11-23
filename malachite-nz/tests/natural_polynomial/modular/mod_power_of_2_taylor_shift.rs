@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::modular::traits::{ModPowerOf2Add, ModPowerOf2IsReduced, ModPowerOf2Neg};
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::modular::traits::{
     ModPowerOf2Evaluate, ModPowerOf2TaylorShift, ModPowerOf2TaylorShiftAssign,
@@ -59,6 +60,12 @@ fn check(p: &NaturalPolynomial, c: &Natural, pow: u64) -> NaturalPolynomial {
 #[test]
 fn test_mod_power_of_2_taylor_shift() {
     let test = |s, c, pow, out| {
+        oracle_row!(
+            "flint",
+            "mod_power_of_2_taylor_shift",
+            "(&({s})).mod_power_of_2_taylor_shift({c}, {pow}) = {out}"
+        );
+
         let p = NaturalPolynomial::from_str(s).unwrap();
         let c = Natural::from_str(c).unwrap();
         let q = check(&p, &c, pow);

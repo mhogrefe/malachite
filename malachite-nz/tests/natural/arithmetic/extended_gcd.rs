@@ -12,6 +12,7 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::number_theory::traits::{ExtendedGcd, Gcd};
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
     unsigned_pair_gen_var_27, unsigned_vec_pair_gen_var_11,
@@ -30974,6 +30975,12 @@ fn test_limbs_extended_gcd() {
 #[test]
 fn test_extended_gcd() {
     let test = |s, t, gcd, x, y| {
+        oracle_row!(
+            "azurite",
+            "az_int_extended_gcd",
+            "{s}.extended_gcd({t}) = ({gcd}, {x}, {y})"
+        );
+
         let u = Natural::from_str(s).unwrap();
         let v = Natural::from_str(t).unwrap();
 

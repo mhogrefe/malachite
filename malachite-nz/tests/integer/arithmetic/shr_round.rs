@@ -15,6 +15,7 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::modular::traits::DivisibleByPowerOf2;
+use malachite_base::oracle_row;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
     signed_rounding_mode_pair_gen, signed_signed_rounding_mode_triple_gen_var_3,
@@ -37,6 +38,11 @@ use std::str::FromStr;
 macro_rules! test_shr_round_unsigned_helper {
     ($t:ident) => {
         let test = |u, v: $t, rm: RoundingMode, out, o| {
+            oracle_row!(
+                "azurite",
+                "az_int_shr_round",
+                "{u}.shr_round({v}, {rm}) = ({out}, {o:?})"
+            );
             let u = Integer::from_str(u).unwrap();
 
             let mut n = u.clone();
@@ -902,6 +908,11 @@ fn shr_round_unsigned_fail() {
 macro_rules! test_shr_round_signed_helper {
     ($t:ident) => {
         let test = |i, j: $t, rm: RoundingMode, out, o| {
+            oracle_row!(
+                "azurite",
+                "az_int_shr_round",
+                "{i}.shr_round({j}, {rm}) = ({out}, {o:?})"
+            );
             let u = Integer::from_str(i).unwrap();
 
             let mut n = u.clone();

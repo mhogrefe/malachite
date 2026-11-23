@@ -12,6 +12,7 @@ use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::linear_algebra::traits::Determinant;
 use malachite_base::num::modular::traits::DivisibleBy;
+use malachite_base::oracle_row;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_matrix::IntegerMatrix;
 use malachite_nz::integer_matrix::linear_algebra::determinant::*;
@@ -27,6 +28,12 @@ use std::panic::catch_unwind;
 #[test]
 fn test_determinant_bareiss() {
     let test = |s, out| {
+        oracle_row!(
+            "flint",
+            "fmpz_mat_det_bareiss",
+            "determinant_bareiss({s}) = {out}"
+        );
+
         let a = IntegerMatrix::from_str(s).unwrap();
         let det = determinant_bareiss(&a);
         assert_eq!(det.to_string(), out);
@@ -55,6 +62,12 @@ fn test_determinant_bareiss() {
 #[test]
 fn test_determinant_cofactor() {
     let test = |s, out| {
+        oracle_row!(
+            "flint",
+            "fmpz_mat_det_cofactor",
+            "determinant_cofactor({s}) = {out}"
+        );
+
         let a = IntegerMatrix::from_str(s).unwrap();
         let det = determinant_cofactor(&a);
         assert_eq!(det.to_string(), out);
@@ -98,6 +111,8 @@ fn verify_determinant(a: &IntegerMatrix) -> Integer {
 #[test]
 fn test_determinant() {
     let test = |s, out| {
+        oracle_row!("flint", "fmpz_mat_det", "determinant({s}) = {out}");
+
         let a = IntegerMatrix::from_str(s).unwrap();
         let det = verify_determinant(&a);
         assert_eq!(det.to_string(), out);
@@ -136,6 +151,12 @@ fn test_determinant() {
 #[test]
 fn test_determinant_divisor() {
     let test = |s, out| {
+        oracle_row!(
+            "flint",
+            "fmpz_mat_det_divisor",
+            "determinant_divisor({s}) = {out}"
+        );
+
         let a = IntegerMatrix::from_str(s).unwrap();
         assert_eq!(determinant_divisor(&a).to_string(), out);
     };

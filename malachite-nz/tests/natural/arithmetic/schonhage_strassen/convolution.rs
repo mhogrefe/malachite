@@ -7,6 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::basic::integers::PrimitiveInt;
+#[cfg(not(feature = "32_bit_limbs"))]
+use malachite_base::oracle_row;
 use malachite_nz::natural::arithmetic::mul::schonhage_strassen::convolution::fft_convolution;
 use malachite_nz::natural::arithmetic::mul::schonhage_strassen::mulmod_2expp1_basecase::*;
 use malachite_nz::platform::Limb;
@@ -44,6 +46,15 @@ fn convolution_helper(
 #[test]
 fn test_fft_convolution() {
     let test = |ii: &[&[Limb]], jj: Option<&[&[Limb]]>, depth: u64, trunc: usize, out: &[Limb]| {
+        oracle_row!(
+            "flint",
+            "fft_convolution",
+            "fft_convolution({ii:?}, {jj:?}, {depth}, {}, {trunc}, _, _, _, _) = ({:?}, {})",
+            ii[0].len() - 1,
+            out.chunks(ii[0].len()).collect::<Vec<_>>(),
+            if jj.is_some() { "_" } else { "None" }
+        );
+
         let ii: Vec<Vec<Limb>> = ii.iter().map(|x| x.to_vec()).collect();
         let jj: Option<Vec<Vec<Limb>>> = jj.map(|jj| jj.iter().map(|x| x.to_vec()).collect());
         let limbs = ii[0].len() - 1;

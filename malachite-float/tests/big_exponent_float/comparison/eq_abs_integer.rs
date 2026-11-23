@@ -105,6 +105,54 @@ fn test_eq_abs_integer() {
         "0x1.0E-25000000000000000000",
         "-1",
     );
+    #[cfg(feature = "oracle")]
+    for x in [
+        "Infinity",
+        "-Infinity",
+        "0x0.0",
+        "0x1.0",
+        "0x0.8",
+        "-0x1.0",
+        "0x3.243f6a8885a3",
+        "-0x3.243f6a8885a3",
+        "0xff.0",
+        "0xff.8",
+        "-0xff.0",
+        "0x1.0E+40",
+        "0x1.0E-40",
+        "0x0.55555555555554",
+        "-0x0.55555555555554",
+        "0x1.0E+25000000000000000000",
+        "0x1.0E-25000000000000000000",
+        "-0x1.0E+25000000000000000000",
+        "-0x1.0E-25000000000000000000",
+    ] {
+        let x = parse_big_exponent_float_hex(x);
+        for y in [
+            "0",
+            "1",
+            "-1",
+            "3",
+            "-3",
+            "-4",
+            "255",
+            "-255",
+            "1461501637330902918203684832716283019655932542976",
+            "-1000000000000000000000000000000",
+        ] {
+            let y = Integer::from_str(y).unwrap();
+            malachite_base::oracle_row!(
+                "flint",
+                "arf_cmp",
+                "|{}| {} |{}|",
+                format!("{x:?}"),
+                malachite_base::test_util::oracle_rows::eq_symbol(
+                    malachite_base::num::comparison::traits::EqAbs::eq_abs(&x, &y)
+                ),
+                y.to_string()
+            );
+        }
+    }
 }
 
 #[test]

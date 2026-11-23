@@ -10,6 +10,7 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::modular::traits::{
     Mod, ModAdd, ModIsReduced, ModNeg, ModSub, ModSubAssign,
 };
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::unsigned_triple_gen_var_12;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
@@ -21,6 +22,8 @@ use std::str::FromStr;
 #[test]
 fn test_mod_sub() {
     let test = |r, s, t, out| {
+        oracle_row!("azurite", "az_zmod_sub", "{r} - {s} ≡ {out} mod {t}");
+
         let u = Natural::from_str(r).unwrap();
         let v = Natural::from_str(s).unwrap();
         let m = Natural::from_str(t).unwrap();

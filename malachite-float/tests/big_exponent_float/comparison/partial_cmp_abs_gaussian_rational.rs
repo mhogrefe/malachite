@@ -103,6 +103,81 @@ fn test_partial_cmp_abs_gaussian_rational() {
         "0x1.0E-25000000000000000000",
         "1/1000000000000000000000000000000+i/1000000000000000000000000000000",
     );
+    #[cfg(feature = "oracle")]
+    for x in [
+        "NaN",
+        "Infinity",
+        "-Infinity",
+        "0x0.0",
+        "0x5.0",
+        "-0x5.0",
+        "-0x4.0",
+        "0x3.0",
+        "-0x3.0",
+        "0x4.8",
+        "0x5.8",
+        "0x5.0000000000000000000010",
+        "0x4.fffffffffffffffffffff0",
+        "0x2.8",
+        "-0x2.8",
+        "0x0.8",
+        "0x1.0E+25000000000000000000",
+        "0x1.0E-25000000000000000000",
+        "-0x1.0E+25000000000000000000",
+        "-0x1.0E-25000000000000000000",
+    ] {
+        let x = parse_big_exponent_float_hex(x);
+        for y in ["3+4i", "-3/2-2i", "3/2+2i", "1/3+i/3", "-3/2", "i/2", "0"] {
+            let y = GaussianRational::from_str(y).unwrap();
+            malachite_base::oracle_row!(
+                "flint",
+                "arf_cmp",
+                "{}",
+                malachite_base::test_util::oracle_rows::partial_cmp_row(
+                    format!("|{x:?}|"),
+                    format!("|{y}|"),
+                    malachite_base::num::comparison::traits::PartialOrdAbs::partial_cmp_abs(&x, &y)
+                )
+            );
+        }
+    }
+    #[cfg(feature = "oracle")]
+    for x in ["3+4i", "-3/2-2i", "3/2+2i", "1/3+i/3", "-3/2", "i/2", "0"] {
+        let x = GaussianRational::from_str(x).unwrap();
+        for y in [
+            "Infinity",
+            "-Infinity",
+            "0x0.0",
+            "0x5.0",
+            "-0x5.0",
+            "-0x4.0",
+            "0x3.0",
+            "-0x3.0",
+            "0x4.8",
+            "0x5.8",
+            "0x5.0000000000000000000010",
+            "0x4.fffffffffffffffffffff0",
+            "0x2.8",
+            "-0x2.8",
+            "0x0.8",
+            "0x1.0E+25000000000000000000",
+            "0x1.0E-25000000000000000000",
+            "-0x1.0E+25000000000000000000",
+            "-0x1.0E-25000000000000000000",
+        ] {
+            let y = parse_big_exponent_float_hex(y);
+            malachite_base::oracle_row!(
+                "flint",
+                "arf_cmp",
+                "{}",
+                malachite_base::test_util::oracle_rows::partial_cmp_row(
+                    format!("|{x}|"),
+                    format!("|{y:?}|"),
+                    malachite_base::num::comparison::traits::PartialOrdAbs::partial_cmp_abs(&x, &y)
+                )
+            );
+        }
+    }
 }
 
 #[test]

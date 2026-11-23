@@ -8,6 +8,7 @@
 
 use malachite_base::num::arithmetic::traits::{DivAssignModEuclidean, DivMod, DivModEuclidean};
 use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::oracle_row;
 use malachite_base::strings::ToDebugString;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::{natural_gen, natural_gen_var_2, natural_pair_gen_var_5};
@@ -16,6 +17,12 @@ use std::str::FromStr;
 #[test]
 fn test_div_mod_euclidean() {
     let test = |s, t, qr| {
+        oracle_row!(
+            "azurite",
+            "az_nat_euclidean",
+            "{s}.div_mod_euclidean({t}) = {qr}"
+        );
+
         let u = Natural::from_str(s).unwrap();
         let v = Natural::from_str(t).unwrap();
 

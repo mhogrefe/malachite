@@ -10,6 +10,7 @@ use malachite_base::num::arithmetic::traits::{DivModEuclidean, UnsignedAbs};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::num::modular::traits::{Mod, ModEuclidean, ModEuclideanAssign};
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
@@ -22,6 +23,12 @@ use std::str::FromStr;
 #[test]
 fn test_mod_euclidean() {
     let test = |s, t, out| {
+        oracle_row!(
+            "azurite",
+            "az_int_mod_euclidean",
+            "({s}).mod_euclidean({t}) = {out}"
+        );
+
         let u = Integer::from_str(s).unwrap();
         let v = Integer::from_str(t).unwrap();
 

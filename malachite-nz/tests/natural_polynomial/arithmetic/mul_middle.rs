@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::arithmetic::traits::{
     DivPowerOfX, MulMiddle, MulMiddleAssign, MulPowerOfX,
@@ -38,6 +39,12 @@ use malachite_nz::test_util::natural_polynomial::arithmetic::mul_middle::mul_mid
 #[test]
 fn test_mul_middle() {
     let test = |s, t, low, high, out| {
+        oracle_row!(
+            "flint",
+            "fmpz_poly_mulmid",
+            "(&({s})).mul_middle(&({t}), {low}, {high}) = {out}"
+        );
+
         let p = NaturalPolynomial::from_str(s).unwrap();
         let q = NaturalPolynomial::from_str(t).unwrap();
         let r = (&p).mul_middle(&q, low, high);

@@ -75,6 +75,42 @@ fn verify<T: PrimitiveUnsigned>(
 
 fn test_mod_div_rem_helper<T: PrimitiveUnsigned>() {
     let test = |p, q, m: u8, out: Option<(&str, &str)>| {
+        #[cfg(feature = "oracle")]
+        if let Some((s, t)) = out {
+            malachite_base::oracle_row!(
+                "flint",
+                "mod_div_rem",
+                "({p}).mod_div_rem({q}, {m}) = ({s}, {t})"
+            );
+            malachite_base::oracle_row!(
+                "flint",
+                "mod_div_rem",
+                "({p}).mod_quotient({q}, {m}) = {s}"
+            );
+            malachite_base::oracle_row!("flint", "mod_div_rem", "({p}).mod_rem({q}, {m}) = {t}");
+            malachite_base::oracle_row!(
+                "flint",
+                "mod_div_rem",
+                "p := {p}; p.mod_div_assign_rem({q}, {m}) = {t}; p = {s}"
+            );
+        } else {
+            malachite_base::oracle_row!(
+                "flint",
+                "mod_div_rem",
+                "({p}).checked_mod_div_rem({q}, {m}) = None"
+            );
+            malachite_base::oracle_row!(
+                "flint",
+                "mod_div_rem",
+                "({p}).checked_mod_quotient({q}, {m}) = None"
+            );
+            malachite_base::oracle_row!(
+                "flint",
+                "mod_div_rem",
+                "({p}).checked_mod_rem({q}, {m}) = None"
+            );
+        }
+
         let p = UnsignedPolynomial::<T>::from_str(p).unwrap();
         let q = UnsignedPolynomial::<T>::from_str(q).unwrap();
         assert_eq!(

@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::oracle_row;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::natural_pair_gen;
 use malachite_q::Rational;
@@ -19,6 +20,12 @@ use std::str::FromStr;
 #[test]
 fn test_partial_cmp_natural() {
     let test = |s, t, out| {
+        oracle_row!(
+            "azurite",
+            "az_rat_cmp_integer",
+            "{s} {} {t}",
+            malachite_base::test_util::oracle_rows::partial_cmp_symbol(out)
+        );
         let u = Rational::from_str(s).unwrap();
         let v = Natural::from_str(t).unwrap();
 

@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::modular::traits::{ModDiv, ModIsReduced, ModMul};
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::unsigned_vector_unsigned_unsigned_triple_gen_var_2;
 use malachite_base::test_util::unsigned_vector::modular::mod_div::*;
 use malachite_base::unsigned_vector::UnsignedVector;
@@ -17,6 +18,12 @@ use malachite_base::vector::Vector;
 #[test]
 fn test_mod_div() {
     let test = |s, c, m, out: Option<&str>| {
+        oracle_row!(
+            "flint",
+            "_fmpz_mod_vec_scalar_div_fmpz_mod",
+            "{s}.mod_div({c}, {m}) = {}",
+            malachite_base::test_util::oracle_rows::option(out)
+        );
         let v = UnsignedVector::<u8>::from_str(s).unwrap();
         let r = (&v).mod_div(c, m);
         assert_eq!(r.as_ref().map(ToString::to_string).as_deref(), out);
@@ -38,8 +45,16 @@ fn test_mod_div() {
 #[test]
 fn test_mod_div_u64() {
     let v = UnsignedVector::<u64>::from_str("(1, 2, 18446744073709551614)").unwrap();
+    let r = (&v).mod_div(2, u64::MAX);
+    oracle_row!(
+        "flint",
+        "_fmpz_mod_vec_scalar_div_fmpz_mod",
+        "{v}.mod_div(2, {}) = {}",
+        u64::MAX,
+        malachite_base::test_util::oracle_rows::option(r.as_ref())
+    );
     assert_eq!(
-        v.mod_div(2, u64::MAX).unwrap().to_string(),
+        r.unwrap().to_string(),
         "(9223372036854775808, 1, 9223372036854775807)"
     );
 }

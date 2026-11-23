@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::comparison::traits::{OrdAbs, OrdAbsDouble, OrdDouble};
+use malachite_base::oracle_row;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::comparison::cmp::limbs_cmp_double;
 use malachite_nz::natural::{LIMB_HIGH_BIT, Natural};
@@ -39,6 +40,12 @@ fn test_limbs_cmp_double() {
 #[test]
 fn test_cmp_double() {
     let test = |s, t, out| {
+        oracle_row!(
+            "azurite",
+            "az_nat_cmp_double",
+            "{s}.cmp_double(&{t}) = {out:?}"
+        );
+
         let x = Natural::from_str(s).unwrap();
         let y = Natural::from_str(t).unwrap();
         assert_eq!(x.cmp_double(&y), out);

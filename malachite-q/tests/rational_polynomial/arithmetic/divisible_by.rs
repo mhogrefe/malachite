@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::modular::traits::DivisibleBy;
+use malachite_base::oracle_row;
 use malachite_base::polynomial::arithmetic::traits::CheckedDivExact;
 use malachite_q::rational_polynomial::RationalPolynomial;
 use malachite_q::test_util::generators::{
@@ -18,6 +19,12 @@ use malachite_q::test_util::generators::{
 #[test]
 fn test_divisible_by() {
     let test = |s, t, out| {
+        oracle_row!(
+            "flint",
+            "fmpq_poly_divides",
+            "(&({s})).divisible_by(&({t})) = {out}"
+        );
+
         let p = RationalPolynomial::from_str(s).unwrap();
         let q = RationalPolynomial::from_str(t).unwrap();
         assert_eq!((&p).divisible_by(&q), out);

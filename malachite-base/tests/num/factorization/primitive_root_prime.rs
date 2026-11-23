@@ -8,12 +8,19 @@
 
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::factorization::traits::{IsPrime, PrimitiveRootPrime};
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::unsigned_gen_var_29;
 use std::fmt::Debug;
 use std::panic::catch_unwind;
 
 fn primitive_root_prime_helper<T: PrimitiveRootPrime<Output = T> + PrimitiveUnsigned>() {
     let test = |n: u64, out| {
+        oracle_row!(
+            "flint",
+            "n_primitive_root_prime",
+            "primitive_root_prime({n}) = {out}"
+        );
+
         if let (Ok(n), Ok(out)) = (T::try_from(n), T::try_from(out)) {
             assert_eq!(n.primitive_root_prime(), out);
         }

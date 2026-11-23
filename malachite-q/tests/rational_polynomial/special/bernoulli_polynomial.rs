@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::arithmetic::traits::{Evaluate, MulPowerOfX, TaylorShift};
 use malachite_base::polynomial::calculus::traits::Derivative;
@@ -18,6 +19,12 @@ use malachite_q::test_util::rational_polynomial::special::bernoulli_polynomial::
 #[test]
 fn test_bernoulli_polynomial() {
     let test = |n, out| {
+        oracle_row!(
+            "flint",
+            "arith_bernoulli_polynomial",
+            "bernoulli_polynomial({n}) = {out}"
+        );
+
         assert_eq!(RationalPolynomial::bernoulli_polynomial(n).to_string(), out);
     };
     // - n == 0

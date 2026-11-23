@@ -16,6 +16,7 @@ use malachite_base::num::linear_algebra::traits::{
 };
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::test_util::generators::{
     unsigned_matrix_unsigned_pair_gen_var_4,
@@ -50,6 +51,11 @@ fn verify<T: PrimitiveUnsigned>(a: &UnsignedMatrix<T>, pow: u64) -> UnsignedPoly
 #[test]
 fn test_mod_power_of_2_characteristic_polynomial() {
     let test = |s, pow, out| {
+        oracle_row!(
+            "flint",
+            "fmpz_mod_mat_charpoly_power_of_2",
+            "{s}.mod_power_of_2_characteristic_polynomial({pow}) = {out}"
+        );
         let a = UnsignedMatrix::<u8>::from_str(s).unwrap();
         assert_eq!(verify(&a, pow).to_string(), out);
     };
@@ -113,6 +119,11 @@ fn test_mod_power_of_2_characteristic_polynomial() {
     );
 
     let test = |s, pow, out| {
+        oracle_row!(
+            "flint",
+            "fmpz_mod_mat_charpoly_power_of_2",
+            "{s}.mod_power_of_2_characteristic_polynomial({pow}) = {out}"
+        );
         let a = UnsignedMatrix::<u64>::from_str(s).unwrap();
         assert_eq!(verify(&a, pow).to_string(), out);
     };

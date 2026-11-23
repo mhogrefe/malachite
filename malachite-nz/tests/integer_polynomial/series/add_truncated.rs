@@ -8,6 +8,7 @@
 
 use core::str::FromStr;
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::series::traits::{
     AddTruncated, AddTruncatedAssign, EqTruncated, SubTruncated,
@@ -19,6 +20,12 @@ use malachite_nz::test_util::integer_polynomial::series::add_truncated::*;
 #[test]
 fn test_add_truncated() {
     let test = |s, t, len, out| {
+        oracle_row!(
+            "flint",
+            "fmpz_poly_add_series",
+            "(&({s})).add_truncated(&({t}), {len}) = {out}"
+        );
+
         let p = IntegerPolynomial::from_str(s).unwrap();
         let q = IntegerPolynomial::from_str(t).unwrap();
         // All four combinations of value and reference, and in place with both.

@@ -8,6 +8,8 @@
 
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::modular::traits::{ModAdd, ModMul, ModSub};
+#[cfg(not(feature = "32_bit_limbs"))]
+use malachite_base::oracle_row;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::mul::schonhage_strassen::fft_truncate_sqrt2::*;
 use malachite_nz::natural::arithmetic::mul::schonhage_strassen::ifft_truncate_sqrt2::*;
@@ -25,6 +27,13 @@ fn test_limbs_ifft_butterfly_sqrt2() {
                 w: u64,
                 s_out: &[Limb],
                 t_out: &[Limb]| {
+        oracle_row!(
+            "flint",
+            "ifft_butterfly_sqrt2",
+            "limbs_ifft_butterfly_sqrt2(_, _, {i1:?}, {i2:?}, {i}, {limbs}, {w}, _) = ({s_out:?}, \
+            {t_out:?}, _, _)"
+        );
+
         let mut s = vec![0; limbs + 1];
         let mut t = vec![0; limbs + 1];
         let mut temp = vec![0; limbs + 1];
@@ -109,6 +118,13 @@ fn limbs_ifft_butterfly_sqrt2_properties() {
 #[test]
 fn test_ifft_truncate_sqrt2() {
     let test = |ii: &[&[Limb]], n: usize, w: u64, trunc: usize, out: &[Limb]| {
+        oracle_row!(
+            "flint",
+            "ifft_truncate_sqrt2",
+            "ifft_truncate_sqrt2({ii:?}, {n}, {w}, _, _, _, {trunc}) = {:?}",
+            out.chunks(ii[0].len()).collect::<Vec<_>>()
+        );
+
         let mut ii: Vec<Vec<Limb>> = ii.iter().map(|x| x.to_vec()).collect();
         let limbs = ii[0].len() - 1;
         let mut t1 = vec![0; limbs + 1];

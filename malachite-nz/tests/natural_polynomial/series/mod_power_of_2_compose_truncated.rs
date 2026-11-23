@@ -11,6 +11,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::modular::traits::{ModPowerOf2, ModPowerOf2IsReduced};
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::modular::traits::ModPowerOf2Compose;
 use malachite_base::polynomial::series::traits::{
@@ -86,6 +87,12 @@ fn verify(p: &NaturalPolynomial, q: &NaturalPolynomial, len: u64, pow: u64) -> N
 #[test]
 fn test_mod_power_of_2_compose_truncated() {
     let test = |p, q, len, pow, out| {
+        oracle_row!(
+            "flint",
+            "mod_power_of_2_compose_series",
+            "({p}).mod_power_of_2_compose_truncated({q}, {len}, {pow}) = {out}"
+        );
+
         let p = NaturalPolynomial::from_str(p).unwrap();
         let q = NaturalPolynomial::from_str(q).unwrap();
         assert_eq!(verify(&p, &q, len, pow).to_string(), out);

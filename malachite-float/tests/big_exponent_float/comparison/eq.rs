@@ -10,6 +10,7 @@ use core::str::FromStr;
 use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeOne, One, OneHalf, Zero,
 };
+use malachite_base::oracle_row;
 use malachite_float::BigExponentFloat;
 use malachite_float::big_exponent_float::{
     ComparableBigExponentFloat, ComparableBigExponentFloatRef,
@@ -51,18 +52,38 @@ fn test_eq() {
     ];
     for (i, x) in xs.iter().enumerate() {
         for (j, y) in xs.iter().enumerate() {
+            oracle_row!(
+                "flint",
+                "arf_cmp",
+                "{x:?} {} {y:?}",
+                malachite_base::test_util::oracle_rows::eq_symbol(x == y)
+            );
             assert_eq!(x == y, i == j);
             assert_eq!(
                 ComparableBigExponentFloatRef(x) == ComparableBigExponentFloatRef(y),
                 i == j
             );
         }
+        oracle_row!(
+            "flint",
+            "arf_cmp",
+            "{x:?} {} NaN",
+            malachite_base::test_util::oracle_rows::eq_symbol(*x == BigExponentFloat::NAN)
+        );
         assert_ne!(*x, BigExponentFloat::NAN);
         assert_ne!(
             ComparableBigExponentFloat(x.clone()),
             ComparableBigExponentFloat(BigExponentFloat::NAN)
         );
     }
+    oracle_row!(
+        "flint",
+        "arf_cmp",
+        "NaN {} NaN",
+        malachite_base::test_util::oracle_rows::eq_symbol(
+            BigExponentFloat::NAN == BigExponentFloat::NAN
+        )
+    );
     assert_ne!(BigExponentFloat::NAN, BigExponentFloat::NAN);
     assert_eq!(
         ComparableBigExponentFloat(BigExponentFloat::NAN),

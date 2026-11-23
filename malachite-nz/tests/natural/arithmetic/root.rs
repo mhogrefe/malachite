@@ -13,6 +13,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
     unsigned_gen, unsigned_pair_gen_var_32, unsigned_vec_unsigned_pair_gen_var_14,
@@ -232,6 +233,12 @@ fn limbs_root_rem_fail() {
 #[test]
 fn test_floor_root() {
     let test = |s, exp, out| {
+        oracle_row!(
+            "azurite",
+            "az_nat_floor_root",
+            "{s}.floor_root({exp}) = {out}"
+        );
+
         let n = Natural::from_str(s).unwrap();
         assert_eq!(n.clone().floor_root(exp).to_string(), out);
         assert_eq!((&n).floor_root(exp).to_string(), out);
@@ -370,6 +377,12 @@ fn ceiling_root_assign_fail() {
 #[test]
 fn test_checked_root() {
     let test = |s, exp, out: Option<&str>| {
+        oracle_row!(
+            "azurite",
+            "az_nat_checked_root",
+            "{s}.checked_root({exp}) = {}",
+            malachite_base::test_util::oracle_rows::option(out)
+        );
         let n = Natural::from_str(s).unwrap();
         let out = out.map(|s| s.to_string());
 

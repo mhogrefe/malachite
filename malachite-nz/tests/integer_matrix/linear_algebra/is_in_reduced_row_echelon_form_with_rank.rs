@@ -10,6 +10,7 @@ use core::str::FromStr;
 use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::NegAssign;
 use malachite_base::num::basic::traits::One;
+use malachite_base::oracle_row;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_matrix::IntegerMatrix;
 use malachite_nz::integer_matrix::linear_algebra::is_in_reduced_row_echelon_form_with_rank::*;
@@ -18,6 +19,12 @@ use malachite_nz::test_util::generators::integer_matrix_integer_pair_gen_var_1;
 #[test]
 fn test_is_in_reduced_row_echelon_form_with_rank() {
     let test = |a, den, rank, out| {
+        oracle_row!(
+            "flint",
+            "fmpz_mat_is_in_rref_with_rank",
+            "is_in_reduced_row_echelon_form_with_rank({a}, {den}, {rank}) = {out}"
+        );
+
         let a = IntegerMatrix::from_str(a).unwrap();
         let den = Integer::from_str(den).unwrap();
         assert_eq!(

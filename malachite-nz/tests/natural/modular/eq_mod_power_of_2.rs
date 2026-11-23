@@ -10,6 +10,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::modular::traits::{DivisibleByPowerOf2, EqModPowerOf2, ModPowerOf2};
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
     unsigned_triple_gen_var_4, unsigned_vec_unsigned_unsigned_triple_gen_var_8,
@@ -75,6 +76,12 @@ fn test_limbs_eq_mod_power_of_2() {
 #[test]
 fn test_eq_mod_power_of_2() {
     let test = |x, y, pow, out| {
+        oracle_row!(
+            "azurite",
+            "az_zmod_pow2_eq",
+            "{x} is {}equal to {y} mod 2^{pow}",
+            malachite_base::test_util::oracle_rows::not(out)
+        );
         assert_eq!(
             Natural::from_str(x)
                 .unwrap()

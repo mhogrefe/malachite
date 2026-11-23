@@ -8,6 +8,7 @@
 
 use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::unsigned_gen_var_5;
 use malachite_nz::natural::Natural;
 use malachite_q::Rational;
@@ -20,6 +21,17 @@ use malachite_q::test_util::rational::number_theory::bernoulli_number::*;
 #[test]
 fn test_bernoulli_number() {
     let test = |n, out| {
+        oracle_row!(
+            "azurite",
+            "az_rat_bernoulli_number",
+            "bernoulli_number({n}) = {out}"
+        );
+        oracle_row!(
+            "flint",
+            "arith_bernoulli_number",
+            "bernoulli_number({n}) = {out}"
+        );
+
         assert_eq!(Rational::bernoulli_number(n).to_string(), out);
     };
     // - n == 0
@@ -87,6 +99,21 @@ fn test_bernoulli_numbers_prefix() {
         bernoulli_numbers_prefix(760),
         bernoulli_numbers_prefix_tangent(760)
     );
+    #[cfg(feature = "oracle")]
+    for n in [0, 10, 760] {
+        malachite_base::oracle_row!(
+            "azurite",
+            "az_rat_bernoulli_numbers_prefix",
+            "bernoulli_numbers_prefix({n}) = {:?}",
+            bernoulli_numbers_prefix(n)
+        );
+        malachite_base::oracle_row!(
+            "flint",
+            "arith_bernoulli_number_vec",
+            "bernoulli_numbers_prefix({n}) = {:?}",
+            bernoulli_numbers_prefix(n)
+        );
+    }
 }
 
 #[test]
@@ -103,6 +130,21 @@ fn test_even_bernoulli_numbers_prefix() {
         even_bernoulli_numbers_prefix(400),
         even_bernoulli_numbers_prefix_tangent(400)
     );
+    #[cfg(feature = "oracle")]
+    for n in [0, 5, 400] {
+        malachite_base::oracle_row!(
+            "azurite",
+            "az_rat_even_bernoulli_numbers_prefix",
+            "even_bernoulli_numbers_prefix({n}) = {:?}",
+            even_bernoulli_numbers_prefix(n)
+        );
+        malachite_base::oracle_row!(
+            "flint",
+            "arith_bernoulli_number_vec",
+            "even_bernoulli_numbers_prefix({n}) = {:?}",
+            even_bernoulli_numbers_prefix(n)
+        );
+    }
 }
 
 #[test]

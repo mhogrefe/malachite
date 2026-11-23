@@ -7,6 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::modular::traits::ModMul;
+#[cfg(not(feature = "32_bit_limbs"))]
+use malachite_base::oracle_row;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::mul::schonhage_strassen::fft_radix2::fft_radix2;
 use malachite_nz::natural::arithmetic::mul::schonhage_strassen::fft_truncate::fft_truncate;
@@ -20,6 +22,13 @@ use malachite_nz::test_util::natural::arithmetic::schonhage_strassen::*;
 #[test]
 fn test_ifft_truncate1() {
     let test = |ii: &[&[Limb]], n: usize, w: u64, trunc: usize, out: &[Limb]| {
+        oracle_row!(
+            "flint",
+            "ifft_truncate1",
+            "ifft_truncate1({ii:?}, {n}, {w}, _, _, {trunc}) = {:?}",
+            out.chunks(ii[0].len()).collect::<Vec<_>>()
+        );
+
         let mut ii: Vec<Vec<Limb>> = ii.iter().map(|x| x.to_vec()).collect();
         let limbs = ii[0].len() - 1;
         let mut t1 = vec![0; limbs + 1];
@@ -119,6 +128,13 @@ fn test_ifft_truncate1() {
 #[test]
 fn test_ifft_truncate() {
     let test = |ii: &[&[Limb]], n: usize, w: u64, trunc: usize, out: &[Limb]| {
+        oracle_row!(
+            "flint",
+            "ifft_truncate",
+            "ifft_truncate({ii:?}, {n}, {w}, _, _, {trunc}) = {:?}",
+            out.chunks(ii[0].len()).collect::<Vec<_>>()
+        );
+
         let mut ii: Vec<Vec<Limb>> = ii.iter().map(|x| x.to_vec()).collect();
         let limbs = ii[0].len() - 1;
         let mut t1 = vec![0; limbs + 1];

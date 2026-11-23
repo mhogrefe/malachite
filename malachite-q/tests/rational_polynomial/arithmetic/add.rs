@@ -8,6 +8,7 @@
 
 use core::str::FromStr;
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::arithmetic::traits::Evaluate;
 use malachite_nz::test_util::generators::integer_polynomial_pair_gen;
@@ -21,6 +22,8 @@ use malachite_q::test_util::rational_polynomial::arithmetic::add::{add_cross_mul
 #[test]
 fn test_add() {
     let test = |s, t, out| {
+        oracle_row!("flint", "fmpq_poly_add", "&({s}) + &({t}) = {out}");
+
         let p = RationalPolynomial::from_str(s).unwrap();
         let q = RationalPolynomial::from_str(t).unwrap();
         // All four combinations of value and reference, and in place with both.
@@ -105,6 +108,8 @@ fn test_add() {
 fn test_add_self() {
     // A polynomial added to itself, through the same reference.
     let test = |s, out| {
+        oracle_row!("flint", "fmpq_poly_add", "&({s}) + &({s}) = {out}");
+
         let p = RationalPolynomial::from_str(s).unwrap();
         let r = &p + &p;
         assert!(r.is_valid());

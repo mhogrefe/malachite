@@ -12,6 +12,7 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base::oracle_row;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
@@ -212,6 +213,8 @@ where
     for<'a> &'a Natural: Shl<T, Output = Natural>,
 {
     let test = |s, v: u8, out| {
+        oracle_row!("azurite", "az_nat_shl", "{s} << {v} = {out}");
+
         let u = Natural::from_str(s).unwrap();
         let v = T::from(v);
 
@@ -284,6 +287,8 @@ where
     for<'a> &'a Natural: Shl<T, Output = Natural>,
 {
     let test = |s, v: i8, out| {
+        oracle_row!("azurite", "az_nat_shl", "{s} << {v} = {out}");
+
         let u = Natural::from_str(s).unwrap();
         let v = T::from(v);
 

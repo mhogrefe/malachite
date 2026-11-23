@@ -9,6 +9,7 @@
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::modular::traits::Crt;
 use malachite_base::num::number_theory::traits::CoprimeWith;
+use malachite_base::oracle_row;
 use malachite_base::strings::ToDebugString;
 use malachite_base::test_util::generators::unsigned_quadruple_gen_var_13;
 use malachite_nz::natural::Natural;
@@ -21,6 +22,8 @@ use std::str::FromStr;
 #[test]
 fn test_crt() {
     let test = |s, t, u, v, out| {
+        oracle_row!("azurite", "az_nat_crt", "{s}.crt({t}, {u}, {v}) = {out}");
+
         let r1 = Natural::from_str(s).unwrap();
         let m1 = Natural::from_str(t).unwrap();
         let r2 = Natural::from_str(u).unwrap();

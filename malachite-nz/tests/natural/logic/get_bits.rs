@@ -9,6 +9,7 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::logic::traits::{BitBlockAccess, LowMask, SignificantBits};
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
     unsigned_pair_gen_var_16, unsigned_triple_gen_var_5,
@@ -83,6 +84,12 @@ fn limbs_vec_get_bits_fail() {
 #[test]
 fn test_get_bits() {
     let test = |s, start, end, t| {
+        oracle_row!(
+            "azurite",
+            "az_nat_get_bits",
+            "12379813738590787192.get_bits({start}, {end}) = {t}"
+        );
+
         let u = Natural::from_str(s).unwrap();
         let v = Natural::from_str(t).unwrap();
 

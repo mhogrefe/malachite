@@ -9,6 +9,7 @@
 use core::cmp::Ordering::{self, *};
 use core::str::FromStr;
 use malachite_base::num::comparison::traits::{OrdProducts, OrdProductsNeg};
+use malachite_base::oracle_row;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::{integer_quadruple_gen, natural_quadruple_gen};
@@ -16,6 +17,16 @@ use malachite_nz::test_util::generators::{integer_quadruple_gen, natural_quadrup
 #[test]
 fn test_cmp_products() {
     let test = |a, b, c, d, out: Ordering, out_neg: Ordering| {
+        oracle_row!(
+            "azurite",
+            "az_int_cmp_products",
+            "Integer::cmp_products_neg(&{a}, &{b}, &{c}, &{d}) = {out_neg:?}"
+        );
+        oracle_row!(
+            "azurite",
+            "az_int_cmp_products",
+            "Integer::cmp_products(&{a}, &{b}, &{c}, &{d}) = {out:?}"
+        );
         let a = Integer::from_str(a).unwrap();
         let b = Integer::from_str(b).unwrap();
         let c = Integer::from_str(c).unwrap();

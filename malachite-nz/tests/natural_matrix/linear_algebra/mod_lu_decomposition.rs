@@ -12,6 +12,7 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::linear_algebra::traits::ModLuDecomposition;
 use malachite_base::num::modular::traits::{ModIsReduced, ModMul};
+use malachite_base::oracle_row;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural_matrix::NaturalMatrix;
 use malachite_nz::test_util::generators::natural_matrix_natural_pair_gen_var_5;
@@ -141,6 +142,11 @@ fn verify_lu(a: &NaturalMatrix, m: &Natural) -> (Vec<u64>, NaturalMatrix, Natura
 }
 
 fn test(a: &str, m: &str, p: &[u64], l: &str, u: &str) {
+    oracle_row!(
+        "flint",
+        "fmpz_mod_mat_lu",
+        "{a}.mod_lu_decomposition({m}) = ({p:?}, {l}, {u})"
+    );
     let a = NaturalMatrix::from_str(a).unwrap();
     let m = Natural::from_str(m).unwrap();
     let (p_out, l_out, u_out) = verify_lu(&a, &m);

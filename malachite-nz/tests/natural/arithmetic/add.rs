@@ -9,6 +9,7 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
     large_type_gen_var_9, unsigned_pair_gen_var_27, unsigned_vec_pair_gen,
@@ -737,6 +738,8 @@ fn limbs_add_same_length_with_carry_in_in_place_left_fail() {
 #[test]
 fn test_add() {
     let test = |s, t, out| {
+        oracle_row!("azurite", "az_nat_add", "{s} + {t} = {out}");
+
         let u = Natural::from_str(s).unwrap();
         let v = Natural::from_str(t).unwrap();
 
@@ -794,6 +797,8 @@ fn test_add() {
 #[test]
 fn test_sum() {
     let test = |xs, out| {
+        oracle_row!("azurite", "az_nat_sum", "sum({xs}) = {out}");
+
         let xs = vec_from_str(xs).unwrap();
         let sum = Natural::sum(xs.iter().cloned());
         assert!(sum.is_valid());

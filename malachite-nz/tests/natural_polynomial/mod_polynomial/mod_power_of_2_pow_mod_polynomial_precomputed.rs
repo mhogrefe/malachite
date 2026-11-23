@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::mod_polynomial::traits::ModPowerOf2PowModPolynomial;
 use malachite_base::polynomial::mod_polynomial::traits::*;
@@ -51,6 +52,12 @@ fn verify(a: &NaturalPolynomial, exp: u64, f: &NaturalPolynomial, pow: u64) -> N
 #[test]
 fn test_mod_power_of_2_pow_mod_polynomial_precomputed() {
     let test = |a, exp, f, pow: u64, out| {
+        oracle_row!(
+            "flint",
+            "mod_power_of_2_pow_mod_polynomial",
+            "({a}).mod_power_of_2_pow_mod_polynomial_precomputed({exp}, {f}, {pow}, &data) = {out}"
+        );
+
         let a = NaturalPolynomial::from_str(a).unwrap();
         let f = NaturalPolynomial::from_str(f).unwrap();
 

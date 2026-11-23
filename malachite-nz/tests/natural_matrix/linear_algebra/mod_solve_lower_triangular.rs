@@ -14,6 +14,7 @@ use malachite_base::num::linear_algebra::traits::{
 };
 use malachite_base::num::modular::traits::{ModIsReduced, ModMul};
 use malachite_base::num::number_theory::traits::CoprimeWith;
+use malachite_base::oracle_row;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural_matrix::NaturalMatrix;
 use malachite_nz::test_util::generators::natural_matrix_natural_matrix_natural_triple_gen_var_4;
@@ -97,6 +98,11 @@ fn test_helper(
 }
 
 fn test(a: &str, b: &str, m: &str, unit_diagonal: bool, out: &str) {
+    oracle_row!(
+        "flint",
+        "fmpz_mod_mat_solve_tril",
+        "{a}.mod_solve_lower_triangular({b}, {m}, {unit_diagonal}) = {out}"
+    );
     let a = NaturalMatrix::from_str(a).unwrap();
     let b = NaturalMatrix::from_str(b).unwrap();
     let m = Natural::from_str(m).unwrap();

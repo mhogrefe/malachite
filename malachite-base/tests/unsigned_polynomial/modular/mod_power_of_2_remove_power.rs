@@ -10,6 +10,7 @@ use core::str::FromStr;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::modular::traits::{ModPowerOf2Mul, ModPowerOf2Pow};
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::modular::traits::{
     ModPowerOf2DivisibleBy, ModPowerOf2RemovePower, ModPowerOf2RemovePowerAssign,
@@ -56,6 +57,17 @@ fn verify<T: PrimitiveUnsigned>(
 
 fn test_mod_power_of_2_remove_power_helper<T: PrimitiveUnsigned>() {
     let test = |p, q, pow: u64, out: &str, out_e| {
+        oracle_row!(
+            "flint",
+            "mod_power_of_2_remove_power",
+            "({p}).mod_power_of_2_remove_power({q}, {pow}) = ({out}, {out_e})"
+        );
+        oracle_row!(
+            "flint",
+            "mod_power_of_2_remove_power",
+            "p := {p}; p.mod_power_of_2_remove_power_assign({q}, {pow}) = {out_e}; p = {out}"
+        );
+
         let p = UnsignedPolynomial::<T>::from_str(p).unwrap();
         let q = UnsignedPolynomial::<T>::from_str(q).unwrap();
         let (s, e) = verify(&p, &q, pow);

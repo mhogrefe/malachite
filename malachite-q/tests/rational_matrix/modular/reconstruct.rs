@@ -10,6 +10,7 @@ use core::str::FromStr;
 use malachite_base::matrix::Matrix;
 use malachite_base::num::basic::traits::{Two, Zero};
 use malachite_base::num::modular::traits::DivisibleBy;
+use malachite_base::oracle_row;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural_matrix::NaturalMatrix;
@@ -38,6 +39,12 @@ fn verify_reconstruct(a: &NaturalMatrix, m: &Natural) -> Option<RationalMatrix> 
 }
 
 fn test(a: &str, m: &str, out: &str) {
+    oracle_row!(
+        "flint",
+        "fmpq_mat_set_fmpz_mat_mod_fmpz",
+        "RationalMatrix::reconstruct({a}, {m}) = {out}"
+    );
+
     let a = NaturalMatrix::from_str(a).unwrap();
     let m = Natural::from_str(m).unwrap();
     assert_eq!(
@@ -67,6 +74,18 @@ fn test_reconstruct() {
         "1361129467683753853853498429727072845819",
         "Some([-13717421/109739369])",
     );
+
+    #[cfg(feature = "oracle")]
+    for (a, m) in [("[61, 71]", "73"), ("[71]", "73")] {
+        let a = NaturalMatrix::from_str(a).unwrap();
+        let m = Natural::from_str(m).unwrap();
+        oracle_row!(
+            "flint",
+            "fmpq_mat_set_fmpz_mat_mod_fmpz",
+            "RationalMatrix::reconstruct({a}, {m}) = {}",
+            malachite_base::test_util::oracle_rows::option(RationalMatrix::reconstruct_ref(&a, &m))
+        );
+    }
 }
 
 #[test]

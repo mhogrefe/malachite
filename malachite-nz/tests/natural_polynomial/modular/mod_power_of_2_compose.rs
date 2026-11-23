@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::modular::traits::{ModPowerOf2, ModPowerOf2IsReduced};
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::modular::traits::{
     ModPowerOf2Compose, ModPowerOf2ComposeAssign, ModPowerOf2Evaluate,
@@ -53,6 +54,12 @@ fn check(p: &NaturalPolynomial, q: &NaturalPolynomial, pow: u64) -> NaturalPolyn
 #[test]
 fn test_mod_power_of_2_compose() {
     let test = |s, t, pow, out| {
+        oracle_row!(
+            "flint",
+            "mod_power_of_2_compose",
+            "({s}).mod_power_of_2_compose({t}, {pow}) = {out}"
+        );
+
         let p = NaturalPolynomial::from_str(s).unwrap();
         let q = NaturalPolynomial::from_str(t).unwrap();
         let r = check(&p, &q, pow);

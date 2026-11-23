@@ -10,6 +10,7 @@ use core::str::FromStr;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::modular::traits::{ModEntrywiseInverse, ModEntrywiseMul, ModIsReduced};
 use malachite_base::num::number_theory::traits::CoprimeWith;
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::unsigned_vector_unsigned_pair_gen_var_5;
 use malachite_base::vector::Vector;
 use malachite_nz::natural::Natural;
@@ -20,6 +21,12 @@ use malachite_nz::test_util::natural_vector::modular::mod_entrywise_inverse::*;
 #[test]
 fn test_mod_entrywise_inverse() {
     let test = |s, m: Natural, out: Option<&str>| {
+        oracle_row!(
+            "flint",
+            "_nmod_vec_invert",
+            "{s}.mod_entrywise_inverse({m}) = {}",
+            malachite_base::test_util::oracle_rows::option(out)
+        );
         let v = NaturalVector::from_str(s).unwrap();
         let r = (&v).mod_entrywise_inverse(&m);
         assert_eq!(r.as_ref().map(ToString::to_string).as_deref(), out);

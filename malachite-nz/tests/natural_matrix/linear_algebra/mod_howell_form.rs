@@ -14,6 +14,7 @@ use malachite_base::num::linear_algebra::traits::{
     ModHowellForm, ModHowellFormAssign, ModStrongEchelonForm,
 };
 use malachite_base::num::modular::traits::ModIsReduced;
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::unsigned_matrix_unsigned_pair_gen_var_9;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural_matrix::NaturalMatrix;
@@ -33,6 +34,12 @@ fn a_is_small(a: &NaturalMatrix, m: &Natural) -> bool {
 #[test]
 fn test_mod_howell_form() {
     let test = |s, m, out| {
+        oracle_row!(
+            "flint",
+            "fmpz_mod_mat_howell_form",
+            "{s}.mod_howell_form({m}) = {out}"
+        );
+
         let a = NaturalMatrix::from_str(s).unwrap();
         let m = Natural::from_str(m).unwrap();
         let b = (&a).mod_howell_form(&m);

@@ -11,6 +11,7 @@ use malachite_base::matrix::Matrix;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::linear_algebra::traits::ModSolve;
 use malachite_base::num::modular::traits::{ModIsReduced, ModMul};
+use malachite_base::oracle_row;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural_matrix::NaturalMatrix;
 use malachite_nz::test_util::generators::{
@@ -52,6 +53,12 @@ fn verify_solve(a: &NaturalMatrix, b: &NaturalMatrix, m: &Natural) -> Option<Nat
 }
 
 fn test(a: &str, b: &str, m: &str, out: Option<&str>) {
+    oracle_row!(
+        "flint",
+        "fmpz_mod_mat_can_solve",
+        "{a}.mod_solve({b}, {m}) = {}",
+        malachite_base::test_util::oracle_rows::option(out)
+    );
     let a = NaturalMatrix::from_str(a).unwrap();
     let b = NaturalMatrix::from_str(b).unwrap();
     let m = Natural::from_str(m).unwrap();

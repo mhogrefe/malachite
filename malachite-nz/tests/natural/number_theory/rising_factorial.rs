@@ -10,6 +10,7 @@ use malachite_base::num::basic::traits::One;
 use malachite_base::num::number_theory::traits::{
     BinomialCoefficient, CheckedRisingFactorial, Factorial, RisingFactorial,
 };
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::unsigned_pair_gen_var_2;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -19,6 +20,12 @@ use std::str::FromStr;
 #[test]
 fn test_rising_factorial() {
     let test = |s, n, out| {
+        oracle_row!(
+            "azurite",
+            "az_nat_rising_factorial",
+            "{s}.rising_factorial({n}) = {out}"
+        );
+
         let x = Natural::from_str(s).unwrap();
         assert_eq!(x.clone().rising_factorial(n).to_string(), out);
         assert_eq!((&x).rising_factorial(n).to_string(), out);

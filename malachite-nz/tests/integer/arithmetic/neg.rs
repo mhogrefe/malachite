@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::NegAssign;
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::signed_gen;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{SignedDoubleLimb, SignedLimb};
@@ -17,6 +18,8 @@ use std::str::FromStr;
 #[test]
 fn test_neg() {
     let test = |s, out| {
+        oracle_row!("azurite", "az_int_neg", "-{out} = {s}");
+
         let u = Integer::from_str(s).unwrap();
 
         let neg = -u.clone();

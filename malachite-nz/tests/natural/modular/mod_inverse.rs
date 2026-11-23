@@ -9,6 +9,7 @@
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::modular::traits::{ModInverse, ModIsReduced, ModMul};
 use malachite_base::num::number_theory::traits::CoprimeWith;
+use malachite_base::oracle_row;
 use malachite_base::strings::ToDebugString;
 use malachite_base::test_util::generators::unsigned_pair_gen_var_38;
 use malachite_nz::natural::Natural;
@@ -20,7 +21,29 @@ use std::str::FromStr;
 
 #[test]
 fn test_mod_inverse() {
-    let test = |s, t, out| {
+    let test = |s, t, out: &str| {
+        oracle_row!(
+            "azurite",
+            "az_nat_mod_inverse",
+            "{}",
+            out.strip_prefix("Some(")
+                .and_then(|x| x.strip_suffix(')'))
+                .map_or_else(
+                    || format!("{s} is not invertible mod {t}"),
+                    |inverse| format!("{s}⁻¹ ≡ {inverse} mod {t}")
+                )
+        );
+        oracle_row!(
+            "azurite",
+            "az_zmod_inverse",
+            "{}",
+            out.strip_prefix("Some(")
+                .and_then(|x| x.strip_suffix(')'))
+                .map_or_else(
+                    || format!("{s} is not invertible mod {t}"),
+                    |inverse| format!("{s}⁻¹ ≡ {inverse} mod {t}")
+                )
+        );
         let n = Natural::from_str(s).unwrap();
         let m = Natural::from_str(t).unwrap();
 

@@ -10,6 +10,7 @@ use core::str::FromStr;
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::modular::traits::{DivisibleBy, ModDiv, ModIsReduced, ModMul};
 use malachite_base::num::number_theory::traits::Gcd;
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::unsigned_vector_unsigned_unsigned_triple_gen_var_2;
 use malachite_base::vector::Vector;
 use malachite_nz::natural::Natural;
@@ -20,6 +21,12 @@ use malachite_nz::test_util::natural_vector::modular::mod_div::*;
 #[test]
 fn test_mod_div() {
     let test = |s, c: Natural, m: Natural, out: Option<&str>| {
+        oracle_row!(
+            "flint",
+            "_fmpz_mod_vec_scalar_div_fmpz_mod",
+            "{s}.mod_div({c}, {m}) = {}",
+            malachite_base::test_util::oracle_rows::option(out)
+        );
         let v = NaturalVector::from_str(s).unwrap();
         let r = (&v).mod_div(&c, &m);
         assert_eq!(r.as_ref().map(ToString::to_string).as_deref(), out);

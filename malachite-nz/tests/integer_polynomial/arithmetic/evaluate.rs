@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::num::modular::traits::Mod;
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::arithmetic::traits::Evaluate;
 use malachite_nz::integer::Integer;
@@ -24,6 +25,22 @@ use malachite_nz::test_util::integer_polynomial::arithmetic::evaluate::evaluate_
 #[test]
 fn test_evaluate() {
     let test = |s, x, out| {
+        oracle_row!(
+            "flint",
+            "fmpz_poly_evaluate_fmpz",
+            "(&({s})).evaluate({x}) = {out}"
+        );
+        oracle_row!(
+            "flint",
+            "fmpz_poly_evaluate_horner_fmpz",
+            "(&({s})).evaluate_horner({x}) = {out}"
+        );
+        oracle_row!(
+            "flint",
+            "fmpz_poly_evaluate_divconquer_fmpz",
+            "(&({s})).evaluate_divide_and_conquer({x}) = {out}"
+        );
+
         let p = IntegerPolynomial::from_str(s).unwrap();
         let x = Integer::from_str(x).unwrap();
         let y = (&p).evaluate(&x);

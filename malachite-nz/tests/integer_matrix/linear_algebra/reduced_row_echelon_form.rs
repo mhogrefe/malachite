@@ -12,6 +12,7 @@ use malachite_base::num::linear_algebra::traits::{
     Nullspace, Rank, ReducedRowEchelonForm, ReducedRowEchelonFormAssign,
 };
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::oracle_row;
 use malachite_nz::integer_matrix::IntegerMatrix;
 use malachite_nz::integer_matrix::linear_algebra::is_in_reduced_row_echelon_form_with_rank::*;
 use malachite_nz::integer_matrix::linear_algebra::rank::rank_small;
@@ -97,6 +98,12 @@ fn verify_rank(a: &IntegerMatrix) -> u64 {
 #[test]
 fn test_reduced_row_echelon_form() {
     let test = |s, out| {
+        oracle_row!(
+            "flint",
+            "fmpz_mat_rref",
+            "reduced_row_echelon_form({s}) = {out}"
+        );
+
         let a = IntegerMatrix::from_str(s).unwrap();
         assert_eq!(verify_rref(&a), out);
     };
@@ -132,6 +139,8 @@ fn test_reduced_row_echelon_form() {
 #[test]
 fn test_rank() {
     let test = |s, out| {
+        oracle_row!("flint", "fmpz_mat_rank", "rank({s}) = {out}");
+
         let a = IntegerMatrix::from_str(s).unwrap();
         assert_eq!(verify_rank(&a).to_string(), out);
     };
@@ -162,6 +171,8 @@ fn test_rank() {
 #[test]
 fn test_nullspace() {
     let test = |s, out| {
+        oracle_row!("flint", "fmpz_mat_nullspace", "nullspace({s}) = {out}");
+
         let a = IntegerMatrix::from_str(s).unwrap();
         assert_eq!(verify_nullspace(&a), out);
     };

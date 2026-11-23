@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::modular::traits::{ModPowerOf2Mul, ModPowerOf2Pow};
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::modular::traits::{
     ModPowerOf2DivisibleBy, ModPowerOf2RemovePower, ModPowerOf2RemovePowerAssign,
@@ -45,6 +46,17 @@ fn verify(p: &NaturalPolynomial, q: &NaturalPolynomial, pow: u64) -> (NaturalPol
 #[test]
 fn test_mod_power_of_2_remove_power() {
     let test = |p, q, pow: u64, out: &str, out_e| {
+        oracle_row!(
+            "flint",
+            "mod_power_of_2_remove_power",
+            "({p}).mod_power_of_2_remove_power({q}, {pow}) = ({out}, {out_e})"
+        );
+        oracle_row!(
+            "flint",
+            "mod_power_of_2_remove_power",
+            "p := {p}; p.mod_power_of_2_remove_power_assign({q}, {pow}) = {out_e}; p = {out}"
+        );
+
         let p = NaturalPolynomial::from_str(p).unwrap();
         let q = NaturalPolynomial::from_str(q).unwrap();
 
@@ -62,6 +74,32 @@ fn test_mod_power_of_2_remove_power() {
     test("x^3+4*x^2+5*x+2", "x+1", 200, "x+2", 2);
     // - an exponent of one limb
     test("3*x^2+2*x+255", "3*x+255", 8, "x+1", 1);
+}
+
+#[cfg(feature = "oracle")]
+#[test]
+fn oracle_rows_mod_power_of_2_remove_power() {
+    for (pow, non_monic) in
+        [(3, "5*x^2+6*x+5"), (8, "45*x^2+30*x+5"), (64, "45*x^2+30*x+5"), (200, "45*x^2+30*x+5")]
+    {
+        for (p, q) in
+            [("x^2+2", "x+1"), ("x^3+4*x^2+5*x+2", "x+1"), (non_monic, "3*x+1"), ("0", "x+1")]
+        {
+            let p = NaturalPolynomial::from_str(p).unwrap();
+            let q = NaturalPolynomial::from_str(q).unwrap();
+            let (s, e) = (&p).mod_power_of_2_remove_power(&q, pow);
+            oracle_row!(
+                "flint",
+                "mod_power_of_2_remove_power",
+                "({p}).mod_power_of_2_remove_power({q}, {pow}) = ({s}, {e})"
+            );
+            oracle_row!(
+                "flint",
+                "mod_power_of_2_remove_power",
+                "p := {p}; p.mod_power_of_2_remove_power_assign({q}, {pow}) = {e}; p = {s}"
+            );
+        }
+    }
 }
 
 #[test]

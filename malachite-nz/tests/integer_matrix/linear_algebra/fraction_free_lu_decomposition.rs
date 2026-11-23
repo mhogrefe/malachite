@@ -13,6 +13,7 @@ use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::linear_algebra::traits::FractionFreeLuDecomposition;
+use malachite_base::oracle_row;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_matrix::IntegerMatrix;
 use malachite_nz::test_util::generators::{integer_matrix_gen, integer_matrix_pair_gen_var_4};
@@ -97,6 +98,12 @@ fn verify_decomposition(a: &IntegerMatrix) -> (Vec<u64>, IntegerMatrix, IntegerM
 }
 
 fn test(a: &str, p: &str, l: &str, u: &str, den: &str) {
+    oracle_row!(
+        "flint",
+        "fmpz_mat_fflu",
+        "{a}.fraction_free_lu_decomposition() = ({p}, {l}, {u}, {den})"
+    );
+
     let a = IntegerMatrix::from_str(a).unwrap();
     let (p_actual, l_actual, u_actual, den_actual) = verify_decomposition(&a);
     assert_eq!(format!("[{}]", p_actual.iter().join(", ")), p);

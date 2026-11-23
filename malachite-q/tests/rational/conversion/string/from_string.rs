@@ -8,6 +8,7 @@
 
 use malachite_base::assert_panic;
 use malachite_base::num::conversion::traits::{FromStringBase, ToStringBase};
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::string_gen;
 use malachite_nz::integer::Integer;
@@ -21,6 +22,11 @@ use std::str::FromStr;
 #[test]
 fn test_from_str() {
     let test_ok = |s, n| {
+        oracle_row!(
+            "azurite",
+            "az_rat_from_str",
+            "Rational::from_str({s}) = Ok({n})"
+        );
         assert_eq!(Rational::from_str(s).unwrap().to_string(), n);
         assert_eq!(BigRational::from_str(s).unwrap().to_string(), n);
         assert_eq!(rug::Rational::from_str(s).unwrap().to_string(), n);
@@ -35,6 +41,11 @@ fn test_from_str() {
     test_ok("3/21", "1/7");
 
     let test_err = |s, rug_err| {
+        oracle_row!(
+            "azurite",
+            "az_rat_from_str",
+            "Rational::from_str({s}) = Err(())"
+        );
         assert!(Rational::from_str(s).is_err());
         assert!(BigRational::from_str(s).is_err());
         let rn = rug::Rational::from_str(s);

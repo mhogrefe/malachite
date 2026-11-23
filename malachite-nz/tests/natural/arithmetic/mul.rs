@@ -11,6 +11,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::exponential::traits::CheckedLogBase2;
+use malachite_base::oracle_row;
 use malachite_base::test_util::common::rle_decode;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
@@ -113,6 +114,8 @@ fn test_limbs_mul_limb_and_limbs_vec_mul_limb_in_place() {
 #[test]
 fn test_product() {
     let test = |xs, out| {
+        oracle_row!("azurite", "az_nat_product", "product({xs}) = {out}");
+
         let xs = vec_from_str(xs).unwrap();
         let product = Natural::product(xs.iter().cloned());
         assert!(product.is_valid());
@@ -11609,6 +11612,8 @@ fn test_fft_avx2_body_in_sync() {
 #[test]
 fn test_mul() {
     let test = |s, t, out| {
+        oracle_row!("azurite", "az_nat_mul", "{s} * {t} = {out}");
+
         let u = Natural::from_str(s).unwrap();
         let v = Natural::from_str(t).unwrap();
 

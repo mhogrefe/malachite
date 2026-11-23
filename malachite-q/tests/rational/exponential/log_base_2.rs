@@ -11,6 +11,7 @@ use malachite_base::num::basic::traits::{NegativeOne, Zero};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::exponential::traits::{CeilingLogBase2, CheckedLogBase2, FloorLogBase2};
+use malachite_base::oracle_row;
 use malachite_nz::test_util::generators::natural_gen_var_2;
 use malachite_q::Rational;
 use malachite_q::test_util::generators::{rational_gen_var_1, rational_gen_var_2};
@@ -19,6 +20,12 @@ use std::str::FromStr;
 #[test]
 fn test_floor_log_base_2_abs() {
     let test = |n, out| {
+        oracle_row!(
+            "azurite",
+            "az_rat_floor_log_base_2",
+            "floor_log_base_2_abs({n}) = {out}"
+        );
+
         assert_eq!(Rational::from_str(n).unwrap().floor_log_base_2_abs(), out);
     };
     test("1", 0);
@@ -73,6 +80,12 @@ fn floor_log_base_2_abs_fail() {
 #[test]
 fn test_ceiling_log_base_2_abs() {
     let test = |n, out| {
+        oracle_row!(
+            "azurite",
+            "az_rat_ceiling_log_base_2",
+            "ceiling_log_base_2_abs({n}) = {out}"
+        );
+
         assert_eq!(Rational::from_str(n).unwrap().ceiling_log_base_2_abs(), out);
     };
     test("1", 0);
@@ -127,6 +140,12 @@ fn ceiling_log_base_2_abs_fail() {
 #[test]
 fn test_floor_log_base_2() {
     let test = |n, out| {
+        oracle_row!(
+            "azurite",
+            "az_rat_floor_log_base_2",
+            "floor_log_base_2({n}) = {out}"
+        );
+
         assert_eq!(Rational::from_str(n).unwrap().floor_log_base_2(), out);
     };
     test("1", 0);
@@ -166,6 +185,12 @@ fn floor_log_base_2_fail_2() {
 #[test]
 fn test_ceiling_log_base_2() {
     let test = |n, out| {
+        oracle_row!(
+            "azurite",
+            "az_rat_ceiling_log_base_2",
+            "ceiling_log_base_2({n}) = {out}"
+        );
+
         assert_eq!(Rational::from_str(n).unwrap().ceiling_log_base_2(), out);
     };
     test("1", 0);

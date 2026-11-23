@@ -16,6 +16,7 @@ use malachite_base::num::basic::traits::{
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::oracle_row;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::common::GenConfig;
@@ -53,6 +54,8 @@ use std::str::FromStr;
 #[test]
 fn test_sqrt() {
     let test = |s, s_hex, out: &str, out_hex: &str| {
+        oracle_row!("azurite", "az_float_sqrt", "({s_hex}).sqrt() = {out_hex}");
+
         let x = parse_hex_string(s_hex);
         assert_eq!(x.to_string(), s);
 
@@ -148,6 +151,12 @@ fn test_sqrt() {
 #[test]
 fn test_sqrt_prec() {
     let test = |s, s_hex, prec: u64, out: &str, out_hex: &str, o_out: Ordering| {
+        oracle_row!(
+            "azurite",
+            "az_float_sqrt",
+            "({s_hex}).sqrt_prec({prec}) = ({out_hex}, {o_out:?})"
+        );
+
         let x = parse_hex_string(s_hex);
         assert_eq!(x.to_string(), s);
 
@@ -319,6 +328,12 @@ fn sqrt_prec_fail() {
 #[test]
 fn test_sqrt_round() {
     let test = |s, s_hex, rm, out: &str, out_hex: &str, o_out| {
+        oracle_row!(
+            "azurite",
+            "az_float_sqrt",
+            "({s_hex}).sqrt_round({rm}) = ({out_hex}, {o_out:?})"
+        );
+
         let x = parse_hex_string(s_hex);
         assert_eq!(x.to_string(), s);
 
@@ -961,6 +976,12 @@ fn sqrt_round_fail() {
 #[test]
 fn test_sqrt_prec_round() {
     let test = |s, s_hex, prec: u64, rm, out: &str, out_hex: &str, o_out: Ordering| {
+        oracle_row!(
+            "azurite",
+            "az_float_sqrt",
+            "({s_hex}).sqrt_prec_round({prec}, {rm}) = ({out_hex}, {o_out:?})"
+        );
+
         let x = parse_hex_string(s_hex);
         assert_eq!(x.to_string(), s);
 

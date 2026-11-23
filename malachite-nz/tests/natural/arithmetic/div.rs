@@ -10,6 +10,7 @@ use malachite_base::num::arithmetic::traits::{CheckedDiv, DivMod, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::oracle_row;
 use malachite_base::strings::ToDebugString;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
@@ -34528,6 +34529,8 @@ fn limbs_div_to_out_ref_ref_fail_4() {
 #[test]
 fn test_div() {
     let test = |s, t, quotient| {
+        oracle_row!("azurite", "az_nat_div", "{s} / {t} = {quotient}");
+
         let u = Natural::from_str(s).unwrap();
         let v = Natural::from_str(t).unwrap();
 

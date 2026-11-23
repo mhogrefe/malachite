@@ -54,6 +54,7 @@ enable_pyo3 = ["pyo3", "pyo3-build-config"]
 enable_serde = ["serde"]
 test_build = ["malachite-base/test_build", "random", "serde", "serde_json", "num", "rug"]
 bin_build = ["test_build"]
+oracle = ["test_build", "malachite-base/oracle"]
 float_helpers = []
 doc-images = ["embed-doc-image"]
 

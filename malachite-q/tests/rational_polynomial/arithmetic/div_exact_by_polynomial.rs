@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{DivExact, DivExactAssign, DivRem};
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::oracle_row;
 use malachite_base::polynomial::arithmetic::traits::CheckedDivExact;
 use malachite_q::rational_polynomial::RationalPolynomial;
 use malachite_q::test_util::generators::{
@@ -18,6 +19,13 @@ use malachite_q::test_util::generators::{
 #[test]
 fn test_checked_div_exact() {
     let test = |s, t, out: Option<&str>| {
+        oracle_row!(
+            "flint",
+            "fmpq_poly_divides",
+            "(&({s})).checked_div_exact(&({t})) = {}",
+            malachite_base::test_util::oracle_rows::option(out)
+        );
+
         let p = RationalPolynomial::from_str(s).unwrap();
         let q = RationalPolynomial::from_str(t).unwrap();
         let r = (&p).checked_div_exact(&q);

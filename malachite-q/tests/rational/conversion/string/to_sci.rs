@@ -13,6 +13,7 @@ use malachite_base::num::conversion::string::options::{
 };
 use malachite_base::num::conversion::traits::{ExactFrom, FromSciString, ToSci};
 use malachite_base::num::exponential::traits::FloorLogBase;
+use malachite_base::oracle_row;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::strings::string_is_subset;
 use malachite_base::test_util::num::conversion::string::from_sci_string::DECIMAL_SCI_STRING_CHARS;
@@ -43,6 +44,8 @@ pub fn test_to_sci() {
     );
 
     fn test(s: &str, out: &str) {
+        oracle_row!("azurite", "az_rat_to_sci", "{s}.to_sci() = {out}");
+
         let x = Rational::from_str(s).unwrap();
         assert_eq!(x.to_sci().to_string(), out);
         assert_eq!(

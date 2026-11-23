@@ -11,6 +11,7 @@ use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::{Pow, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::oracle_row;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_matrix::IntegerMatrix;
 use malachite_nz::integer_matrix::arithmetic::mul::ProductShape;
@@ -35,6 +36,8 @@ use malachite_nz::test_util::integer_matrix::pseudorandom::pseudorandom_integer_
 #[test]
 fn test_mul() {
     let test = |s, t, out| {
+        oracle_row!("flint", "fmpz_mat_mul", "{s} * {t} = {out}");
+
         let a = IntegerMatrix::from_str(s).unwrap();
         let b = IntegerMatrix::from_str(t).unwrap();
 

@@ -14,6 +14,7 @@ use malachite_base::num::modular::traits::{
     DivisibleByPowerOf2, ModPowerOf2, ModPowerOf2Assign, ModPowerOf2IsReduced, NegModPowerOf2,
     NegModPowerOf2Assign, RemPowerOf2, RemPowerOf2Assign,
 };
+use malachite_base::oracle_row;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
@@ -104,6 +105,12 @@ fn test_limbs_neg_mod_power_of_2_and_limbs_neg_mod_power_of_2_in_place() {
 #[test]
 fn test_mod_power_of_2_and_rem_power_of_2() {
     let test = |s, v: u64, out| {
+        oracle_row!(
+            "azurite",
+            "az_nat_mod_power_of_2",
+            "{s}.mod_power_of_2({v}) = {out}"
+        );
+
         let u = Natural::from_str(s).unwrap();
 
         let mut n = u.clone();
@@ -159,6 +166,12 @@ fn test_mod_power_of_2_and_rem_power_of_2() {
 #[test]
 fn test_neg_mod_power_of_2() {
     let test = |s, v: u64, out| {
+        oracle_row!(
+            "azurite",
+            "az_nat_rem_power_of_2",
+            "{s}.neg_mod_power_of_2({v}) = {out}"
+        );
+
         let u = Natural::from_str(s).unwrap();
 
         let mut n = u.clone();

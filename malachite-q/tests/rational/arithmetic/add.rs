@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::oracle_row;
 use malachite_base::vecs::vec_from_str;
 use malachite_nz::integer::Integer;
 use malachite_nz::test_util::generators::{integer_pair_gen, integer_vec_gen};
@@ -22,6 +23,8 @@ use std::str::FromStr;
 #[test]
 fn test_add() {
     let test = |s, t, out| {
+        oracle_row!("azurite", "az_rat_add", "{s} + {t} = {out}");
+
         let u = Rational::from_str(s).unwrap();
         let v = Rational::from_str(t).unwrap();
 
@@ -82,6 +85,12 @@ fn test_add() {
 #[test]
 fn test_sum() {
     let test = |xs, out| {
+        oracle_row!(
+            "azurite",
+            "az_rat_sum",
+            "sum({:?}) = {out}",
+            vec_from_str::<Rational>(xs).unwrap()
+        );
         let xs = vec_from_str(xs).unwrap();
         let sum = Rational::sum(xs.iter().cloned());
         assert!(sum.is_valid());

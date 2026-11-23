@@ -8,6 +8,7 @@
 
 use malachite_base::num::arithmetic::traits::Pow;
 use malachite_base::num::basic::traits::One;
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::mod_polynomial::traits::*;
 use malachite_base::polynomial::mod_polynomial::traits::{
@@ -24,6 +25,12 @@ use std::str::FromStr;
 #[test]
 fn test_mod_compose_mod_polynomial() {
     let test = |f, g, h, m, out| {
+        oracle_row!(
+            "flint",
+            "mod_compose_mod_polynomial",
+            "({f}).mod_compose_mod_polynomial({g}, {h}, {m}) = {out}"
+        );
+
         let f = NaturalPolynomial::from_str(f).unwrap();
         let g = NaturalPolynomial::from_str(g).unwrap();
         let h = NaturalPolynomial::from_str(h).unwrap();

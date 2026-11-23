@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::{CeilingSqrt, Square};
+use malachite_base::oracle_row;
 use malachite_nz::integer_matrix::IntegerMatrix;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::integer_matrix_pair_gen_var_7;
@@ -18,6 +19,12 @@ use std::panic::catch_unwind;
 #[test]
 fn test_solve_bounds() {
     let test = |a, b, out_n, out_d| {
+        oracle_row!(
+            "flint",
+            "fmpz_mat_solve_bound",
+            "{a}.solve_bounds({b}) = ({out_n}, {out_d})"
+        );
+
         let a = IntegerMatrix::from_str(a).unwrap();
         let b = IntegerMatrix::from_str(b).unwrap();
         let (n, d) = a.solve_bounds(&b);

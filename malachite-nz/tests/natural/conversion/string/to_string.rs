@@ -10,6 +10,7 @@ use itertools::repeat_n;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::string::to_string::BaseFmtWrapper as BaseBaseFmtWrapper;
 use malachite_base::num::conversion::traits::{FromStringBase, ToStringBase};
+use malachite_base::oracle_row;
 use malachite_base::strings::{
     ToBinaryString, ToDebugString, ToLowerHexString, ToOctalString, ToUpperHexString,
     string_is_subset,
@@ -1045,6 +1046,12 @@ pub fn gmp_to_string_base(x: &rug::Integer, base: i32) -> String {
 #[test]
 fn test_to_string_base_large() {
     fn test(x: u64, base: u8, out: &str) {
+        oracle_row!(
+            "azurite",
+            "az_nat_to_string_base",
+            "{x}.to_string_base({base}) = {out}"
+        );
+
         let n = Natural::from(x);
         assert_eq!(n.to_string_base(base), out);
         // above base 36 there is only one alphabet, so the uppercase variant is the same

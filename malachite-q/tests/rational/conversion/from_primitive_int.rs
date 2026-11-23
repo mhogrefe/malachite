@@ -10,6 +10,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::{signed_gen, signed_gen_var_2, unsigned_gen};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SignedLimb};
@@ -38,6 +39,11 @@ fn test_from_u32() {
 #[test]
 fn test_from_u64() {
     let test = |u: u64, out| {
+        oracle_row!(
+            "azurite",
+            "az_rat_from_integer",
+            "Rational::from({u}) = {out}"
+        );
         let x = Rational::from(u);
         assert_eq!(x.to_string(), out);
         assert!(x.is_valid());
@@ -78,6 +84,11 @@ fn test_from_i32() {
 #[test]
 fn test_from_i64() {
     let test = |i: i64, out| {
+        oracle_row!(
+            "azurite",
+            "az_rat_from_integer",
+            "Rational::from({i}) = {out}"
+        );
         let x = Rational::from(i);
         assert_eq!(x.to_string(), out);
         assert!(x.is_valid());

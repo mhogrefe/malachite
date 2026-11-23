@@ -14,6 +14,7 @@ use malachite_base::num::basic::traits::{
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::oracle_row;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::primitive_float_pair_gen;
@@ -60,6 +61,8 @@ use std::str::FromStr;
 #[test]
 fn test_sub() {
     let test = |s, s_hex, t, t_hex, out: &str, out_hex: &str| {
+        oracle_row!("azurite", "az_float_sub", "{s_hex} - {t_hex} = {out_hex}");
+
         let x = parse_hex_string(s_hex);
         assert_eq!(x.to_string(), s);
         let y = parse_hex_string(t_hex);
@@ -1834,6 +1837,12 @@ fn test_sub() {
 #[test]
 fn test_sub_prec() {
     let test = |s, s_hex, t, t_hex, prec: u64, out: &str, out_hex: &str, o_out: Ordering| {
+        oracle_row!(
+            "azurite",
+            "az_float_sub",
+            "({s_hex}).sub_prec({t_hex}, {prec}) = ({out_hex}, {o_out:?})"
+        );
+
         let x = parse_hex_string(s_hex);
         assert_eq!(x.to_string(), s);
         let y = parse_hex_string(t_hex);
@@ -2656,6 +2665,12 @@ fn sub_prec_fail() {
 #[test]
 fn test_sub_round() {
     let test = |s, s_hex, t, t_hex, rm, out: &str, out_hex: &str, o_out| {
+        oracle_row!(
+            "azurite",
+            "az_float_sub",
+            "({s_hex}).sub_round({t_hex}, {rm}) = ({out_hex}, {o_out:?})"
+        );
+
         let x = parse_hex_string(s_hex);
         assert_eq!(x.to_string(), s);
         let y = parse_hex_string(t_hex);
@@ -6925,6 +6940,12 @@ fn sub_round_fail() {
 #[test]
 fn test_sub_prec_round() {
     let test = |s, s_hex, t, t_hex, prec: u64, rm, out: &str, out_hex: &str, o_out: Ordering| {
+        oracle_row!(
+            "azurite",
+            "az_float_sub",
+            "({s_hex}).sub_prec_round({t_hex}, {prec}, {rm}) = ({out_hex}, {o_out:?})"
+        );
+
         let x = parse_hex_string(s_hex);
         assert_eq!(x.to_string(), s);
         let y = parse_hex_string(t_hex);
@@ -9515,6 +9536,12 @@ fn sub_prec_round_fail() {
 #[test]
 fn test_sub_rational() {
     let test = |s, s_hex, t, out: &str, out_hex: &str| {
+        oracle_row!(
+            "azurite",
+            "az_float_sub_rational",
+            "{s_hex} - {t} = {out_hex}"
+        );
+
         let x = parse_hex_string(s_hex);
         assert_eq!(x.to_string(), s);
         let y = Rational::from_str(t).unwrap();
@@ -9636,6 +9663,12 @@ fn test_sub_rational() {
 #[test]
 fn test_sub_rational_prec() {
     let test = |s, s_hex, t, prec, out: &str, out_hex: &str, o_out| {
+        oracle_row!(
+            "azurite",
+            "az_float_sub_rational",
+            "({s_hex}).sub_rational_prec({t}, {prec}) = ({out_hex}, {o_out:?})"
+        );
+
         let x = parse_hex_string(s_hex);
         assert_eq!(x.to_string(), s);
         let y = Rational::from_str(t).unwrap();
@@ -9853,6 +9886,12 @@ fn test_sub_rational_round() {
             assert_eq!(o_alt, o);
         };
     let test = |s, s_hex, t, rm, out: &str, out_hex: &str, o_out| {
+        oracle_row!(
+            "azurite",
+            "az_float_sub_rational",
+            "({s_hex}).sub_rational_round({t}, {rm}) = ({out_hex}, {o_out:?})"
+        );
+
         test_helper(
             s,
             s_hex,
@@ -10515,6 +10554,12 @@ fn sub_rational_round_fail() {
 #[test]
 fn test_sub_rational_prec_round() {
     let test = |s, s_hex, t, prec, rm, out: &str, out_hex: &str, o_out| {
+        oracle_row!(
+            "azurite",
+            "az_float_sub_rational",
+            "({s_hex}).sub_rational_prec_round({t}, {prec}, {rm}) = ({out_hex}, {o_out:?})"
+        );
+
         let x = parse_hex_string(s_hex);
         assert_eq!(x.to_string(), s);
         let y = Rational::from_str(t).unwrap();

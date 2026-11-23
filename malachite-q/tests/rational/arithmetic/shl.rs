@@ -12,6 +12,7 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::{
     signed_gen, signed_gen_var_5, unsigned_gen, unsigned_gen_var_5,
 };
@@ -30,6 +31,8 @@ where
     for<'a> &'a Rational: Shl<T, Output = Rational>,
 {
     let test = |s, v: u8, out| {
+        oracle_row!("azurite", "az_rat_shl", "{s} << {v} = {out}");
+
         let u = Rational::from_str(s).unwrap();
         let v = T::from(v);
 
@@ -103,6 +106,8 @@ where
     for<'a> &'a Rational: Shl<T, Output = Rational>,
 {
     let test = |s, v: i8, out| {
+        oracle_row!("azurite", "az_rat_shl", "{s} << {v} = {out}");
+
         let u = Rational::from_str(s).unwrap();
         let v = T::from(v);
 

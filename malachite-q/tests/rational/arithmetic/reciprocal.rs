@@ -9,6 +9,7 @@
 use malachite_base::num::arithmetic::traits::{Reciprocal, ReciprocalAssign};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::comparison::traits::EqAbs;
+use malachite_base::oracle_row;
 use malachite_q::Rational;
 use malachite_q::test_util::generators::rational_gen_var_1;
 use num::BigRational;
@@ -17,6 +18,8 @@ use std::str::FromStr;
 #[test]
 fn test_reciprocal() {
     let test = |s, out| {
+        oracle_row!("azurite", "az_rat_reciprocal", "reciprocal({s}) = {out}");
+
         let x = Rational::from_str(s).unwrap();
 
         let reciprocal = x.clone().reciprocal();

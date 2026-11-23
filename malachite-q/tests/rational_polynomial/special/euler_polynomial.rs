@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::basic::traits::{One, OneHalf, Two};
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::arithmetic::traits::{Evaluate, MulPowerOfX, TaylorShift};
 use malachite_base::polynomial::calculus::traits::Derivative;
@@ -19,6 +20,12 @@ use malachite_q::test_util::rational_polynomial::special::euler_polynomial::*;
 #[test]
 fn test_euler_polynomial() {
     let test = |n, out| {
+        oracle_row!(
+            "flint",
+            "arith_euler_polynomial",
+            "euler_polynomial({n}) = {out}"
+        );
+
         assert_eq!(RationalPolynomial::euler_polynomial(n).to_string(), out);
     };
     // - n == 0

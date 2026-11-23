@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use malachite_base::matrix::Matrix;
 use malachite_base::num::linear_algebra::traits::Permanent;
+use malachite_base::oracle_row;
 use malachite_q::rational_matrix::RationalMatrix;
 use malachite_q::test_util::generators::rational_matrix_gen_var_4;
 use malachite_q::test_util::rational_matrix::linear_algebra::permanent::*;
@@ -27,6 +28,8 @@ fn verify(a: &RationalMatrix) -> String {
 #[test]
 fn test_permanent() {
     let test = |s, out| {
+        oracle_row!("flint", "fmpq_mat_permanent", "permanent({s}) = {out}");
+
         let a = RationalMatrix::from_str(s).unwrap();
         assert_eq!(verify(&a), out);
     };

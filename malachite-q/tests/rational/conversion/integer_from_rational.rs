@@ -12,6 +12,7 @@ use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{
     ConvertibleFrom, ExactFrom, IsInteger, RoundingFrom,
 };
+use malachite_base::oracle_row;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::strings::ToDebugString;
 use malachite_nz::integer::Integer;
@@ -93,6 +94,12 @@ fn test_convertible_from_rational() {
 #[test]
 fn test_rounding_from_rational() {
     let test = |s, rm, out, o_out| {
+        oracle_row!(
+            "azurite",
+            "az_rat_rounding_from",
+            "Integer::rounding_from({s}, {rm}) = ({out}, {o_out:?})"
+        );
+
         let u = Rational::from_str(s).unwrap();
 
         let (n, o) = Integer::rounding_from(u.clone(), rm);

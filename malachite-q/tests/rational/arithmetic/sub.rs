@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::oracle_row;
 use malachite_nz::test_util::generators::integer_pair_gen;
 use malachite_q::Rational;
 use malachite_q::test_util::generators::{rational_gen, rational_pair_gen};
@@ -18,6 +19,8 @@ use std::str::FromStr;
 #[test]
 fn test_sub() {
     let test = |s, t, out| {
+        oracle_row!("azurite", "az_rat_sub", "{s} - {t} = {out}");
+
         let u = Rational::from_str(s).unwrap();
         let v = Rational::from_str(t).unwrap();
 

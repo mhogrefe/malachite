@@ -719,3 +719,203 @@ where
 fn convertible_from_float_properties() {
     apply_fn_to_primitive_floats!(convertible_from_float_properties_helper);
 }
+
+#[cfg(feature = "oracle")]
+#[test]
+fn oracle_rows_from_f32() {
+    for s in [
+        "NaN",
+        "Infinity",
+        "-Infinity",
+        "0.0",
+        "-0.0",
+        "123.0",
+        "1.0e9",
+        "4294967295.0",
+        "4294967296.0",
+        "18446744073709551615.0",
+        "18446744073709551616.0",
+        "1.0e20",
+        "1.23e20",
+        "123.1",
+        "123.5",
+        "124.5",
+        "-0.99",
+        "-0.499",
+        "-0.5",
+        "-123.0",
+        "1.0e-45",
+        "1.1754942e-38",
+        "1.1754944e-38",
+        "3.4028235e38",
+    ] {
+        let f = s.parse::<f32>().unwrap();
+        let convertible = Natural::convertible_from(f);
+        malachite_base::oracle_row!(
+            "azurite",
+            "az_nat_from_f32",
+            "{s} is {}convertible to a Natural",
+            malachite_base::test_util::oracle_rows::not(convertible)
+        );
+        malachite_base::oracle_row!(
+            "azurite",
+            "az_nat_from_f32",
+            "Natural::try_from({s}) = {:?}",
+            Natural::try_from(f)
+        );
+        if convertible {
+            malachite_base::oracle_row!(
+                "azurite",
+                "az_nat_from_f32",
+                "Natural::exact_from({s}) = {}",
+                Natural::exact_from(f)
+            );
+        }
+    }
+    for (s, rm) in [
+        ("0.0", Exact),
+        ("-0.0", Exact),
+        ("123.0", Exact),
+        ("1.0e9", Exact),
+        ("1.0e9", Exact),
+        ("4294967295.0", Exact),
+        ("4294967296.0", Exact),
+        ("18446744073709551615.0", Exact),
+        ("18446744073709551616.0", Exact),
+        ("1.0e20", Exact),
+        ("1.23e20", Exact),
+        ("1.6777216e7", Exact),
+        ("1.6777218e7", Exact),
+        ("123.1", Floor),
+        ("123.1", Down),
+        ("123.1", Ceiling),
+        ("123.1", Up),
+        ("123.1", Nearest),
+        ("123.9", Floor),
+        ("123.9", Down),
+        ("123.9", Ceiling),
+        ("123.9", Up),
+        ("123.9", Nearest),
+        ("123.5", Nearest),
+        ("124.5", Nearest),
+        ("-0.99", Ceiling),
+        ("-0.99", Down),
+        ("-0.499", Nearest),
+        ("-0.5", Nearest),
+        ("-Infinity", Nearest),
+        ("-Infinity", Down),
+        ("-Infinity", Ceiling),
+        ("-123.0", Nearest),
+        ("-123.0", Down),
+        ("-123.0", Ceiling),
+    ] {
+        let (x, o) = Natural::rounding_from(s.parse::<f32>().unwrap(), rm);
+        malachite_base::oracle_row!(
+            "azurite",
+            "az_nat_from_f32",
+            "Natural::rounding_from({s}, {rm}) = ({x}, {o:?})"
+        );
+    }
+}
+
+#[cfg(feature = "oracle")]
+#[test]
+fn oracle_rows_from_f64() {
+    for s in [
+        "NaN",
+        "Infinity",
+        "-Infinity",
+        "0.0",
+        "-0.0",
+        "123.0",
+        "1.0e9",
+        "4294967295.0",
+        "4294967296.0",
+        "18446744073709551615.0",
+        "18446744073709551616.0",
+        "1.0e20",
+        "1.23e20",
+        "1.0e100",
+        "1.23e100",
+        "123.1",
+        "123.5",
+        "124.5",
+        "-0.99",
+        "-0.499",
+        "-0.5",
+        "-123.0",
+        "5.0e-324",
+        "2.225073858507201e-308",
+        "2.2250738585072014e-308",
+        "1.7976931348623157e308",
+    ] {
+        let f = s.parse::<f64>().unwrap();
+        let convertible = Natural::convertible_from(f);
+        malachite_base::oracle_row!(
+            "azurite",
+            "az_nat_from_f64",
+            "{s} is {}convertible to a Natural",
+            malachite_base::test_util::oracle_rows::not(convertible)
+        );
+        malachite_base::oracle_row!(
+            "azurite",
+            "az_nat_from_f64",
+            "Natural::try_from({s}) = {:?}",
+            Natural::try_from(f)
+        );
+        if convertible {
+            malachite_base::oracle_row!(
+                "azurite",
+                "az_nat_from_f64",
+                "Natural::exact_from({s}) = {}",
+                Natural::exact_from(f)
+            );
+        }
+    }
+    for (s, rm) in [
+        ("0.0", Exact),
+        ("-0.0", Exact),
+        ("123.0", Exact),
+        ("1.0e9", Exact),
+        ("1.0e9", Exact),
+        ("4294967295.0", Exact),
+        ("4294967296.0", Exact),
+        ("18446744073709551615.0", Exact),
+        ("18446744073709551616.0", Exact),
+        ("1.0e20", Exact),
+        ("1.23e20", Exact),
+        ("1.0e100", Exact),
+        ("1.23e100", Exact),
+        ("9.007199254740992e15", Exact),
+        ("9.007199254740994e15", Exact),
+        ("123.1", Floor),
+        ("123.1", Down),
+        ("123.1", Ceiling),
+        ("123.1", Up),
+        ("123.1", Nearest),
+        ("123.9", Floor),
+        ("123.9", Down),
+        ("123.9", Ceiling),
+        ("123.9", Up),
+        ("123.9", Nearest),
+        ("123.5", Nearest),
+        ("124.5", Nearest),
+        ("-0.99", Ceiling),
+        ("-0.99", Down),
+        ("-0.499", Nearest),
+        ("-0.5", Nearest),
+        ("-Infinity", Nearest),
+        ("-Infinity", Down),
+        ("-Infinity", Ceiling),
+        ("-123.0", Nearest),
+        ("-123.0", Down),
+        ("-123.0", Ceiling),
+    ] {
+        let (x, o) = Natural::rounding_from(s.parse::<f64>().unwrap(), rm);
+        malachite_base::oracle_row!(
+            "azurite",
+            "az_nat_from_f64",
+            "Natural::rounding_from({s}, {rm}) = ({x}, {o:?})"
+        );
+    }
+}

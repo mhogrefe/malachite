@@ -11,6 +11,7 @@ use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeOne, One, Two, Zero,
 };
 use malachite_base::num::conversion::traits::{ExactFrom, FromStringBase};
+use malachite_base::oracle_row;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::common::GenConfig;
@@ -158,6 +159,17 @@ fn test_ln_gamma_prec_round() {
                 out: &str,
                 out_hex: &str,
                 o: Ordering| {
+        oracle_row!(
+            "azurite",
+            "az_big_exponent_float_ln_gamma",
+            "({x_hex}).ln_gamma_prec_round({prec}, {rm}) = ({out_hex}, {o:?})"
+        );
+        oracle_row!(
+            "flint",
+            "arf_gamma",
+            "({x_hex}).ln_gamma_prec_round({prec}, {rm}) = ({out_hex}, {o:?})"
+        );
+
         assert_eq!(hex(x_hex).to_string(), x);
         let r = ln_gamma_prec_round_all(&hex(x_hex), prec, rm);
         assert_eq!(format!("{:?}", r.0), out_hex, "{x} {prec} {rm}");
@@ -2037,6 +2049,17 @@ fn test_ln_gamma_prec_round() {
 #[test]
 fn test_ln_gamma_rational_prec_round() {
     let test = |x: &str, prec: u64, rm: RoundingMode, out: &str, out_hex: &str, o: Ordering| {
+        oracle_row!(
+            "azurite",
+            "az_big_exponent_float_ln_gamma_rational",
+            "BigExponentFloat::ln_gamma_rational_prec_round({x}, {prec}, {rm}) = ({out_hex}, {o:?})"
+        );
+        oracle_row!(
+            "flint",
+            "arf_gamma",
+            "BigExponentFloat::ln_gamma_rational_prec_round({x}, {prec}, {rm}) = ({out_hex}, {o:?})"
+        );
+
         let r = ln_gamma_rational_prec_round_all(&Rational::from_str(x).unwrap(), prec, rm);
         assert_eq!(format!("{:?}", r.0), out_hex, "{x} {prec} {rm}");
         assert_eq!(r.0.to_string(), out);

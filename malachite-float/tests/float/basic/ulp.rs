@@ -11,6 +11,7 @@ use malachite_base::num::arithmetic::traits::IsPowerOf2;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, NegativeZero, Zero};
 use malachite_base::num::conversion::traits::{ExactFrom, SciMantissaAndExponent};
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::primitive_float_gen_var_12;
 use malachite_float::test_util::common::{parse_hex_string, to_hex_string};
 use malachite_float::test_util::float::conversion::from_primitive_float::alt_precision;
@@ -25,6 +26,12 @@ use std::panic::catch_unwind;
 #[test]
 fn test_ulp() {
     let test = |s, s_hex, out: Option<&str>, out_hex: Option<&str>| {
+        oracle_row!(
+            "azurite",
+            "az_float_ulp",
+            "ulp({s_hex}) = {}",
+            out_hex.unwrap_or("None")
+        );
         let x = parse_hex_string(s_hex);
         assert_eq!(x.to_string(), s);
 

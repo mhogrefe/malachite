@@ -10,13 +10,17 @@ use malachite_base::num::arithmetic::traits::{CheckedRoot, IsPowerOf2, Pow, Powe
 use malachite_base::num::basic::traits::{One, Two};
 use malachite_base::num::exponential::traits::CheckedLogBase2;
 use malachite_base::num::logic::traits::{BitAccess, LowMask};
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::{unsigned_gen_var_5, unsigned_gen_var_15};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 
 #[test]
 fn test_power_of_2() {
-    let test = |pow, out| assert_eq!(Natural::power_of_2(pow).to_string(), out);
+    let test = |pow: u64, out| {
+        oracle_row!("azurite", "az_nat_power_of_2", "2^{pow} = {out}");
+        assert_eq!(Natural::power_of_2(pow).to_string(), out);
+    };
     test(0, "1");
     test(1, "2");
     test(2, "4");

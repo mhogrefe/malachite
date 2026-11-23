@@ -13,6 +13,7 @@ use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::num::modular::traits::{Mod, ModIsReduced};
 use malachite_base::num::number_theory::traits::CoprimeWith;
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::series::traits::{
     ModInverseTruncated, ModMulTruncated, ModSquareTruncated,
@@ -74,6 +75,13 @@ fn verify(p: &NaturalPolynomial, len: u64, m: &Natural) -> Option<NaturalPolynom
 #[test]
 fn test_mod_inverse_truncated() {
     let test = |p, len, m, out: Option<&str>| {
+        oracle_row!(
+            "flint",
+            "mod_inverse_series",
+            "({p}).mod_inverse_truncated({len}, {m}) = {}",
+            out.unwrap_or("None")
+        );
+
         let p = NaturalPolynomial::from_str(p).unwrap();
         let m = Natural::from_str(m).unwrap();
         assert_eq!(

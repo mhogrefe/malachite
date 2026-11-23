@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use malachite_base::matrix::Matrix;
 use malachite_base::num::linear_algebra::traits::Solve;
+use malachite_base::oracle_row;
 use malachite_q::rational_matrix::RationalMatrix;
 use malachite_q::rational_matrix::linear_algebra::solve::*;
 use malachite_q::rational_vector::RationalVector;
@@ -100,6 +101,12 @@ fn verify_public(a: &RationalMatrix, b: &RationalMatrix) -> Option<RationalMatri
 #[test]
 fn test_solve() {
     let test = |a, b, out| {
+        oracle_row!(
+            "flint",
+            "fmpq_mat_solve_or_can_solve",
+            "solve({a}, {b}) = {out}"
+        );
+
         let a = RationalMatrix::from_str(a).unwrap();
         let b = RationalMatrix::from_str(b).unwrap();
         assert_eq!(format_result(&verify_public(&a, &b)), out);
@@ -166,6 +173,12 @@ fn test_solve_vector() {
 #[test]
 fn test_solve_square() {
     let test = |a, b, out| {
+        oracle_row!(
+            "flint",
+            "fmpq_mat_solve",
+            "solve_nonsingular({a}, {b}) = {out}"
+        );
+
         let a = RationalMatrix::from_str(a).unwrap();
         let b = RationalMatrix::from_str(b).unwrap();
         assert_eq!(format_result(&verify_square(&a, &b)), out);
@@ -191,6 +204,8 @@ fn test_solve_square() {
 #[test]
 fn test_can_solve() {
     let test = |a, b, out| {
+        oracle_row!("flint", "fmpq_mat_can_solve", "can_solve({a}, {b}) = {out}");
+
         let a = RationalMatrix::from_str(a).unwrap();
         let b = RationalMatrix::from_str(b).unwrap();
         assert_eq!(format_result(&verify_general(&a, &b)), out);

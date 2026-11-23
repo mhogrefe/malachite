@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use malachite_base::matrix::Matrix;
 use malachite_base::num::linear_algebra::traits::FractionFreeLuDecomposition;
+use malachite_base::oracle_row;
 use malachite_nz::integer_matrix::IntegerMatrix;
 use malachite_nz::integer_matrix::linear_algebra::certify_lu_mod_p::*;
 use malachite_nz::integer_matrix::linear_algebra::is_in_reduced_row_echelon_form_with_rank::*;
@@ -44,6 +45,12 @@ fn verify_certificate(a: &IntegerMatrix, p: Limb) -> String {
 #[test]
 fn test_rref_upper_certify_lu_mod_p() {
     let test = |a, p, out| {
+        oracle_row!(
+            "flint",
+            "fmpz_mat_rref_upper_certify_lu_mod_p",
+            "rref_upper_certify_lu_mod_p({a}, {p}) = {out}"
+        );
+
         let a = IntegerMatrix::from_str(a).unwrap();
         assert_eq!(verify_certificate(&a, p), out);
     };

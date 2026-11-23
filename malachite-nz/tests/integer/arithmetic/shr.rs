@@ -13,6 +13,7 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::oracle_row;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::generators::{
     signed_gen, signed_unsigned_pair_gen_var_1, unsigned_gen,
@@ -35,6 +36,8 @@ where
     for<'a> &'a Integer: Shr<T, Output = Integer>,
 {
     let test = |s, v: u8, out| {
+        oracle_row!("azurite", "az_int_shr", "{s} >> {v} = {out}");
+
         let u = Integer::from_str(s).unwrap();
         let v = T::from(v);
 
@@ -160,6 +163,8 @@ where
     for<'a> &'a Integer: Shr<T, Output = Integer>,
 {
     let test = |s, v: i8, out| {
+        oracle_row!("azurite", "az_int_shr", "{s} >> {v} = {out}");
+
         let u = Integer::from_str(s).unwrap();
         let v = T::from(v);
 

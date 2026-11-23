@@ -10,6 +10,7 @@ use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
     unsigned_pair_gen_var_2, unsigned_vec_unsigned_pair_gen_var_16,
@@ -45,6 +46,8 @@ fn test_limbs_get_bit() {
 #[test]
 fn test_get_bit() {
     let test = |n, index, out| {
+        oracle_row!("azurite", "az_nat_get_bit", "{n}.get_bit({index}) = {out}");
+
         assert_eq!(Natural::from_str(n).unwrap().get_bit(index), out);
         assert_eq!(num_get_bit(&BigUint::from_str(n).unwrap(), index), out);
         assert_eq!(

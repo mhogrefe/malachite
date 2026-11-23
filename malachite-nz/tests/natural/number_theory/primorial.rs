@@ -9,6 +9,7 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::factorization::traits::{IsPrime, Primes};
 use malachite_base::num::number_theory::traits::Primorial;
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::{
     unsigned_gen_var_5, unsigned_gen_var_27, unsigned_gen_var_28,
 };
@@ -22,6 +23,8 @@ use rug::Complete;
 #[test]
 fn test_primorial() {
     fn test(n: u64, out: &str) {
+        oracle_row!("azurite", "az_nat_primorial", "{n}# = {out}");
+
         let p = Natural::primorial(n);
         assert!(p.is_valid());
         assert_eq!(p.to_string(), out);
@@ -51,6 +54,11 @@ fn test_primorial() {
 #[test]
 fn test_product_of_first_n_primes() {
     fn test(n: u64, out: &str) {
+        oracle_row!(
+            "azurite",
+            "az_nat_product_of_first_n_primes",
+            "p_{n}# = {out}"
+        );
         let p = Natural::product_of_first_n_primes(n);
         assert!(p.is_valid());
         assert_eq!(p.to_string(), out);

@@ -11,6 +11,7 @@ use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeOne, One, OneHalf, Zero,
 };
 use malachite_base::num::comparison::traits::{EqAbs, PartialOrdAbs};
+use malachite_base::oracle_row;
 use malachite_float::BigExponentFloat;
 use malachite_float::big_exponent_float::{
     ComparableBigExponentFloat, ComparableBigExponentFloatRef,
@@ -52,6 +53,12 @@ fn test_eq_abs() {
     for x in &xs {
         for y in &xs {
             let out = x == y || *x == big_exponent_float_negate(y.clone());
+            oracle_row!(
+                "flint",
+                "arf_cmp",
+                "|{x:?}| {} |{y:?}|",
+                malachite_base::test_util::oracle_rows::eq_symbol(out)
+            );
             assert_eq!(x.eq_abs(y), out);
             assert_eq!(
                 ComparableBigExponentFloatRef(x).eq_abs(&ComparableBigExponentFloatRef(y)),

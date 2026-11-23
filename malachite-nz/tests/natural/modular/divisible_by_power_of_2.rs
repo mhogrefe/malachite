@@ -10,6 +10,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::modular::traits::DivisibleByPowerOf2;
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
     unsigned_gen, unsigned_pair_gen_var_2, unsigned_vec_unsigned_pair_gen_var_20,
@@ -48,6 +49,12 @@ fn test_limbs_divisible_by_power_of_2() {
 #[test]
 fn test_divisible_by_power_of_2() {
     let test = |n, pow, out| {
+        oracle_row!(
+            "azurite",
+            "az_nat_divisible_by_power_of_2",
+            "{n} is {}divisible by 2^{pow}",
+            malachite_base::test_util::oracle_rows::not(out)
+        );
         assert_eq!(
             Natural::from_str(n).unwrap().divisible_by_power_of_2(pow),
             out

@@ -10,6 +10,7 @@ use core::str::FromStr;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::modular::mod_mul::mod_mul_precompute_shoup;
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::modular::traits::{ModEvaluate, ModPowerOf2Evaluate};
 use malachite_base::test_util::generators::common::GenConfig;
@@ -24,6 +25,12 @@ use malachite_base::unsigned_polynomial::modular::mod_evaluate::*;
 #[test]
 fn test_mod_evaluate() {
     fn test<T: PrimitiveUnsigned>(s: &str, x: T, m: T, out: T) {
+        oracle_row!(
+            "flint",
+            "fmpz_mod_poly_evaluate_fmpz",
+            "(&({s})).mod_evaluate({x}, {m}) = {out}"
+        );
+
         let p = UnsignedPolynomial::<T>::from_str(s).unwrap();
         assert_eq!((&p).mod_evaluate(x, m), out);
         assert_eq!(p.mod_evaluate(x, m), out);
@@ -71,6 +78,12 @@ fn test_mod_evaluate_long() {
     // Polynomials long enough for Shoup's method, which needs the top bit of the modulus clear, in
     // its lazy form when the modulus is at most a third of the type's range.
     fn test<T: PrimitiveUnsigned>(s: &str, x: T, m: T, out: T) {
+        oracle_row!(
+            "flint",
+            "fmpz_mod_poly_evaluate_fmpz",
+            "(&({s})).mod_evaluate({x}, {m}) = {out}"
+        );
+
         let p = UnsignedPolynomial::<T>::from_str(s).unwrap();
         assert_eq!(p.len(), 12);
         assert_eq!((&p).mod_evaluate(x, m), out);

@@ -19,6 +19,19 @@ fn test<T: PrimitiveUnsigned>(a: &str, m: T, out: Option<&str>)
 where
     <UnsignedMatrix<T> as FromStr>::Err: Debug,
 {
+    // FLINT's `nmod_mat_inv` takes a word-sized modulus that is 1 or prime.
+    #[cfg(feature = "oracle")]
+    if m.to_string()
+        .parse::<u64>()
+        .is_ok_and(|m| m == 1 || malachite_base::num::factorization::traits::IsPrime::is_prime(&m))
+    {
+        malachite_base::oracle_row!(
+            "flint",
+            "nmod_mat_inv",
+            "{a}.mod_inverse({m}) = {}",
+            malachite_base::test_util::oracle_rows::option(out)
+        );
+    }
     let a = UnsignedMatrix::<T>::from_str(a).unwrap();
     let x = (&a).mod_inverse(m);
     assert_eq!(a.clone().mod_inverse(m), x);

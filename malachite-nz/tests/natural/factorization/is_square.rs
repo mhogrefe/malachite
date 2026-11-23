@@ -9,6 +9,7 @@
 use malachite_base::num::arithmetic::traits::{CheckedSqrt, Square};
 use malachite_base::num::basic::traits::{One, Two};
 use malachite_base::num::factorization::traits::IsSquare;
+use malachite_base::oracle_row;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::{natural_gen, natural_pair_gen_var_3};
 use std::str::FromStr;
@@ -16,6 +17,12 @@ use std::str::FromStr;
 #[test]
 fn test_is_square() {
     let test = |n, out| {
+        oracle_row!(
+            "azurite",
+            "az_nat_is_square",
+            "{n} is {}a perfect square",
+            malachite_base::test_util::oracle_rows::not(out)
+        );
         assert_eq!(Natural::from_str(n).unwrap().is_square(), out);
         assert_eq!(rug::Integer::from_str(n).unwrap().is_perfect_square(), out);
     };

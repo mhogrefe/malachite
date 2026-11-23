@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::Sign;
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::signed_gen;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
@@ -20,6 +21,16 @@ use std::str::FromStr;
 #[test]
 fn test_sign() {
     let test = |s, out| {
+        oracle_row!(
+            "azurite",
+            "az_int_sign",
+            "{s} is {}",
+            match out {
+                Greater => "positive",
+                Equal => "zero",
+                Less => "negative",
+            }
+        );
         assert_eq!(Integer::from_str(s).unwrap().sign(), out);
         assert_eq!(num_sign(&BigInt::from_str(s).unwrap()), out);
         assert_eq!(rug::Integer::from_str(s).unwrap().cmp0(), out);

@@ -11,6 +11,7 @@ use malachite_base::num::arithmetic::traits::{IsPowerOf2, PowerOf2};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::num::modular::traits::{ModAdd, ModIsReduced, ModNeg};
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::modular::traits::{
     ModEvaluate, ModPowerOf2TaylorShift, ModTaylorShift, ModTaylorShiftAssign,
@@ -72,6 +73,12 @@ fn check(p: &NaturalPolynomial, c: &Natural, m: &Natural) -> NaturalPolynomial {
 #[test]
 fn test_mod_taylor_shift() {
     let test = |s, c, m, out| {
+        oracle_row!(
+            "flint",
+            "mod_taylor_shift",
+            "({s}).mod_taylor_shift({c}, {m}) = {out}"
+        );
+
         let p = NaturalPolynomial::from_str(s).unwrap();
         let c = Natural::from_str(c).unwrap();
         let m = Natural::from_str(m).unwrap();

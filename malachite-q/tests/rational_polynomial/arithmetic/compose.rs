@@ -8,6 +8,7 @@
 
 use core::str::FromStr;
 use malachite_base::num::basic::traits::{One, OneHalf, Zero};
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::arithmetic::traits::{
     Compose, ComposeAssign, Evaluate, TaylorShift,
@@ -40,6 +41,8 @@ fn check(p: &RationalPolynomial, q: &RationalPolynomial) -> RationalPolynomial {
 #[test]
 fn test_compose() {
     let test = |s, t, out| {
+        oracle_row!("flint", "fmpq_poly_compose", "({s}).compose({t}) = {out}");
+
         let p = RationalPolynomial::from_str(s).unwrap();
         let q = RationalPolynomial::from_str(t).unwrap();
         let r = check(&p, &q);

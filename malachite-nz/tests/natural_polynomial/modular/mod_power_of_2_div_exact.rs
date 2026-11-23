@@ -10,6 +10,7 @@ use core::str::FromStr;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::modular::traits::{ModPowerOf2, ModPowerOf2Mul};
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::modular::traits::{
     CheckedModPowerOf2DivExact, ModPowerOf2DivExact, ModPowerOf2DivExactAssign, ModPowerOf2DivRem,
@@ -92,6 +93,27 @@ fn verify_checked(
 #[test]
 fn test_mod_power_of_2_div_exact() {
     let test = |p, q, pow: u64, out: &str| {
+        oracle_row!(
+            "flint",
+            "mod_power_of_2_div_exact",
+            "({p}).mod_power_of_2_div_exact({q}, {pow}) = {out}"
+        );
+        oracle_row!(
+            "flint",
+            "mod_power_of_2_div_exact",
+            "({p}).checked_mod_power_of_2_div_exact({q}, {pow}) = {out}"
+        );
+        oracle_row!(
+            "flint",
+            "mod_power_of_2_div_exact",
+            "({p}).mod_power_of_2_divisible_by({q}, {pow}) = {}",
+            ModPowerOf2DivisibleBy::mod_power_of_2_divisible_by(
+                NaturalPolynomial::from_str(p).unwrap(),
+                NaturalPolynomial::from_str(q).unwrap(),
+                pow
+            )
+        );
+
         let p = NaturalPolynomial::from_str(p).unwrap();
         let q = NaturalPolynomial::from_str(q).unwrap();
 
@@ -123,6 +145,19 @@ fn test_mod_power_of_2_div_exact() {
 #[test]
 fn test_checked_mod_power_of_2_div_exact() {
     let test = |p, q, pow: u64, out: Option<&str>| {
+        oracle_row!(
+            "flint",
+            "mod_power_of_2_div_exact",
+            "({p}).checked_mod_power_of_2_div_exact({q}, {pow}) = {}",
+            out.unwrap_or("None")
+        );
+        oracle_row!(
+            "flint",
+            "mod_power_of_2_div_exact",
+            "({p}).mod_power_of_2_divisible_by({q}, {pow}) = {}",
+            out.is_some()
+        );
+
         let p = NaturalPolynomial::from_str(p).unwrap();
         let q = NaturalPolynomial::from_str(q).unwrap();
 
@@ -135,6 +170,25 @@ fn test_checked_mod_power_of_2_div_exact() {
     test("x^4+7*x+5", "5*x^2+2", 200, None);
     // - divisible
     test("x^2+3*x+2", "x+1", 200, Some("x+2"));
+    #[cfg(feature = "oracle")]
+    {
+        let p = NaturalPolynomial::from_str("x^3+2*x+1").unwrap();
+        let q = NaturalPolynomial::from_str("x^2+3").unwrap();
+        let pow = 200;
+        malachite_base::oracle_row!(
+            "flint",
+            "mod_power_of_2_div_exact",
+            "({p}).checked_mod_power_of_2_div_exact({q}, {pow}) = {}",
+            (&p).checked_mod_power_of_2_div_exact(&q, pow)
+                .map_or_else(|| "None".to_string(), |r| r.to_string())
+        );
+        malachite_base::oracle_row!(
+            "flint",
+            "mod_power_of_2_div_exact",
+            "({p}).mod_power_of_2_divisible_by({q}, {pow}) = {}",
+            (&p).mod_power_of_2_divisible_by(&q, pow)
+        );
+    }
 }
 
 // Every algorithm, at lengths that reach the bidirectional method and the method of Karp and

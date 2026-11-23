@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::oracle_row;
 use malachite_nz::mag::Mag;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::{mag_pair_gen, mag_triple_gen};
@@ -24,6 +25,12 @@ fn add_scaled(x: Natural, i: i64, y: Natural, j: i64) -> (Natural, i64) {
 #[test]
 fn test_add_mul_assign() {
     let test = |s, t, u, out| {
+        oracle_row!(
+            "flint",
+            "mag_fast_addmul",
+            "z := {s}; z.add_mul_assign({t}, {u}); z = {out}"
+        );
+
         let mut z = Mag::from_str(s).unwrap();
         z.add_mul_assign(Mag::from_str(t).unwrap(), Mag::from_str(u).unwrap());
         assert_eq!(z.to_string(), out);

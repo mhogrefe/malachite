@@ -8,6 +8,7 @@
 
 use core::str::FromStr;
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::series::traits::{
     CheckedDivTruncated, DivTruncated, DivTruncatedAssign, MulTruncated,
@@ -23,6 +24,13 @@ use malachite_q::test_util::rational_polynomial::series::div_truncated::div_trun
 #[test]
 fn test_div_truncated() {
     let test = |s, t, len, out: Option<&str>| {
+        oracle_row!(
+            "flint",
+            "fmpq_poly_div_series",
+            "(&({s})).checked_div_truncated(&({t}), {len}) = {}",
+            malachite_base::test_util::oracle_rows::option(out)
+        );
+
         let p = RationalPolynomial::from_str(s).unwrap();
         let q = RationalPolynomial::from_str(t).unwrap();
         let r = (&p).checked_div_truncated(&q, len);

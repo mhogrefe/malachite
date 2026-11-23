@@ -8,6 +8,7 @@
 
 use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::modular::traits::DivisibleBy;
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::unsigned_gen_var_5;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::natural::number_theory::bernoulli_number_denominator::*;
@@ -15,6 +16,12 @@ use malachite_nz::test_util::natural::number_theory::bernoulli_number_denominato
 #[test]
 fn test_bernoulli_number_denominator() {
     let test = |n, out| {
+        oracle_row!(
+            "flint",
+            "arith_bernoulli_number_denom",
+            "bernoulli_number_denominator({n}) = {out}"
+        );
+
         assert_eq!(Natural::bernoulli_number_denominator(n).to_string(), out);
     };
     // - n <= BERNOULLI_DENOMINATOR_MAX_SMALL

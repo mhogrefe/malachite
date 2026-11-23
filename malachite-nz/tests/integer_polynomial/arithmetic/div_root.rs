@@ -8,6 +8,7 @@
 
 use core::str::FromStr;
 use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::arithmetic::traits::{
     DivPowerOfX, DivRoot, DivRootAssign, Evaluate,
@@ -42,6 +43,17 @@ fn verify(p: &IntegerPolynomial, c: &Integer) -> (IntegerPolynomial, Integer) {
 #[test]
 fn test_div_root() {
     let test = |p, c: i32, out: &str, out_r: i32| {
+        oracle_row!(
+            "flint",
+            "fmpz_poly_div_root",
+            "({p}).div_root({c}) = ({out}, {out_r})"
+        );
+        oracle_row!(
+            "flint",
+            "fmpz_poly_div_root",
+            "p := {p}; p.div_root_assign({c}) = {out_r}; p = {out}"
+        );
+
         let p = IntegerPolynomial::from_str(p).unwrap();
         let (q, r) = verify(&p, &Integer::from(c));
         assert_eq!(q.to_string(), out);

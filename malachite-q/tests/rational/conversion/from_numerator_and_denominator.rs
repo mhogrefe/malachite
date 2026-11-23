@@ -13,6 +13,7 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::number_theory::traits::CoprimeWith;
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::{
     signed_gen, signed_pair_gen_var_6, unsigned_gen, unsigned_pair_gen_var_12,
     unsigned_unsigned_bool_triple_gen_var_2,
@@ -32,6 +33,12 @@ use std::str::FromStr;
 #[test]
 fn test_from_naturals() {
     let test = |n, d, out| {
+        oracle_row!(
+            "azurite",
+            "az_rat_from_naturals",
+            "Rational::from_naturals({n}, {d}) = {out}"
+        );
+
         let n = Natural::from_str(n).unwrap();
         let d = Natural::from_str(d).unwrap();
         let x = Rational::from_naturals(n.clone(), d.clone());
@@ -194,6 +201,12 @@ fn const_from_unsigneds_properties() {
 #[test]
 fn test_from_integers() {
     let test = |s, t, out| {
+        oracle_row!(
+            "azurite",
+            "az_rat_from_integers",
+            "Rational::from_integers({s}, {t}) = {out}"
+        );
+
         let n = Integer::from_str(s).unwrap();
         let d = Integer::from_str(t).unwrap();
         let x = Rational::from_integers(n.clone(), d.clone());

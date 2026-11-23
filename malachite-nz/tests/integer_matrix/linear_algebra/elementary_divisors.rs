@@ -12,6 +12,7 @@ use malachite_base::matrix::Matrix;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::linear_algebra::traits::{ElementaryDivisors, Rank, SmithNormalForm};
 use malachite_base::num::modular::traits::DivisibleBy;
+use malachite_base::oracle_row;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::strings::ToDebugString;
 use malachite_nz::integer::Integer;
@@ -40,6 +41,12 @@ fn verify_elementary_divisors(a: &IntegerMatrix) {
 #[test]
 fn test_elementary_divisors() {
     let test = |s, out| {
+        oracle_row!(
+            "flint",
+            "fmpz_mat_elementary_divisors",
+            "elementary_divisors({s}) = {out}"
+        );
+
         let a = IntegerMatrix::from_str(s).unwrap();
         let actual = (&a).elementary_divisors().to_debug_string();
         assert_eq!(a.elementary_divisors().to_debug_string(), actual);

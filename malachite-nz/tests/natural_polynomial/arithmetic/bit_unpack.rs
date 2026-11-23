@@ -8,6 +8,7 @@
 
 use core::str::FromStr;
 use malachite_base::num::modular::traits::ModPowerOf2IsReduced;
+use malachite_base::oracle_row;
 use malachite_base::polynomial::arithmetic::traits::{BitPack, BitUnpack};
 use malachite_nz::natural::Natural;
 use malachite_nz::natural_polynomial::NaturalPolynomial;
@@ -19,6 +20,12 @@ use malachite_nz::test_util::natural_polynomial::arithmetic::bit_unpack::bit_unp
 #[test]
 fn test_bit_unpack() {
     let test = |s, bits, out| {
+        oracle_row!(
+            "flint",
+            "fmpz_poly_bit_unpack_unsigned",
+            "NaturalPolynomial::bit_unpack(&{s}, {bits}) = {out}"
+        );
+
         let n = Natural::from_str(s).unwrap();
         let p = NaturalPolynomial::bit_unpack(&n, bits);
         assert!(p.is_valid());

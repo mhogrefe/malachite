@@ -16,6 +16,7 @@ use malachite_base::num::conversion::traits::{
 };
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::num::modular::traits::ModPowerOf2;
+use malachite_base::oracle_row;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer::conversion::primitive_int_from_integer::{
     SignedFromIntegerError, UnsignedFromIntegerError,
@@ -102,6 +103,12 @@ fn u32_exact_from_integer_fail_6() {
 #[test]
 fn test_u32_wrapping_from_integer() {
     let test = |s, out| {
+        oracle_row!(
+            "azurite",
+            "az_int_wrapping_from",
+            "u32::wrapping_from(&{s}) = {out}"
+        );
+
         let u = Integer::from_str(s).unwrap();
 
         assert_eq!(u32::wrapping_from(&u), out);
@@ -239,6 +246,12 @@ fn u64_exact_from_integer_fail_5() {
 #[test]
 fn test_u64_wrapping_from_integer() {
     let test = |s, out| {
+        oracle_row!(
+            "azurite",
+            "az_int_wrapping_from",
+            "u64::wrapping_from(&{s}) = {out}"
+        );
+
         let u = Integer::from_str(s).unwrap();
         assert_eq!(u64::wrapping_from(&u), out);
         assert_eq!(rug::Integer::from_str(s).unwrap().to_u64_wrapping(), out);
@@ -370,6 +383,11 @@ fn i32_exact_from_integer_fail_4() {
 #[test]
 fn test_i32_wrapping_from_integer() {
     let test = |s, out| {
+        oracle_row!(
+            "azurite",
+            "az_int_wrapping_from",
+            "i32::wrapping_from(&{s}) = {out}"
+        );
         let u = Integer::from_str(s).unwrap();
         assert_eq!(i32::wrapping_from(&u), out);
         assert_eq!(rug::Integer::from_str(s).unwrap().to_i32_wrapping(), out);
@@ -501,6 +519,11 @@ fn i64_exact_from_integer_fail_4() {
 #[test]
 fn test_i64_wrapping_from_integer() {
     let test = |s, out| {
+        oracle_row!(
+            "azurite",
+            "az_int_wrapping_from",
+            "i64::wrapping_from(&{s}) = {out}"
+        );
         let u = Integer::from_str(s).unwrap();
         assert_eq!(i64::wrapping_from(&u), out);
         assert_eq!(rug::Integer::from_str(s).unwrap().to_i64_wrapping(), out);

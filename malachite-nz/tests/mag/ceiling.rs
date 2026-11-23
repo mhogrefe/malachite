@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::basic::traits::One;
+use malachite_base::oracle_row;
 use malachite_nz::mag::Mag;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::{mag_gen_var_1, natural_gen};
@@ -17,6 +18,8 @@ use std::str::FromStr;
 #[test]
 fn test_ceiling() {
     let test = |s, out| {
+        oracle_row!("flint", "mag_get_fmpz", "({s}).ceiling() = {out}");
+
         assert_eq!(Mag::from_str(s).unwrap().ceiling().to_string(), out);
     };
     test("0", "0");

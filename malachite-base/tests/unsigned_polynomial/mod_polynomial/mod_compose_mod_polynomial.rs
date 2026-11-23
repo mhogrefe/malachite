@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::mod_polynomial::traits::*;
 use malachite_base::polynomial::mod_polynomial::traits::{
@@ -22,6 +23,12 @@ use std::str::FromStr;
 #[test]
 fn test_mod_compose_mod_polynomial() {
     fn test<T: PrimitiveUnsigned>(f: &str, g: &str, h: &str, m: T, out: &str) {
+        oracle_row!(
+            "flint",
+            "mod_compose_mod_polynomial",
+            "({f}).mod_compose_mod_polynomial({g}, {h}, {m}) = {out}"
+        );
+
         let f = UnsignedPolynomial::<T>::from_str(f).unwrap();
         let g = UnsignedPolynomial::<T>::from_str(g).unwrap();
         let h = UnsignedPolynomial::<T>::from_str(h).unwrap();
@@ -80,6 +87,23 @@ fn test_mod_compose_mod_polynomial() {
         "x^8+6*x^7+2*x^6+9*x^5+5*x^4+x^3+4*x^2+x+3",
         101,
         "49*x^7+98*x^6+25*x^5+93*x^4+92*x^3+59*x^2+6*x+88",
+    );
+}
+
+#[cfg(feature = "oracle")]
+#[test]
+fn oracle_rows_mod_compose_mod_polynomial_precomputed_powers() {
+    let f = UnsignedPolynomial::<u8>::from_str("5*x^4+4*x^3+3*x^2+2*x+1").unwrap();
+    let g = UnsignedPolynomial::<u8>::from_str("x+1").unwrap();
+    let h = UnsignedPolynomial::<u8>::from_str("x^3+2*x^2+1").unwrap();
+    let m = 7;
+    let powers = UnsignedPolynomial::precompute_mod_compose_mod_polynomial_powers_data(&g, &h, &m);
+    let r = (&f).mod_compose_mod_polynomial_precomputed_powers(&h, m, &powers);
+    malachite_base::oracle_row!(
+        "flint",
+        "mod_compose_mod_polynomial",
+        "({f}).mod_compose_mod_polynomial_precomputed_powers({h}, {m}, &data) = {r}, where data \
+        is from g = {g}"
     );
 }
 

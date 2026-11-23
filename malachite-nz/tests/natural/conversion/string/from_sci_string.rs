@@ -10,6 +10,7 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::string::options::FromSciStringOptions;
 use malachite_base::num::conversion::traits::{ExactFrom, FromSciString, ToStringBase};
+use malachite_base::oracle_row;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::generators::{
     string_from_sci_string_options_pair_gen_var_2, string_from_sci_string_options_pair_gen_var_3,
@@ -22,6 +23,12 @@ use std::str::FromStr;
 #[test]
 pub fn test_from_sci_string() {
     fn test(s: &str, out: Option<&'static str>) {
+        oracle_row!(
+            "azurite",
+            "az_nat_from_sci_string",
+            "Natural::from_sci_string({s}) = {}",
+            malachite_base::test_util::oracle_rows::option(out)
+        );
         let out = out.map(|s| Natural::from_str(s).unwrap());
         assert_eq!(Natural::from_sci_string(s), out);
         assert_eq!(

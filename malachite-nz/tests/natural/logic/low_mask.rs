@@ -9,6 +9,7 @@
 use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::logic::traits::{BitScan, CountOnes, LowMask};
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::{unsigned_gen_var_5, unsigned_gen_var_9};
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::logic::low_mask::limbs_low_mask;
@@ -28,7 +29,14 @@ fn test_limbs_low_mask() {
 
 #[test]
 fn test_low_mask() {
-    let test = |bits, out| assert_eq!(Natural::low_mask(bits).to_string(), out);
+    let test = |bits: u64, out| {
+        oracle_row!(
+            "azurite",
+            "az_nat_low_mask",
+            "Natural::low_mask({bits}) = {out}"
+        );
+        assert_eq!(Natural::low_mask(bits).to_string(), out);
+    };
     test(0, "0");
     test(1, "1");
     test(2, "3");

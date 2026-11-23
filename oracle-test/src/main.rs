@@ -19,7 +19,7 @@
 // `MALACHITE_ORACLE_JOBS` workers (4 by default), with a `[done/total]` count; `-- plan` prints
 // them without running anything. See README.md.
 
-use std::collections::HashMap;
+use std::collections::{BTreeMap, BTreeSet, HashMap};
 use std::env;
 use std::fs::{self, File};
 use std::io::{self, Write};
@@ -103,9 +103,14 @@ fn build_oracle() -> PathBuf {
     binary
 }
 
-// What a check hands to an oracle mode: a unit-row file, or the output of one demo run.
+// What a check hands to an oracle mode: the rows that a crate's unit tests record with
+// `oracle_row!` (see `plan_test_rows`), or the output of one demo run.
 enum CheckInput {
-    Unit(PathBuf),
+    TestRows {
+        crate_dir: String,
+        tests: Vec<String>,
+        rows: PathBuf,
+    },
     Demo {
         crate_dir: String,
         demo: String,
@@ -240,24 +245,290 @@ fn check_demo_against_flint_no_special(
     );
 }
 
-// Plans every unit-row file under `unit/<dir>/`: each `<mode>/<name>.txt` holds lines in the
-// format the demos print, mostly the rows of a `test_*` function in Malachite's own tests, and is
-// handed to the oracle's mode `<mode>` as it is.
-fn plan_unit_files(backend: &'static str, dir: &str, oracle: &Path) {
-    let root = Path::new("unit").join(dir);
-    let mode_dirs = fs::read_dir(&root)
-        .unwrap_or_else(|_| panic!("no unit-row directory {}", root.display()))
-        .map(|entry| entry.unwrap().path())
-        .filter(|path| path.is_dir());
-    for mode_dir in mode_dirs {
-        let mode = mode_dir.file_name().unwrap().to_str().unwrap().to_string();
-        let files = fs::read_dir(&mode_dir)
-            .unwrap()
-            .map(|entry| entry.unwrap().path())
-            .filter(|path| path.extension().and_then(|e| e.to_str()) == Some("txt"));
-        for file in files {
-            plan_check(backend, oracle, &mode, CheckInput::Unit(file));
+// The crates whose unit tests may record rows with `oracle_row!`.
+const TEST_CRATES: [&str; 4] = [
+    "../malachite-base",
+    "../malachite-nz",
+    "../malachite-q",
+    "../malachite-float",
+];
+
+// The string literal at the start of `s` (after whitespace) and the text after it, or `None`.
+fn leading_string_literal(s: &str) -> Option<(&str, &str)> {
+    let s = s.trim_start().strip_prefix('"')?;
+    let end = s.find('"')?;
+    Some((&s[..end], &s[end + 1..]))
+}
+
+// A top-level function or `macro_rules!` macro of a test file: its name, whether it is a `#[test]`,
+// and the byte range from its first line to its closing brace (a `}` at the start of a line, as
+// rustfmt leaves it), and that text. A test that passes a macro to `apply_to_unsigneds!` or the
+// like mentions its name, so a row recorded in the macro reaches that test.
+struct TopLevelFn<'a> {
+    name: &'a str,
+    is_test: bool,
+    start: usize,
+    end: usize,
+    text: &'a str,
+}
+
+fn top_level_fns(text: &str) -> Vec<TopLevelFn<'_>> {
+    let mut fns = Vec::new();
+    let mut offset = 0;
+    let mut attributes_are_test = false;
+    for line in text.split_inclusive('\n') {
+        let start = offset;
+        offset += line.len();
+        if line.starts_with("#[") {
+            attributes_are_test |= line.trim_end() == "#[test]";
+            continue;
         }
+        let is_test = mem::take(&mut attributes_are_test);
+        let Some(rest) = line
+            .strip_prefix("fn ")
+            .or_else(|| line.strip_prefix("pub fn "))
+            .or_else(|| line.strip_prefix("macro_rules! "))
+        else {
+            continue;
+        };
+        let name_end = rest
+            .find(|c: char| !(c.is_alphanumeric() || c == '_'))
+            .unwrap_or(rest.len());
+        let end = text[start..]
+            .find("\n}")
+            .map_or(text.len(), |e| start + e + 2);
+        fns.push(TopLevelFn {
+            name: &rest[..name_end],
+            is_test,
+            start,
+            end,
+            text: &text[start..end],
+        });
+    }
+    fns
+}
+
+// Whether `text` mentions the identifier `name`.
+fn mentions(text: &str, name: &str) -> bool {
+    let is_ident = |c: char| c.is_alphanumeric() || c == '_';
+    text.match_indices(name).any(|(i, _)| {
+        !text[..i].ends_with(is_ident) && !text[i + name.len()..].starts_with(is_ident)
+    })
+}
+
+// The test functions that reach the byte at `position`: the test function containing it, or, when
+// it is in a helper, the test functions that mention the helper, directly or through other helpers
+// of the same file. `None` if there are none.
+fn tests_reaching<'a>(fns: &[TopLevelFn<'a>], position: usize) -> Option<BTreeSet<&'a str>> {
+    let first = fns
+        .iter()
+        .find(|f| f.start <= position && position < f.end)?;
+    let mut tests = BTreeSet::new();
+    // Items are told apart by position, since a helper macro may share its test's name.
+    let mut seen = BTreeSet::from([first.start]);
+    let mut pending = vec![first];
+    while let Some(f) = pending.pop() {
+        if f.is_test {
+            tests.insert(f.name);
+            continue;
+        }
+        for caller in fns {
+            if !seen.contains(&caller.start) && mentions(caller.text, f.name) {
+                seen.insert(caller.start);
+                pending.push(caller);
+            }
+        }
+    }
+    if tests.is_empty() {
+        None
+    } else {
+        Some(tests)
+    }
+}
+
+// Plans one check per oracle mode of `backend` (`FLINT` or `Azurite`) that a crate's unit tests
+// record rows in: every `oracle_row!("<backend>", "<mode>", ...)` call in the crate's `tests`
+// directory adds the test function containing it to the tests that `run_plan` runs, with
+// `MALACHITE_ORACLE_DUMP` set, before the checks start. See
+// `malachite_base::test_util::oracle_rows`.
+fn plan_test_rows(backend: &'static str, oracle: &Path) {
+    let backend_name = backend.to_lowercase();
+    for crate_dir in TEST_CRATES {
+        let tests_dir = Path::new(crate_dir).join("tests");
+        let mut tests_of_mode: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
+        let mut dirs = vec![tests_dir.clone()];
+        while let Some(dir) = dirs.pop() {
+            let Ok(entries) = fs::read_dir(&dir) else {
+                continue;
+            };
+            for entry in entries {
+                let path = entry.unwrap().path();
+                if path.is_dir() {
+                    dirs.push(path);
+                    continue;
+                }
+                if path.extension().and_then(|e| e.to_str()) != Some("rs") {
+                    continue;
+                }
+                let text = fs::read_to_string(&path).unwrap();
+                let fns = top_level_fns(&text);
+                // The test's path in the test binary: the file's path under `tests`, without
+                // `lib.rs` or `mod.rs`, then the function's name.
+                let module: Vec<String> = path
+                    .strip_prefix(&tests_dir)
+                    .unwrap()
+                    .with_extension("")
+                    .iter()
+                    .map(|c| c.to_str().unwrap().to_string())
+                    .filter(|c| c != "lib" && c != "mod")
+                    .collect();
+                for (i, _) in text.match_indices("oracle_row!(") {
+                    let args = &text[i + "oracle_row!(".len()..];
+                    let (row_backend, rest) = leading_string_literal(args).unwrap_or_else(|| {
+                        panic!("the backend of an oracle_row! call in {path:?} is not a literal")
+                    });
+                    let (mode, _) = rest
+                        .trim_start()
+                        .strip_prefix(',')
+                        .and_then(leading_string_literal)
+                        .unwrap_or_else(|| {
+                            panic!("the mode of an oracle_row! call in {path:?} is not a literal")
+                        });
+                    if row_backend != backend_name {
+                        continue;
+                    }
+                    let tests = tests_reaching(&fns, i).unwrap_or_else(|| {
+                        panic!("no test function in {path:?} reaches an oracle_row! call")
+                    });
+                    for function in tests {
+                        let mut test = module.clone();
+                        test.push(function.to_string());
+                        tests_of_mode
+                            .entry(mode.to_string())
+                            .or_default()
+                            .insert(test.join("::"));
+                    }
+                }
+            }
+        }
+        let crate_name = Path::new(crate_dir).file_name().unwrap().to_str().unwrap();
+        for (mode, tests) in tests_of_mode {
+            let rows = Path::new(OUT_DIR)
+                .join("rows")
+                .join(crate_name)
+                .join(format!("{mode}.txt"));
+            plan_check(
+                backend,
+                oracle,
+                &mode,
+                CheckInput::TestRows {
+                    crate_dir: crate_dir.to_string(),
+                    tests: tests.into_iter().collect(),
+                    rows,
+                },
+            );
+        }
+    }
+}
+
+// Builds a crate's unit-test binary (`tests/lib.rs`) with the `oracle` feature and runs `tests` in
+// it, with `MALACHITE_ORACLE_DUMP` set so that their `oracle_row!` calls write the files `rows`,
+// emptied first. Panics if a test fails or a file stays empty.
+fn record_test_rows(crate_dir: &str, tests: &BTreeSet<&str>, rows: &BTreeSet<&Path>) {
+    for file in rows {
+        fs::create_dir_all(file.parent().unwrap()).unwrap();
+        File::create(file).unwrap_or_else(|e| panic!("cannot create {file:?}: {e}"));
+    }
+    let output = Command::new("cargo")
+        .args(["test", "--no-run", "--test", "lib", "--features", "oracle"])
+        .args([
+            "--release",
+            "-j",
+            "4",
+            "-q",
+            "--message-format=json-render-diagnostics",
+        ])
+        .current_dir(crate_dir)
+        .stderr(Stdio::inherit())
+        .output()
+        .expect("failed to run cargo");
+    assert!(
+        output.status.success(),
+        "failed to build the unit tests of {crate_dir}"
+    );
+    let messages = String::from_utf8(output.stdout).unwrap();
+    let binary = messages
+        .lines()
+        .filter(|line| {
+            line.contains("\"reason\":\"compiler-artifact\"")
+                && line.contains("\"kind\":[\"test\"]")
+        })
+        .find_map(|line| {
+            let start = line.find("\"executable\":\"")?;
+            let rest = &line[start + "\"executable\":\"".len()..];
+            Some(PathBuf::from(&rest[..rest.find('"')?]))
+        })
+        .unwrap_or_else(|| panic!("cargo built no unit-test binary in {crate_dir}"));
+    let dump = fs::canonicalize(rows.first().unwrap().parent().unwrap()).unwrap();
+    let output = Command::new(&binary)
+        .args(tests)
+        .args(["--exact", "--test-threads", "4"])
+        .env("MALACHITE_ORACLE_DUMP", &dump)
+        .current_dir(crate_dir)
+        .output()
+        .unwrap_or_else(|e| panic!("failed to run {binary:?}: {e}"));
+    assert!(
+        output.status.success(),
+        "the unit tests of {crate_dir} failed:\n{}{}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
+    for file in rows {
+        assert_ne!(
+            fs::metadata(file).unwrap().len(),
+            0,
+            "the unit tests of {crate_dir} recorded no rows in {file:?}"
+        );
+        leave_out_slow_rows(file);
+    }
+}
+
+// Recorded rows that an oracle cannot check in reasonable time, as (oracle mode, row prefix). The
+// unit tests still check them; only the oracle check leaves them out, and says how many it left.
+const SLOW_TEST_ROWS: &[(&str, &str)] = &[
+    // Azurite takes over a minute on each of these: ln |Γ(x)| at a tiny negative x with a huge
+    // exponent.
+    (
+        "az_big_exponent_float_ln_abs_gamma",
+        "(-0x1.0E-274877906944).",
+    ),
+];
+
+// Removes the `SLOW_TEST_ROWS` of a recorded rows file, whose name is its oracle mode.
+fn leave_out_slow_rows(file: &Path) {
+    let mode = file.file_stem().unwrap().to_str().unwrap();
+    let prefixes: Vec<&str> = SLOW_TEST_ROWS
+        .iter()
+        .filter(|(m, _)| *m == mode)
+        .map(|(_, prefix)| *prefix)
+        .collect();
+    if prefixes.is_empty() {
+        return;
+    }
+    let text = fs::read_to_string(file).unwrap();
+    let mut kept = String::new();
+    let mut left_out = 0;
+    for line in text.lines() {
+        if prefixes.iter().any(|prefix| line.starts_with(prefix)) {
+            left_out += 1;
+        } else {
+            kept.push_str(line);
+            kept.push('\n');
+        }
+    }
+    if left_out != 0 {
+        fs::write(file, kept).unwrap();
+        println!("leaving out {left_out} rows of {mode} that the oracle is too slow to check");
     }
 }
 
@@ -339,7 +610,7 @@ impl DemoSources {
     }
 }
 
-// Takes the planned checks and orders them: the unit-row files first, by path, and then the demos,
+// Takes the planned checks and orders them: the unit-test rows first, by path, and then the demos,
 // by the path of the file that registers each one, keeping the planned order within a file. Panics,
 // before anything runs, if a planned demo is not registered, even one that the filter drops.
 fn take_ordered_plan() -> Vec<Check> {
@@ -349,7 +620,9 @@ fn take_ordered_plan() -> Vec<Check> {
     let mut keyed = Vec::new();
     for (index, check) in checks.into_iter().enumerate() {
         let key = match &check.input {
-            CheckInput::Unit(file) => (0, file.to_str().unwrap().to_string()),
+            CheckInput::TestRows { rows: file, .. } => {
+                (0, file.to_str().unwrap().to_string())
+            }
             CheckInput::Demo {
                 crate_dir, demo, ..
             } => {
@@ -386,12 +659,17 @@ fn take_ordered_plan() -> Vec<Check> {
 
 fn describe(check: &Check) -> String {
     match &check.input {
-        CheckInput::Unit(file) => {
-            format!("unit rows {} in mode {}", file.display(), check.oracle_mode)
-        }
-        CheckInput::Demo { demo, gen_mode, .. } => {
-            format!("{demo} in mode {gen_mode} against {}", check.backend)
-        }
+        CheckInput::TestRows {
+            crate_dir, tests, ..
+        } => format!(
+            "unit-test rows of {crate_dir} ({}) in mode {}",
+            tests.join(", "),
+            check.oracle_mode
+        ),
+        CheckInput::Demo { demo, gen_mode, .. } => format!(
+            "{demo} in mode {gen_mode} against {} ({})",
+            check.backend, check.oracle_mode
+        ),
     }
 }
 
@@ -505,7 +783,7 @@ fn run_check(
 ) -> Result<Vec<u8>, String> {
     let mut printed = Vec::new();
     let input = match &check.input {
-        CheckInput::Unit(file) => file.as_path(),
+        CheckInput::TestRows { rows, .. } => rows.as_path(),
         CheckInput::Demo {
             crate_dir,
             demo,
@@ -551,6 +829,22 @@ fn jobs() -> usize {
 fn run_plan() {
     let checks = take_ordered_plan();
     let total = checks.len();
+    let mut test_rows: BTreeMap<&str, (BTreeSet<&str>, BTreeSet<&Path>)> = BTreeMap::new();
+    for check in &checks {
+        if let CheckInput::TestRows {
+            crate_dir,
+            tests,
+            rows,
+        } = &check.input
+        {
+            let entry = test_rows.entry(crate_dir).or_default();
+            entry.0.extend(tests.iter().map(String::as_str));
+            entry.1.insert(rows);
+        }
+    }
+    for (crate_dir, (tests, rows)) in &test_rows {
+        record_test_rows(crate_dir, tests, rows);
+    }
     let mut runners = HashMap::new();
     for check in &checks {
         if let CheckInput::Demo { crate_dir, .. } = &check.input {
@@ -592,7 +886,9 @@ fn run_plan() {
                             let mut failure = failure.lock().unwrap();
                             if failure.is_none() {
                                 let demo_output = match check.input {
-                                    CheckInput::Unit(_) => String::new(),
+                                    CheckInput::TestRows { ref rows, .. } => {
+                                        format!(" (the recorded rows are in {})", rows.display())
+                                    }
                                     CheckInput::Demo { .. } => {
                                         format!(" (the demo's output is in {})", out.display())
                                     }
@@ -9858,7 +10154,7 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES_NO_SPECIAL: &[(&str, &str)] = &[
 ];
 
 fn test_azurite_units(oracle: &Path) {
-    plan_unit_files("Azurite", "azurite", oracle);
+    plan_test_rows("Azurite", oracle);
 }
 
 // Plans every Azurite check. Unless `build` is false (for `-- plan`, which runs nothing), first
@@ -9947,7 +10243,7 @@ fn main() {
         [] => (true, true, false),
         ["flint"] => (true, false, false),
         ["azurite"] => (false, true, false),
-        // The unit-row files alone, for both backends: a quick check while adding rows.
+        // The unit-test rows alone, for both backends: a quick check while adding rows.
         ["units"] => (true, true, true),
         _ => panic!("usage: cargo run --release -- [plan] [flint | azurite | units]"),
     };
@@ -9979,7 +10275,7 @@ fn main() {
 }
 
 fn test_flint_units(oracle: &Path) {
-    plan_unit_files("FLINT", "flint", oracle);
+    plan_test_rows("FLINT", oracle);
 }
 
 // Plans every FLINT check. Unless `build` is false (for `-- plan`, which runs nothing), first

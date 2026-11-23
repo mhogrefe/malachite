@@ -8,6 +8,7 @@
 
 pub mod bench;
 pub mod common;
+pub mod oracle_rows;
 pub mod extra_variadic;
 pub mod generators;
 pub mod hash;

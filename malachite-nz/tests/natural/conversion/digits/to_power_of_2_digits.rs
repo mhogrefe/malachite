@@ -14,6 +14,7 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, PowerOf2Digits};
 use malachite_base::num::exponential::traits::FloorLogBasePowerOf2;
 use malachite_base::num::logic::traits::{BitConvertible, SignificantBits};
+use malachite_base::oracle_row;
 use malachite_base::strings::ToDebugString;
 use malachite_base::test_util::generators::{
     unsigned_gen_var_3, unsigned_gen_var_11, unsigned_pair_gen_var_4,
@@ -164,6 +165,12 @@ fn to_power_of_2_digits_desc_fail() {
 #[test]
 fn test_to_power_of_2_digits_asc_natural() {
     let test = |n, log_base, out| {
+        oracle_row!(
+            "azurite",
+            "az_nat_to_power_of_2_digits",
+            "{n}.to_power_of_2_digits_asc({log_base}) = {out}"
+        );
+
         let n = Natural::from_str(n).unwrap();
         assert_eq!(
             PowerOf2Digits::<Natural>::to_power_of_2_digits_asc(&n, log_base).to_debug_string(),

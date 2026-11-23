@@ -13,6 +13,7 @@ use malachite_base::num::exponential::traits::{
     CeilingLogBase, CeilingLogBase2, CheckedLogBase, CheckedLogBase2, FloorLogBase, FloorLogBase2,
 };
 use malachite_base::num::float::NiceFloat;
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::unsigned_gen_var_31;
 use malachite_nz::test_util::generators::natural_pair_gen_var_3;
 use malachite_q::Rational;
@@ -307,6 +308,12 @@ fn checked_log_base_fail_4() {
 #[test]
 fn test_floor_log_base_u64() {
     let test = |n, base: u64, out| {
+        oracle_row!(
+            "azurite",
+            "az_rat_floor_log_base",
+            "floor_log_base({n}, {base}) = {out}"
+        );
+
         let x = Rational::from_str(n).unwrap();
         assert_eq!((&x).floor_log_base(base), out);
         // The u64 specialization agrees with the arbitrary-Rational-base version.
@@ -358,6 +365,12 @@ fn floor_log_base_u64_fail_3() {
 #[test]
 fn test_ceiling_log_base_u64() {
     let test = |n, base: u64, out| {
+        oracle_row!(
+            "azurite",
+            "az_rat_ceiling_log_base",
+            "ceiling_log_base({n}, {base}) = {out}"
+        );
+
         let x = Rational::from_str(n).unwrap();
         assert_eq!((&x).ceiling_log_base(base), out);
         assert_eq!((&x).ceiling_log_base(&Rational::from(base)), out);

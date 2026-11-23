@@ -8,6 +8,7 @@
 
 use malachite_base::num::arithmetic::traits::{Abs, AbsAssign, DivAssignMod, UnsignedAbs};
 use malachite_base::num::basic::traits::Two;
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::signed_gen;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
@@ -19,6 +20,12 @@ use std::str::FromStr;
 #[test]
 fn test_abs() {
     let test = |s, out| {
+        oracle_row!(
+            "azurite",
+            "az_int_unsigned_abs",
+            "unsigned_abs({s}) = {out}"
+        );
+
         let n = Integer::from_str(s).unwrap();
 
         let abs = n.clone().abs();

@@ -18,6 +18,18 @@ fn test_product_of_unsigneds() {
     where
         Natural: From<T> + Product<T> + for<'a> Product<&'a T>,
     {
+        #[cfg(feature = "oracle")]
+        {
+            if T::WIDTH <= 64 {
+                malachite_base::oracle_row!(
+                    "flint",
+                    "_fmpz_ui_vec_prod",
+                    "product({xs:?}) = {out}"
+                );
+            }
+            malachite_base::oracle_row!("azurite", "az_nat_product", "product({xs:?}) = {out}");
+        }
+
         let product = Natural::product(xs.iter());
         assert!(product.is_valid());
         assert_eq!(product.to_string(), out);

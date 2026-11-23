@@ -10,6 +10,7 @@ use malachite_base::num::arithmetic::traits::DivExact;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::number_theory::traits::{BinomialCoefficient, Gcd};
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{unsigned_pair_gen_var_28, unsigned_pair_gen_var_44};
 use malachite_nz::natural::Natural;
@@ -296,6 +297,12 @@ fn test_binomial_coefficient_limb_limb() {
 #[test]
 fn test_binomial_coefficient() {
     fn test(n: &str, k: &str, out: &str) {
+        oracle_row!(
+            "azurite",
+            "az_nat_binomial_coefficient",
+            "C({n}, {k}) = {out}"
+        );
+
         let n = Natural::from_str(n).unwrap();
         let k = Natural::from_str(k).unwrap();
         let b = Natural::binomial_coefficient(n.clone(), k.clone());

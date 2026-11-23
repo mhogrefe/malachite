@@ -11,6 +11,7 @@ use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::linear_algebra::traits::Permanent;
+use malachite_base::oracle_row;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_matrix::IntegerMatrix;
 use malachite_nz::integer_matrix::linear_algebra::permanent::*;
@@ -44,6 +45,8 @@ fn verify_permanent(a: &IntegerMatrix) -> Integer {
 #[test]
 fn test_permanent() {
     let test = |s, out| {
+        oracle_row!("flint", "fmpz_mat_permanent", "permanent({s}) = {out}");
+
         let a = IntegerMatrix::from_str(s).unwrap();
         let p = verify_permanent(&a);
         assert_eq!(p.to_string(), out);

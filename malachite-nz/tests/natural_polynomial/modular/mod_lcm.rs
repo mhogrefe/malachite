@@ -13,6 +13,7 @@ use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::factorization::traits::IsPrime;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::num::modular::traits::{ModIsReduced, ModMul};
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::modular::traits::{
     CheckedModLcm, ModGcd, ModLcm, ModLcmAssign, ModMakeMonic, ModRem,
@@ -97,6 +98,22 @@ fn verify(
 #[test]
 fn test_mod_lcm() {
     let test = |p, q, m, out: Option<&str>| {
+        oracle_row!(
+            "flint",
+            "mod_gcd",
+            "({p}).checked_mod_lcm({q}, {m}) = {}",
+            out.unwrap_or("None")
+        );
+        #[cfg(feature = "oracle")]
+        if let Some(out) = out.filter(|_| probably_prime(&Natural::from_str(m).unwrap())) {
+            oracle_row!("flint", "mod_gcd", "({p}).mod_lcm({q}, {m}) = {out}");
+            oracle_row!(
+                "flint",
+                "mod_gcd",
+                "p := {p}; p.mod_lcm_assign({q}, {m}); p = {out}"
+            );
+        }
+
         let p = NaturalPolynomial::from_str(p).unwrap();
         let q = NaturalPolynomial::from_str(q).unwrap();
         let m = Natural::from_str(m).unwrap();

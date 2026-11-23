@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::arithmetic::mul_high::classical::mul_high_to_out_classical;
@@ -25,6 +26,15 @@ fn parse(xs: &[&str]) -> Vec<Integer> {
     xs.iter().map(|x| Integer::from_str(x).unwrap()).collect()
 }
 
+// The coefficients of `xs` from `start` on, with zeros below `start`, where `mul_high_to_out`
+// leaves unspecified values.
+#[cfg(feature = "oracle")]
+fn high_part(xs: &[Integer], start: usize) -> Vec<Integer> {
+    let mut xs = xs.to_vec();
+    xs[..start].fill(Integer::ZERO);
+    xs
+}
+
 #[test]
 fn test_mul_high_to_out_classical() {
     let test = |xs: &[&str], ys: &[&str], start: usize, out: &[&str]| {
@@ -32,6 +42,11 @@ fn test_mul_high_to_out_classical() {
         let ys = parse(ys);
         let mut result = vec![Integer::ZERO; xs.len() + ys.len() - 1];
         mul_high_to_out_classical(&mut result, &xs, &ys, start);
+        oracle_row!(
+            "flint",
+            "_fmpz_poly_mulhigh_classical",
+            "mul_high_to_out_classical(_, {xs:?}, {ys:?}, {start}) = {result:?}"
+        );
         assert!(result.iter().all(Integer::is_valid));
         assert_eq!(result, parse(out));
         assert_eq!(&integers_mul_naive(&xs, &ys)[start..], &result[start..]);
@@ -128,6 +143,11 @@ fn test_mul_high_to_out_karatsuba_n() {
         let ys = parse(ys);
         let mut result = vec![Integer::ZERO; xs.len() + ys.len() - 1];
         mul_high_to_out_karatsuba_n(&mut result, &xs, &ys);
+        oracle_row!(
+            "flint",
+            "_fmpz_poly_mulhigh_karatsuba_n",
+            "mul_high_to_out_karatsuba_n(_, {xs:?}, {ys:?}) = {result:?}"
+        );
         assert!(result.iter().all(Integer::is_valid));
         assert_eq!(result, parse(out));
         assert_eq!(&integers_mul_naive(&xs, &ys)[start..], &result[start..]);
@@ -254,6 +274,12 @@ fn test_mul_high_to_out() {
         let ys = parse(ys);
         let mut result = vec![Integer::ZERO; xs.len() + ys.len() - 1];
         mul_high_to_out(&mut result, &xs, &ys, start);
+        oracle_row!(
+            "flint",
+            "_fmpz_poly_mulhigh",
+            "mul_high_to_out(_, {xs:?}, {ys:?}, {start}) = {:?}",
+            high_part(&result, start)
+        );
         assert!(result.iter().all(Integer::is_valid));
         // The coefficients below `start` are unspecified.
         assert_eq!(&result[start..], &parse(out)[start..]);
@@ -488,4 +514,54 @@ fn mul_high_to_out_properties() {
         assert!(out.iter().all(Integer::is_valid));
         assert_eq!(&integers_mul_naive(&xs, &ys)[start..], &out[start..]);
     });
+}
+
+// Records, for the oracle, the high products, from every start, of inputs that the tests above do
+// not give these functions.
+#[cfg(feature = "oracle")]
+#[cfg(not(feature = "32_bit_limbs"))]
+#[test]
+fn oracle_rows_mul_high_to_out() {
+    fn rows(
+        name: &str,
+        f: fn(&mut [Integer], &[Integer], &[Integer], usize),
+        pairs: &[(&[&str], &[&str])],
+    ) {
+        for &(xs, ys) in pairs {
+            let xs = parse(xs);
+            let ys = parse(ys);
+            let len = xs.len() + ys.len() - 1;
+            for start in 0..=len {
+                let mut result = vec![Integer::ZERO; len];
+                f(&mut result, &xs, &ys, start);
+                oracle_row!(
+                    "flint",
+                    "_fmpz_poly_mulhigh_classical",
+                    "{name}(_, {xs:?}, {ys:?}, {start}) = {result:?}"
+                );
+            }
+        }
+    }
+    rows(
+        "mul_high_to_out_classical",
+        mul_high_to_out_classical,
+        &[
+            (&["-5"], &["7", "0", "-2"]),
+            (&["1", "2", "3"], &["-6"]),
+            (&["1", "2", "3"], &["4", "5", "6"]),
+            (&["0", "0", "1"], &["0", "1"]),
+            (
+                &["1180591620717411303424", "-3", "36893488147419103233"],
+                &["-18446744073709551616", "5"],
+            ),
+            (
+                &["100000000000000000000", "-10000000000000000000000000", "7", "0", "3"],
+                &["-1", "1267650600228229401496703205376", "11"],
+            ),
+            (
+                &["9223372036854775808", "-9223372036854775807", "17"],
+                &["-9223372036854775808", "9223372036854775807"],
+            ),
+        ],
+    );
 }

@@ -8,6 +8,7 @@
 
 use malachite_base::num::arithmetic::traits::{Reciprocal, Square};
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
+use malachite_base::oracle_row;
 use malachite_base::vecs::vec_from_str;
 use malachite_nz::integer::Integer;
 use malachite_nz::test_util::generators::{integer_pair_gen, integer_vec_gen};
@@ -23,6 +24,8 @@ use std::str::FromStr;
 #[test]
 fn test_mul() {
     let test = |s, t, out| {
+        oracle_row!("azurite", "az_rat_mul", "{s} * {t} = {out}");
+
         let u = Rational::from_str(s).unwrap();
         let v = Rational::from_str(t).unwrap();
 
@@ -88,6 +91,12 @@ fn test_mul() {
 #[test]
 fn test_product() {
     let test = |xs, out| {
+        oracle_row!(
+            "azurite",
+            "az_rat_product",
+            "product({:?}) = {out}",
+            vec_from_str::<Rational>(xs).unwrap()
+        );
         let xs = vec_from_str(xs).unwrap();
         let product = Rational::product(xs.iter().cloned());
         assert!(product.is_valid());

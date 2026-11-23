@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::series::traits::{
     CheckedDivTruncated, DivTruncated, DivTruncatedAssign, InverseTruncated, MulTruncated,
@@ -27,6 +28,21 @@ use malachite_nz::test_util::integer_polynomial::series::div_truncated::*;
 #[test]
 fn test_div_truncated() {
     let test = |s, t, len, out: Option<&str>| {
+        oracle_row!(
+            "flint",
+            "fmpz_poly_div_series",
+            "(&({s})).checked_div_truncated(&({t}), {len}) = {}",
+            malachite_base::test_util::oracle_rows::option(out)
+        );
+        #[cfg(feature = "oracle")]
+        if let Some(out) = out {
+            oracle_row!(
+                "flint",
+                "fmpz_poly_div_series",
+                "(&({s})).div_truncated(&({t}), {len}) = {out}"
+            );
+        }
+
         let p = IntegerPolynomial::from_str(s).unwrap();
         let q = IntegerPolynomial::from_str(t).unwrap();
         let r = (&p).checked_div_truncated(&q, len);

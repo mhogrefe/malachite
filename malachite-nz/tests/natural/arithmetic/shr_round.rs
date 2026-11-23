@@ -19,6 +19,7 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::modular::traits::DivisibleByPowerOf2;
+use malachite_base::oracle_row;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
@@ -172,6 +173,12 @@ where
     for<'a> &'a Natural: ShrRound<T, Output = Natural>,
 {
     let test = |s, v: u8, rm: RoundingMode, out, o| {
+        oracle_row!(
+            "azurite",
+            "az_nat_shr_round",
+            "{s}.shr_round({v}, {rm}) = ({out}, {o:?})"
+        );
+
         let u = Natural::from_str(s).unwrap();
         let v = T::from(v);
 
@@ -603,6 +610,12 @@ where
     for<'a> &'a Natural: ShrRound<T, Output = Natural>,
 {
     let test = |s, j: i8, rm: RoundingMode, out, o| {
+        oracle_row!(
+            "azurite",
+            "az_nat_shr_round",
+            "{s}.shr_round({j}, {rm}) = ({out}, {o:?})"
+        );
+
         let u = Natural::from_str(s).unwrap();
         let j = T::from(j);
 

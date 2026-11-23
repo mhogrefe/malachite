@@ -13,6 +13,7 @@ use malachite_base::num::linear_algebra::traits::{
     ModRank, ModReducedRowEchelonForm, ModReducedRowEchelonFormAssign,
 };
 use malachite_base::num::modular::traits::ModMul;
+use malachite_base::oracle_row;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural_matrix::NaturalMatrix;
 use malachite_nz::test_util::generators::natural_matrix_natural_pair_gen_var_5;
@@ -70,6 +71,11 @@ fn verify_rref(a: &NaturalMatrix, m: &Natural) -> NaturalMatrix {
 }
 
 fn test(a: &str, m: &str, out: &str) {
+    oracle_row!(
+        "flint",
+        "fmpz_mod_mat_rref",
+        "{a}.mod_reduced_row_echelon_form({m}) = {out}"
+    );
     let a = NaturalMatrix::from_str(a).unwrap();
     let m = Natural::from_str(m).unwrap();
     assert_eq!(verify_rref(&a, &m).to_string(), out);

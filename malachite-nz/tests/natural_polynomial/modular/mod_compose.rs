@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::modular::traits::{Mod, ModIsReduced};
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::modular::traits::{ModCompose, ModComposeAssign, ModEvaluate};
 use malachite_base::test_util::generators::*;
@@ -48,6 +49,12 @@ fn check(p: &NaturalPolynomial, q: &NaturalPolynomial, m: &Natural) -> NaturalPo
 #[test]
 fn test_mod_compose() {
     let test = |s, t, m, out| {
+        oracle_row!(
+            "flint",
+            "mod_compose",
+            "({s}).mod_compose({t}, {m}) = {out}"
+        );
+
         let m = Natural::from_str(m).unwrap();
         let p = NaturalPolynomial::from_str(s).unwrap();
         let q = NaturalPolynomial::from_str(t).unwrap();

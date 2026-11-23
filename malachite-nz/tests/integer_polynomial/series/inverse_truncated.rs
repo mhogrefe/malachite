@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::series::traits::{InverseTruncated, MulTruncated};
 use malachite_nz::integer::Integer;
@@ -23,6 +24,13 @@ use malachite_nz::test_util::integer_polynomial::series::inverse_truncated::*;
 #[test]
 fn test_inverse_truncated() {
     let test = |s, len, out: Option<&str>| {
+        oracle_row!(
+            "flint",
+            "fmpz_poly_inv_series",
+            "(&({s})).inverse_truncated({len}) = {}",
+            malachite_base::test_util::oracle_rows::option(out)
+        );
+
         let p = IntegerPolynomial::from_str(s).unwrap();
         let r = (&p).inverse_truncated(len);
         assert!(r.as_ref().is_none_or(IntegerPolynomial::is_valid));

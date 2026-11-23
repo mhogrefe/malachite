@@ -11,6 +11,7 @@ use malachite_base::num::arithmetic::traits::{Parity, PowerOf2};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::modular::traits::{ModMul, ModSqrt};
 use malachite_base::num::number_theory::traits::JacobiSymbol;
+use malachite_base::oracle_row;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::{natural_gen, natural_pair_gen_var_8};
 use std::panic::catch_unwind;
@@ -19,6 +20,12 @@ use std::str::FromStr;
 #[test]
 fn test_mod_sqrt() {
     let test = |x, m, out: Option<&str>| {
+        oracle_row!(
+            "azurite",
+            "az_zmod_sqrt",
+            "{x}.mod_sqrt({m}) = {}",
+            malachite_base::test_util::oracle_rows::option(out)
+        );
         let x = Natural::from_str(x).unwrap();
         let m = Natural::from_str(m).unwrap();
         let out = out.map(|s| Natural::from_str(s).unwrap());

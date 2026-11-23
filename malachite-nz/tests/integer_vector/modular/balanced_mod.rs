@@ -12,6 +12,7 @@ use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::traits::{NegativeOne, One, Two, Zero};
 use malachite_base::num::comparison::traits::OrdDouble;
 use malachite_base::num::modular::traits::{BalancedMod, BalancedModAssign, DivisibleBy, Mod};
+use malachite_base::oracle_row;
 use malachite_base::vector::Vector;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_vector::IntegerVector;
@@ -24,6 +25,12 @@ use malachite_nz::test_util::generators::{
 #[test]
 fn test_balanced_mod() {
     let test = |s, m, out| {
+        oracle_row!(
+            "flint",
+            "_fmpz_vec_scalar_smod_fmpz",
+            "{s}.balanced_mod({m}) = {out}"
+        );
+
         let v = IntegerVector::from_str(s).unwrap();
         let m = Integer::from_str(m).unwrap();
         // All four combinations of value and reference, and in place with both.

@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::NegAssign;
+use malachite_base::oracle_row;
 use malachite_nz::test_util::generators::integer_gen;
 use malachite_q::Rational;
 use malachite_q::test_util::generators::rational_gen;
@@ -16,6 +17,8 @@ use std::str::FromStr;
 #[test]
 fn test_neg() {
     let test = |s, out| {
+        oracle_row!("azurite", "az_rat_neg", "-({s}) = {out}");
+
         let x = Rational::from_str(s).unwrap();
 
         let neg = -x.clone();

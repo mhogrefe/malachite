@@ -95,6 +95,8 @@
 //!   However, doctests don't require it, since they only test the public interface.
 //! - `bin_build`: This feature is used to build the code for demos and benchmarks, which also
 //!   takes a long time to build. Enabling this feature also enables `test_build`.
+//! - `oracle`: Lets unit tests record their rows for the oracles in `oracle-test`; see
+//!   `test_util::oracle_rows`. Enabling this feature also enables `test_build`.
 
 #![forbid(unsafe_code)]
 #![allow(

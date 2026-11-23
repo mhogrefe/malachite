@@ -9,6 +9,7 @@
 use malachite_base::num::basic::traits::NaN;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::float::NiceFloat;
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::primitive_float_pair_gen;
 use malachite_float::test_util::common::{
     ORDERED_FLOAT_HEX_STRINGS, ORDERED_FLOAT_STRINGS, parse_hex_string,
@@ -50,6 +51,20 @@ fn test_eq() {
         let x = parse_hex_string(sx);
         for (sy, &e) in ORDERED_FLOAT_HEX_STRINGS.iter().zip(row.iter()) {
             let y = parse_hex_string(sy);
+            oracle_row!(
+                "azurite",
+                "az_float_eq",
+                "{sx} {} {sy}",
+                malachite_base::test_util::oracle_rows::eq_symbol(x == y)
+            );
+            oracle_row!(
+                "azurite",
+                "az_float_comparable_eq",
+                "{sx} {} {sy}",
+                malachite_base::test_util::oracle_rows::eq_symbol(
+                    ComparableFloatRef(&x) == ComparableFloatRef(&y)
+                )
+            );
             assert_eq!(u8::from(x == y), e);
             assert_eq!(
                 u8::from(rug::Float::exact_from(&x) == rug::Float::exact_from(&y)),

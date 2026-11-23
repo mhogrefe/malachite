@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::basic::traits::Sqrt3Over3;
+use malachite_base::oracle_row;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
     unsigned_gen_var_11, unsigned_rounding_mode_pair_gen_var_4,
@@ -21,6 +22,11 @@ use std::cmp::Ordering::{self, *};
 use std::panic::catch_unwind;
 
 fn test_sqrt_3_over_3_prec_helper(prec: u64, out: &str, out_hex: &str, out_o: Ordering) {
+    oracle_row!(
+        "azurite",
+        "az_float_irrational_constant",
+        "sqrt_3_over_3_prec({prec}) = ({out_hex}, {out_o:?})"
+    );
     let (x, o) = Float::sqrt_3_over_3_prec(prec);
     assert!(x.is_valid());
     assert_eq!(x.to_string(), out);
@@ -156,6 +162,11 @@ fn test_sqrt_3_over_3_prec_round_helper(
     out_hex: &str,
     out_o: Ordering,
 ) {
+    oracle_row!(
+        "azurite",
+        "az_float_irrational_constant",
+        "sqrt_3_over_3_prec_round({prec}, {rm}) = ({out_hex}, {out_o:?})"
+    );
     let (x, o) = Float::sqrt_3_over_3_prec_round(prec, rm);
     assert!(x.is_valid());
     assert_eq!(x.to_string(), out);

@@ -17,6 +17,7 @@ use malachite_base::num::conversion::traits::{
 };
 use malachite_base::num::exponential::traits::FloorLogBase;
 use malachite_base::num::logic::traits::BitConvertible;
+use malachite_base::oracle_row;
 use malachite_base::slices::slice_leading_zeros;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{unsigned_gen_var_6, unsigned_pair_gen_var_6};
@@ -1061,6 +1062,11 @@ fn test_to_digits_asc_unsigned() {
     where
         Natural: Digits<T> + From<T>,
     {
+        oracle_row!(
+            "azurite",
+            "az_nat_to_digits_asc",
+            "to_digits_asc({x}, {base}) = {out:?}"
+        );
         let x = Natural::from_str(x).unwrap();
         assert_eq!(x.to_digits_asc(&base), out);
         let mut digits_alt = Vec::new();
@@ -1306,6 +1312,12 @@ fn to_digits_desc_properties() {
 #[test]
 fn test_to_digits_asc_natural() {
     fn test(x: &str, base: &str, out: &[&str]) {
+        oracle_row!(
+            "azurite",
+            "az_nat_to_digits",
+            "to_digits_asc({x}, {base}) = [{}]",
+            out.join(", ")
+        );
         let x = Natural::from_str(x).unwrap();
         let base = Natural::from_str(base).unwrap();
         let out = out

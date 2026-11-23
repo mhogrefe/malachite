@@ -5,6 +5,7 @@
 // Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+use malachite_base::oracle_row;
 use malachite_base::polynomial::mod_polynomial::traits::*;
 use malachite_base::polynomial::modular::traits::ModPowerOf2DivRemPrecomputed;
 use malachite_base::polynomial::mod_polynomial::traits::ModPowerOf2ComposeModPolynomial;
@@ -17,6 +18,12 @@ use malachite_nz::test_util::natural_polynomial::mod_polynomial::mod_power_of_2_
 #[test]
 fn test_mod_power_of_2_compose_mod_polynomial() {
     let test = |f, g, h, pow, out| {
+        oracle_row!(
+            "flint",
+            "mod_power_of_2_compose_mod_polynomial",
+            "({f}).mod_power_of_2_compose_mod_polynomial({g}, {h}, {pow}) = {out}"
+        );
+
         let f = NaturalPolynomial::from_str(f).unwrap();
         let g = NaturalPolynomial::from_str(g).unwrap();
         let h = NaturalPolynomial::from_str(h).unwrap();

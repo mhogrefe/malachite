@@ -14,6 +14,7 @@ use malachite_base::num::modular::traits::{
     ModPowerOf2, ModPowerOf2IsReduced, ModPowerOf2Mul, ModPowerOf2Neg, ModPowerOf2Pow,
     ModPowerOf2PowAssign,
 };
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
     unsigned_triple_gen_var_16, unsigned_vec_pair_gen_var_3,
@@ -150,6 +151,12 @@ fn limbs_mod_power_of_2_pow_fail_2() {
 #[test]
 fn test_mod_power_of_2_pow() {
     let test = |s, t, pow, out| {
+        oracle_row!(
+            "azurite",
+            "az_zmod_pow2_pow",
+            "{s}.pow({t}) ≡ {out} mod 2^{pow}"
+        );
+
         let u = Natural::from_str(s).unwrap();
         let exp = Natural::from_str(t).unwrap();
         assert!(u.mod_power_of_2_is_reduced(pow));

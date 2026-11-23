@@ -43,7 +43,25 @@ fn verify_inverse(a: &NaturalMatrix, m: &Natural) -> Option<NaturalMatrix> {
     x
 }
 
+// Whether `m` is prime, as far as these tests need: their moduli are either below 1000000 or prime
+// or divisible by a prime below 1000.
+#[cfg(feature = "oracle")]
+fn probably_prime(m: &str) -> bool {
+    let m = Natural::from_str(m).unwrap();
+    m > 1u32 && (2u32..1000).all(|d| m == d || &m % Natural::from(d) != 0u32)
+}
+
 fn test(a: &str, m: &str, out: Option<&str>) {
+    // FLINT's `fmpz_mod_mat_inv` takes a prime modulus.
+    #[cfg(feature = "oracle")]
+    if probably_prime(m) {
+        malachite_base::oracle_row!(
+            "flint",
+            "fmpz_mod_mat_inv",
+            "{a}.mod_inverse({m}) = {}",
+            malachite_base::test_util::oracle_rows::option(out)
+        );
+    }
     let a = NaturalMatrix::from_str(a).unwrap();
     let m = Natural::from_str(m).unwrap();
     assert_eq!(

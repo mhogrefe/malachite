@@ -8,6 +8,7 @@
 
 use core::str::FromStr;
 use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::arithmetic::traits::{
     Compose, ComposeAssign, Evaluate, TaylorShift,
@@ -53,6 +54,8 @@ fn check(p: &IntegerPolynomial, q: &IntegerPolynomial) -> IntegerPolynomial {
 #[test]
 fn test_compose() {
     let test = |s, t, out| {
+        oracle_row!("flint", "fmpz_poly_compose", "({s}).compose({t}) = {out}");
+
         let p = IntegerPolynomial::from_str(s).unwrap();
         let q = IntegerPolynomial::from_str(t).unwrap();
         let r = check(&p, &q);

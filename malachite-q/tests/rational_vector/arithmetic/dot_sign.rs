@@ -10,6 +10,7 @@ use core::cmp::Ordering::{self, *};
 use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{Dot, DotSign, Sign};
 use malachite_base::num::basic::traits::One;
+use malachite_base::oracle_row;
 use malachite_base::vector::Vector;
 use malachite_nz::integer_vector::IntegerVector;
 use malachite_nz::test_util::generators::integer_vector_pair_gen_var_1;
@@ -20,6 +21,8 @@ use malachite_q::test_util::generators::rational_vector_pair_gen_var_1;
 #[test]
 fn test_dot_sign() {
     let test = |a, b, out: Ordering| {
+        oracle_row!("azurite", "az_rat_dot_sign", "{a}.dot_sign({b}) = {out:?}");
+
         let v = RationalVector::from_str(a).unwrap();
         let w = RationalVector::from_str(b).unwrap();
         assert_eq!((&v).dot_sign(&w), out);

@@ -37,6 +37,34 @@ fn test_ord() {
     test_cmp_helper::<Integer>(strings);
     test_cmp_helper::<BigInt>(strings);
     test_cmp_helper::<rug::Integer>(strings);
+    #[cfg(feature = "oracle")]
+    for x in strings {
+        for y in strings {
+            let x_n = x.parse::<Integer>().unwrap();
+            let y_n = y.parse::<Integer>().unwrap();
+            malachite_base::oracle_row!(
+                "azurite",
+                "az_int_cmp",
+                "{x} {} {y}",
+                malachite_base::test_util::oracle_rows::cmp_symbol(x_n.cmp(&y_n))
+            );
+            malachite_base::oracle_row!(
+                "azurite",
+                "az_int_eq",
+                "{x} {} {y}",
+                malachite_base::test_util::oracle_rows::eq_symbol(x_n == y_n)
+            );
+        }
+    }
+    #[cfg(feature = "oracle")]
+    for x in strings {
+        malachite_base::oracle_row!(
+            "azurite",
+            "az_int_to_string",
+            "{}",
+            x.parse::<Integer>().unwrap()
+        );
+    }
 }
 
 #[test]

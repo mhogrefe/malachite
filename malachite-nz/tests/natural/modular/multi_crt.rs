@@ -31,6 +31,45 @@ fn ns(ss: &[&str]) -> Vec<Natural> {
 #[test]
 fn test_multi_crt() {
     let test = |ms: &[&str], vs: &[&str], out: &str, out_balanced: &str| {
+        #[cfg(feature = "oracle")]
+        {
+            malachite_base::oracle_row!(
+                "flint",
+                "fmpz_multi_CRT",
+                "multi_crt([{}], [{}]) = {out}",
+                ms.join(", "),
+                vs.join(", ")
+            );
+            malachite_base::oracle_row!(
+                "flint",
+                "fmpz_multi_CRT",
+                "multi_crt_balanced([{}], [{}]) = {out_balanced}",
+                ms.join(", "),
+                vs.join(", ")
+            );
+            malachite_base::oracle_row!(
+                "flint",
+                "fmpz_multi_CRT_balanced",
+                "multi_crt([{}], [{}]) = {out}",
+                ms.join(", "),
+                vs.join(", ")
+            );
+            malachite_base::oracle_row!(
+                "flint",
+                "fmpz_multi_CRT_balanced",
+                "multi_crt_balanced([{}], [{}]) = {out_balanced}",
+                ms.join(", "),
+                vs.join(", ")
+            );
+            malachite_base::oracle_row!(
+                "azurite",
+                "az_nat_multi_crt",
+                "multi_crt([{}], [{}]) = {out}",
+                ms.join(", "),
+                vs.join(", ")
+            );
+        }
+
         let ms = ns(ms);
         let vs = ns(vs);
         let crt = MultiCrt::new(&ms);

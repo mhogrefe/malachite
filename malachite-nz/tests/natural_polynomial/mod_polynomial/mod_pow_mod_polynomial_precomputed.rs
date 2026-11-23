@@ -8,6 +8,7 @@
 
 use core::str::FromStr;
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::mod_polynomial::traits::{
     ModPowModPolynomial, ModPowModPolynomialPrecomputed, ModPowModPolynomialPrecomputedAssign,
@@ -62,6 +63,12 @@ fn verify(
 #[test]
 fn test_mod_pow_mod_polynomial_precomputed() {
     let test = |a, exp, f, m: &str, out| {
+        oracle_row!(
+            "flint",
+            "mod_pow_mod_polynomial",
+            "({a}).mod_pow_mod_polynomial_precomputed({exp}, {f}, {m}, &data) = {out}"
+        );
+
         let a = NaturalPolynomial::from_str(a).unwrap();
         let f = NaturalPolynomial::from_str(f).unwrap();
         let m = Natural::from_str(m).unwrap();

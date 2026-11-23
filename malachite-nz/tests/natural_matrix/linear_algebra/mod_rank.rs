@@ -11,6 +11,7 @@ use malachite_base::matrix::Matrix;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::linear_algebra::traits::{ModLuDecomposition, ModRank};
 use malachite_base::num::modular::traits::ModMul;
+use malachite_base::oracle_row;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural_matrix::NaturalMatrix;
 use malachite_nz::test_util::generators::natural_matrix_natural_pair_gen_var_5;
@@ -29,6 +30,7 @@ fn verify_rank(a: &NaturalMatrix, m: &Natural) -> u64 {
 }
 
 fn test(a: &str, m: &str, out: u64) {
+    oracle_row!("flint", "fmpz_mod_mat_rank", "{a}.mod_rank({m}) = {out}");
     let a = NaturalMatrix::from_str(a).unwrap();
     let m = Natural::from_str(m).unwrap();
     assert_eq!(verify_rank(&a, &m), out);

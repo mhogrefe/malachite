@@ -12,6 +12,7 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::number_theory::traits::{
     DoubleFactorial, Factorial, Multifactorial, Subfactorial,
 };
+use malachite_base::oracle_row;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
@@ -1924,6 +1925,8 @@ fn test_limbs_odd_factorial() {
 #[test]
 fn test_factorial() {
     fn test(n: u64, out: &str) {
+        oracle_row!("azurite", "az_nat_factorial", "{n}! = {out}");
+
         let f = Natural::factorial(n);
         assert!(f.is_valid());
         assert_eq!(f.to_string(), out);
@@ -1987,6 +1990,8 @@ fn test_factorial() {
 #[test]
 fn test_double_factorial() {
     fn test(n: u64, out: &str) {
+        oracle_row!("azurite", "az_nat_double_factorial", "{n}!! = {out}");
+
         let f = Natural::double_factorial(n);
         assert!(f.is_valid());
         assert_eq!(f.to_string(), out);
@@ -2055,6 +2060,16 @@ fn test_double_factorial() {
 #[test]
 fn test_multifactorial() {
     fn test(n: u64, m: u64, out: &str) {
+        oracle_row!(
+            "azurite",
+            "az_nat_multifactorial",
+            "{n}{} = {out}",
+            if m <= 4 {
+                "!".repeat(usize::exact_from(m))
+            } else {
+                format!("[!^{m}]")
+            }
+        );
         let f = Natural::multifactorial(n, m);
         assert!(f.is_valid());
         assert_eq!(f.to_string(), out);
@@ -2144,6 +2159,8 @@ fn test_multifactorial() {
 #[test]
 fn test_subfactorial() {
     fn test(n: u64, out: &str) {
+        oracle_row!("azurite", "az_nat_subfactorial", "!{n} = {out}");
+
         let f = Natural::subfactorial(n);
         assert!(f.is_valid());
         assert_eq!(f.to_string(), out);

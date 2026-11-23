@@ -7,6 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::modular::traits::{ModAdd, ModMul, ModSub};
+#[cfg(not(feature = "32_bit_limbs"))]
+use malachite_base::oracle_row;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::mul::schonhage_strassen::fft_radix2::fft_radix2;
 use malachite_nz::natural::arithmetic::mul::schonhage_strassen::ifft_radix2::*;
@@ -25,6 +27,13 @@ fn test_limbs_ifft_butterfly() {
                 w: u64,
                 s_out: &[Limb],
                 t_out: &[Limb]| {
+        oracle_row!(
+            "flint",
+            "ifft_butterfly",
+            "limbs_ifft_butterfly(_, _, {i1:?}, {i2:?}, {i}, {limbs}, {w}) = ({s_out:?}, \
+            {t_out:?}, _, _)"
+        );
+
         let mut s = vec![0; limbs + 1];
         let mut t = vec![0; limbs + 1];
         let mut i1 = i1.to_vec();
@@ -99,6 +108,13 @@ fn limbs_ifft_butterfly_properties() {
 #[test]
 fn test_ifft_radix2() {
     let test = |ii: &[&[Limb]], n: usize, w: u64, out: &[Limb]| {
+        oracle_row!(
+            "flint",
+            "ifft_radix2",
+            "ifft_radix2({ii:?}, {n}, {w}, _, _) = {:?}",
+            out.chunks(ii[0].len()).collect::<Vec<_>>()
+        );
+
         let mut ii: Vec<Vec<Limb>> = ii.iter().map(|x| x.to_vec()).collect();
         let limbs = ii[0].len() - 1;
         let mut t1 = vec![0; limbs + 1];

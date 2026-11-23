@@ -11,6 +11,7 @@ use malachite_base::iterators::comparison::is_strictly_ascending;
 use malachite_base::num::arithmetic::traits::SaturatingSub;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::factorization::traits::Primes;
+use malachite_base::oracle_row;
 use malachite_base::strings::ToDebugString;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::natural_gen_var_9;
@@ -19,6 +20,12 @@ use std::str::FromStr;
 #[test]
 fn test_primes_less_than() {
     let test = |n: &str, out: &str| {
+        oracle_row!(
+            "azurite",
+            "az_nat_primes_less_than",
+            "primes_less_than({n}) = {out}"
+        );
+
         let n = Natural::from_str(n).unwrap();
         assert_eq!(
             Natural::primes_less_than(&n)
@@ -55,6 +62,12 @@ fn test_primes_less_than() {
 #[test]
 fn test_primes_less_than_or_equal_to() {
     let test = |n: &str, out: &str| {
+        oracle_row!(
+            "azurite",
+            "az_nat_primes_less_than",
+            "primes_less_than_or_equal_to({n}) = {out}"
+        );
+
         let n = Natural::from_str(n).unwrap();
         assert_eq!(
             Natural::primes_less_than_or_equal_to(&n)

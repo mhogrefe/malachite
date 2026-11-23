@@ -12,6 +12,7 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::PowerOf2Digits;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::oracle_row;
 use malachite_base::slices::{slice_leading_zeros, slice_trailing_zeros};
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
@@ -172,6 +173,11 @@ fn from_power_of_2_digits_desc_fail() {
 #[test]
 fn test_from_power_of_2_digits_asc_natural() {
     let test_ok = |log_base, digits, out| {
+        oracle_row!(
+            "azurite",
+            "az_nat_from_power_of_2_digits",
+            "Natural::from_power_of_2_digits_asc({log_base}, {digits}) = Some({out})"
+        );
         let digits = vec_from_str(digits).unwrap();
         assert_eq!(
             Natural::from_power_of_2_digits_asc(log_base, digits.iter().cloned())
@@ -215,6 +221,11 @@ fn test_from_power_of_2_digits_asc_natural() {
     );
 
     let test_err = |log_base, digits| {
+        oracle_row!(
+            "azurite",
+            "az_nat_from_power_of_2_digits",
+            "Natural::from_power_of_2_digits_asc({log_base}, {digits}) = None"
+        );
         let digits = vec_from_str(digits).unwrap();
         assert!(Natural::from_power_of_2_digits_asc(log_base, digits.iter().cloned()).is_none());
         assert!(

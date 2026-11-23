@@ -11,6 +11,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::traits::{NegativeOne, One, Two, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::{signed_unsigned_pair_gen_var_15, unsigned_gen_var_5};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
@@ -26,6 +27,8 @@ use std::str::FromStr;
 #[test]
 fn test_pow() {
     let test = |s, exp, out| {
+        oracle_row!("azurite", "az_int_pow", "({s}).pow({exp}) = {out}");
+
         let u = Integer::from_str(s).unwrap();
 
         let mut x = u.clone();

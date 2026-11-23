@@ -41,6 +41,23 @@ fn test_mod_power_of_2_divisible_by() {
     assert!(
         UnsignedPolynomial::<u8>::ZERO.mod_power_of_2_divisible_by(UnsignedPolynomial::ZERO, 0)
     );
+    #[cfg(feature = "oracle")]
+    for (p, q, pow) in [
+        ("0", "0", 3),
+        ("x+1", "0", 3),
+        ("x^2+3*x+2", "x+1", 3),
+        ("x^4+7*x+5", "5*x^2+2", 3),
+        ("0", "0", 0),
+    ] {
+        let p = UnsignedPolynomial::<u8>::from_str(p).unwrap();
+        let q = UnsignedPolynomial::<u8>::from_str(q).unwrap();
+        let out = (&p).mod_power_of_2_divisible_by(&q, pow);
+        malachite_base::oracle_row!(
+            "flint",
+            "mod_power_of_2_div_exact",
+            "({p}).mod_power_of_2_divisible_by({q}, {pow}) = {out}"
+        );
+    }
 }
 
 #[test]

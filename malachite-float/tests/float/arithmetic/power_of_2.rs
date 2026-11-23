@@ -9,6 +9,7 @@
 use malachite_base::num::arithmetic::traits::{IsPowerOf2, PowerOf2};
 use malachite_base::num::basic::traits::Infinity;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom};
+use malachite_base::oracle_row;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::{
@@ -32,6 +33,12 @@ use std::panic::catch_unwind;
 #[test]
 fn test_power_of_2_prec_round() {
     let test = |i: i64, prec: u64, rm: RoundingMode, out: &str, out_hex: &str, o_out| {
+        oracle_row!(
+            "azurite",
+            "az_float_power_of_2",
+            "Float::power_of_2_prec_round({i}, {prec}, {rm}) = ({out_hex}, {o_out:?})"
+        );
+
         let (p, o) = Float::power_of_2_prec_round(i, prec, rm);
         assert!(p.is_valid());
         assert_eq!(o, o_out);
@@ -623,6 +630,12 @@ fn power_of_2_prec_round_properties() {
 #[test]
 fn test_power_of_2_prec() {
     let test = |i: i64, prec: u64, out: &str, out_hex: &str, o_out: Ordering| {
+        oracle_row!(
+            "azurite",
+            "az_float_power_of_2",
+            "Float::power_of_2_prec({i}, {prec}) = ({out_hex}, {o_out:?})"
+        );
+
         let (p, o) = Float::power_of_2_prec(i, prec);
         assert!(p.is_valid());
         assert_eq!(o, o_out);
@@ -749,6 +762,11 @@ fn power_of_2_prec_properties() {
 #[test]
 fn test_power_of_2() {
     let test = |i: i64, out: &str, out_hex: &str| {
+        oracle_row!(
+            "azurite",
+            "az_float_power_of_2",
+            "Float::power_of_2({i}) = {out_hex}"
+        );
         let p = Float::power_of_2(i);
         assert!(p.is_valid());
 
@@ -778,6 +796,11 @@ fn test_power_of_2() {
     test(-1073741825, "0.0", "0x0.0");
 
     let test = |u: u64, out: &str, out_hex: &str| {
+        oracle_row!(
+            "azurite",
+            "az_float_power_of_2",
+            "Float::power_of_2({u}) = {out_hex}"
+        );
         let p = Float::power_of_2(u);
         assert!(p.is_valid());
 

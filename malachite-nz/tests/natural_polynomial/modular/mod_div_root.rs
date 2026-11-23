@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::modular::traits::{Mod, ModAdd, ModMul};
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::arithmetic::traits::DivPowerOfX;
 use malachite_base::polynomial::modular::traits::{ModDivRoot, ModDivRootAssign, ModEvaluate};
@@ -40,6 +41,17 @@ fn verify(p: &NaturalPolynomial, c: &Natural, m: &Natural) -> (NaturalPolynomial
 #[test]
 fn test_mod_div_root() {
     let test = |p, c, m: &str, out: &str, out_r: &str| {
+        oracle_row!(
+            "flint",
+            "mod_div_root",
+            "({p}).mod_div_root({c}, {m}) = ({out}, {out_r})"
+        );
+        oracle_row!(
+            "flint",
+            "mod_div_root",
+            "p := {p}; p.mod_div_root_assign({c}, {m}) = {out_r}; p = {out}"
+        );
+
         let p = NaturalPolynomial::from_str(p).unwrap();
         let c = Natural::from_str(c).unwrap();
         let m = Natural::from_str(m).unwrap();
@@ -77,6 +89,34 @@ fn test_mod_div_root() {
     );
     // - a modulus of one limb
     test("x^3+2*x+1", "3", "7", "x^2+3*x+4", "6");
+}
+
+#[cfg(feature = "oracle")]
+#[test]
+fn oracle_rows_mod_div_root() {
+    for m in ["6", "7", "251", "1361129467683753853853498429727072845827"] {
+        let m = Natural::from_str(m).unwrap();
+        for (p, c) in [
+            ("0", Natural::from(3u32)),
+            ("5", Natural::from(3u32)),
+            ("x^2+3*x+2", Natural::ZERO),
+            ("x^2+3*x+2", &m - Natural::ONE),
+            ("x^3+2*x+1", Natural::from(3u32)),
+        ] {
+            let p = NaturalPolynomial::from_str(p).unwrap();
+            let (q, r) = (&p).mod_div_root(&c, &m);
+            oracle_row!(
+                "flint",
+                "mod_div_root",
+                "({p}).mod_div_root({c}, {m}) = ({q}, {r})"
+            );
+            oracle_row!(
+                "flint",
+                "mod_div_root",
+                "p := {p}; p.mod_div_root_assign({c}, {m}) = {r}; p = {q}"
+            );
+        }
+    }
 }
 
 #[test]

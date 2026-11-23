@@ -6,6 +6,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+#[cfg(not(feature = "32_bit_limbs"))]
+use malachite_base::oracle_row;
 use malachite_nz::natural::arithmetic::mul::schonhage_strassen::fft_mfa_truncate_sqrt2::*;
 use malachite_nz::natural::arithmetic::mul::schonhage_strassen::fft_mfa_truncate_sqrt2_inner::*;
 use malachite_nz::natural::arithmetic::mul::schonhage_strassen::ifft_mfa_truncate_sqrt2::*;
@@ -24,6 +26,15 @@ fn test_fft_mfa_truncate_sqrt2_inner() {
                 n1: usize,
                 trunc: usize,
                 out: &[Limb]| {
+        oracle_row!(
+            "flint",
+            "fft_mfa_truncate_sqrt2_inner",
+            "fft_mfa_truncate_sqrt2_inner({ii:?}, {jj:?}, {n}, {w}, _, _, _, {n1}, {trunc}, _) = \
+            ({:?}, {})",
+            out.chunks(ii[0].len()).collect::<Vec<_>>(),
+            if jj.is_some() { "_" } else { "None" }
+        );
+
         let mut ii: Vec<Vec<Limb>> = ii.iter().map(|x| x.to_vec()).collect();
         let mut jj: Option<Vec<Vec<Limb>>> = jj.map(|jj| jj.iter().map(|x| x.to_vec()).collect());
         let limbs = ii[0].len() - 1;

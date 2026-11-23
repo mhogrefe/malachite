@@ -10,6 +10,7 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::number_theory::traits::{
     BinomialCoefficient, CheckedFallingFactorial, Factorial, FallingFactorial, RisingFactorial,
 };
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::unsigned_pair_gen_var_2;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
@@ -21,6 +22,12 @@ use std::str::FromStr;
 #[test]
 fn test_falling_factorial() {
     let test = |s, n, out| {
+        oracle_row!(
+            "azurite",
+            "az_nat_falling_factorial",
+            "{s}.falling_factorial({n}) = {out}"
+        );
+
         let x = Natural::from_str(s).unwrap();
         assert_eq!(x.clone().falling_factorial(n).to_string(), out);
         assert_eq!((&x).falling_factorial(n).to_string(), out);

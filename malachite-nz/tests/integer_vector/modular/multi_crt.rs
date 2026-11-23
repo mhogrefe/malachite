@@ -12,6 +12,7 @@ use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::num::factorization::traits::Primes;
 use malachite_base::num::modular::traits::{BalancedMod, Mod};
 use malachite_base::num::number_theory::traits::CoprimeWith;
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::unsigned_vec_gen;
 use malachite_base::unsigned_vector::UnsignedVector;
 use malachite_base::vector::Vector;
@@ -26,6 +27,14 @@ use malachite_nz::test_util::integer_vector::modular::multi_crt::*;
 #[test]
 fn test_multi_balanced_crt() {
     let test = |moduli: &[Limb], residues: &[&str], out: Option<&str>| {
+        oracle_row!(
+            "flint",
+            "_fmpz_vec_multi_CRT_ui",
+            "multi_balanced_crt({moduli:?}, [{}]) = {}",
+            residues.join(", "),
+            malachite_base::test_util::oracle_rows::option(out)
+        );
+
         let residues: Vec<UnsignedVector<Limb>> = residues
             .iter()
             .map(|s| UnsignedVector::from_str(s).unwrap())
@@ -92,10 +101,24 @@ fn test_multi_balanced_crt_many_primes() {
         Integer::from(&half),
         Integer::ONE - Integer::from(half),
     ]);
-    assert_eq!(
-        IntegerVector::multi_balanced_crt(&primes, &residues),
-        Some(expected)
+    let result = IntegerVector::multi_balanced_crt(&primes, &residues);
+    oracle_row!(
+        "flint",
+        "_fmpz_vec_multi_CRT_ui",
+        "multi_balanced_crt({primes:?}, [{}]) = {}",
+        residues_string(&residues),
+        malachite_base::test_util::oracle_rows::option(result.as_ref())
     );
+    assert_eq!(result, Some(expected));
+}
+
+#[cfg(feature = "oracle")]
+fn residues_string(residues: &[UnsignedVector<Limb>]) -> String {
+    residues
+        .iter()
+        .map(ToString::to_string)
+        .collect::<Vec<_>>()
+        .join(", ")
 }
 
 #[test]

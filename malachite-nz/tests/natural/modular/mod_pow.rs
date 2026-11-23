@@ -13,6 +13,7 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::modular::traits::{
     ModIsReduced, ModMul, ModNeg, ModPow, ModPowAssign, ModPowPrecomputed, ModPowPrecomputedAssign,
 };
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::unsigned_triple_gen_var_15;
 use malachite_nz::natural::Natural;
@@ -338,6 +339,13 @@ fn limbs_mod_pow_fail_6() {
 #[test]
 fn test_mod_pow() {
     let test = |r, s, t, out| {
+        oracle_row!("azurite", "az_zmod_pow", "{r}.pow({s}) ≡ {out} mod {t}");
+        oracle_row!(
+            "azurite",
+            "az_zmod_pow_precomputed",
+            "{r}.mod_pow_precomputed({s}, {t}, &data) = {out}"
+        );
+
         let u = Natural::from_str(r).unwrap();
         let exp = Natural::from_str(s).unwrap();
         let m = Natural::from_str(t).unwrap();

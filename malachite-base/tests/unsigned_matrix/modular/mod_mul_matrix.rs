@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use malachite_base::matrix::Matrix;
 use malachite_base::num::modular::traits::{ModAdd, ModMul, ModMulAssign};
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::{
     unsigned_matrix_gen_var_1, unsigned_matrix_unsigned_matrix_unsigned_triple_gen_var_3,
 };
@@ -18,6 +19,8 @@ use malachite_base::unsigned_matrix::UnsignedMatrix;
 #[test]
 fn test_mod_mul_matrix() {
     let test = |s, t, m: u8, out| {
+        oracle_row!("flint", "nmod_mat_mul", "{s}.mod_mul({t}, {m}) = {out}");
+
         let a = UnsignedMatrix::<u8>::from_str(s).unwrap();
         let b = UnsignedMatrix::<u8>::from_str(t).unwrap();
         let c = a.clone().mod_mul(b.clone(), m);

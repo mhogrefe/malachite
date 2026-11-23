@@ -11,6 +11,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves};
 use malachite_base::num::modular::traits::{Mod, ModAssign, ModIsReduced, NegMod, NegModAssign};
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
     unsigned_pair_gen_var_12, unsigned_vec_pair_gen_var_11, unsigned_vec_pair_gen_var_18,
@@ -12383,6 +12384,8 @@ fn limbs_mod_to_out_fail_3() {
 #[test]
 fn test_mod() {
     let test = |s, t, remainder| {
+        oracle_row!("azurite", "az_nat_mod", "{s} % {t} = {remainder}");
+
         let u = Natural::from_str(s).unwrap();
         let v = Natural::from_str(t).unwrap();
 

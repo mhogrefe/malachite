@@ -10,6 +10,7 @@ use malachite_base::num::arithmetic::traits::{Abs, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::signed_gen;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
@@ -22,6 +23,12 @@ use std::str::FromStr;
 #[test]
 fn test_significant_bits() {
     let test = |n, out| {
+        oracle_row!(
+            "azurite",
+            "az_int_significant_bits",
+            "significant_bits({n}) = {out}"
+        );
+
         assert_eq!(Integer::from_str(n).unwrap().significant_bits(), out);
         assert_eq!(u64::wrapping_from(BigInt::from_str(n).unwrap().bits()), out);
         assert_eq!(

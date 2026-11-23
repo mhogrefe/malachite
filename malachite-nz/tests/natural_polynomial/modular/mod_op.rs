@@ -12,6 +12,7 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::modular::traits::{Mod, ModAssign, ModIsReduced, ModPowerOf2};
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::test_util::generators::unsigned_polynomial_unsigned_pair_gen_var_1;
 use malachite_base::unsigned_polynomial::UnsignedPolynomial;
@@ -25,6 +26,12 @@ use malachite_nz::test_util::generators::{
 #[test]
 fn test_rem() {
     let test = |s, m, out| {
+        oracle_row!(
+            "flint",
+            "fmpz_mod_poly_set_fmpz_poly",
+            "({s}) % {m} = {out}"
+        );
+
         let p = NaturalPolynomial::from_str(s).unwrap();
         let m = Natural::from_str(m).unwrap();
         // All four combinations of value and reference, and in place with both.
@@ -69,6 +76,12 @@ fn test_mod_op() {
     // `mod_op` is `%` under the name the mod-family traits use; a `NaturalPolynomial`'s
     // coefficients are never negative, so there is no case where the two could differ.
     let test = |s, m, out| {
+        oracle_row!(
+            "flint",
+            "fmpz_mod_poly_set_fmpz_poly",
+            "({s}).mod_op({m}) = {out}"
+        );
+
         let p = NaturalPolynomial::from_str(s).unwrap();
         let m = Natural::from_str(m).unwrap();
         let q = (&p).mod_op(&m);
@@ -100,6 +113,12 @@ fn test_rem_lowers_the_degree() {
     // A leading coefficient that is a multiple of the divisor becomes zero, and a polynomial does
     // not hold trailing zero coefficients, so the degree falls.
     let test = |s, m, out| {
+        oracle_row!(
+            "flint",
+            "fmpz_mod_poly_set_fmpz_poly",
+            "({s}) % {m} = {out}"
+        );
+
         let m = Natural::from_str(m).unwrap();
         assert_eq!(
             (NaturalPolynomial::from_str(s).unwrap() % m).to_string(),
@@ -269,6 +288,12 @@ fn test_rem_unsigned() {
     where
         Natural: From<T>,
     {
+        oracle_row!(
+            "flint",
+            "fmpz_mod_poly_set_fmpz_poly",
+            "({s}) % {m} = {out}"
+        );
+
         let p = NaturalPolynomial::from_str(s).unwrap();
         let q: UnsignedPolynomial<T> = &p % m;
         assert!(q.is_valid());

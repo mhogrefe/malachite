@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use malachite_base::matrix::Matrix;
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::oracle_row;
 use malachite_nz::integer_matrix::arithmetic::mul::classical::matrix_mul_classical;
 use malachite_nz::integer_matrix::arithmetic::mul::double_word::matrix_mul_double_word;
 use malachite_nz::integer_matrix::arithmetic::mul::multi_mod::matrix_mul_multi_mod_any;
@@ -32,6 +33,8 @@ use malachite_nz::test_util::natural_matrix::pseudorandom::pseudorandom_natural_
 #[test]
 fn test_mul() {
     let test = |s, t, out| {
+        oracle_row!("flint", "fmpz_mat_mul", "{s} * {t} = {out}");
+
         let a = NaturalMatrix::from_str(s).unwrap();
         let b = NaturalMatrix::from_str(t).unwrap();
 

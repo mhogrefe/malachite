@@ -7,6 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::basic::integers::PrimitiveInt;
+#[cfg(not(feature = "32_bit_limbs"))]
+use malachite_base::oracle_row;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::mul::schonhage_strassen::split_bits::*;
 use malachite_nz::platform::Limb;
@@ -38,12 +40,23 @@ fn split_bits_helper(limbs: &[Limb], bits: u64, output_limbs: usize) -> (usize, 
 #[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_fft_split_limbs() {
-    let test =
-        |limbs: &[Limb], coeff_limbs: usize, output_limbs: usize, length: usize, out: &[Limb]| {
-            let (result, poly) = split_limbs_helper(limbs, coeff_limbs, output_limbs);
-            assert_eq!(result, length);
-            assert_eq!(poly.concat(), out);
-        };
+    let test = |limbs: &[Limb],
+                coeff_limbs: usize,
+                output_limbs: usize,
+                length: usize,
+                out: &[Limb]| {
+        oracle_row!(
+            "flint",
+            "fft_split_limbs",
+            "fft_split_limbs(_, {limbs:?}, {}, {coeff_limbs}, {output_limbs}) = ({length}, {:?})",
+            limbs.len(),
+            out.chunks(output_limbs + 1).collect::<Vec<_>>()
+        );
+
+        let (result, poly) = split_limbs_helper(limbs, coeff_limbs, output_limbs);
+        assert_eq!(result, length);
+        assert_eq!(poly.concat(), out);
+    };
     // - i >= length
     // - total_limbs <= skip
     test(&[1, 2, 3], 1, 1, 3, &[1, 0, 2, 0, 3, 0]);
@@ -57,6 +70,14 @@ fn test_fft_split_limbs() {
 #[test]
 fn test_fft_split_bits() {
     let test = |limbs: &[Limb], bits: u64, output_limbs: usize, length: usize, out: &[Limb]| {
+        oracle_row!(
+            "flint",
+            "fft_split_bits",
+            "fft_split_bits(_, {limbs:?}, {}, {bits}, {output_limbs}) = ({length}, {:?})",
+            limbs.len(),
+            out.chunks(output_limbs + 1).collect::<Vec<_>>()
+        );
+
         let (result, poly) = split_bits_helper(limbs, bits, output_limbs);
         assert_eq!(result, length);
         assert_eq!(poly.concat(), out);

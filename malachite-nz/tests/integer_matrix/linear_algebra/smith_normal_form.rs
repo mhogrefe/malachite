@@ -12,6 +12,7 @@ use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::linear_algebra::traits::{
     Determinant, ElementaryDivisors, Rank, SmithNormalForm, SmithNormalFormAssign,
 };
+use malachite_base::oracle_row;
 use malachite_nz::integer_matrix::IntegerMatrix;
 use malachite_nz::integer_matrix::linear_algebra::smith_normal_form::*;
 use malachite_nz::natural::Natural;
@@ -78,6 +79,8 @@ fn verify_snf(a: &IntegerMatrix) -> String {
 #[test]
 fn test_smith_normal_form() {
     let test = |s, out| {
+        oracle_row!("flint", "fmpz_mat_snf", "smith_normal_form({s}) = {out}");
+
         let a = IntegerMatrix::from_str(s).unwrap();
         assert_eq!(verify_snf(&a), out);
     };

@@ -9,6 +9,8 @@
 use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::exponential::traits::CeilingLogBase2;
+#[cfg(not(feature = "32_bit_limbs"))]
+use malachite_base::oracle_row;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::mul::schonhage_strassen::mulmod_2expp1::*;
 use malachite_nz::natural::arithmetic::mul::schonhage_strassen::mulmod_2expp1_basecase::*;
@@ -22,6 +24,13 @@ use malachite_nz::test_util::natural::arithmetic::schonhage_strassen::*;
 #[test]
 fn test_fft_naive_convolution_1() {
     let test = |ii: &[Limb], jj: &[Limb], out: &[Limb]| {
+        oracle_row!(
+            "flint",
+            "fft_naive_convolution_1",
+            "fft_naive_convolution_1(_, {ii:?}, {jj:?}, {}) = {out:?}",
+            ii.len()
+        );
+
         let mut r = vec![0; ii.len()];
         fft_naive_convolution_1(&mut r, ii, jj, ii.len());
         assert_eq!(r, out);
@@ -53,6 +62,12 @@ fn fft_naive_convolution_1_properties() {
 #[test]
 fn test_fft_mulmod_2expp1() {
     let test = |r: &[Limb], i2: Option<&[Limb]>, n: usize, w: u64, out: &[Limb]| {
+        oracle_row!(
+            "flint",
+            "fft_mulmod_2expp1",
+            "fft_mulmod_2expp1({r:?}, {i2:?}, {n}, {w}, _) = {out:?}"
+        );
+
         let mut r = r.to_vec();
         let mut tt = vec![0; limbs_mul_mod_2expp1_basecase_scratch_len(r.len() - 1)];
         fft_mulmod_2expp1(&mut r, i2, n, w, &mut tt);
@@ -109,6 +124,12 @@ fn fft_mulmod_2expp1_negacyclic_properties() {
 #[test]
 fn test_fft_adjust_limbs() {
     let test = |limbs: usize, out: usize| {
+        oracle_row!(
+            "flint",
+            "fft_adjust_limbs",
+            "fft_adjust_limbs({limbs}) = {out}"
+        );
+
         assert_eq!(fft_adjust_limbs(limbs), out);
     };
     // - limbs <= FFT_MULMOD_2EXPP1_CUTOFF

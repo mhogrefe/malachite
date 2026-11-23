@@ -11,6 +11,7 @@ use malachite_base::num::arithmetic::traits::Pow;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::factorization::traits::{RemovePower, RemovePowerAssign};
 use malachite_base::num::modular::traits::DivisibleBy;
+use malachite_base::oracle_row;
 use malachite_q::rational_polynomial::RationalPolynomial;
 use malachite_q::test_util::generators::rational_polynomial_pair_gen_var_5;
 use malachite_q::test_util::rational_polynomial::arithmetic::div_rem::remove_power_naive;
@@ -18,6 +19,12 @@ use malachite_q::test_util::rational_polynomial::arithmetic::div_rem::remove_pow
 #[test]
 fn test_remove_power() {
     let test = |s, t, out, e_out| {
+        oracle_row!(
+            "flint",
+            "fmpq_poly_remove",
+            "(&({s})).remove_power(&({t})) = ({out}, {e_out})"
+        );
+
         let p = RationalPolynomial::from_str(s).unwrap();
         let q = RationalPolynomial::from_str(t).unwrap();
         let (r, e) = (&p).remove_power(&q);

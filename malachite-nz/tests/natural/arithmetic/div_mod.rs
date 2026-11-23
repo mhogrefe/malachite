@@ -18,6 +18,7 @@ use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves, WrappingFro
 use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_base::num::logic::traits::LowMask;
 use malachite_base::num::modular::traits::NegMod;
+use malachite_base::oracle_row;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
@@ -23192,6 +23193,12 @@ fn limbs_div_mod_to_out_fail_4() {
 #[test]
 fn test_div_mod() {
     let test = |s, t, quotient, remainder| {
+        oracle_row!(
+            "azurite",
+            "az_nat_div_mod",
+            "{s}.div_mod({t}) = ({quotient}, {remainder})"
+        );
+
         let u = Natural::from_str(s).unwrap();
         let v = Natural::from_str(t).unwrap();
 

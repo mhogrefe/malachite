@@ -11,6 +11,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::exponential::traits::CheckedLogBase;
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
     unsigned_gen_var_5, unsigned_pair_gen_var_29, unsigned_vec_unsigned_pair_gen_var_31,
@@ -141,6 +142,8 @@ fn limbs_pow_fail_4() {
 #[test]
 fn test_pow() {
     let test = |s, exp, out| {
+        oracle_row!("azurite", "az_nat_pow", "{s}.pow({exp}) = {out}");
+
         let u = Natural::from_str(s).unwrap();
 
         let mut x = u.clone();

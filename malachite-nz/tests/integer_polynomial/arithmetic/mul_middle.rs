@@ -12,6 +12,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::modular::traits::Mod;
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::arithmetic::traits::{
     DivPowerOfX, MulMiddle, MulMiddleAssign, MulPowerOfX,
@@ -67,6 +68,11 @@ fn test_mul_middle_to_out_classical() {
         let ys = parse(ys);
         let mut result = vec![Integer::ZERO; nhi - nlo];
         mul_middle_to_out_classical(&mut result, &xs, &ys, nlo, nhi);
+        oracle_row!(
+            "flint",
+            "_fmpz_poly_mulmid_classical",
+            "mul_middle_to_out_classical(_, {xs:?}, {ys:?}, {nlo}, {nhi}) = {result:?}"
+        );
         assert!(result.iter().all(Integer::is_valid));
         assert_eq!(result, parse(out));
         assert_eq!(&integers_mul_naive(&xs, &ys)[nlo..nhi], result);
@@ -76,6 +82,11 @@ fn test_mul_middle_to_out_classical() {
         let xs = parse(xs);
         let mut result = vec![Integer::ZERO; nhi - nlo];
         mul_middle_to_out_classical(&mut result, &xs, &xs, nlo, nhi);
+        oracle_row!(
+            "flint",
+            "_fmpz_poly_mulmid_classical",
+            "mul_middle_to_out_classical(_, {xs:?}, {xs:?}, {nlo}, {nhi}) = {result:?}"
+        );
         assert!(result.iter().all(Integer::is_valid));
         assert_eq!(result, parse(out));
         assert_eq!(&integers_mul_naive(&xs, &xs)[nlo..nhi], result);
@@ -121,6 +132,11 @@ fn test_mul_middle_to_out_tiny_1() {
         let ys = parse(ys);
         let mut result = vec![Integer::ZERO; nhi - nlo];
         mul_middle_to_out_tiny_1(&mut result, &xs, &ys, nlo, nhi);
+        oracle_row!(
+            "flint",
+            "_fmpz_poly_mulmid",
+            "mul_middle_to_out_tiny_1(_, {xs:?}, {ys:?}, {nlo}, {nhi}) = {result:?}"
+        );
         assert!(result.iter().all(Integer::is_valid));
         assert_eq!(result, parse(out));
         assert_eq!(&integers_mul_naive(&xs, &ys)[nlo..nhi], result);
@@ -130,6 +146,11 @@ fn test_mul_middle_to_out_tiny_1() {
         let xs = parse(xs);
         let mut result = vec![Integer::ZERO; nhi - nlo];
         mul_middle_to_out_tiny_1(&mut result, &xs, &xs, nlo, nhi);
+        oracle_row!(
+            "flint",
+            "_fmpz_poly_mulmid",
+            "mul_middle_to_out_tiny_1(_, {xs:?}, {xs:?}, {nlo}, {nhi}) = {result:?}"
+        );
         assert!(result.iter().all(Integer::is_valid));
         assert_eq!(result, parse(out));
         assert_eq!(&integers_mul_naive(&xs, &xs)[nlo..nhi], result);
@@ -161,6 +182,11 @@ fn test_mul_middle_to_out_tiny_2() {
         let ys = parse(ys);
         let mut result = vec![Integer::ZERO; nhi - nlo];
         mul_middle_to_out_tiny_2(&mut result, &xs, &ys, nlo, nhi);
+        oracle_row!(
+            "flint",
+            "_fmpz_poly_mulmid",
+            "mul_middle_to_out_tiny_2(_, {xs:?}, {ys:?}, {nlo}, {nhi}) = {result:?}"
+        );
         assert!(result.iter().all(Integer::is_valid));
         assert_eq!(result, parse(out));
         assert_eq!(&integers_mul_naive(&xs, &ys)[nlo..nhi], result);
@@ -170,6 +196,11 @@ fn test_mul_middle_to_out_tiny_2() {
         let xs = parse(xs);
         let mut result = vec![Integer::ZERO; nhi - nlo];
         mul_middle_to_out_tiny_2(&mut result, &xs, &xs, nlo, nhi);
+        oracle_row!(
+            "flint",
+            "_fmpz_poly_mulmid",
+            "mul_middle_to_out_tiny_2(_, {xs:?}, {xs:?}, {nlo}, {nhi}) = {result:?}"
+        );
         assert!(result.iter().all(Integer::is_valid));
         assert_eq!(result, parse(out));
         assert_eq!(&integers_mul_naive(&xs, &xs)[nlo..nhi], result);
@@ -238,6 +269,11 @@ fn test_mul_middle_to_out() {
         let ys = parse(ys);
         let mut result = vec![Integer::ZERO; nhi - nlo];
         mul_middle_to_out(&mut result, &xs, &ys, nlo, nhi);
+        oracle_row!(
+            "flint",
+            "_fmpz_poly_mulmid",
+            "mul_middle_to_out(_, {xs:?}, {ys:?}, {nlo}, {nhi}) = {result:?}"
+        );
         assert!(result.iter().all(Integer::is_valid));
         assert_eq!(result, parse(out));
         assert_eq!(&integers_mul_naive(&xs, &ys)[nlo..nhi], result);
@@ -247,6 +283,11 @@ fn test_mul_middle_to_out() {
         let xs = parse(xs);
         let mut result = vec![Integer::ZERO; nhi - nlo];
         mul_middle_to_out(&mut result, &xs, &xs, nlo, nhi);
+        oracle_row!(
+            "flint",
+            "_fmpz_poly_mulmid",
+            "mul_middle_to_out(_, {xs:?}, {xs:?}, {nlo}, {nhi}) = {result:?}"
+        );
         assert!(result.iter().all(Integer::is_valid));
         assert_eq!(result, parse(out));
         assert_eq!(&integers_mul_naive(&xs, &xs)[nlo..nhi], result);
@@ -257,6 +298,11 @@ fn test_mul_middle_to_out() {
         let ys = coefficients(q);
         let mut result = vec![Integer::ZERO; nhi - nlo];
         mul_middle_to_out(&mut result, &xs, &ys, nlo, nhi);
+        oracle_row!(
+            "flint",
+            "_fmpz_poly_mulmid",
+            "mul_middle_to_out(_, {xs:?}, {ys:?}, {nlo}, {nhi}) = {result:?}"
+        );
         assert_eq!(&integers_mul_naive(&xs, &ys)[nlo..nhi], result);
         assert_eq!(
             IntegerPolynomial::from_coefficients_asc(result).to_string(),
@@ -531,6 +577,11 @@ fn test_mul_middle_to_out_kronecker() {
         let ys = parse(ys);
         let mut result = vec![Integer::ZERO; nhi - nlo];
         mul_middle_to_out_kronecker(&mut result, &xs, &ys, nlo, nhi);
+        oracle_row!(
+            "flint",
+            "_fmpz_poly_mulmid_KS",
+            "mul_middle_to_out_kronecker(_, {xs:?}, {ys:?}, {nlo}, {nhi}) = {result:?}"
+        );
         assert!(result.iter().all(Integer::is_valid));
         assert_eq!(result, parse(out));
         assert_eq!(&integers_mul_naive(&xs, &ys)[nlo..nhi], result);
@@ -540,6 +591,11 @@ fn test_mul_middle_to_out_kronecker() {
         let xs = parse(xs);
         let mut result = vec![Integer::ZERO; nhi - nlo];
         mul_middle_to_out_kronecker(&mut result, &xs, &xs, nlo, nhi);
+        oracle_row!(
+            "flint",
+            "_fmpz_poly_mulmid_KS",
+            "mul_middle_to_out_kronecker(_, {xs:?}, {xs:?}, {nlo}, {nhi}) = {result:?}"
+        );
         assert!(result.iter().all(Integer::is_valid));
         assert_eq!(result, parse(out));
         assert_eq!(&integers_mul_naive(&xs, &xs)[nlo..nhi], result);
@@ -665,6 +721,11 @@ fn test_mul_middle_to_out_schonhage_strassen() {
         let ys = parse(ys);
         let mut result = vec![Integer::ZERO; nhi - nlo];
         mul_middle_to_out_schonhage_strassen(&mut result, &xs, &ys, nlo, nhi);
+        oracle_row!(
+            "flint",
+            "_fmpz_poly_mulmid_SS",
+            "mul_middle_to_out_schonhage_strassen(_, {xs:?}, {ys:?}, {nlo}, {nhi}) = {result:?}"
+        );
         assert!(result.iter().all(Integer::is_valid));
         assert_eq!(result, parse(out));
         assert_eq!(&integers_mul_naive(&xs, &ys)[nlo..nhi], result);
@@ -674,6 +735,11 @@ fn test_mul_middle_to_out_schonhage_strassen() {
         let xs = parse(xs);
         let mut result = vec![Integer::ZERO; nhi - nlo];
         mul_middle_to_out_schonhage_strassen(&mut result, &xs, &xs, nlo, nhi);
+        oracle_row!(
+            "flint",
+            "_fmpz_poly_mulmid_SS",
+            "mul_middle_to_out_schonhage_strassen(_, {xs:?}, {xs:?}, {nlo}, {nhi}) = {result:?}"
+        );
         assert!(result.iter().all(Integer::is_valid));
         assert_eq!(result, parse(out));
         assert_eq!(&integers_mul_naive(&xs, &xs)[nlo..nhi], result);
@@ -901,6 +967,11 @@ fn test_mul_middle_to_out_fft() {
         let ys = parse(ys);
         let mut result = vec![Integer::ZERO; nhi - nlo];
         assert!(mul_middle_to_out_fft(&mut result, &xs, &ys, nlo, nhi));
+        oracle_row!(
+            "flint",
+            "_fmpz_poly_mul_mid_default_mpn_ctx",
+            "mul_middle_to_out_fft(_, {xs:?}, {ys:?}, {nlo}, {nhi}) = Some({result:?})"
+        );
         assert!(result.iter().all(Integer::is_valid));
         assert_eq!(result, parse(out));
         assert_eq!(&integers_mul_naive(&xs, &ys)[nlo..nhi], result);
@@ -1030,6 +1101,14 @@ fn mul_middle_to_out_fft_properties() {
 #[test]
 fn test_integers_to_fermat_residues() {
     let test = |xs: &[&str], limbs: usize, out: &[Limb]| {
+        oracle_row!(
+            "flint",
+            "_fmpz_vec_get_fft",
+            "integers_to_fermat_residues(_, [{}], {limbs}) = {:?}",
+            xs.join(", "),
+            out.chunks(limbs + 1).collect::<Vec<_>>()
+        );
+
         let xs = parse(xs);
         let mut coeffs_f = vec![vec![0; limbs + 1]; xs.len()];
         integers_to_fermat_residues(&mut coeffs_f, &xs, limbs);
@@ -1086,6 +1165,13 @@ fn integers_to_fermat_residues_properties() {
 #[test]
 fn test_integers_from_fermat_residues() {
     let test = |coeffs_f: &[&[Limb]], limbs: usize, sign: bool, out: &[&str]| {
+        oracle_row!(
+            "flint",
+            "_fmpz_vec_set_fft",
+            "integers_from_fermat_residues(_, {coeffs_f:?}, {limbs}, {sign}) = [{}]",
+            out.join(", ")
+        );
+
         let coeffs_f: Vec<Vec<Limb>> = coeffs_f.iter().map(|x| x.to_vec()).collect();
         let mut xs = vec![Integer::ZERO; coeffs_f.len()];
         integers_from_fermat_residues(&mut xs, &coeffs_f, limbs, sign);
@@ -1163,6 +1249,12 @@ fn integers_from_fermat_residues_properties() {
 #[test]
 fn test_mul_middle() {
     let test = |s, t, low, high, out| {
+        oracle_row!(
+            "flint",
+            "fmpz_poly_mulmid",
+            "(&({s})).mul_middle(&({t}), {low}, {high}) = {out}"
+        );
+
         let p = IntegerPolynomial::from_str(s).unwrap();
         let q = IntegerPolynomial::from_str(t).unwrap();
         let r = (&p).mul_middle(&q, low, high);
@@ -1316,4 +1408,207 @@ fn mul_middle_properties() {
             (&p * &p).truncate(high).div_power_of_x(low)
         );
     });
+}
+
+// Records, for the oracle, the middle products, over every range, of inputs that the tests above do
+// not give these functions.
+#[cfg(feature = "oracle")]
+#[cfg(not(feature = "32_bit_limbs"))]
+#[test]
+fn oracle_rows_mul_middle_to_out() {
+    fn rows(
+        name: &str,
+        mode: &str,
+        f: fn(&mut [Integer], &[Integer], &[Integer], usize, usize),
+        pairs: &[(&[&str], &[&str])],
+    ) {
+        for &(xs, ys) in pairs {
+            let xs = parse(xs);
+            let ys = parse(ys);
+            let len = xs.len() + ys.len() - 1;
+            for nlo in 0..len {
+                for nhi in nlo + 1..=len {
+                    let mut result = vec![Integer::ZERO; nhi - nlo];
+                    f(&mut result, &xs, &ys, nlo, nhi);
+                    match mode {
+                        "_fmpz_poly_mulmid" => oracle_row!(
+                            "flint",
+                            "_fmpz_poly_mulmid",
+                            "{name}(_, {xs:?}, {ys:?}, {nlo}, {nhi}) = {result:?}"
+                        ),
+                        "_fmpz_poly_mulmid_classical" => oracle_row!(
+                            "flint",
+                            "_fmpz_poly_mulmid_classical",
+                            "{name}(_, {xs:?}, {ys:?}, {nlo}, {nhi}) = {result:?}"
+                        ),
+                        _ => panic!("unexpected mode {mode}"),
+                    }
+                }
+            }
+        }
+    }
+    rows(
+        "mul_middle_to_out",
+        "_fmpz_poly_mulmid",
+        mul_middle_to_out,
+        &[
+            (&["3"], &["4"]),
+            (&["-5"], &["7", "0", "-2"]),
+            (&["1", "2", "3"], &["-6"]),
+            (&["1", "2", "3"], &["4", "5", "6"]),
+            (&["0", "0", "1"], &["0", "1"]),
+            (
+                &["1180591620717411303424", "-3", "36893488147419103233"],
+                &["-18446744073709551616", "5"],
+            ),
+            (
+                &["100000000000000000000", "-10000000000000000000000000", "7", "0", "3"],
+                &["-1", "1267650600228229401496703205376", "11"],
+            ),
+            (
+                &["9223372036854775808", "-9223372036854775807", "17"],
+                &["-9223372036854775808", "9223372036854775807"],
+            ),
+            (&["-7", "0", "11", "-13"], &["5", "-1"]),
+            (
+                &["536870912", "-536870912"],
+                &["536870912", "3", "-268435456"],
+            ),
+            (
+                &["1", "1", "1", "1", "1", "1", "1", "1"],
+                &["-1", "-1", "-1", "-1", "-1", "-1", "-1", "-1"],
+            ),
+            (
+                &["2305843009213693952", "-2305843009213693951"],
+                &["2305843009213693951", "1152921504606846976"],
+            ),
+            (
+                &["-1099511627776", "5", "1125899906842624"],
+                &["3", "-35184372088832", "1048576", "1"],
+            ),
+            (&["3"], &["3"]),
+            (&["-5"], &["-5"]),
+            (&["1", "2", "3"], &["1", "2", "3"]),
+            (&["0", "0", "1"], &["0", "0", "1"]),
+            (
+                &["1180591620717411303424", "-3", "36893488147419103233"],
+                &["1180591620717411303424", "-3", "36893488147419103233"],
+            ),
+            (
+                &["100000000000000000000", "-10000000000000000000000000", "7", "0", "3"],
+                &["100000000000000000000", "-10000000000000000000000000", "7", "0", "3"],
+            ),
+            (
+                &["9223372036854775808", "-9223372036854775807", "17"],
+                &["9223372036854775808", "-9223372036854775807", "17"],
+            ),
+            (&["-7", "0", "11", "-13"], &["-7", "0", "11", "-13"]),
+            (&["536870912", "-536870912"], &["536870912", "-536870912"]),
+            (
+                &["1", "1", "1", "1", "1", "1", "1", "1"],
+                &["1", "1", "1", "1", "1", "1", "1", "1"],
+            ),
+            (
+                &["2305843009213693952", "-2305843009213693951"],
+                &["2305843009213693952", "-2305843009213693951"],
+            ),
+            (
+                &["-1099511627776", "5", "1125899906842624"],
+                &["-1099511627776", "5", "1125899906842624"],
+            ),
+        ],
+    );
+    rows(
+        "mul_middle_to_out_tiny_1",
+        "_fmpz_poly_mulmid",
+        mul_middle_to_out_tiny_1,
+        &[
+            (&["3"], &["4"]),
+            (&["1", "2", "3"], &["4", "5", "6"]),
+            (&["-7", "0", "11", "-13"], &["5", "-1"]),
+            (
+                &["536870912", "-536870912"],
+                &["536870912", "3", "-268435456"],
+            ),
+            (
+                &["1", "1", "1", "1", "1", "1", "1", "1"],
+                &["-1", "-1", "-1", "-1", "-1", "-1", "-1", "-1"],
+            ),
+            (&["3"], &["3"]),
+            (&["1", "2", "3"], &["1", "2", "3"]),
+            (&["-7", "0", "11", "-13"], &["-7", "0", "11", "-13"]),
+            (&["536870912", "-536870912"], &["536870912", "-536870912"]),
+            (
+                &["1", "1", "1", "1", "1", "1", "1", "1"],
+                &["1", "1", "1", "1", "1", "1", "1", "1"],
+            ),
+        ],
+    );
+    rows(
+        "mul_middle_to_out_tiny_2",
+        "_fmpz_poly_mulmid",
+        mul_middle_to_out_tiny_2,
+        &[
+            (&["3"], &["4"]),
+            (&["1", "2", "3"], &["4", "5", "6"]),
+            (
+                &["2305843009213693952", "-2305843009213693951"],
+                &["2305843009213693951", "1152921504606846976"],
+            ),
+            (
+                &["-1099511627776", "5", "1125899906842624"],
+                &["3", "-35184372088832", "1048576", "1"],
+            ),
+            (&["3"], &["3"]),
+            (&["1", "2", "3"], &["1", "2", "3"]),
+            (
+                &["2305843009213693952", "-2305843009213693951"],
+                &["2305843009213693952", "-2305843009213693951"],
+            ),
+            (
+                &["-1099511627776", "5", "1125899906842624"],
+                &["-1099511627776", "5", "1125899906842624"],
+            ),
+        ],
+    );
+    rows(
+        "mul_middle_to_out_classical",
+        "_fmpz_poly_mulmid_classical",
+        mul_middle_to_out_classical,
+        &[
+            (&["3"], &["4"]),
+            (&["-5"], &["7", "0", "-2"]),
+            (&["1", "2", "3"], &["-6"]),
+            (&["1", "2", "3"], &["4", "5", "6"]),
+            (&["0", "0", "1"], &["0", "1"]),
+            (
+                &["1180591620717411303424", "-3", "36893488147419103233"],
+                &["-18446744073709551616", "5"],
+            ),
+            (
+                &["100000000000000000000", "-10000000000000000000000000", "7", "0", "3"],
+                &["-1", "1267650600228229401496703205376", "11"],
+            ),
+            (
+                &["9223372036854775808", "-9223372036854775807", "17"],
+                &["-9223372036854775808", "9223372036854775807"],
+            ),
+            (&["3"], &["3"]),
+            (&["-5"], &["-5"]),
+            (&["1", "2", "3"], &["1", "2", "3"]),
+            (&["0", "0", "1"], &["0", "0", "1"]),
+            (
+                &["1180591620717411303424", "-3", "36893488147419103233"],
+                &["1180591620717411303424", "-3", "36893488147419103233"],
+            ),
+            (
+                &["100000000000000000000", "-10000000000000000000000000", "7", "0", "3"],
+                &["100000000000000000000", "-10000000000000000000000000", "7", "0", "3"],
+            ),
+            (
+                &["9223372036854775808", "-9223372036854775807", "17"],
+                &["9223372036854775808", "-9223372036854775807", "17"],
+            ),
+        ],
+    );
 }

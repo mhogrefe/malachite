@@ -9,6 +9,7 @@
 use malachite_base::num::arithmetic::traits::Sign;
 use malachite_base::num::basic::traits::NaN;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::primitive_float_gen_var_11;
 use malachite_float::Float;
 use malachite_float::test_util::common::parse_hex_string;
@@ -19,6 +20,15 @@ use std::cmp::Ordering::*;
 #[test]
 fn test_sign() {
     let test = |s, s_hex, out| {
+        oracle_row!(
+            "azurite",
+            "az_float_sign",
+            "{s_hex} is {}",
+            match out {
+                std::cmp::Ordering::Greater => "positive",
+                _ => "negative",
+            }
+        );
         let x = parse_hex_string(s_hex);
         assert_eq!(x.to_string(), s);
 

@@ -8,6 +8,7 @@
 
 use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::modular::traits::{ModIsReduced, ModPowerOf2, ModPowerOf2IsReduced};
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::unsigned_pair_gen_var_2;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -17,6 +18,12 @@ use std::str::FromStr;
 #[test]
 fn test_mod_power_of_2_is_reduced() {
     let test = |u, pow, out| {
+        oracle_row!(
+            "azurite",
+            "az_zmod_pow2_is_reduced",
+            "{u} is {}reduced mod 2^{pow}",
+            malachite_base::test_util::oracle_rows::not(out)
+        );
         assert_eq!(
             Natural::from_str(u).unwrap().mod_power_of_2_is_reduced(pow),
             out

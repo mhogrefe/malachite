@@ -11,6 +11,7 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::modular::traits::{
     ModDiv, ModPowerOf2Div, ModPowerOf2IsReduced, ModPowerOf2Mul,
 };
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::unsigned_vector_unsigned_unsigned_triple_gen_var_1;
 use malachite_base::test_util::unsigned_vector::modular::mod_power_of_2_div::*;
 use malachite_base::unsigned_vector::UnsignedVector;
@@ -19,6 +20,12 @@ use malachite_base::vector::Vector;
 #[test]
 fn test_mod_power_of_2_div() {
     let test = |s, c, pow, out: Option<&str>| {
+        oracle_row!(
+            "flint",
+            "_fmpz_mod_vec_scalar_div_fmpz_mod",
+            "{s}.mod_power_of_2_div({c}, {pow}) = {}",
+            malachite_base::test_util::oracle_rows::option(out)
+        );
         let v = UnsignedVector::<u8>::from_str(s).unwrap();
         let r = (&v).mod_power_of_2_div(c, pow);
         assert_eq!(r.as_ref().map(ToString::to_string).as_deref(), out);
@@ -40,8 +47,15 @@ fn test_mod_power_of_2_div() {
 #[test]
 fn test_mod_power_of_2_div_u64() {
     let v = UnsignedVector::<u64>::from_str("(18446744073709551615, 2, 6)").unwrap();
+    let r = (&v).mod_power_of_2_div(3, 64);
+    oracle_row!(
+        "flint",
+        "_fmpz_mod_vec_scalar_div_fmpz_mod",
+        "{v}.mod_power_of_2_div(3, 64) = {}",
+        malachite_base::test_util::oracle_rows::option(r.as_ref())
+    );
     assert_eq!(
-        v.mod_power_of_2_div(3, 64).unwrap().to_string(),
+        r.unwrap().to_string(),
         "(6148914691236517205, 6148914691236517206, 2)"
     );
 }

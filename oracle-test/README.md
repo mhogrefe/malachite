@@ -49,10 +49,10 @@ from this directory, or `cargo run --release` for both. `build.sh` runs them as 
 FLINT, the driver compiles the oracle sources in `oracle/` on demand (into `target/`); for Azurite,
 it builds `lake exe oracle` in the Azurite checkout. It then runs each registered Malachite demo in
 all three generator modes (`exhaustive`, `random`, `special_random`) at 10000 lines each, checking
-every run against the oracle, after the unit-row files described below. Any disagreement fails the
+every run against the oracle, after the unit-test rows described below. Any disagreement fails the
 run with the offending line reported.
 
-The driver first collects a backend's checks, then orders them: the unit-row files by path, and
+The driver first collects a backend's checks, then orders them: the unit-test rows by path, and
 then the demos by the path of the `demo_and_bench` file that registers each one (which mirrors the
 layout of the crate's sources), keeping the order of the tables in `src/main.rs` within a file. A
 demo name that no `demo_and_bench` file registers fails the run before anything runs. It builds
@@ -74,14 +74,34 @@ it: `MALACHITE_ORACLE_FILTER=ln_gamma cargo run --release -- azurite`.
 
 ## Unit rows
 
-Besides the generated cases, each backend checks hand-picked edge cases: the files under
-`unit/flint/<mode>/` and `unit/azurite/<mode>/` hold lines in the format the demos print, and the
-driver hands every `<mode>/<name>.txt` to the oracle's mode `<mode>` as it is, before the demos.
-Most files are the rows of one `test_*` function in Malachite's own tests, reformatted, and are
-named after it (`unit/azurite/az_nat_div_round/test_div_round.txt`); the FLINT files that were
-once constants in `src/main.rs` keep those constants' names. `cargo run --release -- units` checks
-the unit files alone, for both backends, which is the quick loop while adding rows. An input
-string in a unit file is printed bare, exactly as the demo would print it.
+Besides the generated cases, each backend checks hand-picked edge cases: the rows of Malachite's own
+unit tests. A test records its rows for an oracle by calling, typically at the start of its row
+closure,
+
+```rust
+oracle_row!(
+    "azurite",
+    "az_float_atan2",
+    "({ysh}).atan2_prec_round({xsh}, {prec}, {rm}) = ({out_hex}, {o_out:?})"
+);
+```
+
+with the backend, the oracle mode, and the row in the format that the mode reads (the format the
+demos print). See `malachite_base::test_util::oracle_rows`, which also has helpers for rows whose
+wording depends on the result, such as `3 is not even` or `x and y are incomparable`. The macro does
+nothing unless the crate is built with its `oracle` feature. Code that exists only to record rows,
+such as a loop over a table of inputs whose outputs Malachite computes, is marked
+`#[cfg(feature = "oracle")]`.
+
+The driver finds these calls in the `tests` directories of the crates, including calls in helper
+functions and `macro_rules!` test helpers, which it traces to the tests that use them. It builds
+each such crate's unit tests with `--features oracle`, runs the tests that contain the calls with
+`MALACHITE_ORACLE_DUMP` set, and hands the recorded rows, in
+`target/oracle-out/rows/<crate>/<mode>.txt`, to each mode, before the demos. These checks are
+described as `unit-test rows of <crate> (<tests>) in mode <mode>`. `cargo run --release -- units`
+checks them alone, for both backends, which is the quick loop while adding rows. Rows that an
+oracle cannot check in reasonable time are listed in `SLOW_TEST_ROWS` in `src/main.rs`; the tests
+still check them, and the run says how many it left out.
 
 ## Current oracles
 
@@ -333,8 +353,8 @@ identity `s·x + t·y = g` in Azurite arithmetic, and the pair Malachite's docum
 ## Adding an oracle
 
 1. Write a Malachite demo that prints one line per case in a stable `input = output` format,
-   and put the rows of the corresponding `test_*` function, in that format, in a file under
-   `unit/<backend>/<mode>/`.
+   and have the corresponding `test_*` function record its rows, in that format, with
+   `oracle_row!` (see "Unit rows" above).
 2. Add a mode file under `oracle/` that parses that format (one `run_*` entry point; declare it
    in `oracle/oracle.h` and add a row to the table in `oracle/main.c`),
    recomputes with FLINT, and returns 1 with a diagnostic on the first mismatch.
@@ -343,7 +363,7 @@ identity `s·x + t·y = g` in Azurite arithmetic, and the pair Malachite's docum
    Otherwise a change to the demo's output format makes every run pass without checking anything.
    The polynomial modes do this, and share `split_polynomial_scalar_line` and
    `fmpz_poly_set_str_malachite` from `oracle/util.c`.
-3. Register the demo in `src/main.rs` with `check_demo_against_flint`; the unit file needs no
+3. Register the demo in `src/main.rs` with `check_demo_against_flint`; the unit-test rows need no
    registration.
 4. Prove the harness can fail: corrupt one line of a demo's output (a
    `target/oracle-out/test-out-<worker>.txt` left by a run, or the output of the demo run by hand)
@@ -353,8 +373,7 @@ For an Azurite oracle, step 2 is a `check*` function in `Azurite/Oracle/AzNat.le
 file for another type) and a row in the `modes` table of `Azurite/Oracle/Main.lean`, written
 against the parsers in `Azurite/Oracle/Parse.lean`; the strictness rule is built into the runner,
 which errors on any unrecognized nonempty line and on an input in which nothing was checked. Step 3
-is a row in one of the `AZURITE_*_STAGES` tables, and the unit rows a file under
-`unit/azurite/<mode>/`. Azurite
-is Apache-licensed and must not derive code from
-Malachite or the LGPL libraries Malachite ports, so an oracle implements Malachite's *documented*
-behavior, never a translation of its code.
+is a row in one of the `AZURITE_*_STAGES` tables, and the unit rows are `oracle_row!` calls with
+the backend `"azurite"`. Azurite is Apache-licensed and must not derive code from Malachite or the
+LGPL libraries Malachite ports, so an oracle implements Malachite's *documented* behavior, never a
+translation of its code.

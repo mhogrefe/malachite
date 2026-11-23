@@ -10,6 +10,7 @@ use core::str::FromStr;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::modular::traits::ModMul;
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::modular::traits::{
     CheckedModDivExact, ModDivExact, ModDivExactAssign, ModDivRem, ModDivisibleBy,
@@ -88,6 +89,32 @@ fn verify_checked<T: PrimitiveUnsigned>(
 
 fn test_mod_div_exact_helper<T: PrimitiveUnsigned>() {
     let test = |p, q, m: u8, out| {
+        oracle_row!(
+            "flint",
+            "mod_div_exact",
+            "({p}).mod_div_exact({q}, {m}) = {out}"
+        );
+        oracle_row!(
+            "flint",
+            "mod_div_exact",
+            "p := {p}; p.mod_div_exact_assign({q}, {m}); p = {out}"
+        );
+        oracle_row!(
+            "flint",
+            "mod_div_exact",
+            "({p}).checked_mod_div_exact({q}, {m}) = {out}"
+        );
+        oracle_row!(
+            "flint",
+            "mod_div_exact",
+            "({p}).mod_divisible_by({q}, {m}) = {}",
+            ModDivisibleBy::mod_divisible_by(
+                UnsignedPolynomial::<T>::from_str(p).unwrap(),
+                UnsignedPolynomial::<T>::from_str(q).unwrap(),
+                T::from(m)
+            )
+        );
+
         let p = UnsignedPolynomial::<T>::from_str(p).unwrap();
         let q = UnsignedPolynomial::<T>::from_str(q).unwrap();
         assert_eq!(verify_exact(&p, &q, T::from(m)).to_string(), out);
@@ -122,6 +149,19 @@ fn test_mod_div_exact() {
 
 fn test_checked_mod_div_exact_helper<T: PrimitiveUnsigned>() {
     let test = |p, q, m: u8, out: Option<&str>| {
+        oracle_row!(
+            "flint",
+            "mod_div_exact",
+            "({p}).checked_mod_div_exact({q}, {m}) = {}",
+            out.unwrap_or("None")
+        );
+        oracle_row!(
+            "flint",
+            "mod_div_exact",
+            "({p}).mod_divisible_by({q}, {m}) = {}",
+            out.is_some()
+        );
+
         let p = UnsignedPolynomial::<T>::from_str(p).unwrap();
         let q = UnsignedPolynomial::<T>::from_str(q).unwrap();
         assert_eq!(

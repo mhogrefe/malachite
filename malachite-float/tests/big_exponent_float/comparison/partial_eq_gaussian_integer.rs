@@ -79,6 +79,73 @@ fn test_partial_eq_gaussian_integer() {
         "0x1.0E+25000000000000000000",
         "0",
     );
+    #[cfg(feature = "oracle")]
+    for x in [
+        "NaN",
+        "Infinity",
+        "-Infinity",
+        "0x0.0",
+        "0x5.0",
+        "-0x5.0",
+        "-0x4.0",
+        "0x3.0",
+        "-0x3.0",
+        "0x4.8",
+        "0x5.8",
+        "0x5.0000000000000000000010",
+        "0x4.fffffffffffffffffffff0",
+        "0x2.8",
+        "-0x2.8",
+        "0x0.8",
+        "0x1.0E+25000000000000000000",
+        "0x1.0E-25000000000000000000",
+        "-0x1.0E+25000000000000000000",
+        "-0x1.0E-25000000000000000000",
+    ] {
+        let x = parse_big_exponent_float_hex(x);
+        for y in ["3+4i", "-3-4i", "-4i", "3", "0", "i", "-3+4i", "1+i"] {
+            let y = GaussianInteger::from_str(y).unwrap();
+            malachite_base::oracle_row!(
+                "flint",
+                "arf_cmp",
+                "{x:?} {} {y}",
+                malachite_base::test_util::oracle_rows::eq_symbol(x == y)
+            );
+        }
+    }
+    #[cfg(feature = "oracle")]
+    for x in ["3+4i", "-3-4i", "-4i", "3", "0", "i", "-3+4i", "1+i"] {
+        let x = GaussianInteger::from_str(x).unwrap();
+        for y in [
+            "Infinity",
+            "-Infinity",
+            "0x0.0",
+            "0x5.0",
+            "-0x5.0",
+            "-0x4.0",
+            "0x3.0",
+            "-0x3.0",
+            "0x4.8",
+            "0x5.8",
+            "0x5.0000000000000000000010",
+            "0x4.fffffffffffffffffffff0",
+            "0x2.8",
+            "-0x2.8",
+            "0x0.8",
+            "0x1.0E+25000000000000000000",
+            "0x1.0E-25000000000000000000",
+            "-0x1.0E+25000000000000000000",
+            "-0x1.0E-25000000000000000000",
+        ] {
+            let y = parse_big_exponent_float_hex(y);
+            malachite_base::oracle_row!(
+                "flint",
+                "arf_cmp",
+                "{x} {} {y:?}",
+                malachite_base::test_util::oracle_rows::eq_symbol(x == y)
+            );
+        }
+    }
 }
 
 #[test]

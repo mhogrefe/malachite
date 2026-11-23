@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::IsPowerOf2;
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::{signed_gen, unsigned_gen};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
@@ -17,6 +18,12 @@ use std::str::FromStr;
 #[test]
 fn test_is_power_of_2() {
     let test = |n, out| {
+        oracle_row!(
+            "azurite",
+            "az_int_is_power_of_2",
+            "{n} is {}a power of 2",
+            malachite_base::test_util::oracle_rows::not(out)
+        );
         assert_eq!(Integer::from_str(n).unwrap().is_power_of_2(), out);
         assert_eq!(rug::Integer::from_str(n).unwrap().is_power_of_two(), out);
     };

@@ -11,6 +11,7 @@ use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeOne, One, OneHalf, Zero,
 };
 use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs, PartialOrdAbsDouble};
+use malachite_base::oracle_row;
 use malachite_float::BigExponentFloat;
 use malachite_float::big_exponent_float::{
     ComparableBigExponentFloat, ComparableBigExponentFloatRef,
@@ -62,6 +63,20 @@ fn test_partial_cmp_abs() {
     for x in &xs {
         for y in &xs {
             let out = abs(x).partial_cmp(&abs(y));
+            oracle_row!(
+                "flint",
+                "arf_cmp",
+                "|{x:?}| {} |{y:?}|",
+                malachite_base::test_util::oracle_rows::partial_cmp_symbol(out)
+            );
+            oracle_row!(
+                "flint",
+                "arf_cmp_total",
+                "|{x:?}| {} |{y:?}|",
+                malachite_base::test_util::oracle_rows::cmp_symbol(
+                    ComparableBigExponentFloatRef(x).cmp_abs(&ComparableBigExponentFloatRef(y))
+                )
+            );
             assert_eq!(x.partial_cmp_abs(y), out);
             assert_eq!(
                 ComparableBigExponentFloatRef(x).cmp_abs(&ComparableBigExponentFloatRef(y)),
@@ -70,12 +85,30 @@ fn test_partial_cmp_abs() {
         }
         assert_eq!(x.partial_cmp_abs(&BigExponentFloat::NAN), None);
         // - NaN is below everything in absolute value
+        oracle_row!(
+            "flint",
+            "arf_cmp_total",
+            "|NaN| {} |{x:?}|",
+            malachite_base::test_util::oracle_rows::cmp_symbol(
+                ComparableBigExponentFloat(BigExponentFloat::NAN)
+                    .cmp_abs(&ComparableBigExponentFloat(x.clone()))
+            )
+        );
         assert_eq!(
             ComparableBigExponentFloat(BigExponentFloat::NAN)
                 .cmp_abs(&ComparableBigExponentFloat(x.clone())),
             Less
         );
     }
+    oracle_row!(
+        "flint",
+        "arf_cmp_total",
+        "|NaN| {} |NaN|",
+        malachite_base::test_util::oracle_rows::cmp_symbol(
+            ComparableBigExponentFloat(BigExponentFloat::NAN)
+                .cmp_abs(&ComparableBigExponentFloat(BigExponentFloat::NAN))
+        )
+    );
 }
 
 #[test]

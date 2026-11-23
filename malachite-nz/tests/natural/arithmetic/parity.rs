@@ -9,6 +9,7 @@
 use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::basic::traits::{One, Two};
 use malachite_base::num::modular::traits::{DivisibleBy, DivisibleByPowerOf2};
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::unsigned_gen;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -18,6 +19,12 @@ use std::str::FromStr;
 #[test]
 fn test_even() {
     let test = |n, out| {
+        oracle_row!(
+            "azurite",
+            "az_nat_parity",
+            "{n} is {}even",
+            malachite_base::test_util::oracle_rows::not(out)
+        );
         assert_eq!(Natural::from_str(n).unwrap().even(), out);
     };
     test("0", true);
@@ -32,6 +39,12 @@ fn test_even() {
 #[test]
 fn test_odd() {
     let test = |n, out| {
+        oracle_row!(
+            "azurite",
+            "az_nat_parity",
+            "{n} is {}odd",
+            malachite_base::test_util::oracle_rows::not(out)
+        );
         assert_eq!(Natural::from_str(n).unwrap().odd(), out);
     };
     test("0", false);

@@ -15,6 +15,7 @@ use malachite_base::num::exponential::traits::{
 };
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::num::modular::traits::DivisibleBy;
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
     unsigned_gen_var_11, unsigned_pair_gen_var_21, unsigned_vec_unsigned_pair_gen_var_13,
@@ -137,6 +138,12 @@ fn limbs_checked_log_base_power_of_2_fail() {
 #[test]
 fn test_floor_log_base_power_of_2() {
     let test = |n, pow, out| {
+        oracle_row!(
+            "azurite",
+            "az_nat_log_base_power_of_2",
+            "floor_log_base_power_of_2({n}, {pow}) = {out}"
+        );
+
         assert_eq!(
             Natural::from_str(n).unwrap().floor_log_base_power_of_2(pow),
             out
@@ -182,6 +189,12 @@ fn floor_log_base_power_of_2_fail_2() {
 #[test]
 fn test_ceiling_log_base_power_of_2() {
     let test = |n, pow, out| {
+        oracle_row!(
+            "azurite",
+            "az_nat_log_base_power_of_2",
+            "ceiling_log_base_power_of_2({n}, {pow}) = {out}"
+        );
+
         assert_eq!(
             Natural::from_str(n)
                 .unwrap()
@@ -229,6 +242,12 @@ fn ceiling_log_base_power_of_2_fail_2() {
 #[test]
 fn test_checked_log_base_power_of_2() {
     let test = |n, pow, out| {
+        oracle_row!(
+            "azurite",
+            "az_nat_log_base_power_of_2",
+            "checked_log_base_power_of_2({n}, {pow}) = {}",
+            malachite_base::test_util::oracle_rows::option(out)
+        );
         assert_eq!(
             Natural::from_str(n)
                 .unwrap()

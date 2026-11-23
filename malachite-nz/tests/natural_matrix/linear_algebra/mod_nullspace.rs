@@ -11,6 +11,7 @@ use malachite_base::matrix::Matrix;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::linear_algebra::traits::{ModLeftNullspace, ModNullspace, ModRank};
 use malachite_base::num::modular::traits::ModMul;
+use malachite_base::oracle_row;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural_matrix::NaturalMatrix;
 use malachite_nz::test_util::generators::natural_matrix_natural_pair_gen_var_5;
@@ -53,6 +54,11 @@ fn verify_left_nullspace(a: &NaturalMatrix, m: &Natural) -> NaturalMatrix {
 }
 
 fn test(a: &str, m: &str, out: &str, out_left: &str) {
+    oracle_row!(
+        "flint",
+        "fmpz_mod_mat_nullspace",
+        "{a}.mod_nullspace({m}) = {out}"
+    );
     let a = NaturalMatrix::from_str(a).unwrap();
     let m = Natural::from_str(m).unwrap();
     assert_eq!(verify_nullspace(&a, &m).to_string(), out);

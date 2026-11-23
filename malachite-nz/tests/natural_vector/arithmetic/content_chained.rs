@@ -11,6 +11,7 @@ use malachite_base::num::arithmetic::traits::{Content, ContentChained};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::modular::traits::DivisibleBy;
 use malachite_base::num::number_theory::traits::Gcd;
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::unsigned_vec_unsigned_pair_gen;
 use malachite_base::unsigned_vector::UnsignedVector;
 use malachite_base::vector::Vector;
@@ -25,6 +26,12 @@ use malachite_nz::test_util::generators::{
 #[test]
 fn test_content_chained() {
     let test = |s, x, out| {
+        oracle_row!(
+            "flint",
+            "_fmpz_vec_content_chained",
+            "{s}.content_chained({x}) = {out}"
+        );
+
         let v = NaturalVector::from_str(s).unwrap();
         let x = Natural::from_str(x).unwrap();
         let g = (&v).content_chained(&x);

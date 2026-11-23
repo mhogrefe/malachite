@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::oracle_row;
 use malachite_nz::mag::Mag;
 use malachite_nz::test_util::generators::{mag_gen, mag_pair_gen, mag_triple_gen};
 use malachite_nz::test_util::mag::{cmp_scaled, mag_to_scaled_natural};
@@ -15,6 +16,9 @@ use std::str::FromStr;
 #[test]
 fn test_cmp() {
     let test = |s, t, out: Ordering| {
+        oracle_row!("flint", "mag_cmp", "({s}).cmp(&{t}) = {out:?}");
+        oracle_row!("flint", "mag_cmp", "({t}).cmp(&{s}) = {:?}", out.reverse());
+
         let x = Mag::from_str(s).unwrap();
         let y = Mag::from_str(t).unwrap();
         assert_eq!(x.cmp(&y), out);

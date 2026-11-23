@@ -9,6 +9,8 @@
 use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::modular::traits::Mod;
+#[cfg(not(feature = "32_bit_limbs"))]
+use malachite_base::oracle_row;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::mul::schonhage_strassen::mulmod_2expp1_basecase::*;
 use malachite_nz::platform::Limb;
@@ -18,6 +20,12 @@ use malachite_nz::test_util::generators::large_type_gen_var_48;
 #[test]
 fn test_limbs_mul_mod_2expp1_basecase() {
     let test = |xs: &[Limb], ys: Option<&[Limb]>, c: Limb, b: u64, carry: Limb, out: &[Limb]| {
+        oracle_row!(
+            "flint",
+            "flint_mpn_mulmod_2expp1_basecase",
+            "limbs_mul_mod_2expp1_basecase({xs:?}, {ys:?}, {c}, {b}, _) = ({carry}, {out:?})"
+        );
+
         let mut xs = xs.to_vec();
         let mut tp = vec![0; limbs_mul_mod_2expp1_basecase_scratch_len(xs.len())];
         assert_eq!(

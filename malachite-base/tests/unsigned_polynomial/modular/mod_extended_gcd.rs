@@ -89,6 +89,26 @@ fn verify<T: PrimitiveUnsigned>(
 
 fn test_mod_extended_gcd_helper<T: PrimitiveUnsigned>() {
     let test = |p, q, m: u8, out: Option<(&str, &str, &str)>| {
+        #[cfg(feature = "oracle")]
+        {
+            let out_string = out.map_or_else(
+                || "None".to_string(),
+                |(g, s, t)| format!("({g}, {s}, {t})"),
+            );
+            malachite_base::oracle_row!(
+                "flint",
+                "mod_gcd",
+                "({p}).checked_mod_extended_gcd({q}, {m}) = {out_string}"
+            );
+            if out.is_some() && u64::from(m).is_prime() {
+                malachite_base::oracle_row!(
+                    "flint",
+                    "mod_gcd",
+                    "({p}).mod_extended_gcd({q}, {m}) = {out_string}"
+                );
+            }
+        }
+
         let p = UnsignedPolynomial::<T>::from_str(p).unwrap();
         let q = UnsignedPolynomial::<T>::from_str(q).unwrap();
         let prime = u64::from(m).is_prime();

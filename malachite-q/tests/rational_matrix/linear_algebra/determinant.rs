@@ -10,6 +10,7 @@ use core::str::FromStr;
 use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::{Inverse, Reciprocal};
 use malachite_base::num::linear_algebra::traits::Determinant;
+use malachite_base::oracle_row;
 use malachite_q::Rational;
 use malachite_q::rational_matrix::RationalMatrix;
 use malachite_q::test_util::generators::{
@@ -37,6 +38,8 @@ fn verify_determinant(a: &RationalMatrix) -> Rational {
 #[test]
 fn test_determinant() {
     let test = |s, out| {
+        oracle_row!("flint", "fmpq_mat_det", "determinant({s}) = {out}");
+
         let a = RationalMatrix::from_str(s).unwrap();
         assert_eq!(verify_determinant(&a).to_string(), out);
     };

@@ -11,6 +11,7 @@ use malachite_base::matrix::Matrix;
 use malachite_base::num::linear_algebra::traits::{
     Determinant, HermiteNormalForm, HermiteNormalFormAndTransform,
 };
+use malachite_base::oracle_row;
 use malachite_nz::integer_matrix::IntegerMatrix;
 use malachite_nz::integer_matrix::linear_algebra::hermite_normal_form_and_transform::*;
 use malachite_nz::test_util::generators::common::has_full_column_rank;
@@ -53,6 +54,12 @@ fn verify_transform(a: &IntegerMatrix) -> String {
 #[test]
 fn test_hermite_normal_form_and_transform() {
     let test = |s, out| {
+        oracle_row!(
+            "flint",
+            "fmpz_mat_hnf_transform",
+            "hermite_normal_form_and_transform({s}) = {out}"
+        );
+
         let a = IntegerMatrix::from_str(s).unwrap();
         assert_eq!(verify_transform(&a), out);
     };

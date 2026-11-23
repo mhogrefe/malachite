@@ -11,6 +11,7 @@ use malachite_base::matrix::Matrix;
 use malachite_base::num::linear_algebra::traits::{
     Determinant, SmithNormalForm, SmithNormalFormAndTransforms,
 };
+use malachite_base::oracle_row;
 use malachite_nz::integer_matrix::IntegerMatrix;
 use malachite_nz::test_util::generators::{
     integer_matrix_gen, integer_matrix_gen_var_3, integer_matrix_pair_gen_var_4,
@@ -42,6 +43,12 @@ fn verify_transforms(a: &IntegerMatrix) -> String {
 #[test]
 fn test_smith_normal_form_and_transforms() {
     let test = |s, out| {
+        oracle_row!(
+            "flint",
+            "fmpz_mat_snf_transform",
+            "smith_normal_form_and_transforms({s}) = {out}"
+        );
+
         let a = IntegerMatrix::from_str(s).unwrap();
         assert_eq!(verify_transforms(&a), out);
     };

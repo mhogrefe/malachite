@@ -8,6 +8,7 @@
 
 use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::unsigned_vec_gen_var_2;
 use malachite_nz::natural::Natural;
@@ -45,6 +46,11 @@ fn limbs_trailing_zeros_fail_2() {
 #[test]
 fn test_trailing_zeros() {
     let test = |s, out| {
+        oracle_row!(
+            "azurite",
+            "az_nat_trailing_zeros",
+            "trailing_zeros({s}) = {out:?}"
+        );
         let u = Natural::from_str(s).unwrap();
 
         assert_eq!(u.trailing_zeros(), out);

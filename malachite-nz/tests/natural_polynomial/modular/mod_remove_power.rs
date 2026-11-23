@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::modular::traits::{ModMul, ModPow};
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::modular::traits::{
     ModDivisibleBy, ModRemovePower, ModRemovePowerAssign,
@@ -43,6 +44,17 @@ fn verify(p: &NaturalPolynomial, q: &NaturalPolynomial, m: &Natural) -> (Natural
 #[test]
 fn test_mod_remove_power() {
     let test = |p, q, m: &str, out: &str, out_e| {
+        oracle_row!(
+            "flint",
+            "mod_remove_power",
+            "({p}).mod_remove_power({q}, {m}) = ({out}, {out_e})"
+        );
+        oracle_row!(
+            "flint",
+            "mod_remove_power",
+            "p := {p}; p.mod_remove_power_assign({q}, {m}) = {out_e}; p = {out}"
+        );
+
         let p = NaturalPolynomial::from_str(p).unwrap();
         let q = NaturalPolynomial::from_str(q).unwrap();
         let m = Natural::from_str(m).unwrap();
@@ -80,6 +92,41 @@ fn test_mod_remove_power() {
     );
     // - a modulus of one limb
     test("x^4+4*x^2+3", "x+3", "6", "x^2+1", 2);
+}
+
+#[cfg(feature = "oracle")]
+#[test]
+fn oracle_rows_mod_remove_power() {
+    for (m, non_monic) in [
+        ("6", None),
+        ("7", Some("3*x^2+2*x+5")),
+        ("251", Some("45*x^2+30*x+5")),
+        (
+            "1361129467683753853853498429727072845827",
+            Some("45*x^2+30*x+5"),
+        ),
+    ] {
+        let m = Natural::from_str(m).unwrap();
+        let mut cases = vec![("x^2+2", "x+1"), ("x^3+4*x^2+5*x+2", "x+1"), ("0", "x+1")];
+        if let Some(p) = non_monic {
+            cases.push((p, "3*x+1"));
+        }
+        for (p, q) in cases {
+            let p = NaturalPolynomial::from_str(p).unwrap();
+            let q = NaturalPolynomial::from_str(q).unwrap();
+            let (s, e) = (&p).mod_remove_power(&q, &m);
+            oracle_row!(
+                "flint",
+                "mod_remove_power",
+                "({p}).mod_remove_power({q}, {m}) = ({s}, {e})"
+            );
+            oracle_row!(
+                "flint",
+                "mod_remove_power",
+                "p := {p}; p.mod_remove_power_assign({q}, {m}) = {e}; p = {s}"
+            );
+        }
+    }
 }
 
 #[test]

@@ -8,6 +8,7 @@
 
 use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::logic::traits::TrailingZeros;
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::signed_gen_var_6;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
@@ -18,6 +19,11 @@ use std::str::FromStr;
 #[test]
 fn test_trailing_zeros() {
     let test = |s, out| {
+        oracle_row!(
+            "azurite",
+            "az_int_trailing_zeros",
+            "trailing_zeros({s}) = {out:?}"
+        );
         let n = Integer::from_str(s).unwrap();
         assert_eq!(n.trailing_zeros(), out);
         assert_eq!(integer_trailing_zeros_alt(&n), out);

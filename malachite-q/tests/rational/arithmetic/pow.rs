@@ -11,6 +11,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::traits::{NegativeOne, One, Two, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::{signed_gen_var_5, unsigned_gen_var_5};
 use malachite_nz::test_util::generators::integer_unsigned_pair_gen_var_2;
 use malachite_q::Rational;
@@ -28,6 +29,7 @@ use std::str::FromStr;
 #[test]
 fn test_pow() {
     let test = |s, exp: u64, out| {
+        oracle_row!("azurite", "az_rat_pow", "({s}).pow({exp}) = {out}");
         let u = Rational::from_str(s).unwrap();
 
         let mut x = u.clone();
@@ -99,6 +101,7 @@ fn test_pow() {
     test("-22/7", 3, "-10648/343");
 
     let test = |s, exp: i64, out| {
+        oracle_row!("azurite", "az_rat_pow", "({s}).pow({exp}) = {out}");
         let u = Rational::from_str(s).unwrap();
 
         let mut x = u.clone();

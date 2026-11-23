@@ -11,6 +11,7 @@ use malachite_base::num::arithmetic::traits::{Pow, Reciprocal};
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::num::conversion::traits::IsInteger;
 use malachite_base::num::modular::traits::DivisibleBy;
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::arithmetic::traits::Evaluate;
 use malachite_nz::integer::Integer;
@@ -30,6 +31,22 @@ use malachite_q::test_util::rational_polynomial::arithmetic::evaluate::*;
 #[test]
 fn test_evaluate_integer_polynomial_rational() {
     let test = |s, x, out| {
+        oracle_row!(
+            "flint",
+            "fmpz_poly_evaluate_divconquer_fmpq",
+            "(&({s})).evaluate_divide_and_conquer({x}) = {out}"
+        );
+        oracle_row!(
+            "flint",
+            "fmpz_poly_evaluate_fmpq",
+            "(&({s})).evaluate({x}) = {out}"
+        );
+        oracle_row!(
+            "flint",
+            "fmpz_poly_evaluate_horner_fmpq",
+            "(&({s})).evaluate_horner({x}) = {out}"
+        );
+
         let p = IntegerPolynomial::from_str(s).unwrap();
         let x = Rational::from_str(x).unwrap();
         let y = (&p).evaluate(&x);
@@ -250,6 +267,12 @@ fn evaluate_integer_polynomial_rational_properties() {
 #[test]
 fn test_evaluate_rational_polynomial() {
     let test = |s, x, out| {
+        oracle_row!(
+            "flint",
+            "fmpq_poly_evaluate_fmpq",
+            "(&({s})).evaluate({x}) = {out}"
+        );
+
         let p = RationalPolynomial::from_str(s).unwrap();
         let x = Rational::from_str(x).unwrap();
         let y = (&p).evaluate(&x);
@@ -328,6 +351,12 @@ fn evaluate_rational_polynomial_properties() {
 #[test]
 fn test_evaluate_rational_polynomial_integer() {
     let test = |s, x, out| {
+        oracle_row!(
+            "flint",
+            "fmpq_poly_evaluate_fmpz",
+            "(&({s})).evaluate({x}) = {out}"
+        );
+
         let p = RationalPolynomial::from_str(s).unwrap();
         let x = Integer::from_str(x).unwrap();
         let y = (&p).evaluate(&x);

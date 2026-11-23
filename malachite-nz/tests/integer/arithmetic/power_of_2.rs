@@ -10,6 +10,7 @@ use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, LowMask};
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::{unsigned_gen_var_5, unsigned_gen_var_16};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
@@ -17,7 +18,10 @@ use malachite_nz::platform::SignedLimb;
 
 #[test]
 fn test_power_of_2() {
-    let test = |pow, out| assert_eq!(Integer::power_of_2(pow).to_string(), out);
+    let test = |pow: u64, out| {
+        oracle_row!("azurite", "az_int_power_of_2", "2^{pow} = {out}");
+        assert_eq!(Integer::power_of_2(pow).to_string(), out);
+    };
     test(0, "1");
     test(1, "2");
     test(2, "4");

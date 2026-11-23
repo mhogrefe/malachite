@@ -8,6 +8,7 @@
 
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::{signed_pair_gen, unsigned_pair_gen_var_27};
 use malachite_nz::integer::Integer;
 use malachite_nz::test_util::generators::{integer_signed_pair_gen, integer_unsigned_pair_gen};
@@ -19,6 +20,12 @@ use std::str::FromStr;
 #[test]
 fn test_partial_eq_u32() {
     let test = |s, v: u32, out| {
+        oracle_row!(
+            "azurite",
+            "az_int_eq_unsigned",
+            "{s} {} {v}",
+            malachite_base::test_util::oracle_rows::eq_symbol(out)
+        );
         let u = Integer::from_str(s).unwrap();
 
         assert_eq!(u == v, out);
@@ -44,6 +51,12 @@ fn test_partial_eq_u32() {
 #[test]
 fn test_partial_eq_u64() {
     let test = |s, v: u64, out| {
+        oracle_row!(
+            "azurite",
+            "az_int_eq_unsigned",
+            "{s} {} {v}",
+            malachite_base::test_util::oracle_rows::eq_symbol(out)
+        );
         let u = Integer::from_str(s).unwrap();
 
         assert_eq!(u == v, out);
@@ -73,6 +86,12 @@ fn test_partial_eq_u64() {
 #[test]
 fn test_partial_eq_i32() {
     let test = |s, v: i32, out| {
+        oracle_row!(
+            "azurite",
+            "az_int_eq_signed",
+            "{s} {} {v}",
+            malachite_base::test_util::oracle_rows::eq_symbol(out)
+        );
         let u = Integer::from_str(s).unwrap();
 
         assert_eq!(u == v, out);
@@ -95,6 +114,12 @@ fn test_partial_eq_i32() {
 #[test]
 fn test_partial_eq_i64() {
     let test = |s, v: i64, out| {
+        oracle_row!(
+            "azurite",
+            "az_int_eq_signed",
+            "{s} {} {v}",
+            malachite_base::test_util::oracle_rows::eq_symbol(out)
+        );
         let u = Integer::from_str(s).unwrap();
 
         assert_eq!(u == v, out);

@@ -12,6 +12,7 @@ use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
+use malachite_base::oracle_row;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_float::float::conversion::from_rational::{
     from_rational_prec_round_direct, from_rational_prec_round_ref_direct,
@@ -44,6 +45,12 @@ fn test_from_rational_prec() {
     }
 
     let test = |s, prec, out, out_hex, out_o| {
+        oracle_row!(
+            "azurite",
+            "az_float_from_rational",
+            "Float::from_rational_prec({s}, {prec}) = ({out_hex}, {out_o:?})"
+        );
+
         let u = Rational::from_str(s).unwrap();
 
         let (x, o) = Float::from_rational_prec(u.clone(), prec);
@@ -623,6 +630,12 @@ fn from_rational_prec_ref_fail() {
 #[test]
 fn test_from_rational_prec_round() {
     let test = |s, prec, rm, out, out_hex, out_o| {
+        oracle_row!(
+            "azurite",
+            "az_float_from_rational",
+            "Float::from_rational_prec_round({s}, {prec}, {rm}) = ({out_hex}, {out_o:?})"
+        );
+
         let u = Rational::from_str(s).unwrap();
 
         let (x, o) = Float::from_rational_prec_round(u.clone(), prec, rm);

@@ -12,6 +12,7 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::modular::traits::{DivisibleBy, ModPowerOf2};
 use malachite_base::num::number_theory::traits::{CoprimeWith, Gcd, GcdAssign, Lcm};
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::common::{GenConfig, TINY_LIMIT};
 use malachite_base::test_util::generators::{
     unsigned_gen_var_11, unsigned_pair_gen_var_27, unsigned_quadruple_gen_var_11,
@@ -12838,6 +12839,8 @@ fn test_limbs_gcd_reduced() {
 #[test]
 fn test_gcd() {
     let test = |s, t, out| {
+        oracle_row!("azurite", "az_nat_gcd", "{s}.gcd({t}) = {out}");
+
         let u = Natural::from_str(s).unwrap();
         let v = Natural::from_str(t).unwrap();
 

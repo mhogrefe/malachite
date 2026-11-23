@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::oracle_row;
 use malachite_base::polynomial::mod_polynomial::traits::*;
 use malachite_base::polynomial::modular::traits::ModPowerOf2DivRemPrecomputed;
 use malachite_base::polynomial::mod_polynomial::traits::ModPowerOf2ComposeModPolynomial;
@@ -19,6 +20,12 @@ use std::str::FromStr;
 #[test]
 fn test_mod_power_of_2_compose_mod_polynomial() {
     fn test<T: PrimitiveUnsigned>(f: &str, g: &str, h: &str, pow: u64, out: &str) {
+        oracle_row!(
+            "flint",
+            "mod_power_of_2_compose_mod_polynomial",
+            "({f}).mod_power_of_2_compose_mod_polynomial({g}, {h}, {pow}) = {out}"
+        );
+
         let f = UnsignedPolynomial::<T>::from_str(f).unwrap();
         let g = UnsignedPolynomial::<T>::from_str(g).unwrap();
         let h = UnsignedPolynomial::<T>::from_str(h).unwrap();
@@ -78,6 +85,32 @@ fn test_mod_power_of_2_compose_mod_polynomial() {
         "x^8+6*x^7+2*x^6+9*x^5+5*x^4+x^3+4*x^2+x+3",
         8,
         "246*x^7+189*x^6+18*x^5+97*x^4+10*x^3+239*x^2+84*x+233",
+    );
+}
+
+#[cfg(feature = "oracle")]
+#[test]
+fn oracle_rows_mod_power_of_2_compose_mod_polynomial() {
+    let pow = 8;
+    let f = UnsignedPolynomial::<u16>::from_str("3*x^2+2*x+1").unwrap();
+    let g = UnsignedPolynomial::<u16>::from_str("x+1").unwrap();
+    let h = UnsignedPolynomial::<u16>::from_str("x^3+2*x^2+1").unwrap();
+    let r = (&f).mod_power_of_2_compose_mod_polynomial(&g, &h, pow);
+    malachite_base::oracle_row!(
+        "flint",
+        "mod_power_of_2_compose_mod_polynomial",
+        "({f}).mod_power_of_2_compose_mod_polynomial({g}, {h}, {pow}) = {r}"
+    );
+    let f = UnsignedPolynomial::<u16>::from_str("5*x^4+4*x^3+3*x^2+2*x+1").unwrap();
+    let powers = UnsignedPolynomial::precompute_mod_power_of_2_compose_mod_polynomial_powers_data(
+        &g, &h, &pow,
+    );
+    let r = (&f).mod_power_of_2_compose_mod_polynomial_precomputed_powers(&h, pow, &powers);
+    malachite_base::oracle_row!(
+        "flint",
+        "mod_power_of_2_compose_mod_polynomial",
+        "({f}).mod_power_of_2_compose_mod_polynomial_precomputed_powers({h}, {pow}, &data) = \
+        {r}, where data is from g = {g}"
     );
 }
 

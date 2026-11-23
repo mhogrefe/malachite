@@ -55,6 +55,35 @@ fn verify(p: &IntegerPolynomial, q: &IntegerPolynomial) -> Option<IntegerPolynom
 #[test]
 fn test_div_exact_by_polynomial() {
     let test = |p, q, out: Option<&str>| {
+        #[cfg(feature = "oracle")]
+        {
+            let divisible = IntegerPolynomial::from_str(p)
+                .unwrap()
+                .divisible_by(IntegerPolynomial::from_str(q).unwrap());
+            if let Some(out) = out {
+                malachite_base::oracle_row!(
+                    "flint",
+                    "fmpz_poly_divexact",
+                    "({p}).div_exact({q}) = {out}"
+                );
+                malachite_base::oracle_row!(
+                    "flint",
+                    "fmpz_poly_divexact",
+                    "p := {p}; p.div_exact_assign({q}); p = {out}"
+                );
+            }
+            malachite_base::oracle_row!(
+                "flint",
+                "fmpz_poly_divexact",
+                "({p}).checked_div_exact({q}) = {}",
+                out.unwrap_or("None")
+            );
+            malachite_base::oracle_row!(
+                "flint",
+                "fmpz_poly_divexact",
+                "({p}).divisible_by({q}) = {divisible}"
+            );
+        }
         let p = IntegerPolynomial::from_str(p).unwrap();
         let q = IntegerPolynomial::from_str(q).unwrap();
         assert_eq!(

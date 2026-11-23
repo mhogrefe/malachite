@@ -8,6 +8,7 @@
 
 use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, NegativeZero, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::primitive_float_gen;
 use malachite_float::test_util::common::{parse_hex_string, to_hex_string};
 use malachite_float::test_util::generators::{float_gen, float_gen_var_12};
@@ -17,6 +18,12 @@ use std::num::FpCategory;
 #[test]
 fn test_is_nan() {
     let test = |s, s_hex, out| {
+        oracle_row!(
+            "azurite",
+            "az_float_is_nan",
+            "{s_hex} is {}NaN",
+            malachite_base::test_util::oracle_rows::not(out)
+        );
         let x = parse_hex_string(s_hex);
         assert_eq!(x.to_string(), s);
 
@@ -78,6 +85,12 @@ fn is_nan_properties() {
 #[test]
 fn test_is_finite() {
     let test = |s, s_hex, out| {
+        oracle_row!(
+            "azurite",
+            "az_float_is_finite",
+            "{s_hex} is {}finite",
+            malachite_base::test_util::oracle_rows::not(out)
+        );
         let x = parse_hex_string(s_hex);
         assert_eq!(x.to_string(), s);
 
@@ -138,6 +151,12 @@ fn is_finite_properties() {
 #[test]
 fn test_is_infinite() {
     let test = |s, s_hex, out| {
+        oracle_row!(
+            "azurite",
+            "az_float_is_infinite",
+            "{s_hex} is {}infinite",
+            malachite_base::test_util::oracle_rows::not(out)
+        );
         let x = parse_hex_string(s_hex);
         assert_eq!(x.to_string(), s);
 
@@ -329,6 +348,12 @@ fn is_negative_zero_properties() {
 #[test]
 fn test_is_zero() {
     let test = |s, s_hex, out| {
+        oracle_row!(
+            "azurite",
+            "az_float_is_zero",
+            "{s_hex} is {}zero",
+            malachite_base::test_util::oracle_rows::not(out)
+        );
         let x = parse_hex_string(s_hex);
         assert_eq!(x.to_string(), s);
 
@@ -386,6 +411,12 @@ fn is_zero_properties() {
 #[test]
 fn test_is_normal() {
     let test = |s, s_hex, out| {
+        oracle_row!(
+            "azurite",
+            "az_float_is_normal",
+            "{s_hex} is {}normal",
+            malachite_base::test_util::oracle_rows::not(out)
+        );
         let x = parse_hex_string(s_hex);
         assert_eq!(x.to_string(), s);
 

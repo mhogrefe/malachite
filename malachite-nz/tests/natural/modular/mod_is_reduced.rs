@@ -8,6 +8,7 @@
 
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::modular::traits::ModIsReduced;
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::unsigned_pair_gen_var_12;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -17,6 +18,12 @@ use std::str::FromStr;
 #[test]
 fn test_mod_is_reduced() {
     let test = |u, v, out| {
+        oracle_row!(
+            "azurite",
+            "az_zmod_is_reduced",
+            "{u} is {}reduced mod {v}",
+            malachite_base::test_util::oracle_rows::not(out)
+        );
         assert_eq!(
             Natural::from_str(u)
                 .unwrap()

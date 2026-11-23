@@ -10,6 +10,7 @@ use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::Square;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::logic::traits::LowMask;
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::arithmetic::traits::{BitPack, Evaluate};
 use malachite_base::test_util::generators::common::GenConfig;
@@ -49,6 +50,11 @@ fn test_mul_to_out_classical() {
         let ys = parse(ys);
         let mut result = vec![Integer::ZERO; xs.len() + ys.len() - 1];
         mul_to_out_classical(&mut result, &xs, &ys);
+        oracle_row!(
+            "flint",
+            "_fmpz_poly_mul_classical",
+            "mul_to_out_classical(_, {xs:?}, {ys:?}) = {result:?}"
+        );
         assert!(result.iter().all(Integer::is_valid));
         assert_eq!(result, parse(out));
         assert_eq!(integers_mul_naive(&xs, &ys), result);
@@ -58,6 +64,11 @@ fn test_mul_to_out_classical() {
         let xs = parse(xs);
         let mut result = vec![Integer::ZERO; (xs.len() << 1) - 1];
         mul_to_out_classical(&mut result, &xs, &xs);
+        oracle_row!(
+            "flint",
+            "_fmpz_poly_mul_classical",
+            "mul_to_out_classical(_, {xs:?}, {xs:?}) = {result:?}"
+        );
         assert!(result.iter().all(Integer::is_valid));
         assert_eq!(result, parse(out));
         assert_eq!(integers_mul_naive(&xs, &xs), result);
@@ -124,6 +135,11 @@ fn test_mul_to_out_tiny_1() {
         let ys = parse(ys);
         let mut result = vec![Integer::ZERO; xs.len() + ys.len() - 1];
         mul_to_out_tiny_1(&mut result, &xs, &ys);
+        oracle_row!(
+            "flint",
+            "_fmpz_poly_mul",
+            "mul_to_out_tiny_1(_, {xs:?}, {ys:?}) = {result:?}"
+        );
         assert!(result.iter().all(Integer::is_valid));
         assert_eq!(result, parse(out));
         assert_eq!(integers_mul_naive(&xs, &ys), result);
@@ -133,6 +149,11 @@ fn test_mul_to_out_tiny_1() {
         let xs = parse(xs);
         let mut result = vec![Integer::ZERO; (xs.len() << 1) - 1];
         mul_to_out_tiny_1(&mut result, &xs, &xs);
+        oracle_row!(
+            "flint",
+            "_fmpz_poly_mul",
+            "mul_to_out_tiny_1(_, {xs:?}, {xs:?}) = {result:?}"
+        );
         assert!(result.iter().all(Integer::is_valid));
         assert_eq!(result, parse(out));
         assert_eq!(integers_mul_naive(&xs, &xs), result);
@@ -178,6 +199,11 @@ fn test_mul_to_out_tiny_2() {
         let ys = parse(ys);
         let mut result = vec![Integer::ZERO; xs.len() + ys.len() - 1];
         mul_to_out_tiny_2(&mut result, &xs, &ys);
+        oracle_row!(
+            "flint",
+            "_fmpz_poly_mul",
+            "mul_to_out_tiny_2(_, {xs:?}, {ys:?}) = {result:?}"
+        );
         assert!(result.iter().all(Integer::is_valid));
         assert_eq!(result, parse(out));
         assert_eq!(integers_mul_naive(&xs, &ys), result);
@@ -187,6 +213,11 @@ fn test_mul_to_out_tiny_2() {
         let xs = parse(xs);
         let mut result = vec![Integer::ZERO; (xs.len() << 1) - 1];
         mul_to_out_tiny_2(&mut result, &xs, &xs);
+        oracle_row!(
+            "flint",
+            "_fmpz_poly_mul",
+            "mul_to_out_tiny_2(_, {xs:?}, {xs:?}) = {result:?}"
+        );
         assert!(result.iter().all(Integer::is_valid));
         assert_eq!(result, parse(out));
         assert_eq!(integers_mul_naive(&xs, &xs), result);
@@ -276,6 +307,11 @@ fn test_mul_greater_to_out() {
         let ys = parse(ys);
         let mut result = vec![Integer::ZERO; xs.len() + ys.len() - 1];
         mul_greater_to_out(&mut result, &xs, &ys);
+        oracle_row!(
+            "flint",
+            "_fmpz_poly_mul",
+            "mul_greater_to_out(_, {xs:?}, {ys:?}) = {result:?}"
+        );
         assert!(result.iter().all(Integer::is_valid));
         assert_eq!(result, parse(out));
         assert_eq!(integers_mul_naive(&xs, &ys), result);
@@ -285,6 +321,11 @@ fn test_mul_greater_to_out() {
         let xs = parse(xs);
         let mut result = vec![Integer::ZERO; (xs.len() << 1) - 1];
         mul_greater_to_out(&mut result, &xs, &xs);
+        oracle_row!(
+            "flint",
+            "_fmpz_poly_mul",
+            "mul_greater_to_out(_, {xs:?}, {xs:?}) = {result:?}"
+        );
         assert!(result.iter().all(Integer::is_valid));
         assert_eq!(result, parse(out));
         assert_eq!(integers_mul_naive(&xs, &xs), result);
@@ -295,6 +336,11 @@ fn test_mul_greater_to_out() {
         let ys = coefficients(q);
         let mut result = vec![Integer::ZERO; xs.len() + ys.len() - 1];
         mul_greater_to_out(&mut result, &xs, &ys);
+        oracle_row!(
+            "flint",
+            "_fmpz_poly_mul",
+            "mul_greater_to_out(_, {xs:?}, {ys:?}) = {result:?}"
+        );
         assert_eq!(integers_mul_naive(&xs, &ys), result);
         assert_eq!(
             IntegerPolynomial::from_coefficients_asc(result).to_string(),
@@ -437,6 +483,8 @@ fn test_mul_greater_to_out() {
 #[test]
 fn test_mul() {
     let test = |s, t, out| {
+        oracle_row!("flint", "fmpz_poly_mul", "&({s}) * &({t}) = {out}");
+
         let p = IntegerPolynomial::from_str(s).unwrap();
         let q = IntegerPolynomial::from_str(t).unwrap();
         let r = &p * &q;
@@ -607,6 +655,11 @@ fn test_mul_to_out_karatsuba() {
         let ys = parse(ys);
         let mut result = vec![Integer::ZERO; xs.len() + ys.len() - 1];
         mul_to_out_karatsuba(&mut result, &xs, &ys);
+        oracle_row!(
+            "flint",
+            "_fmpz_poly_mul_karatsuba",
+            "mul_to_out_karatsuba(_, {xs:?}, {ys:?}) = {result:?}"
+        );
         assert!(result.iter().all(Integer::is_valid));
         assert_eq!(result, parse(out));
         assert_eq!(integers_mul_naive(&xs, &ys), result);
@@ -616,6 +669,11 @@ fn test_mul_to_out_karatsuba() {
         let xs = parse(xs);
         let mut result = vec![Integer::ZERO; (xs.len() << 1) - 1];
         mul_to_out_karatsuba(&mut result, &xs, &xs);
+        oracle_row!(
+            "flint",
+            "_fmpz_poly_mul_karatsuba",
+            "mul_to_out_karatsuba(_, {xs:?}, {xs:?}) = {result:?}"
+        );
         assert!(result.iter().all(Integer::is_valid));
         assert_eq!(result, parse(out));
         assert_eq!(integers_mul_naive(&xs, &xs), result);
@@ -741,6 +799,11 @@ fn test_mul_to_out_kronecker() {
         let ys = parse(ys);
         let mut result = vec![Integer::ZERO; xs.len() + ys.len() - 1];
         mul_to_out_kronecker(&mut result, &xs, &ys);
+        oracle_row!(
+            "flint",
+            "_fmpz_poly_mul_KS",
+            "mul_to_out_kronecker(_, {xs:?}, {ys:?}) = {result:?}"
+        );
         assert!(result.iter().all(Integer::is_valid));
         assert_eq!(result, parse(out));
         assert_eq!(integers_mul_naive(&xs, &ys), result);
@@ -750,6 +813,11 @@ fn test_mul_to_out_kronecker() {
         let xs = parse(xs);
         let mut result = vec![Integer::ZERO; (xs.len() << 1) - 1];
         mul_to_out_kronecker(&mut result, &xs, &xs);
+        oracle_row!(
+            "flint",
+            "_fmpz_poly_mul_KS",
+            "mul_to_out_kronecker(_, {xs:?}, {xs:?}) = {result:?}"
+        );
         assert!(result.iter().all(Integer::is_valid));
         assert_eq!(result, parse(out));
         assert_eq!(integers_mul_naive(&xs, &xs), result);
@@ -805,6 +873,11 @@ fn test_mul_to_out_schonhage_strassen() {
         let ys = parse(ys);
         let mut result = vec![Integer::ZERO; xs.len() + ys.len() - 1];
         mul_to_out_schonhage_strassen(&mut result, &xs, &ys);
+        oracle_row!(
+            "flint",
+            "_fmpz_poly_mul_SS",
+            "mul_to_out_schonhage_strassen(_, {xs:?}, {ys:?}) = {result:?}"
+        );
         assert!(result.iter().all(Integer::is_valid));
         assert_eq!(result, parse(out));
         assert_eq!(integers_mul_naive(&xs, &ys), result);
@@ -814,6 +887,11 @@ fn test_mul_to_out_schonhage_strassen() {
         let xs = parse(xs);
         let mut result = vec![Integer::ZERO; (xs.len() << 1) - 1];
         mul_to_out_schonhage_strassen(&mut result, &xs, &xs);
+        oracle_row!(
+            "flint",
+            "_fmpz_poly_mul_SS",
+            "mul_to_out_schonhage_strassen(_, {xs:?}, {xs:?}) = {result:?}"
+        );
         assert!(result.iter().all(Integer::is_valid));
         assert_eq!(result, parse(out));
         assert_eq!(integers_mul_naive(&xs, &xs), result);
@@ -928,4 +1006,96 @@ fn mul_to_out_schonhage_strassen_properties() {
     integer_vec_pair_gen_var_1().test_properties(test);
     integer_vec_pair_gen_var_1().test_properties_with_config(&config, test);
     integer_vec_pair_gen_var_1().test_properties_with_config(&wide_config, test);
+}
+
+// Records, for the oracle, the products of inputs that the tests above do not give these functions.
+#[cfg(feature = "oracle")]
+#[cfg(not(feature = "32_bit_limbs"))]
+#[test]
+fn oracle_rows_mul_to_out() {
+    fn rows(
+        name: &str,
+        mode: &str,
+        f: fn(&mut [Integer], &[Integer], &[Integer]),
+        pairs: &[(&[&str], &[&str])],
+    ) {
+        for &(xs, ys) in pairs {
+            let xs = parse(xs);
+            let ys = parse(ys);
+            let mut result = vec![Integer::ZERO; xs.len() + ys.len() - 1];
+            f(&mut result, &xs, &ys);
+            match mode {
+                "_fmpz_poly_mul" => oracle_row!(
+                    "flint",
+                    "_fmpz_poly_mul",
+                    "{name}(_, {xs:?}, {ys:?}) = {result:?}"
+                ),
+                "_fmpz_poly_mul_classical" => oracle_row!(
+                    "flint",
+                    "_fmpz_poly_mul_classical",
+                    "{name}(_, {xs:?}, {ys:?}) = {result:?}"
+                ),
+                _ => panic!("unexpected mode {mode}"),
+            }
+        }
+    }
+    rows(
+        "mul_greater_to_out",
+        "_fmpz_poly_mul",
+        mul_greater_to_out,
+        &[
+            (&["3"], &["4"]),
+            (&["7", "0", "-2"], &["-5"]),
+            (&["1", "-1"], &["1", "1"]),
+            (&["0", "0", "1"], &["0", "1"]),
+            (
+                &["4611686018427387903", "4611686018427387903", "1"],
+                &["4611686018427387903", "-4611686018427387903"],
+            ),
+            (&["-7", "0", "11", "-13"], &["5", "-1"]),
+            (
+                &["536870912", "3", "-268435456"],
+                &["536870912", "-536870912"],
+            ),
+            (&["0", "5", "0", "-1"], &["0", "0", "1"]),
+            (
+                &["1", "1", "1", "1", "1", "1", "1", "1"],
+                &["-1", "-1", "-1", "-1", "-1", "-1", "-1", "-1"],
+            ),
+            (
+                &["4611686018427387903", "-4611686018427387903", "7"],
+                &["4611686018427387903", "1"],
+            ),
+            (
+                &["3", "-35184372088832", "1048576", "1"],
+                &["-1099511627776", "5", "1125899906842624"],
+            ),
+            (&["2147483648", "0", "-1"], &["0", "1073741824"]),
+        ],
+    );
+    rows(
+        "mul_to_out_tiny_1",
+        "_fmpz_poly_mul",
+        mul_to_out_tiny_1,
+        &[(&["3"], &["4"]), (&["0", "0", "1"], &["0", "5", "0", "-1"])],
+    );
+    rows(
+        "mul_to_out_tiny_2",
+        "_fmpz_poly_mul",
+        mul_to_out_tiny_2,
+        &[
+            (&["3"], &["4"]),
+            (&["1", "2", "3"], &["4", "5", "6"]),
+            (&["0", "1073741824"], &["2147483648", "0", "-1"]),
+        ],
+    );
+    rows(
+        "mul_to_out_classical",
+        "_fmpz_poly_mul_classical",
+        mul_to_out_classical,
+        &[(
+            &["4611686018427387903", "-4611686018427387903"],
+            &["4611686018427387903", "4611686018427387903", "1"],
+        )],
+    );
 }

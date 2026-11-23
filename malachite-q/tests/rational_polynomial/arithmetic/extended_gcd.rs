@@ -50,6 +50,14 @@ fn verify(
 #[test]
 fn test_extended_gcd() {
     let test = |p, q, out: Option<(&str, &str, &str)>| {
+        #[cfg(feature = "oracle")]
+        if let Some((g, s, t)) = out {
+            malachite_base::oracle_row!(
+                "flint",
+                "rational_polynomial_gcd",
+                "({p}).extended_gcd({q}) = ({g}, {s}, {t})"
+            );
+        }
         let p = RationalPolynomial::from_str(p).unwrap();
         let q = RationalPolynomial::from_str(q).unwrap();
         assert_eq!(

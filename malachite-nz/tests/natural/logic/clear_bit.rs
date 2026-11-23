@@ -60,6 +60,29 @@ fn test_clear_bit() {
     test("1267650600228229401496703205381", 100, "5");
 }
 
+#[cfg(feature = "oracle")]
+#[test]
+fn oracle_rows_clear_bit() {
+    for (u, index) in [
+        ("0", 10),
+        ("0", 100),
+        ("1024", 10),
+        ("101", 0),
+        ("1000000001024", 10),
+        ("1000000001024", 100),
+        ("1267650600228229402496703205376", 100),
+        ("1267650600228229401496703205381", 100),
+    ] {
+        let mut n = u.parse::<Natural>().unwrap();
+        n.clear_bit(index);
+        malachite_base::oracle_row!(
+            "azurite",
+            "az_nat_clear_bit",
+            "x := {u}; x.clear_bit({index}); x = {n}"
+        );
+    }
+}
+
 #[test]
 fn limbs_clear_bit_properties() {
     let mut config = GenConfig::new();

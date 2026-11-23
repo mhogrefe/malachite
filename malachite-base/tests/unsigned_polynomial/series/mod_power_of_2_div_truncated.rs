@@ -11,6 +11,7 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::modular::traits::{ModPowerOf2, ModPowerOf2IsReduced};
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::series::traits::{
     CheckedModDivTruncated, CheckedModPowerOf2DivTruncated, ModPowerOf2DivTruncated,
@@ -95,6 +96,14 @@ fn verify<T: PrimitiveUnsigned>(
 
 fn test_mod_power_of_2_div_truncated_helper<T: PrimitiveUnsigned>() {
     let test = |p, q, len, pow, out: Option<&str>| {
+        oracle_row!(
+            "flint",
+            "mod_power_of_2_div_series",
+            "({p}).{}mod_power_of_2_div_truncated({q}, {len}, {pow}) = {}",
+            if out.is_some() { "" } else { "checked_" },
+            out.unwrap_or("None")
+        );
+
         let p = UnsignedPolynomial::<T>::from_str(p).unwrap();
         let q = UnsignedPolynomial::<T>::from_str(q).unwrap();
         assert_eq!(

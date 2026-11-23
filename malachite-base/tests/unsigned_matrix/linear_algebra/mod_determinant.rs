@@ -24,6 +24,11 @@ where
     UnsignedMatrix<T>: ModDeterminant<T, Output = T>,
     for<'a> &'a UnsignedMatrix<T>: ModDeterminant<T, Output = T>,
 {
+    // FLINT's `nmod_mat_det` takes a word-sized modulus.
+    #[cfg(feature = "oracle")]
+    if m.to_string().parse::<u64>().is_ok() {
+        malachite_base::oracle_row!("flint", "nmod_mat_det", "{a}.mod_determinant({m}) = {out}");
+    }
     let a = UnsignedMatrix::<T>::from_str(a).unwrap();
     let d = (&a).mod_determinant(m);
     assert_eq!(d, out);

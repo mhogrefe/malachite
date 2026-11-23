@@ -9,6 +9,7 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::modular::traits::DivisibleBy;
+use malachite_base::oracle_row;
 use malachite_base::slices::slice_test_zero;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
@@ -793,6 +794,12 @@ fn limbs_divisible_by_ref_ref_fail_4() {
 #[test]
 fn test_divisible_by() {
     let test = |s, t, divisible| {
+        oracle_row!(
+            "azurite",
+            "az_nat_divisible_by",
+            "{s} is {}divisible by {t}",
+            malachite_base::test_util::oracle_rows::not(divisible)
+        );
         let u = Natural::from_str(s).unwrap();
         let v = Natural::from_str(t).unwrap();
 

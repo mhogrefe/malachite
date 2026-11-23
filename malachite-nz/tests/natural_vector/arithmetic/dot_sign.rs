@@ -9,12 +9,14 @@
 use core::cmp::Ordering::{self, *};
 use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{Dot, DotSign, Sign};
+use malachite_base::oracle_row;
 use malachite_nz::natural_vector::NaturalVector;
 use malachite_nz::test_util::generators::natural_vector_pair_gen_var_1;
 
 #[test]
 fn test_dot_sign() {
     let test = |a, b, out: Ordering| {
+        oracle_row!("azurite", "az_nat_dot_sign", "{a}.dot_sign({b}) = {out:?}");
         let v = NaturalVector::from_str(a).unwrap();
         let w = NaturalVector::from_str(b).unwrap();
         assert_eq!((&v).dot_sign(&w), out);
@@ -41,6 +43,17 @@ fn test_dot_sign() {
         "(1, 18446744073709551616)",
         Greater,
     );
+    #[cfg(feature = "oracle")]
+    for (a, b) in [("(5)", "(3)"), ("(0)", "(3)")] {
+        let v = NaturalVector::from_str(a).unwrap();
+        let w = NaturalVector::from_str(b).unwrap();
+        malachite_base::oracle_row!(
+            "azurite",
+            "az_nat_dot_sign",
+            "{a}.dot_sign({b}) = {:?}",
+            v.dot_sign(w)
+        );
+    }
 }
 
 #[test]

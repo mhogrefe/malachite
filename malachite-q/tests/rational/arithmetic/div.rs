@@ -8,6 +8,7 @@
 
 use malachite_base::num::arithmetic::traits::{CheckedDiv, Reciprocal};
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
+use malachite_base::oracle_row;
 use malachite_q::Rational;
 use malachite_q::test_util::generators::{
     rational_gen, rational_gen_var_1, rational_pair_gen, rational_pair_gen_var_1,
@@ -20,6 +21,8 @@ use std::str::FromStr;
 #[test]
 fn test_div() {
     let test = |s, t, out| {
+        oracle_row!("azurite", "az_rat_div", "{s} / {t} = {out}");
+
         let u = Rational::from_str(s).unwrap();
         let v = Rational::from_str(t).unwrap();
 

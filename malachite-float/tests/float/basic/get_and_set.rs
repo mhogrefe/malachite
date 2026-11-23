@@ -10,6 +10,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{ExactFrom, SciMantissaAndExponent};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::num::modular::traits::DivisibleByPowerOf2;
+use malachite_base::oracle_row;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::strings::ToDebugString;
 use malachite_float::test_util::common::{
@@ -28,6 +29,12 @@ use std::cmp::Ordering::*;
 #[test]
 fn test_to_significand() {
     let test = |s, s_hex, out| {
+        oracle_row!(
+            "azurite",
+            "az_float_to_significand",
+            "to_significand({s_hex}) = {out}"
+        );
+
         let x = parse_hex_string(s_hex);
         assert_eq!(x.to_string(), s);
 
@@ -176,6 +183,11 @@ fn to_significand_properties() {
 #[test]
 fn test_get_exponent() {
     let test = |s, s_hex, out| {
+        oracle_row!(
+            "azurite",
+            "az_float_get_exponent",
+            "get_exponent({s_hex}) = {out:?}"
+        );
         let x = parse_hex_string(s_hex);
         assert_eq!(x.to_string(), s);
 
@@ -258,6 +270,11 @@ fn get_exponent_properties() {
 #[test]
 fn test_get_prec() {
     let test = |s, s_hex, out| {
+        oracle_row!(
+            "azurite",
+            "az_float_get_prec",
+            "get_prec({s_hex}) = {out:?}"
+        );
         let x = parse_hex_string(s_hex);
         assert_eq!(x.to_string(), s);
 
@@ -423,6 +440,12 @@ fn get_min_prec_properties() {
 #[test]
 fn test_set_prec_round() {
     let test = |s, s_hex, prec, rm, out, out_hex, o| {
+        oracle_row!(
+            "azurite",
+            "az_float_set_prec",
+            "x := {s_hex}; x.set_prec_round({prec}, {rm}) = {o:?}; x = {out_hex}"
+        );
+
         let mut x = parse_hex_string(s_hex);
         assert_eq!(x.to_string(), s);
 

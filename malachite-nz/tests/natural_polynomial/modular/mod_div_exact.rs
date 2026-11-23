@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::modular::traits::{Mod, ModMul};
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::modular::traits::{
     CheckedModDivExact, ModDivExact, ModDivExactAssign, ModDivRem, ModDivisibleBy,
@@ -83,6 +84,27 @@ fn verify_checked(
 #[test]
 fn test_mod_div_exact() {
     let test = |p, q, m: &str, out: &str| {
+        oracle_row!(
+            "flint",
+            "mod_div_exact",
+            "({p}).mod_div_exact({q}, {m}) = {out}"
+        );
+        oracle_row!(
+            "flint",
+            "mod_div_exact",
+            "({p}).checked_mod_div_exact({q}, {m}) = {out}"
+        );
+        oracle_row!(
+            "flint",
+            "mod_div_exact",
+            "({p}).mod_divisible_by({q}, {m}) = {}",
+            ModDivisibleBy::mod_divisible_by(
+                NaturalPolynomial::from_str(p).unwrap(),
+                NaturalPolynomial::from_str(q).unwrap(),
+                Natural::from_str(m).unwrap()
+            )
+        );
+
         let p = NaturalPolynomial::from_str(p).unwrap();
         let q = NaturalPolynomial::from_str(q).unwrap();
         let m = Natural::from_str(m).unwrap();
@@ -134,6 +156,19 @@ fn test_mod_div_exact() {
 #[test]
 fn test_checked_mod_div_exact() {
     let test = |p, q, m: &str, out: Option<&str>| {
+        oracle_row!(
+            "flint",
+            "mod_div_exact",
+            "({p}).checked_mod_div_exact({q}, {m}) = {}",
+            out.unwrap_or("None")
+        );
+        oracle_row!(
+            "flint",
+            "mod_div_exact",
+            "({p}).mod_divisible_by({q}, {m}) = {}",
+            out.is_some()
+        );
+
         let p = NaturalPolynomial::from_str(p).unwrap();
         let q = NaturalPolynomial::from_str(q).unwrap();
         let m = Natural::from_str(m).unwrap();

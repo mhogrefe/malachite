@@ -8,6 +8,7 @@
 
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::oracle_row;
 use malachite_base::test_util::common::test_cmp_helper;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
@@ -109,11 +110,30 @@ fn test_cmp() {
     test_cmp_helper::<Natural>(&strings);
     test_cmp_helper::<BigUint>(&strings);
     test_cmp_helper::<rug::Integer>(&strings);
+    #[cfg(feature = "oracle")]
+    for x in &strings {
+        for y in &strings {
+            let x_n = x.parse::<Natural>().unwrap();
+            let y_n = y.parse::<Natural>().unwrap();
+            malachite_base::oracle_row!(
+                "azurite",
+                "az_nat_cmp",
+                "{x} {} {y}",
+                malachite_base::test_util::oracle_rows::cmp_symbol(x_n.cmp(&y_n))
+            );
+        }
+    }
 }
 
 #[test]
 fn test_cmp_normalized() {
     let test = |x, y, out| {
+        oracle_row!(
+            "azurite",
+            "az_nat_cmp_normalized",
+            "cmp_normalized({x}, {y}) = {out:?}"
+        );
+
         let x = Natural::from_str(x).unwrap();
         let y = Natural::from_str(y).unwrap();
         assert_eq!(x.cmp_normalized(&y), out);

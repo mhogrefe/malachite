@@ -11,6 +11,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::modular::traits::{ModPowerOf2, ModPowerOf2Neg};
+use malachite_base::oracle_row;
 use malachite_base::slices::slice_test_zero;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{
@@ -752,6 +753,8 @@ fn limbs_sub_same_length_to_out_with_overlap_fail() {
 #[test]
 fn test_sub_natural() {
     let test = |s, t, out| {
+        oracle_row!("azurite", "az_nat_sub", "{s} - {t} = {out}");
+
         let u = Natural::from_str(s).unwrap();
         let v = Natural::from_str(t).unwrap();
 

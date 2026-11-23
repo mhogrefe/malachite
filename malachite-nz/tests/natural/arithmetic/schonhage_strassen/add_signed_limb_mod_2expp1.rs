@@ -8,6 +8,8 @@
 
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::modular::traits::Mod;
+#[cfg(not(feature = "32_bit_limbs"))]
+use malachite_base::oracle_row;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::mul::schonhage_strassen::limbs_add_signed_limb_mod_2expp1;
 #[cfg(not(feature = "32_bit_limbs"))]
@@ -20,6 +22,12 @@ use malachite_nz::test_util::natural::arithmetic::schonhage_strassen::*;
 #[test]
 fn test_limbs_add_signed_limb_mod_2expp1() {
     let test = |r: &[Limb], limbs: usize, c: Limb, out: &[Limb]| {
+        oracle_row!(
+            "flint",
+            "mpn_addmod_2expp1_1",
+            "limbs_add_signed_limb_mod_2expp1({r:?}, {limbs}, {c}) = {out:?}"
+        );
+
         let mut r = r.to_vec();
         limbs_add_signed_limb_mod_2expp1(&mut r, limbs, c);
         assert_eq!(r, out);

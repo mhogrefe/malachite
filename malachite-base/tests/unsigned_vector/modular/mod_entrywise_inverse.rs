@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::modular::traits::{ModEntrywiseInverse, ModEntrywiseMul, ModIsReduced};
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::unsigned_vector_unsigned_pair_gen_var_5;
 use malachite_base::test_util::unsigned_vector::modular::mod_entrywise_inverse::*;
 use malachite_base::unsigned_vector::UnsignedVector;
@@ -17,6 +18,12 @@ use malachite_base::vector::Vector;
 #[test]
 fn test_mod_entrywise_inverse() {
     let test = |s, m, out: Option<&str>| {
+        oracle_row!(
+            "flint",
+            "_nmod_vec_invert",
+            "{s}.mod_entrywise_inverse({m}) = {}",
+            malachite_base::test_util::oracle_rows::option(out)
+        );
         let v = UnsignedVector::<u8>::from_str(s).unwrap();
         let r = (&v).mod_entrywise_inverse(m);
         assert_eq!(r.as_ref().map(ToString::to_string).as_deref(), out);
@@ -38,8 +45,16 @@ fn test_mod_entrywise_inverse() {
 #[test]
 fn test_mod_entrywise_inverse_u64() {
     let v = UnsignedVector::<u64>::from_str("(2, 18446744073709551614, 7)").unwrap();
+    let r = (&v).mod_entrywise_inverse(u64::MAX);
+    oracle_row!(
+        "flint",
+        "_nmod_vec_invert",
+        "{v}.mod_entrywise_inverse({}) = {}",
+        u64::MAX,
+        malachite_base::test_util::oracle_rows::option(r.as_ref())
+    );
     assert_eq!(
-        v.mod_entrywise_inverse(u64::MAX).unwrap().to_string(),
+        r.unwrap().to_string(),
         "(9223372036854775808, 18446744073709551614, 15811494920322472813)"
     );
 }

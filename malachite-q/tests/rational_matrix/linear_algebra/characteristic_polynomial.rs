@@ -13,6 +13,7 @@ use malachite_base::num::basic::traits::One;
 use malachite_base::num::linear_algebra::traits::{
     CharacteristicPolynomial, Determinant, SimilarityTransform, Trace,
 };
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_nz::test_util::generators::integer_matrix_gen_var_1;
 use malachite_q::Rational;
@@ -44,6 +45,12 @@ fn verify(a: &RationalMatrix) -> RationalPolynomial {
 #[test]
 fn test_characteristic_polynomial() {
     let test = |s, out| {
+        oracle_row!(
+            "flint",
+            "fmpq_mat_charpoly",
+            "{s}.characteristic_polynomial() = {out}"
+        );
+
         let a = RationalMatrix::from_str(s).unwrap();
         assert_eq!(verify(&a).to_string(), out);
     };

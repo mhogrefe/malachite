@@ -9,6 +9,7 @@
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::modular::traits::{ModDiv, ModInverse, ModIsReduced, ModMul};
 use malachite_base::num::number_theory::traits::{CoprimeWith, Gcd};
+use malachite_base::oracle_row;
 use malachite_base::strings::ToDebugString;
 use malachite_base::test_util::generators::unsigned_triple_gen_var_12;
 use malachite_nz::natural::Natural;
@@ -23,6 +24,8 @@ use std::str::FromStr;
 #[test]
 fn test_mod_div() {
     let test = |s, t, u, out| {
+        oracle_row!("azurite", "az_zmod_div", "{s}.mod_div({t}, {u}) = {out}");
+
         let b = Natural::from_str(s).unwrap();
         let c = Natural::from_str(t).unwrap();
         let m = Natural::from_str(u).unwrap();

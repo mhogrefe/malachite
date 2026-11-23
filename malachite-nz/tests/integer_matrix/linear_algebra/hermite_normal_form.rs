@@ -12,6 +12,7 @@ use malachite_base::num::linear_algebra::traits::{
     HermiteNormalForm, HermiteNormalFormAssign, Rank,
 };
 use malachite_base::num::number_theory::traits::ExtendedGcd;
+use malachite_base::oracle_row;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_matrix::IntegerMatrix;
 use malachite_nz::integer_matrix::linear_algebra::hermite_normal_form::*;
@@ -98,6 +99,8 @@ fn verify_extended_gcd(f: &Integer, g: &Integer) -> String {
 #[test]
 fn test_hermite_normal_form() {
     let test = |s, out| {
+        oracle_row!("flint", "fmpz_mat_hnf", "hermite_normal_form({s}) = {out}");
+
         let a = IntegerMatrix::from_str(s).unwrap();
         assert_eq!(verify_hnf(&a), out);
     };
@@ -223,6 +226,12 @@ fn test_hermite_normal_form() {
 #[test]
 fn test_extended_gcd_reduced_cofactor() {
     let test = |f, g, out| {
+        oracle_row!(
+            "flint",
+            "fmpz_xgcd",
+            "extended_gcd_reduced_cofactor({f}, {g}) = {out}"
+        );
+
         assert_eq!(
             verify_extended_gcd(
                 &Integer::from_str(f).unwrap(),

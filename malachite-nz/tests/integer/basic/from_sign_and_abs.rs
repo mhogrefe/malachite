@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
+use malachite_base::oracle_row;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::{natural_bool_pair_gen, natural_gen};
@@ -15,6 +16,12 @@ use std::str::FromStr;
 #[test]
 fn test_from_sign_and_abs() {
     let test = |sign, abs, out| {
+        oracle_row!(
+            "azurite",
+            "az_int_from_sign_and_abs",
+            "Integer::from_sign_and_abs({sign}, {abs}) = {out}"
+        );
+
         let abs = Natural::from_str(abs).unwrap();
         let x = Integer::from_sign_and_abs(sign, abs.clone());
         assert!(x.is_valid());

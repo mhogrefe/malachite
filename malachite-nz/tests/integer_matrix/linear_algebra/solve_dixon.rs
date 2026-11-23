@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use malachite_base::matrix::Matrix;
 use malachite_base::num::number_theory::traits::Gcd;
+use malachite_base::oracle_row;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_matrix::IntegerMatrix;
 use malachite_nz::integer_matrix::arithmetic::fraction_matrix::*;
@@ -65,6 +66,12 @@ fn verify_solution(a: &IntegerMatrix, b: &IntegerMatrix) -> Option<(IntegerMatri
 #[test]
 fn test_solve_dixon_den() {
     let test = |a, b, out| {
+        oracle_row!(
+            "flint",
+            "fmpz_mat_solve_dixon_den",
+            "solve_dixon_den({a}, {b}) = {out}"
+        );
+
         let a = IntegerMatrix::from_str(a).unwrap();
         let b = IntegerMatrix::from_str(b).unwrap();
         assert_eq!(format_solution(&verify_solution(&a, &b)), out);

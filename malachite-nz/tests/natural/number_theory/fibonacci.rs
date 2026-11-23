@@ -11,6 +11,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Two};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::number_theory::traits::{Fibonacci, Gcd, LucasNumber};
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::{
     unsigned_gen_var_5, unsigned_gen_var_11, unsigned_gen_var_32, unsigned_gen_var_33,
     unsigned_pair_gen_var_18,
@@ -101,6 +102,8 @@ fn limbs_fibonacci_pair_properties() {
 #[test]
 fn test_fibonacci() {
     fn test(n: u64, out: &str) {
+        oracle_row!("azurite", "az_nat_fibonacci", "F({n}) = {out}");
+
         let f = Natural::fibonacci(n);
         assert!(f.is_valid());
         assert_eq!(f.to_string(), out);
@@ -202,6 +205,12 @@ fn fibonacci_properties() {
 #[test]
 fn test_fibonacci_pair() {
     fn test(n: u64, out: &str, out_1: &str) {
+        oracle_row!(
+            "azurite",
+            "az_nat_fibonacci_pair",
+            "fibonacci_pair({n}) = ({out}, {out_1})"
+        );
+
         let (f, f1) = Natural::fibonacci_pair(n);
         assert!(f.is_valid());
         assert!(f1.is_valid());
@@ -241,6 +250,8 @@ fn fibonacci_pair_properties() {
 #[test]
 fn test_lucas_number() {
     fn test(n: u64, out: &str) {
+        oracle_row!("azurite", "az_nat_lucas_number", "L({n}) = {out}");
+
         let l = Natural::lucas_number(n);
         assert!(l.is_valid());
         assert_eq!(l.to_string(), out);
@@ -329,6 +340,12 @@ fn lucas_number_properties() {
 #[test]
 fn test_lucas_number_pair() {
     fn test(n: u64, out: &str, out_1: &str) {
+        oracle_row!(
+            "azurite",
+            "az_nat_lucas_number_pair",
+            "lucas_number_pair({n}) = ({out}, {out_1})"
+        );
+
         let (l, l1) = Natural::lucas_number_pair(n);
         assert!(l.is_valid());
         assert!(l1.is_valid());

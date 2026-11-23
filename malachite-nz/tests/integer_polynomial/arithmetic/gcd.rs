@@ -77,6 +77,15 @@ fn content_or_zero(p: &IntegerPolynomial) -> Natural {
 #[test]
 fn test_gcd() {
     let test = |p, q, out: Option<&str>| {
+        #[cfg(feature = "oracle")]
+        if let Some(out) = out {
+            malachite_base::oracle_row!("flint", "polynomial_gcd", "({p}).gcd({q}) = {out}");
+            malachite_base::oracle_row!(
+                "flint",
+                "polynomial_gcd",
+                "p := {p}; p.gcd_assign({q}); p = {out}"
+            );
+        }
         let p = IntegerPolynomial::from_str(p).unwrap();
         let q = IntegerPolynomial::from_str(q).unwrap();
         assert_eq!(

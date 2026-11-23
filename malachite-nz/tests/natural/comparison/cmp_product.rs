@@ -10,12 +10,19 @@ use core::cmp::Ordering::{self, *};
 use core::str::FromStr;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::comparison::traits::OrdProduct;
+use malachite_base::oracle_row;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::{natural_pair_gen, natural_triple_gen};
 
 #[test]
 fn test_cmp_product() {
     let test = |a, b, c, out: Ordering| {
+        oracle_row!(
+            "azurite",
+            "az_nat_cmp_product",
+            "Natural::cmp_product(&{a}, &{b}, &{c}) = {out:?}"
+        );
+
         let a = Natural::from_str(a).unwrap();
         let b = Natural::from_str(b).unwrap();
         let c = Natural::from_str(c).unwrap();

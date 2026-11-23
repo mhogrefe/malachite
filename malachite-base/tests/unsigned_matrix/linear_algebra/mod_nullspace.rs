@@ -12,6 +12,7 @@ use malachite_base::matrix::Matrix;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::linear_algebra::traits::{ModLeftNullspace, ModNullspace, ModRank};
 use malachite_base::num::modular::traits::ModMul;
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::unsigned_matrix_unsigned_pair_gen_var_10;
 use malachite_base::test_util::unsigned_matrix::linear_algebra::mod_nullspace::*;
 use malachite_base::unsigned_matrix::UnsignedMatrix;
@@ -55,6 +56,16 @@ fn test<T: PrimitiveUnsigned>(a: &str, m: T, out: &str, out_left: &str)
 where
     <UnsignedMatrix<T> as FromStr>::Err: Debug,
 {
+    oracle_row!(
+        "flint",
+        "nmod_mat_nullspace",
+        "{a}.mod_nullspace({m}) = {out}"
+    );
+    oracle_row!(
+        "flint",
+        "nmod_mat_left_nullspace",
+        "{a}.mod_left_nullspace({m}) = {out_left}"
+    );
     let a = UnsignedMatrix::<T>::from_str(a).unwrap();
     assert_eq!(verify_nullspace(&a, m).to_string(), out);
     assert_eq!(verify_left_nullspace(&a, m).to_string(), out_left);

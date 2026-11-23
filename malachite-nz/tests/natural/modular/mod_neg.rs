@@ -8,6 +8,7 @@
 
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::modular::traits::{Mod, ModAdd, ModIsReduced, ModNeg, ModNegAssign};
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::unsigned_pair_gen_var_16;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
@@ -19,6 +20,8 @@ use std::str::FromStr;
 #[test]
 fn test_mod_neg() {
     let test = |s, t, out| {
+        oracle_row!("azurite", "az_zmod_neg", "-{s} ≡ {out} mod {t}");
+
         let u = Natural::from_str(s).unwrap();
         let v = Natural::from_str(t).unwrap();
 

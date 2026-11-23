@@ -12,6 +12,7 @@ use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::linear_algebra::traits::{FractionFreeLuDecomposition, Solve};
 use malachite_base::num::number_theory::traits::Gcd;
+use malachite_base::oracle_row;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_matrix::IntegerMatrix;
 use malachite_nz::integer_matrix::linear_algebra::can_solve_multi_mod::can_solve_multi_mod_den;
@@ -67,6 +68,12 @@ fn verify_solution(a: &IntegerMatrix, b: &IntegerMatrix) -> Option<(IntegerMatri
 #[test]
 fn test_solve_fflu() {
     let test = |a, b, out| {
+        oracle_row!(
+            "flint",
+            "fmpz_mat_solve_fflu",
+            "solve_fflu({a}, {b}) = {out}"
+        );
+
         let a = IntegerMatrix::from_str(a).unwrap();
         let b = IntegerMatrix::from_str(b).unwrap();
         assert_eq!(format_solution(&verify_solution(&a, &b)), out);
@@ -113,6 +120,12 @@ fn test_solve_fflu() {
 #[test]
 fn test_solve_cramer() {
     let test = |a, b, out| {
+        oracle_row!(
+            "flint",
+            "fmpz_mat_solve_cramer",
+            "solve_cramer({a}, {b}) = {out}"
+        );
+
         let a = IntegerMatrix::from_str(a).unwrap();
         let b = IntegerMatrix::from_str(b).unwrap();
         assert_eq!(format_solution(&solve_cramer(&a, &b)), out);
@@ -182,6 +195,12 @@ fn verify_precomp(a: &IntegerMatrix, b: &IntegerMatrix) -> Option<IntegerMatrix>
 #[test]
 fn test_solve_fflu_precomp() {
     let test = |a, b, out| {
+        oracle_row!(
+            "flint",
+            "fmpz_mat_solve_fflu_precomp",
+            "solve_fflu_precomp({a}, {b}) = {out}"
+        );
+
         let a = IntegerMatrix::from_str(a).unwrap();
         let b = IntegerMatrix::from_str(b).unwrap();
         let x = verify_precomp(&a, &b);
@@ -335,6 +354,8 @@ fn verify_public_solve(a: &IntegerMatrix, b: &IntegerMatrix) -> Option<(IntegerM
 #[test]
 fn test_solve() {
     let test = |a, b, out| {
+        oracle_row!("flint", "fmpz_mat_solve", "solve({a}, {b}) = {out}");
+
         let a = IntegerMatrix::from_str(a).unwrap();
         let b = IntegerMatrix::from_str(b).unwrap();
         assert_eq!(format_solution(&verify_public_solve(&a, &b)), out);
@@ -416,6 +437,12 @@ fn test_solve_vector() {
 #[test]
 fn test_can_solve_fflu() {
     let test = |a, b, out| {
+        oracle_row!(
+            "flint",
+            "fmpz_mat_can_solve_fflu",
+            "can_solve_fflu({a}, {b}) = {out}"
+        );
+
         let a = IntegerMatrix::from_str(a).unwrap();
         let b = IntegerMatrix::from_str(b).unwrap();
         let result = can_solve_fflu(&a, &b);
@@ -464,6 +491,8 @@ fn test_can_solve_fflu() {
 #[test]
 fn test_can_solve() {
     let test = |a, b, out| {
+        oracle_row!("flint", "fmpz_mat_can_solve", "can_solve({a}, {b}) = {out}");
+
         let a = IntegerMatrix::from_str(a).unwrap();
         let b = IntegerMatrix::from_str(b).unwrap();
         assert_eq!(format_solution(&verify_can_solve(&a, &b)), out);

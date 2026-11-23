@@ -12,6 +12,7 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::num::modular::traits::{Mod, ModIsReduced};
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::modular::traits::ModCompose;
 use malachite_base::polynomial::series::traits::{ModComposeTruncated, ModComposeTruncatedAssign};
@@ -93,6 +94,12 @@ fn verify(
 #[test]
 fn test_mod_compose_truncated() {
     let test = |p, q, len, m, out| {
+        oracle_row!(
+            "flint",
+            "mod_compose_series",
+            "({p}).mod_compose_truncated({q}, {len}, {m}) = {out}"
+        );
+
         let p = NaturalPolynomial::from_str(p).unwrap();
         let q = NaturalPolynomial::from_str(q).unwrap();
         let m = Natural::from_str(m).unwrap();

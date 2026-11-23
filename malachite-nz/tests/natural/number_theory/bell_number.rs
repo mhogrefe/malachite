@@ -9,6 +9,7 @@
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::number_theory::traits::{BellNumber, BinomialCoefficient};
+use malachite_base::oracle_row;
 use malachite_base::test_util::generators::unsigned_gen_var_5;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::number_theory::bell_number::{
@@ -18,6 +19,8 @@ use malachite_nz::natural::number_theory::bell_number::{
 #[test]
 fn test_bell_number() {
     let test = |n, out: &str| {
+        oracle_row!("azurite", "az_nat_bell_number", "bell_number({n}) = {out}");
+
         assert_eq!(Natural::bell_number(n).to_string(), out);
     };
     // (expected values computed independently with python, checked against OEIS A000110)
@@ -133,6 +136,15 @@ fn test_bell_numbers_prefix() {
         bell_numbers_prefix_multi_mod(3),
         vec![Natural::ONE, Natural::ONE, Natural::TWO]
     );
+    #[cfg(feature = "oracle")]
+    for n in 0..4 {
+        malachite_base::oracle_row!(
+            "azurite",
+            "az_nat_bell_numbers_prefix",
+            "bell_numbers_prefix({n}) = {:?}",
+            bell_numbers_prefix(n)
+        );
+    }
 }
 
 #[test]

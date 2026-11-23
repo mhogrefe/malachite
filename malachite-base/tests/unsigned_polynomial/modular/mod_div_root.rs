@@ -9,6 +9,7 @@
 use core::str::FromStr;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::modular::traits::{ModAdd, ModMul};
+use malachite_base::oracle_row;
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::arithmetic::traits::DivPowerOfX;
 use malachite_base::polynomial::modular::traits::{ModDivRoot, ModDivRootAssign, ModEvaluate};
@@ -43,6 +44,17 @@ fn verify<T: PrimitiveUnsigned>(
 
 fn test_mod_div_root_helper<T: PrimitiveUnsigned>() {
     let test = |p, c: u8, m: u8, out: &str, out_r: u8| {
+        oracle_row!(
+            "flint",
+            "mod_div_root",
+            "({p}).mod_div_root({c}, {m}) = ({out}, {out_r})"
+        );
+        oracle_row!(
+            "flint",
+            "mod_div_root",
+            "p := {p}; p.mod_div_root_assign({c}, {m}) = {out_r}; p = {out}"
+        );
+
         let p = UnsignedPolynomial::<T>::from_str(p).unwrap();
         let (q, r) = verify(&p, T::from(c), T::from(m));
         assert_eq!(q.to_string(), out);

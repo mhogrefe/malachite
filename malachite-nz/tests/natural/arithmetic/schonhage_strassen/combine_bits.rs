@@ -7,6 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::basic::integers::PrimitiveInt;
+#[cfg(not(feature = "32_bit_limbs"))]
+use malachite_base::oracle_row;
 use malachite_nz::natural::arithmetic::mul::schonhage_strassen::combine_bits::*;
 use malachite_nz::natural::arithmetic::mul::schonhage_strassen::split_bits::*;
 use malachite_nz::platform::Limb;
@@ -15,21 +17,32 @@ use malachite_nz::test_util::generators::{large_type_gen_var_51, large_type_gen_
 #[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_fft_combine_limbs() {
-    let test =
-        |res: &[Limb], poly: &[&[Limb]], coeff_limbs: usize, output_limbs: usize, out: &[Limb]| {
-            let mut res = res.to_vec();
-            let poly: Vec<Vec<Limb>> = poly.iter().map(|x| x.to_vec()).collect();
-            let total_limbs = res.len();
-            fft_combine_limbs(
-                &mut res,
-                &poly,
-                poly.len(),
-                coeff_limbs,
-                output_limbs,
-                total_limbs,
-            );
-            assert_eq!(res, out);
-        };
+    let test = |res: &[Limb],
+                poly: &[&[Limb]],
+                coeff_limbs: usize,
+                output_limbs: usize,
+                out: &[Limb]| {
+        oracle_row!(
+            "flint",
+            "fft_combine_limbs",
+            "fft_combine_limbs({res:?}, {poly:?}, {}, {coeff_limbs}, {output_limbs}, {}) = {out:?}",
+            poly.len(),
+            res.len()
+        );
+
+        let mut res = res.to_vec();
+        let poly: Vec<Vec<Limb>> = poly.iter().map(|x| x.to_vec()).collect();
+        let total_limbs = res.len();
+        fft_combine_limbs(
+            &mut res,
+            &poly,
+            poly.len(),
+            coeff_limbs,
+            output_limbs,
+            total_limbs,
+        );
+        assert_eq!(res, out);
+    };
     // - !(i < length && skip + output_limbs < total_limbs)
     // - i < length && skip + output_limbs < total_limbs
     // - !(skip < total_limbs && i < length)
@@ -62,6 +75,14 @@ fn test_fft_combine_limbs() {
 #[test]
 fn test_fft_combine_bits() {
     let test = |res: &[Limb], poly: &[&[Limb]], bits: u64, output_limbs: usize, out: &[Limb]| {
+        oracle_row!(
+            "flint",
+            "fft_combine_bits",
+            "fft_combine_bits({res:?}, {poly:?}, {}, {bits}, {output_limbs}, {}) = {out:?}",
+            poly.len(),
+            res.len()
+        );
+
         let mut res = res.to_vec();
         let poly: Vec<Vec<Limb>> = poly.iter().map(|x| x.to_vec()).collect();
         let total_limbs = res.len();
