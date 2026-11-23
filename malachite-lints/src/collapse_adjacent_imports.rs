@@ -10,7 +10,7 @@ use clippy_utils::diagnostics::span_lint_and_help;
 use clippy_utils::source::snippet_opt;
 use rustc_ast::{Block, Crate, Item, ItemKind, ModKind, StmtKind, UseTreeKind, VisibilityKind};
 use rustc_lint::{EarlyContext, EarlyLintPass};
-use rustc_session::{declare_lint, declare_lint_pass};
+use rustc_lint::{declare_lint, declare_lint_pass};
 
 declare_lint! {
     /// ### What it does

@@ -16,14 +16,12 @@ companion to [Malachite for FLINT Users: Integers](/mapping/flint-integers/), wh
 [conventions](/mapping/flint-integers/#conventions), including word types and aliasing, apply here
 as well; the [mapping index](/mapping/) lists the whole family.
 
-Every section of the chapter is mapped below: 78 rows across 15 sections, of which 60 are ✓, 2 ⚙,
-7 ≈, 8 —, and 1 ✗. Functions whose names begin with an underscore are included, since they make
+Every section of the chapter is mapped below: 78 rows across 15 sections, of which 61 are ✓, 2 ⚙,
+7 ≈, and 8 —; every function has a counterpart or needs none. Functions whose names begin with an underscore are included, since they make
 up most of the chapter (see [Underscore functions](#underscore-functions)). Two functions that
 `fmpz_vec.h` declares but the chapter does not document, `_fmpz_vec_min` and
 `_fmpz_vec_min_inplace`, have no rows (see [Comparison](#comparison)).
 
-The one ✗ row is `_fmpz_vec_dot_general`, the dot product with an initial term, a subtraction
-flag, and a reversal flag; its note gives the interim way to compute it.
 
 ## Conventions {#conventions}
 
@@ -277,8 +275,8 @@ works on any string, however it was read.
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✓ | `void _fmpz_vec_get_nmod_vec(nn_ptr res, const fmpz * poly, slong len, nmod_t mod)` | [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Mod.html) |
-| ≈ | `void _fmpz_vec_set_nmod_vec(fmpz * res, nn_srcptr poly, slong len, nmod_t mod)` | [`BalancedMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BalancedMod.html) |
+| ✓ | `void _fmpz_vec_get_nmod_vec(nn_ptr res, const fmpz * poly, slong len, nmod_t mod)` | [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.Mod.html) |
+| ≈ | `void _fmpz_vec_set_nmod_vec(fmpz * res, nn_srcptr poly, slong len, nmod_t mod)` | [`BalancedMod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.BalancedMod.html) |
 | ⚙ | `void _fmpz_vec_get_fft(ulong ** coeffs_f, const fmpz * coeffs_m, slong l, slong length)` | [`Mul`](https://doc.rust-lang.org/nightly/core/ops/trait.Mul.html) |
 | ⚙ | `void _fmpz_vec_set_fft(fmpz * coeffs_m, slong length, const nn_ptr * coeffs_f, slong limbs, slong sign)` | [`Mul`](https://doc.rust-lang.org/nightly/core/ops/trait.Mul.html) |
 | — | `slong _fmpz_vec_get_d_vec_2exp(double * appv, const fmpz * vec, slong len)` | |
@@ -287,7 +285,7 @@ Malachite has no `nmod_vec` type: a vector of residues modulo a word-sized $$n$$
 [`UnsignedVector<u64>`](https://docs.rs/malachite-base/latest/malachite_base/unsigned_vector/struct.UnsignedVector.html)
 whose elements are less than $$n$$. `get_nmod_vec` reduces each element modulo $$n$$ into
 $$[0, n)$$; it is
-[`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Mod.html)
+[`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.Mod.html)
 with a primitive unsigned modulus, `v.mod_op(n)`, which returns an `UnsignedVector` of the
 modulus's type. The same reduction modulo a
 [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html) returns
@@ -296,7 +294,7 @@ a
 and a `NaturalVector` can be reduced modulo a primitive unsigned modulus in the same way.
 
 `set_nmod_vec` converts each residue to its balanced representative, as
-[`BalancedMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BalancedMod.html)
+[`BalancedMod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.BalancedMod.html)
 does for a single value (see [`fmpz_set_ui_smod`](/mapping/flint-integers/#conversion)). For
 vectors this is `BalancedMod` on a `NaturalVector`, which returns an `IntegerVector`; convert the
 `UnsignedVector` of residues to a `NaturalVector` with
@@ -304,7 +302,7 @@ vectors this is `BalancedMod` on a `NaturalVector`, which returns an `IntegerVec
 `set_nmod_vec`, it accepts elements that are not yet reduced. The manual gives the balanced range
 as $$[-n/2, n/2)$$, but the implementation (`fmpz_set_ui_smod`) keeps $$x$$ when $$x \le n/2$$, so
 the range is $$(-n/2, n/2]$$, the same as
-[`BalancedMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BalancedMod.html)'s.
+[`BalancedMod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.BalancedMod.html)'s.
 The two differ only for even $$n$$, where FLINT returns $$n/2$$, not $$-n/2$$.
 
 `get_fft` and `set_fft` convert between integers and the residues modulo a Fermat number
@@ -429,9 +427,9 @@ operator also takes either operand by value or by reference, and taking an opera
 Malachite reuse its storage for the result, as `&v - w` does.
 
 The modular counterparts, which belong to FLINT's `fmpz_mod_vec` and `nmod_vec` modules, are
-[`ModAdd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModAdd.html)
+[`ModAdd`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModAdd.html)
 and
-[`ModSub`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModSub.html)
+[`ModSub`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModSub.html)
 (and their power-of-2 forms) on
 [`NaturalVector`](https://docs.rs/malachite-nz/latest/malachite_nz/natural_vector/struct.NaturalVector.html)
 and
@@ -452,7 +450,7 @@ and
 | ✓ | `void _fmpz_vec_scalar_fdiv_q_si(fmpz * vec1, const fmpz * vec2, slong len2, slong c)` | [`EntrywiseDivRound`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.EntrywiseDivRound.html), [`EntrywiseDivRoundAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.EntrywiseDivRoundAssign.html) |
 | ✓ | `void _fmpz_vec_scalar_fdiv_q_ui(fmpz * vec1, const fmpz * vec2, slong len2, ulong c)` | [`EntrywiseDivRound`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.EntrywiseDivRound.html), [`EntrywiseDivRoundAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.EntrywiseDivRoundAssign.html) |
 | ✓ | `void _fmpz_vec_scalar_fdiv_q_2exp(fmpz * vec1, const fmpz * vec2, slong len2, ulong exp)` | [`Shr`](https://doc.rust-lang.org/nightly/core/ops/trait.Shr.html), [`ShrAssign`](https://doc.rust-lang.org/nightly/core/ops/trait.ShrAssign.html) |
-| ✓ | `void _fmpz_vec_scalar_fdiv_r_2exp(fmpz * vec1, const fmpz * vec2, slong len2, ulong exp)` | [`ModPowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2.html) |
+| ✓ | `void _fmpz_vec_scalar_fdiv_r_2exp(fmpz * vec1, const fmpz * vec2, slong len2, ulong exp)` | [`ModPowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2.html) |
 | ✓ | `void _fmpz_vec_scalar_tdiv_q_fmpz(fmpz * vec1, const fmpz * vec2, slong len2, const fmpz_t c)` | [`Div`](https://doc.rust-lang.org/nightly/core/ops/trait.Div.html), [`DivAssign`](https://doc.rust-lang.org/nightly/core/ops/trait.DivAssign.html) |
 | ✓ | `void _fmpz_vec_scalar_tdiv_q_si(fmpz * vec1, const fmpz * vec2, slong len2, slong c)` | [`Div`](https://doc.rust-lang.org/nightly/core/ops/trait.Div.html), [`DivAssign`](https://doc.rust-lang.org/nightly/core/ops/trait.DivAssign.html) |
 | ✓ | `void _fmpz_vec_scalar_tdiv_q_ui(fmpz * vec1, const fmpz * vec2, slong len2, ulong c)` | [`Div`](https://doc.rust-lang.org/nightly/core/ops/trait.Div.html), [`DivAssign`](https://doc.rust-lang.org/nightly/core/ops/trait.DivAssign.html) |
@@ -521,7 +519,7 @@ when `vec1` is `vec2`; the `_si` and `_ui` forms divide by an
 [`Integer`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html) made from
 the word. Like FLINT's, the integer version special-cases division by 1 and $$-1$$. Neither
 library checks that each division is exact. To check, use
-[`DivisibleBy`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivisibleBy.html)
+[`DivisibleBy`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.DivisibleBy.html)
 on each element first.
 
 `scalar_tdiv_q`, which rounds toward zero, is
@@ -549,7 +547,7 @@ a zero shift, and a scalar of $$\pm 1$$ directly. `NaturalVector` implements `Ad
 `Natural` (`AddMulShl` only), and `Rational`.
 
 `scalar_fdiv_r_2exp`, the remainder in $$[0, 2^e)$$, is
-[`ModPowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2.html)
+[`ModPowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2.html)
 on an
 [`IntegerVector`](https://docs.rs/malachite-nz/latest/malachite_nz/integer_vector/struct.IntegerVector.html).
 Every remainder is nonnegative, so it returns a
@@ -602,15 +600,15 @@ word, then combines the resulting words in a balanced tree; it also stops at a z
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✓ | `void _fmpz_vec_scalar_mod_fmpz(fmpz * res, const fmpz * vec, slong len, const fmpz_t p)` | [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Mod.html) |
-| ✓ | `void _fmpz_vec_scalar_smod_fmpz(fmpz * res, const fmpz * vec, slong len, const fmpz_t p)` | [`BalancedMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BalancedMod.html), [`BalancedModAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BalancedModAssign.html) |
+| ✓ | `void _fmpz_vec_scalar_mod_fmpz(fmpz * res, const fmpz * vec, slong len, const fmpz_t p)` | [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.Mod.html) |
+| ✓ | `void _fmpz_vec_scalar_smod_fmpz(fmpz * res, const fmpz * vec, slong len, const fmpz_t p)` | [`BalancedMod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.BalancedMod.html), [`BalancedModAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.BalancedModAssign.html) |
 | ✓ | `void _fmpz_vec_multi_CRT_ui(fmpz * res, nn_srcptr * residues, slong len, nn_srcptr primes, slong num_primes, int sign)` | [`NaturalVector::multi_crt`](https://docs.rs/malachite-nz/latest/malachite_nz/natural_vector/struct.NaturalVector.html#method.multi_crt), [`IntegerVector::multi_balanced_crt`](https://docs.rs/malachite-nz/latest/malachite_nz/integer_vector/struct.IntegerVector.html#method.multi_balanced_crt) |
 
 `scalar_mod_fmpz` reduces each element into $$[0, p)$$, and `scalar_smod_fmpz` into
 $$(-p/2, p/2]$$. For a single value these are
-[`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Mod.html)
+[`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.Mod.html)
 and
-[`BalancedMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BalancedMod.html).
+[`BalancedMod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.BalancedMod.html).
 `scalar_mod_fmpz` is `Mod` on an
 [`IntegerVector`](https://docs.rs/malachite-nz/latest/malachite_nz/integer_vector/struct.IntegerVector.html)
 with a [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html)
@@ -690,7 +688,7 @@ number. `ElementLcm` is implemented for `IntegerVector` and `NaturalVector`.
 | | FLINT | Malachite |
 | :---: | --- | --- |
 | — | `void _fmpz_vec_dot_general_naive(fmpz_t res, const fmpz_t initial, int subtract, const fmpz * a, const fmpz * b, int reverse, slong len)` | |
-| ✗ | `void _fmpz_vec_dot_general(fmpz_t res, const fmpz_t initial, int subtract, const fmpz * a, const fmpz * b, int reverse, slong len)` | |
+| ✓ | `void _fmpz_vec_dot_general(fmpz_t res, const fmpz_t initial, int subtract, const fmpz * a, const fmpz * b, int reverse, slong len)` | [`AddDot`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.AddDot.html), [`SubDot`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.SubDot.html), [`DotReversed`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DotReversed.html), [`AddDotReversed`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.AddDotReversed.html), [`SubDotReversed`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.SubDotReversed.html) |
 | ✓ | `void _fmpz_vec_dot(fmpz_t res, const fmpz * vec1, const fmpz * vec2, slong len2)` | [`Dot`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Dot.html) |
 
 `_fmpz_vec_dot` is $$\sum_i a_i b_i$$. `_fmpz_vec_dot_general` generalizes it to
@@ -703,17 +701,18 @@ in its test code rather than its public API.
 `_fmpz_vec_dot` is [`Dot`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Dot.html)'s `v.dot(w)`, for `IntegerVector` and `NaturalVector`, with
 each vector taken by value or by reference; the vectors must have the same dimension, and the dot
 product of two 0-dimensional vectors is $$0$$. It uses the same accumulation as FLINT, described
-below. The general form has no counterpart yet; until it does, start from the initial term (or
-zero) and apply
-[`AddMulAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.AddMulAssign.html)
-or
-[`SubMulAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.SubMulAssign.html)
-for each pair of elements, iterating over the second vector in reverse for the `reverse` form.
-FLINT's `_fmpz_vec_dot_general` accumulates the small products in three words and the large ones
-in two separate limb buffers, one for positive terms and one for negative, so it creates no
-intermediate
-[`Integer`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html)s, and
-`Dot` does the same; the element-by-element fold does not avoid them. Malachite does have a dot product for floating-point
+below. The general form splits into one trait per combination of its two flags, with the initial term
+as the receiver, as in [`AddMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.AddMul.html):
+[`AddDot`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.AddDot.html)'s `x.add_dot(v, w)` is $x + v \cdot w$ and
+[`SubDot`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.SubDot.html)'s `x.sub_dot(v, w)` is $x - v \cdot w$, and
+[`DotReversed`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DotReversed.html), [`AddDotReversed`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.AddDotReversed.html), and
+[`SubDotReversed`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.SubDotReversed.html) are the `reverse` forms; the `*Assign` forms update
+`x` in place. A null `initial` with `subtract` set is `-v.dot(w)`. All of them use the same kernel
+as `Dot`, which accumulates the small products in three words and the large ones in two separate
+limb buffers, one for positive terms and one for negative, so it creates no intermediate
+[`Integer`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html)s. They are
+implemented for `Natural` with `NaturalVector`s too (subtracting more than `x` panics) and for
+`Rational` with `RationalVector`s. Malachite does have a dot product for floating-point
 numbers,
 [`Float::dot`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.dot)
 and its rounding variants, the counterpart of MPFR's `mpfr_dot`.

@@ -3105,9 +3105,9 @@ pub(crate) fn mpn_ctx_mpn_mul(
         );
         let crt = &r.crts[p.np - 1];
         let mut m = 0;
-        for l in 0..p.np {
+        for (l, fft) in r.ffts[..p.np].iter_mut().enumerate() {
             process_fft(
-                &mut r.ffts[l],
+                fft,
                 crt.co_prime_red(l),
                 depth,
                 ztrunc,

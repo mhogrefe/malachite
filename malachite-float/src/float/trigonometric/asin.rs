@@ -1228,7 +1228,7 @@ impl Float {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::PowerOf2;
-    /// use malachite_base::num::basic::traits::{One, OneHalf};
+    /// use malachite_base::num::basic::traits::One;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
@@ -1297,7 +1297,7 @@ impl Float {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::PowerOf2;
-    /// use malachite_base::num::basic::traits::{One, OneHalf};
+    /// use malachite_base::num::basic::traits::One;
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
@@ -1329,7 +1329,6 @@ impl Float {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::PowerOf2;
-    /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
@@ -1469,7 +1468,6 @@ impl Float {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::PowerOf2;
-    /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
@@ -1506,7 +1504,6 @@ impl Float {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::PowerOf2;
-    /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///

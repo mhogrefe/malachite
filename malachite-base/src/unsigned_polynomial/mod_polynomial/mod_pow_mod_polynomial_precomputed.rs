@@ -410,12 +410,8 @@ impl<T: PrimitiveUnsigned> ModPowModPolynomialPrecomputedAssign<Self, T> for Uns
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::arithmetic::traits::*;
-    /// use malachite_base::polynomial::calculus::traits::*;
     /// use malachite_base::polynomial::mod_polynomial::traits::*;
-    /// use malachite_base::polynomial::modular::traits::*;
-    /// use malachite_base::polynomial::series::traits::*;
-    /// use malachite_base::polynomial::*;
+    /// use malachite_base::polynomial::modular::traits::ModDivRemPrecomputed;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// let f = UnsignedPolynomial::<u8>::from_str("x^3+2*x+1").unwrap();
@@ -482,12 +478,8 @@ impl<T: PrimitiveUnsigned> ModPowModPolynomialPrecomputedAssign<&Self, T>
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::arithmetic::traits::*;
-    /// use malachite_base::polynomial::calculus::traits::*;
     /// use malachite_base::polynomial::mod_polynomial::traits::*;
-    /// use malachite_base::polynomial::modular::traits::*;
-    /// use malachite_base::polynomial::series::traits::*;
-    /// use malachite_base::polynomial::*;
+    /// use malachite_base::polynomial::modular::traits::ModDivRemPrecomputed;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// let f = UnsignedPolynomial::<u8>::from_str("x^3+2*x+1").unwrap();

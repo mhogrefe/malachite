@@ -6,12 +6,12 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::eq_expr_value;
 use clippy_utils::diagnostics::span_lint;
-use clippy_utils::eq_expr_value;
 use rustc_hir::{AssignOpKind, BinOpKind, Expr, ExprKind};
 use rustc_lint::{LateContext, LateLintPass};
+use rustc_lint::{declare_lint, declare_lint_pass};
 use rustc_middle::ty::Ty;
-use rustc_session::{declare_lint, declare_lint_pass};
 
 declare_lint! {
     /// ### What it does
@@ -117,7 +117,12 @@ pub(crate) fn has_trait_impl<'tcx>(cx: &LateContext<'tcx>, ty: Ty<'tcx>, path: &
         .filter(|did| cx.tcx.def_kind(*did) == rustc_hir::def::DefKind::Trait)
         .any(|trait_did| {
             cx.tcx.all_impls(trait_did).any(|impl_did| {
-                let self_ty = cx.tcx.type_of(impl_did).instantiate_identity().peel_refs();
+                let self_ty = cx
+                    .tcx
+                    .type_of(impl_did)
+                    .instantiate_identity()
+                    .skip_normalization()
+                    .peel_refs();
                 match (self_ty.kind(), target.kind()) {
                     (TyKind::Adt(a, _), TyKind::Adt(b, _)) => a.did() == b.did(),
                     (TyKind::Float(a), TyKind::Float(b)) => a == b,

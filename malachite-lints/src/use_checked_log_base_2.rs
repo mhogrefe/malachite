@@ -6,14 +6,14 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::eq_expr_value;
 use clippy_utils::diagnostics::span_lint_and_help;
-use clippy_utils::eq_expr_value;
 use clippy_utils::source::snippet;
 use rustc_hir::intravisit::{Visitor, walk_expr};
 use rustc_hir::{Expr, ExprKind};
 use rustc_lint::{LateContext, LateLintPass};
+use rustc_lint::{declare_lint, declare_lint_pass};
 use rustc_middle::ty::Ty;
-use rustc_session::{declare_lint, declare_lint_pass};
 use rustc_span::Span;
 
 declare_lint! {

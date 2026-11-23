@@ -244,7 +244,7 @@ Karatsuba, Toom–Cook, FFT), with each library's own thresholds.
 | :---: | --- | --- |
 | ✓ | `divMod (U V : AzNat) : AzNat × AzNat` | [`DivMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivMod.html) |
 | ✓ | `div (U V : AzNat) : AzNat`, `instance : Div AzNat` | [`Div`](https://doc.rust-lang.org/nightly/std/ops/trait.Div.html) |
-| ✓ | `mod (U V : AzNat) : AzNat`, `instance : Mod AzNat` | [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Mod.html), [`Rem`](https://doc.rust-lang.org/nightly/std/ops/trait.Rem.html) |
+| ✓ | `mod (U V : AzNat) : AzNat`, `instance : Mod AzNat` | [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.Mod.html), [`Rem`](https://doc.rust-lang.org/nightly/std/ops/trait.Rem.html) |
 | ✓ | `divModUInt64 (U : AzNat) (d : UInt64) (hd : d ≠ 0) : AzNat × UInt64` | [`DivMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivMod.html) |
 | ✓ | `AzNat.divRound (x y : AzNat) (mode : RoundingMode) : AzNat × Ordering` | [`DivRound`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivRound.html) |
 | ⚙ | `exactDivOdd (d dinv : UInt64) (n : AzNat) : AzNat` | [`DivExact`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivExact.html) |
@@ -280,12 +280,22 @@ conversion reaches its base-$$10^{19}$$ digits internally.
 | ✓ | `shiftLeft (a : AzNat) (sh : Nat) : AzNat`, `instance : HShiftLeft AzNat Nat AzNat` | [`Shl`](https://doc.rust-lang.org/nightly/std/ops/trait.Shl.html), [`ShlAssign`](https://doc.rust-lang.org/nightly/std/ops/trait.ShlAssign.html) |
 | ✓ | `shiftRight (a : AzNat) (sh : Nat) : AzNat`, `instance : HShiftRight AzNat Nat AzNat` | [`Shr`](https://doc.rust-lang.org/nightly/std/ops/trait.Shr.html), [`ShrAssign`](https://doc.rust-lang.org/nightly/std/ops/trait.ShrAssign.html) |
 | ✓ | `AzNat.shiftRightRound (n : AzNat) (mode : RoundingMode) (sh : Nat) : AzNat × Ordering` | [`ShrRound`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ShrRound.html) |
+| ✓ | `AzNat.shiftRightNearestTernary (n : AzNat) (o : Ordering) (sh : Nat) : AzNat` | [`ShrRoundWithOrdering`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ShrRoundWithOrdering.html), [`ShrRoundWithOrderingAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ShrRoundWithOrderingAssign.html) |
 
 **Shift amounts.** Azurite's are `Nat`; Malachite's `<<` and `>>` accept any primitive integer, a
 negative count shifting the other way, as described under
 [Counts and exponents](#counts-and-exponents). `a >>> sh` floors, as `a >> sh` does;
 `shiftRightRound` and `shr_round` apply the rounding mode and return the `Ordering`, with the
 argument order swapped.
+
+**Shifting an inexact value.** `shiftRightNearestTernary o sh` and
+`shr_round_with_ordering(sh, Nearest, o)` round $$x/2^{sh}$$ to the nearest integer when $$x$$ is
+itself an approximation and `o` is its ordering against the exact value: an exact half rounds up if
+`o` is `Less` (the exact value is larger), down if `Greater`, and to even if `Equal`. This is the
+second rounding of a double rounding, which then gives what a single rounding of the exact value
+would have. Malachite's function takes every rounding mode, not only `Nearest`, and also returns
+the result's `Ordering` against the shifted exact value; Azurite's returns only the
+natural.
 
 ## Bits {#bits}
 
@@ -297,8 +307,8 @@ argument order swapped.
 | ✓ | `clearBit (n : AzNat) (i : Nat) : AzNat` | [`BitAccess::clear_bit`](https://docs.rs/malachite-base/latest/malachite_base/num/logic/traits/trait.BitAccess.html) |
 | ✓ | `AzNat.getBits (n : AzNat) (i j : Nat) : AzNat` | [`BitBlockAccess::get_bits`](https://docs.rs/malachite-base/latest/malachite_base/num/logic/traits/trait.BitBlockAccess.html) |
 | ⚙ | `AzNat.getBitsAsLimb (n : AzNat) (i j : Nat) (h : j - i ≤ 64) : UInt64` | [`BitBlockAccess::get_bits`](https://docs.rs/malachite-base/latest/malachite_base/num/logic/traits/trait.BitBlockAccess.html) |
-| ✓ | `AzNat.modPow2 (n : AzNat) (k : Nat) : AzNat` | [`ModPowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2.html) |
-| ✓ | `AzNat.isMultipleOfPow2 (n : AzNat) (k : Nat) : Bool` | [`DivisibleByPowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivisibleByPowerOf2.html) |
+| ✓ | `AzNat.modPow2 (n : AzNat) (k : Nat) : AzNat` | [`ModPowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2.html) |
+| ✓ | `AzNat.isMultipleOfPow2 (n : AzNat) (k : Nat) : Bool` | [`DivisibleByPowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.DivisibleByPowerOf2.html) |
 | ✓ | `AzNat.isPowerOfTwo (a : AzNat) : Bool` | [`IsPowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.IsPowerOf2.html) |
 | ✓ | `trailingZeros (n : AzNat) : Option Nat` | [`trailing_zeros`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html#method.trailing_zeros) |
 | ✓ | `AzNat.isEven (n : AzNat) : Bool`, `AzNat.isOdd` | [`Parity`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Parity.html) |
@@ -331,10 +341,10 @@ and the conversions to and from sequences of bits
 
 | | Azurite | Malachite |
 | :---: | --- | --- |
-| ≈ | `addModPow2 (a b : AzNat) (k : Nat) : AzNat` | [`ModPowerOf2Add`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2Add.html) |
-| ≈ | `subModPow2 (a b : AzNat) (k : Nat) : AzNat` | [`ModPowerOf2Sub`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2Sub.html) |
-| ≈ | `mulDispatchModPow2 (a b : AzNat) (k : Nat) : AzNat` | [`ModPowerOf2Mul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2Mul.html) |
-| ≈ | `squareDispatchModPow2 (a : AzNat) (k : Nat) : AzNat` | [`ModPowerOf2Square`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2Square.html) |
+| ≈ | `addModPow2 (a b : AzNat) (k : Nat) : AzNat` | [`ModPowerOf2Add`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2Add.html) |
+| ≈ | `subModPow2 (a b : AzNat) (k : Nat) : AzNat` | [`ModPowerOf2Sub`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2Sub.html) |
+| ≈ | `mulDispatchModPow2 (a b : AzNat) (k : Nat) : AzNat` | [`ModPowerOf2Mul`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2Mul.html) |
+| ≈ | `squareDispatchModPow2 (a : AzNat) (k : Nat) : AzNat` | [`ModPowerOf2Square`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2Square.html) |
 | — | `mulSchoolbookModPow2`, `mulKaratsubaModPow2`, `mulToomCook3ModPow2`, `squareSchoolbookModPow2`, `squareKaratsubaModPow2`, `squareToomCook3ModPow2` | |
 
 **Reduced inputs.** The four Azurite operations accept any operands and reduce the result modulo
@@ -355,6 +365,16 @@ variants are benchmark instruments, as under
 | ✓ | `isSquare (n : AzNat) : Bool` | [`IsSquare`](https://docs.rs/malachite-base/latest/malachite_base/num/factorization/traits/trait.IsSquare.html) |
 | ✓ | `rootInt (m : AzNat) (k : ℕ) : AzNat` | [`FloorRoot`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.FloorRoot.html) |
 | ⚙ | `isPow (m : AzNat) (k : ℕ) : Bool` | [`CheckedRoot`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CheckedRoot.html) |
+| ✓ | `AzNat.floorLogBase2 (n : AzNat) : Option Nat` | [`FloorLogBase2`](https://docs.rs/malachite-base/latest/malachite_base/num/exponential/traits/trait.FloorLogBase2.html) |
+| ✓ | `AzNat.ceilingLogBase2 (n : AzNat) : Option Nat` | [`CeilingLogBase2`](https://docs.rs/malachite-base/latest/malachite_base/num/exponential/traits/trait.CeilingLogBase2.html) |
+| ✓ | `AzNat.checkedLogBase2 (n : AzNat) : Option Nat` | [`CheckedLogBase2`](https://docs.rs/malachite-base/latest/malachite_base/num/exponential/traits/trait.CheckedLogBase2.html) |
+| ✓ | `AzNat.floorLogBasePowerOf2 (n : AzNat) (k : Nat) : Option Nat` | [`FloorLogBasePowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/exponential/traits/trait.FloorLogBasePowerOf2.html) |
+| ✓ | `AzNat.ceilingLogBasePowerOf2 (n : AzNat) (k : Nat) : Option Nat` | [`CeilingLogBasePowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/exponential/traits/trait.CeilingLogBasePowerOf2.html) |
+| ✓ | `AzNat.checkedLogBasePowerOf2 (n : AzNat) (k : Nat) : Option Nat` | [`CheckedLogBasePowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/exponential/traits/trait.CheckedLogBasePowerOf2.html) |
+| ✓ | `AzNat.floorLogBase (b n : AzNat) : Option Nat` | [`FloorLogBase`](https://docs.rs/malachite-base/latest/malachite_base/num/exponential/traits/trait.FloorLogBase.html) |
+| ✓ | `AzNat.ceilingLogBase (b n : AzNat) : Option Nat` | [`CeilingLogBase`](https://docs.rs/malachite-base/latest/malachite_base/num/exponential/traits/trait.CeilingLogBase.html) |
+| ✓ | `AzNat.checkedLogBase (b n : AzNat) : Option Nat` | [`CheckedLogBase`](https://docs.rs/malachite-base/latest/malachite_base/num/exponential/traits/trait.CheckedLogBase.html) |
+| — | `approxLog2 (m : AzNat) : Float`, `estimateLogBase (b n : AzNat) : Nat`, `floorLogSearch (b n : AzNat) (lo hi : Nat) : Nat` | |
 
 **`pow`, `powBinary`.** Both are exact exponentiation; `powBinary` is the right-to-left binary
 method kept for benchmarking against the sliding-window `pow`. Malachite's `pow` takes a `u64`
@@ -366,14 +386,32 @@ panics in Malachite and is unspecified in Azurite. `isPow m k` asks whether `m` 
 [`IsPower`](https://docs.rs/malachite-base/latest/malachite_base/num/factorization/traits/trait.IsPower.html)
 asks a different question, whether *some* exponent greater than 1 works.
 
+**Base-2 logarithms.** `floorLogBase2 n` and `ceilingLogBase2 n` are $$\lfloor \log_2 n \rfloor$$
+and $$\lceil \log_2 n \rceil$$, read off the bit length and a power-of-2 test, and are `none` for
+zero, where Malachite's `floor_log_base_2` and `ceiling_log_base_2` panic and otherwise return the
+`u64` directly. `checkedLogBase2 n` is `some k` exactly when $$n = 2^k$$, as `checked_log_base_2`
+is, and is `none` for zero, where Malachite panics. The logarithms in base $$2^k$$,
+`floorLogBasePowerOf2 n k` and its siblings, are `n.floor_log_base_power_of_2(k)` and its siblings:
+the base-2 logarithm divided by $$k$$, rounded down or up, and for the checked form `some e` exactly
+when $$n = 2^{ke}$$. They are `none` when `n` or `k` is zero, where Malachite panics.
+
+**General logarithms.** `floorLogBase b n` is `n.floor_log_base(&b)`, with the arguments in the
+other order, and likewise for the ceiling and the checked form; all are `none` when `n` is zero or
+$$b < 2$$, where Malachite panics. Both libraries start from a floating-point estimate of the
+exponent and confirm it exactly, so an estimate that is off costs time, never correctness: Azurite
+checks a bracket of width three around its estimate with two power comparisons and falls back to
+a binary search over the whole range (`approxLog2`, `estimateLogBase`, and `floorLogSearch` are
+these internal steps, with no Malachite counterpart). Malachite's oracle tests check all nine
+logarithms against Azurite's.
+
 ## GCD and modular arithmetic {#gcd-and-modular-arithmetic}
 
 | | Azurite | Malachite |
 | :---: | --- | --- |
-| ✓ | `gcd (a b : AzNat) : AzNat` | [`Gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Gcd.html) |
-| ✓ | `coprime (a b : AzNat) : Bool` | [`CoprimeWith`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CoprimeWith.html) |
-| ≈ | `invMod (a n : AzNat) : AzNat` | [`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModInverse.html) |
-| ✓ | `jacobi (a n : AzNat) : ℤ` | [`JacobiSymbol`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.JacobiSymbol.html) |
+| ✓ | `gcd (a b : AzNat) : AzNat` | [`Gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.Gcd.html) |
+| ✓ | `coprime (a b : AzNat) : Bool` | [`CoprimeWith`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.CoprimeWith.html) |
+| ≈ | `invMod (a n : AzNat) : AzNat` | [`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModInverse.html) |
+| ✓ | `jacobi (a n : AzNat) : ℤ` | [`JacobiSymbol`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.JacobiSymbol.html) |
 | ≈ | `garner (ms ns : List AzNat) : AzNat` | [`multi_crt`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html#method.multi_crt) |
 
 **`gcd`, `coprime`.** Azurite's `gcd` is Stein's binary algorithm and Malachite's is the
@@ -392,7 +430,7 @@ residues `nᵢ` modulo pairwise coprime `mᵢ`; Malachite's `Natural::multi_crt(
 computes the same `n`, but returns `None` if the moduli are not pairwise coprime or if any residue
 is at least its modulus, where Azurite leaves the result unspecified and accepts an unreduced
 residue. Reduce the residues first to match. For two congruences,
-[`Crt`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Crt.html)
+[`Crt`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.Crt.html)
 is the pairwise form.
 
 ## Primality and divisors {#primality-and-divisors}
@@ -433,24 +471,25 @@ for a `Natural`; this is the same gap as `arith_divisors`
 
 | | Azurite | Malachite |
 | :---: | --- | --- |
-| ✓ | `factorial (n : Nat) : AzNat` | [`Factorial`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Factorial.html) |
-| ✓ | `doubleFactorial (n : Nat) : AzNat` | [`DoubleFactorial`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DoubleFactorial.html) |
-| ≈ | `multiFactorial (n m : Nat) : AzNat` | [`Multifactorial`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Multifactorial.html) |
-| ✓ | `subfactorial (n : Nat) : AzNat` | [`Subfactorial`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Subfactorial.html) |
-| ✓ | `risingFactorial (x : AzNat) (k : Nat) : AzNat` | [`RisingFactorial`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.RisingFactorial.html) |
-| ✓ | `fallingFactorial (x : AzNat) (k : Nat) : AzNat` | [`FallingFactorial`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.FallingFactorial.html) |
-| ⚙ | `factorialQuotient (a b : Nat) : AzNat` | [`FallingFactorial`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.FallingFactorial.html) |
-| ✓ | `binomial (n : AzNat) (k : Nat) : AzNat` | [`BinomialCoefficient`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BinomialCoefficient.html) |
-| ✓ | `fibonacci (n : Nat) : AzNat` | [`Fibonacci::fibonacci`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Fibonacci.html#tymethod.fibonacci) |
-| ✓ | `fibonacciPair (n : Nat) : AzNat × AzNat` | [`Fibonacci::fibonacci_pair`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Fibonacci.html#tymethod.fibonacci_pair) |
-| ✓ | `lucasNumber (n : Nat) : AzNat` | [`LucasNumber::lucas_number`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.LucasNumber.html#tymethod.lucas_number) |
-| ≈ | `lucasNumberPair (n : Nat) : AzNat × AzNat` | [`LucasNumber::lucas_number_pair`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.LucasNumber.html#tymethod.lucas_number_pair) |
-| ✓ | `primorial (n : Nat) : AzNat` | [`Primorial::primorial`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Primorial.html#tymethod.primorial) |
-| ✓ | `productOfFirstNPrimes (n : Nat) : AzNat` | [`Primorial::product_of_first_n_primes`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Primorial.html#tymethod.product_of_first_n_primes) |
-| ✓ | `bellNumber (n : Nat) : AzNat` | [`BellNumber`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BellNumber.html) |
-| ✓ | `bellNumbersPrefix (n : Nat) : List AzNat` | [`bell_numbers_prefix`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/bell_number/fn.bell_numbers_prefix.html) |
-| ✓ | `landauFunctionPrefix (n : Nat) : List AzNat` | [`landau_function_prefix`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/landau_function/fn.landau_function_prefix.html) |
-| — | `factorialOdd`, `oddPrimeExps`, `legendreExp`, `prodPrimePowers`, `primesWithBit`, `hornerPow`, `oddDoubleFactorialExps`, `subfactorialSplit`, `factorialQuotientExps`, `binomialExps`, `binomialPrime`, `binomialProduct`, `binomialDenseRatio`, `fibonacciDouble`, `Nat.lucas`, `firstPrimes`, `bellRowNext`, `dobinskiTerms`, `dobinskiSums`, `landauCandidates`, `landauStep` | |
+| ✓ | `factorial (n : Nat) : AzNat` | [`Factorial`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.Factorial.html) |
+| ✓ | `doubleFactorial (n : Nat) : AzNat` | [`DoubleFactorial`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.DoubleFactorial.html) |
+| ≈ | `multiFactorial (n m : Nat) : AzNat` | [`Multifactorial`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.Multifactorial.html) |
+| ✓ | `subfactorial (n : Nat) : AzNat` | [`Subfactorial`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.Subfactorial.html) |
+| ✓ | `risingFactorial (x : AzNat) (k : Nat) : AzNat` | [`RisingFactorial`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.RisingFactorial.html) |
+| ✓ | `fallingFactorial (x : AzNat) (k : Nat) : AzNat` | [`FallingFactorial`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.FallingFactorial.html) |
+| ⚙ | `factorialQuotient (a b : Nat) : AzNat` | [`FallingFactorial`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.FallingFactorial.html) |
+| ✓ | `binomial (n : AzNat) (k : Nat) : AzNat` | [`BinomialCoefficient`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.BinomialCoefficient.html) |
+| ✓ | `fibonacci (n : Nat) : AzNat` | [`Fibonacci::fibonacci`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.Fibonacci.html#tymethod.fibonacci) |
+| ✓ | `fibonacciPair (n : Nat) : AzNat × AzNat` | [`Fibonacci::fibonacci_pair`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.Fibonacci.html#tymethod.fibonacci_pair) |
+| ✓ | `lucasNumber (n : Nat) : AzNat` | [`LucasNumber::lucas_number`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.LucasNumber.html#tymethod.lucas_number) |
+| ≈ | `lucasNumberPair (n : Nat) : AzNat × AzNat` | [`LucasNumber::lucas_number_pair`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.LucasNumber.html#tymethod.lucas_number_pair) |
+| ✓ | `primorial (n : Nat) : AzNat` | [`Primorial::primorial`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.Primorial.html#tymethod.primorial) |
+| ✓ | `productOfFirstNPrimes (n : Nat) : AzNat` | [`Primorial::product_of_first_n_primes`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.Primorial.html#tymethod.product_of_first_n_primes) |
+| ✓ | `bellNumber (n : Nat) : AzNat` | [`BellNumber`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.BellNumber.html) |
+| ✓ | `bellNumbersPrefix (n : Nat) : List AzNat` | [`bell_numbers_prefix`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/number_theory/bell_number/fn.bell_numbers_prefix.html) |
+| ✓ | `landauFunctionPrefix (n : Nat) : List AzNat` | [`landau_function_prefix`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/number_theory/landau_function/fn.landau_function_prefix.html) |
+| ✓ | `tangentNumbers (m : Nat) : Array AzNat` | [`tangent_numbers_prefix`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/number_theory/tangent_numbers/fn.tangent_numbers_prefix.html) |
+| — | `factorialOdd`, `oddPrimeExps`, `legendreExp`, `prodPrimePowers`, `primesWithBit`, `hornerPow`, `oddDoubleFactorialExps`, `subfactorialSplit`, `factorialQuotientExps`, `binomialExps`, `binomialPrime`, `binomialProduct`, `binomialDenseRatio`, `fibonacciDouble`, `Nat.lucas`, `firstPrimes`, `bellRowNext`, `dobinskiTerms`, `dobinskiSums`, `landauCandidates`, `landauStep`, `tangentPassArr`, `tangentOuterArr` | |
 
 **`factorial`.** `factorial n` is `Natural::factorial(n)`, with a Lean `Nat` argument where
 Malachite takes a `u64`. Both compute the odd part of $$n!$$ and shift it left by the power of 2,
@@ -506,6 +545,16 @@ $$g(0), \ldots, g(n - 1)$$ of the largest orders of permutations. The two prefix
 computes a single Bell number exactly from Dobinski's formula, truncated after enough terms and
 rounded up, the prefix from the Bell triangle, and Landau's function by a table over the primes,
 trying each prime power as a part.
+
+**Tangent numbers.** `tangentNumbers m` is `tangent_numbers_prefix(m)`, the tangent numbers
+$$T_1, \ldots, T_m$$ ($$1, 2, 16, 272, 7936, \ldots$$), the coefficients of
+$$\tan x = \sum_{j \ge 1} T_j\, x^{2j-1}/(2j-1)!$$, with $$T_j$$ at index $$j - 1$$. Malachite takes
+a `u64` length and returns a `Vec<Natural>` where Azurite returns an `Array AzNat`. Both use
+Algorithm 4.3 of Brent and Zimmermann's *Modern Computer Arithmetic*, which starts from the
+factorials $$(j - 1)!$$ and updates the table in place with additions and small multiplications
+only; `tangentPassArr` and `tangentOuterArr` are its inner and outer loops. Azurite uses the
+tangent numbers for the Bernoulli numbers
+([on the rationals page](/mapping/azurite-rationals/#bernoulli-numbers)).
 
 ## Strings and digits {#strings-and-digits}
 

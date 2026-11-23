@@ -7,10 +7,10 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use clippy_utils::diagnostics::span_lint_hir;
-use rustc_hir::attrs::AttributeKind;
-use rustc_hir::{Attribute, CRATE_HIR_ID, HirId};
+use rustc_attr_ir::{Attribute, AttributeKind};
+use rustc_hir::{CRATE_HIR_ID, HirId};
 use rustc_lint::{LateContext, LateLintPass, LintContext};
-use rustc_session::{declare_lint, declare_lint_pass};
+use rustc_lint::{declare_lint, declare_lint_pass};
 use rustc_span::{BytePos, FileName, SourceFile, Span, SyntaxContext};
 use serde::Deserialize;
 
@@ -99,10 +99,18 @@ impl<'tcx> LateLintPass<'tcx> for LongLines {
             let mut span = cx.tcx.hir_span(hir_id);
             for attr in cx.tcx.hir_attrs(hir_id) {
                 // Some synthetic parsed attributes have no span (`Attribute::span` panics on them);
-                // only real source attributes -- unparsed ones and doc comments -- extend the
-                // extent.
+                // only real source attributes -- tool and derive-helper attributes, the lint
+                // attributes (`allow`, `expect`, and the rest, which are parsed), and doc comments
+                // -- extend the extent.
                 match attr {
-                    Attribute::Unparsed(u) => span = span.to(u.span),
+                    Attribute::Tool(item) | Attribute::DeriveHelper(item) => {
+                        span = span.to(item.span);
+                    }
+                    Attribute::Parsed(AttributeKind::LintCheck(checks)) => {
+                        for check in checks {
+                            span = span.to(check.attr_span);
+                        }
+                    }
                     Attribute::Parsed(AttributeKind::DocComment {
                         span: attr_span, ..
                     }) => {
@@ -123,6 +131,11 @@ impl<'tcx> LateLintPass<'tcx> for LongLines {
             let Some(path) = real.local_path() else {
                 continue;
             };
+            // Only Rust sources: dylint (from 6.4) loads its configuration, `dylint.toml`, into the
+            // source map, so that the compiler tracks it as an input.
+            if path.extension().is_none_or(|e| e != "rs") {
+                continue;
+            }
             let path_str = path.to_string_lossy().replace('\\', "/");
             let Some(src) = file.src.as_ref() else {
                 continue;

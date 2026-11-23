@@ -605,10 +605,18 @@ pub fn random_non_positive_finite_big_exponent_floats(
 ///
 /// assert!(
 ///     striped_random_non_negative_finite_big_exponent_floats(
-///         EXAMPLE_SEED, 2, 1, 4, 1, 4, 1, 1, 10
+///         EXAMPLE_SEED,
+///         2,
+///         1,
+///         4,
+///         1,
+///         4,
+///         1,
+///         1,
+///         10
 ///     )
-///         .take(100)
-///         .all(|x| x.is_sign_positive())
+///     .take(100)
+///     .all(|x| x.is_sign_positive())
 /// );
 /// ```
 pub fn striped_random_non_negative_finite_big_exponent_floats(
@@ -664,10 +672,18 @@ pub fn striped_random_non_negative_finite_big_exponent_floats(
 ///
 /// assert!(
 ///     striped_random_non_positive_finite_big_exponent_floats(
-///         EXAMPLE_SEED, 2, 1, 4, 1, 4, 1, 1, 10
+///         EXAMPLE_SEED,
+///         2,
+///         1,
+///         4,
+///         1,
+///         4,
+///         1,
+///         1,
+///         10
 ///     )
-///         .take(100)
-///         .all(|x| x.is_zero() || x.is_sign_negative())
+///     .take(100)
+///     .all(|x| x.is_zero() || x.is_sign_negative())
 /// );
 /// ```
 pub fn striped_random_non_positive_finite_big_exponent_floats(

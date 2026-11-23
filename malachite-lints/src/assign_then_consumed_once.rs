@@ -14,7 +14,7 @@ use rustc_hir::{
     BindingMode, Block, ByRef, Expr, ExprKind, HirId, Mutability, Node, PatKind, StmtKind,
 };
 use rustc_lint::{LateContext, LateLintPass};
-use rustc_session::{declare_lint, declare_lint_pass};
+use rustc_lint::{declare_lint, declare_lint_pass};
 
 declare_lint! {
     /// ### What it does
@@ -154,10 +154,10 @@ fn consumed_once_by_move<'tcx>(
         ControlFlow::<()>::Continue(())
     };
     for stmt in &block.stmts[after + 1..] {
-        for_each_expr(cx, stmt, &mut inspect);
+        for_each_expr(cx.tcx, stmt, &mut inspect);
     }
     if let Some(e) = block.expr {
-        for_each_expr(cx, e, &mut inspect);
+        for_each_expr(cx.tcx, e, &mut inspect);
     }
     ok && count == 1
 }

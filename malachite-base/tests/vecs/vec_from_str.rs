@@ -6,7 +6,6 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::nevers::Never;
 use malachite_base::options::option_from_str;
 use malachite_base::orderings::ordering_from_str;
 use malachite_base::vecs::{vec_from_str, vec_from_str_custom};
@@ -21,7 +20,7 @@ fn vec_from_str_helper<T: Debug + Eq + FromStr>(s: &str, out: Option<Vec<T>>) {
 
 #[test]
 fn test_vec_from_str() {
-    vec_from_str_helper::<Never>("[]", Some(vec![]));
+    vec_from_str_helper::<bool>("[]", Some(vec![]));
     vec_from_str_helper::<u32>("[5]", Some(vec![5]));
     vec_from_str_helper::<u32>("[5, 6, 7]", Some(vec![5, 6, 7]));
     vec_from_str_helper::<bool>("[false, false, true]", Some(vec![false, false, true]));

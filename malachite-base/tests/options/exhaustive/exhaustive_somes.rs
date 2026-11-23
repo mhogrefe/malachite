@@ -7,7 +7,6 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use itertools::Itertools;
-use malachite_base::nevers::Never;
 use malachite_base::options::exhaustive::exhaustive_somes;
 use std::fmt::Debug;
 
@@ -22,7 +21,7 @@ fn exhaustive_somes_helper<T: Clone + Debug + Eq>(xs: &[T], out: &[Option<T>]) {
 
 #[test]
 fn test_exhaustive_somes() {
-    exhaustive_somes_helper::<Never>(&[], &[]);
+    exhaustive_somes_helper::<!>(&[], &[]);
     exhaustive_somes_helper(&[5], &[Some(5)]);
     exhaustive_somes_helper(&[1, 2, 3], &[Some(1), Some(2), Some(3)]);
     exhaustive_somes_helper(

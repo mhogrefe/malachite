@@ -7,7 +7,6 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use itertools::Itertools;
-use malachite_base::nevers::Never;
 use malachite_base::tuples::singletons;
 use std::fmt::Debug;
 
@@ -17,7 +16,7 @@ fn singletons_helper<T: Clone + Debug + Eq>(xs: &[T], out: &[(T,)]) {
 
 #[test]
 fn test_singletons() {
-    singletons_helper::<Never>(&[], &[]);
+    singletons_helper::<!>(&[], &[]);
     singletons_helper(&[5], &[(5,)]);
     singletons_helper(&[1, 2, 3], &[(1,), (2,), (3,)]);
     singletons_helper(&[(2,), (1,), (5,)], &[((2,),), ((1,),), ((5,),)]);

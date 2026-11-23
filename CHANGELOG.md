@@ -6,10 +6,23 @@ Unreleased section as work lands; at release time the section is stamped with th
 date. The 0.10.0 section was reconstructed retroactively; releases before 0.10.0 are only
 documented by git history.
 
-## Unreleased
+## 0.15.0 — 2026-11-20
 
 ### Breaking and behavioral changes
 
+- The crates now require Rust 1.100 or later (the workspace's `rust-version` was 1.90), so that they
+  can use the never type `!`, which Rust 1.100 stabilized.
+- `malachite_base::nevers::Never` and `NeverError` are gone; the never type `!` takes their place.
+  `nevers()` now generates the (no) values of `!`, and `ToLatex` and `ToTypst` are implemented for
+  `!`, so `None::<!>` still writes as $\bot$. `!` has no `FromStr` implementation, and none can be
+  added outside the standard library, so `Never::from_str` has no replacement.
+- malachite-base no longer depends on `getrandom`, which it had needed only for `rand` 0.8 on
+  WebAssembly; its `random` feature builds there without it. The optional dependency's implicit
+  `getrandom` feature is gone with it; enable `random` instead.
+- malachite-nz no longer depends on `indoc`, which nothing used; the optional dependency's implicit
+  `indoc` feature is gone with it.
+- malachite-base no longer depends on `time`, which nothing used (the benchmark code times with
+  `std::time`); the optional dependency's implicit `time` feature is gone with it.
 - The `arithmetic` modules are being split up, since they had become catch-alls. The traits of
   `malachite_base::num::arithmetic::traits` now live in six modules: `num::arithmetic::traits` keeps
   the ring operations, rounding, shifts, roots, powers, and the `checked_`/`wrapping_`/
@@ -60,6 +73,13 @@ documented by git history.
 
 ### malachite-base
 
+- `exhaustive_chars` no longer stops short of the graphic `char`s that newer Unicode versions add.
+  It had hardcoded the last graphic `char` of an older Unicode version, so with Rust 1.100's tables
+  it skipped 11,328 `char`s and generated 1,100,736 instead of all 1,112,064; it now finds the end
+  of the graphic `char`s from whatever Unicode version the standard library has. Which `char`s
+  `char_is_graphic` counts as graphic, and so the output of the graphic-weighted random `char` and
+  string generators, also follows the standard library's Unicode version, and changed with Rust
+  1.100.
 - The `LambertW0`, `LambertW0Assign`, `LambertWMinus1`, and `LambertWMinus1Assign` traits, in
   `num::exponential::traits`, for the two real branches of the Lambert $W$ function.
 - The `TreeT0`, `TreeT0Assign`, `TreeTMinus1`, and `TreeTMinus1Assign` traits, in

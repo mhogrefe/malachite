@@ -63,7 +63,7 @@ built from one base name. The exact counterpart of `mpfr_log` is
 `op.ln_prec_round(prec, rm)` returns the rounded result and the ternary value. From there the
 family abbreviates: `ln_prec(prec)` rounds to nearest, `ln_round(rm)` keeps the input's
 precision, and the plain trait spelling
-[`op.ln()`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Ln.html)
+[`op.ln()`](https://docs.rs/malachite-base/latest/malachite_base/num/exponential/traits/trait.Ln.html)
 does both. Each has a `_ref` form that borrows instead of consuming, and an `_assign` form that
 mutates in place and returns the bare ternary value. The tables below list each row's base name
 once and leave the family implied; operations that Rust spells through standard traits, like
@@ -782,19 +782,19 @@ and the shifted variants append `_x_minus_1` or insert `_1_plus_x` where C appen
 
 | | MPFR | Malachite |
 | :---: | --- | --- |
-| ✓ | `int mpfr_log (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`ln_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.ln_prec_round), [`Ln`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Ln.html) |
+| ✓ | `int mpfr_log (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`ln_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.ln_prec_round), [`Ln`](https://docs.rs/malachite-base/latest/malachite_base/num/exponential/traits/trait.Ln.html) |
 | ✓ | `int mpfr_log_ui (mpfr_t rop, unsigned long int op, mpfr_rnd_t rnd)` | [`ln_unsigned_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.ln_unsigned_prec_round) |
-| ✓ | `int mpfr_log2 (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`log_base_2_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.log_base_2_prec_round), [`LogBase2`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.LogBase2.html) |
-| ✓ | `int mpfr_log10 (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`log_base_10_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.log_base_10_prec_round), [`LogBase10`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.LogBase10.html) |
-| ✓ | `int mpfr_log1p (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`ln_1_plus_x_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.ln_1_plus_x_prec_round), [`Ln1PlusX`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Ln1PlusX.html) |
-| ✓ | `int mpfr_log2p1 (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`log_base_2_1_plus_x_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.log_base_2_1_plus_x_prec_round), [`LogBase2Of1PlusX`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.LogBase2Of1PlusX.html) |
-| ✓ | `int mpfr_log10p1 (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`log_base_10_1_plus_x_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.log_base_10_1_plus_x_prec_round), [`LogBase10Of1PlusX`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.LogBase10Of1PlusX.html) |
-| ✓ | `int mpfr_exp (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`exp_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.exp_prec_round), [`Exp`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Exp.html) |
+| ✓ | `int mpfr_log2 (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`log_base_2_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.log_base_2_prec_round), [`LogBase2`](https://docs.rs/malachite-base/latest/malachite_base/num/exponential/traits/trait.LogBase2.html) |
+| ✓ | `int mpfr_log10 (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`log_base_10_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.log_base_10_prec_round), [`LogBase10`](https://docs.rs/malachite-base/latest/malachite_base/num/exponential/traits/trait.LogBase10.html) |
+| ✓ | `int mpfr_log1p (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`ln_1_plus_x_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.ln_1_plus_x_prec_round), [`Ln1PlusX`](https://docs.rs/malachite-base/latest/malachite_base/num/exponential/traits/trait.Ln1PlusX.html) |
+| ✓ | `int mpfr_log2p1 (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`log_base_2_1_plus_x_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.log_base_2_1_plus_x_prec_round), [`LogBase2Of1PlusX`](https://docs.rs/malachite-base/latest/malachite_base/num/exponential/traits/trait.LogBase2Of1PlusX.html) |
+| ✓ | `int mpfr_log10p1 (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`log_base_10_1_plus_x_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.log_base_10_1_plus_x_prec_round), [`LogBase10Of1PlusX`](https://docs.rs/malachite-base/latest/malachite_base/num/exponential/traits/trait.LogBase10Of1PlusX.html) |
+| ✓ | `int mpfr_exp (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`exp_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.exp_prec_round), [`Exp`](https://docs.rs/malachite-base/latest/malachite_base/num/exponential/traits/trait.Exp.html) |
 | ✓ | `int mpfr_exp2 (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`power_of_2_of_float_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.power_of_2_of_float_prec_round), [`PowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.PowerOf2.html) |
-| ✓ | `int mpfr_exp10 (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`power_of_10_of_float_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.power_of_10_of_float_prec_round), [`PowerOf10`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.PowerOf10.html) |
-| ✓ | `int mpfr_expm1 (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`exp_x_minus_1_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.exp_x_minus_1_prec_round), [`ExpXMinus1`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ExpXMinus1.html) |
-| ✓ | `int mpfr_exp2m1 (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`power_of_2_x_minus_1_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.power_of_2_x_minus_1_prec_round), [`PowerOf2XMinus1`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.PowerOf2XMinus1.html) |
-| ✓ | `int mpfr_exp10m1 (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`power_of_10_x_minus_1_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.power_of_10_x_minus_1_prec_round), [`PowerOf10XMinus1`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.PowerOf10XMinus1.html) |
+| ✓ | `int mpfr_exp10 (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`power_of_10_of_float_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.power_of_10_of_float_prec_round), [`PowerOf10`](https://docs.rs/malachite-base/latest/malachite_base/num/exponential/traits/trait.PowerOf10.html) |
+| ✓ | `int mpfr_expm1 (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`exp_x_minus_1_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.exp_x_minus_1_prec_round), [`ExpXMinus1`](https://docs.rs/malachite-base/latest/malachite_base/num/exponential/traits/trait.ExpXMinus1.html) |
+| ✓ | `int mpfr_exp2m1 (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`power_of_2_x_minus_1_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.power_of_2_x_minus_1_prec_round), [`PowerOf2XMinus1`](https://docs.rs/malachite-base/latest/malachite_base/num/exponential/traits/trait.PowerOf2XMinus1.html) |
+| ✓ | `int mpfr_exp10m1 (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`power_of_10_x_minus_1_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.power_of_10_x_minus_1_prec_round), [`PowerOf10XMinus1`](https://docs.rs/malachite-base/latest/malachite_base/num/exponential/traits/trait.PowerOf10XMinus1.html) |
 
 **The logarithms.** All four are ports, `ln_unsigned_prec_round` being the binary-splitting
 `mpfr_log_ui`, the logarithm of a `u64`. The special-value rules carry over exactly: the
@@ -831,7 +831,7 @@ the rational to a float first and accepts the intermediate rounding.
 | ✓ | `int mpfr_pow_z (mpfr_t rop, mpfr_t op1, mpz_t op2, mpfr_rnd_t rnd)` | [`pow_integer_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.pow_integer_prec_round), [`Pow`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Pow.html) |
 | ✓ | `int mpfr_ui_pow_ui (mpfr_t rop, unsigned long int op1, unsigned long int op2, mpfr_rnd_t rnd)` | [`unsigned_pow_unsigned_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.unsigned_pow_unsigned_prec_round) |
 | ✓ | `int mpfr_ui_pow (mpfr_t rop, unsigned long int op1, mpfr_t op2, mpfr_rnd_t rnd)` | [`unsigned_pow_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.unsigned_pow_prec_round) |
-| ✓ | `int mpfr_compound_si (mpfr_t rop, mpfr_t op, long int n, mpfr_rnd_t rnd)` | [`compound_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.compound_prec_round), [`Compound`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Compound.html) |
+| ✓ | `int mpfr_compound_si (mpfr_t rop, mpfr_t op, long int n, mpfr_rnd_t rnd)` | [`compound_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.compound_prec_round), [`Compound`](https://docs.rs/malachite-base/latest/malachite_base/num/exponential/traits/trait.Compound.html) |
 
 **`mpfr_pow`.** `pow_prec_round` and the
 [`Pow`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Pow.html)
@@ -860,9 +860,9 @@ computed at the target precision rather than exactly.
 **`mpfr_compound_si`.** $$(1+op)^n$$, IEEE 754's compound-interest function, accurate without
 forming $$1+op$$, is ported: `compound_prec_round`, with the usual `prec`, `round`, and plain
 levels, in-place `*_assign` forms, and the new
-[`Compound`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Compound.html)
+[`Compound`](https://docs.rs/malachite-base/latest/malachite_base/num/exponential/traits/trait.Compound.html)
 and
-[`CompoundAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CompoundAssign.html)
+[`CompoundAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/exponential/traits/trait.CompoundAssign.html)
 traits at the plain level. The special-value table matches, including the corners the manual
 calls out: `compound(x, 0)` is 1 even for NaN, and `op` below $$-1$$ gives NaN even when
 `n = 0`. One caution when comparing against released MPFR: the port follows the current MPFR
@@ -887,9 +887,9 @@ and a `u64` base under a `Rational` exponent (`unsigned_pow_rational_prec_round`
 
 | | MPFR | Malachite |
 | :---: | --- | --- |
-| ✓ | `int mpfr_cos (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`cos_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.cos_prec_round), [`Cos`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Cos.html) |
+| ✓ | `int mpfr_cos (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`cos_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.cos_prec_round), [`Cos`](https://docs.rs/malachite-base/latest/malachite_base/num/trigonometric/traits/trait.Cos.html) |
 | ✓ | `int mpfr_sin (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`sin_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.sin_prec_round) |
-| ✓ | `int mpfr_tan (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`tan_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.tan_prec_round), [`Tan`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Tan.html) |
+| ✓ | `int mpfr_tan (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`tan_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.tan_prec_round), [`Tan`](https://docs.rs/malachite-base/latest/malachite_base/num/trigonometric/traits/trait.Tan.html) |
 | ✓ | `int mpfr_cosu (mpfr_t rop, mpfr_t op, unsigned long int u, mpfr_rnd_t rnd)` | [`cos_with_period_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.cos_with_period_prec_round) |
 | ✓ | `int mpfr_sinu (mpfr_t rop, mpfr_t op, unsigned long int u, mpfr_rnd_t rnd)` | [`sin_with_period_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.sin_with_period_prec_round) |
 | ✓ | `int mpfr_tanu (mpfr_t rop, mpfr_t op, unsigned long int u, mpfr_rnd_t rnd)` | [`tan_with_period_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.tan_with_period_prec_round) |
@@ -1084,16 +1084,16 @@ range by the rounding function".
 
 | | MPFR | Malachite |
 | :---: | --- | --- |
-| ✓ | `int mpfr_cosh (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`cosh_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.cosh_prec_round), [`Cosh`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Cosh.html) |
-| ✓ | `int mpfr_sinh (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`sinh_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.sinh_prec_round), [`Sinh`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Sinh.html) |
-| ✓ | `int mpfr_tanh (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`tanh_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.tanh_prec_round), [`Tanh`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Tanh.html) |
-| ✓ | `int mpfr_sinh_cosh (mpfr_t sop, mpfr_t cop, mpfr_t op, mpfr_rnd_t rnd)` | [`sinh_cosh_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.sinh_cosh_prec_round), [`SinhCosh`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.SinhCosh.html) |
-| ✓ | `int mpfr_sech (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`sech_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.sech_prec_round), [`Sech`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Sech.html) |
-| ✓ | `int mpfr_csch (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`csch_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.csch_prec_round), [`Csch`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Csch.html) |
-| ✓ | `int mpfr_coth (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`coth_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.coth_prec_round), [`Coth`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Coth.html) |
-| ✓ | `int mpfr_acosh (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`acosh_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.acosh_prec_round), [`Acosh`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Acosh.html) |
-| ✓ | `int mpfr_asinh (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`asinh_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.asinh_prec_round), [`Asinh`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Asinh.html) |
-| ✓ | `int mpfr_atanh (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`atanh_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.atanh_prec_round), [`Atanh`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Atanh.html) |
+| ✓ | `int mpfr_cosh (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`cosh_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.cosh_prec_round), [`Cosh`](https://docs.rs/malachite-base/latest/malachite_base/num/hyperbolic/traits/trait.Cosh.html) |
+| ✓ | `int mpfr_sinh (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`sinh_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.sinh_prec_round), [`Sinh`](https://docs.rs/malachite-base/latest/malachite_base/num/hyperbolic/traits/trait.Sinh.html) |
+| ✓ | `int mpfr_tanh (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`tanh_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.tanh_prec_round), [`Tanh`](https://docs.rs/malachite-base/latest/malachite_base/num/hyperbolic/traits/trait.Tanh.html) |
+| ✓ | `int mpfr_sinh_cosh (mpfr_t sop, mpfr_t cop, mpfr_t op, mpfr_rnd_t rnd)` | [`sinh_cosh_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.sinh_cosh_prec_round), [`SinhCosh`](https://docs.rs/malachite-base/latest/malachite_base/num/hyperbolic/traits/trait.SinhCosh.html) |
+| ✓ | `int mpfr_sech (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`sech_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.sech_prec_round), [`Sech`](https://docs.rs/malachite-base/latest/malachite_base/num/hyperbolic/traits/trait.Sech.html) |
+| ✓ | `int mpfr_csch (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`csch_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.csch_prec_round), [`Csch`](https://docs.rs/malachite-base/latest/malachite_base/num/hyperbolic/traits/trait.Csch.html) |
+| ✓ | `int mpfr_coth (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`coth_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.coth_prec_round), [`Coth`](https://docs.rs/malachite-base/latest/malachite_base/num/hyperbolic/traits/trait.Coth.html) |
+| ✓ | `int mpfr_acosh (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`acosh_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.acosh_prec_round), [`Acosh`](https://docs.rs/malachite-base/latest/malachite_base/num/hyperbolic/traits/trait.Acosh.html) |
+| ✓ | `int mpfr_asinh (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`asinh_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.asinh_prec_round), [`Asinh`](https://docs.rs/malachite-base/latest/malachite_base/num/hyperbolic/traits/trait.Asinh.html) |
+| ✓ | `int mpfr_atanh (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`atanh_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.atanh_prec_round), [`Atanh`](https://docs.rs/malachite-base/latest/malachite_base/num/hyperbolic/traits/trait.Atanh.html) |
 
 **The family.** Ten rows, no gaps. The hyperbolic functions and their inverses are algebraic
 combinations of the exponential and the logarithm, whose cores this page already marks ✓, so there
@@ -1157,10 +1157,10 @@ $$\ln 2 - \ln|x|$$.
 | :---: | --- | --- |
 | ✗ | `int mpfr_eint (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | |
 | ✗ | `int mpfr_li2 (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_gamma (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | |
+| ✓ | `int mpfr_gamma (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`gamma_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.gamma_prec_round) |
 | ✗ | `int mpfr_gamma_inc (mpfr_t rop, mpfr_t op, mpfr_t op2, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_lngamma (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_lgamma (mpfr_t rop, int *signp, mpfr_t op, mpfr_rnd_t rnd)` | |
+| ≈ | `int mpfr_lngamma (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`ln_gamma_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.ln_gamma_prec_round) |
+| ✓ | `int mpfr_lgamma (mpfr_t rop, int *signp, mpfr_t op, mpfr_rnd_t rnd)` | [`ln_abs_gamma_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.ln_abs_gamma_prec_round) |
 | ✗ | `int mpfr_digamma (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | |
 | ✗ | `int mpfr_beta (mpfr_t rop, mpfr_t op1, mpfr_t op2, mpfr_rnd_t rnd)` | |
 | ✗ | `int mpfr_zeta (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | |
@@ -1176,19 +1176,36 @@ $$\ln 2 - \ln|x|$$.
 | ✓ | `int mpfr_agm (mpfr_t rop, mpfr_t op1, mpfr_t op2, mpfr_rnd_t rnd)` | [`agm_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.agm_prec_round) |
 | ✗ | `int mpfr_ai (mpfr_t rop, mpfr_t x, mpfr_rnd_t rnd)` | |
 
-**The special-function block.** Eighteen gaps in one sweep: the exponential integral and the
-dilogarithm; the Gamma family, `gamma`, the upper incomplete `gamma_inc`, `lngamma`,
-`lgamma`, and `digamma`, with `beta` alongside; the Riemann zeta function, on a `Float` and on
-a `u64`; the error-function pair; and the Bessel functions of the first and second kinds at
-orders 0, 1, and `n`. One signature deserves a forward-looking remark: `mpfr_lgamma` returns
-the sign of $$\Gamma(op)$$ through an out-parameter `signp`, which a Rust signature would fold
-into the return value alongside the ternary.
+**The special-function block.** Fifteen gaps in one sweep: the exponential integral and the
+dilogarithm; the rest of the Gamma family, the upper incomplete `gamma_inc` and `digamma`, with
+`beta` alongside; the Riemann zeta function, on a `Float` and on a `u64`; the error-function pair;
+and the Bessel functions of the first and second kinds at orders 0, 1, and `n`.
+
+**`mpfr_gamma`.** The gamma function is `gamma_prec_round`, with the same special values as MPFR's:
+$$\Gamma(\pm 0) = \pm\infty$$, $$\Gamma(+\infty) = +\infty$$, and NaN at the negative integers and
+at $$-\infty$$. It is not a port of `mpfr_gamma` but of the gamma function of
+[Azurite](/mapping/azurite-floats/#the-gamma-function), which computes an enclosure of $$\ln\Gamma$$
+from Stirling's series; the two agree on every result, and the property tests compare them.
+Malachite also has the reciprocal, `reciprocal_gamma_prec_round`, which is defined at the poles too,
+and forms of both that take a `Rational` argument.
+
+**`mpfr_lngamma` and `mpfr_lgamma`.** `mpfr_lgamma` is `ln_abs_gamma_prec_round`, which returns
+$$\ln|\Gamma(x)|$$ and, where MPFR writes the sign of $$\Gamma(x)$$ through the out-parameter
+`signp`, returns it as a `bool` (`true` for positive) between the value and the ternary. The two
+agree on every value and sign, including $$+\infty$$ at the poles and at $$\pm\infty$$, and the
+negative sign at $$-0$$; the property tests compare them. `mpfr_lngamma` is `ln_gamma_prec_round`,
+and it is ≈: both are $$\ln\Gamma(x)$$ for $$x > 0$$ and $$+\infty$$ at $$\pm 0$$, but for a negative
+argument MPFR gives $$\ln\Gamma(x)$$ wherever $$\Gamma(x)$$ is positive and NaN elsewhere, and
+$$+\infty$$ at $$-\infty$$, while Malachite gives NaN for every negative argument and at
+$$-\infty$$, as [Azurite](/mapping/azurite-floats/#the-gamma-function) does; `ln_abs_gamma_prec_round`
+covers the negative arguments. Both functions are ports of Azurite's, and have forms that take a
+`Rational` argument.
 
 **`mpfr_agm`.** The arithmetic-geometric mean is ported: `agm_prec_round`, agreeing with MPFR
 down to the special-value fine print, NaN when "any operand is negative and the other one is
 not zero", $$+0$$ for a zero paired with a finite value, and NaN for a zero paired with an
-infinity. It is the engine under the logarithm family above, and the one inhabitant of this
-subsection that is already built.
+infinity. It is the engine under the logarithm family above, and, with the gamma function, one
+of the two inhabitants of this subsection that are already built.
 
 **`mpfr_ai`.** The Airy function comes with a documented restriction in MPFR: "The current
 implementation is not intended to be used with large arguments. It works with $$|x|$$

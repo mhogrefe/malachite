@@ -180,9 +180,9 @@ polynomials, where they are cross-checked.
 | [floor](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/floor/index.html) | `Floor` | ✓ |  | ✓ | ✓ |  |
 | [ceiling](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/ceiling/index.html) | `Ceiling` | ✓ |  | ✓ | ✓ |  |
 | [round_to_multiple](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/round_to_multiple/index.html) | `RoundToMultiple` |  |  |  |  |  |
-| [mod_op](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/mod_op/index.html) | `Mod` |  |  |  |  | ✓ |
-| [mod_op](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/mod_op/index.html) | `Rem` |  |  |  | ✓ | ✓ |
-| [mod_op](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/mod_op/index.html) | `CeilingMod` |  |  |  |  | ✓ |
+| [mod_op](https://docs.rs/malachite-q/latest/malachite_q/rational/modular/mod_op/index.html) | `Mod` |  |  |  |  | ✓ |
+| [mod_op](https://docs.rs/malachite-q/latest/malachite_q/rational/modular/mod_op/index.html) | `Rem` |  |  |  | ✓ | ✓ |
+| [mod_op](https://docs.rs/malachite-q/latest/malachite_q/rational/modular/mod_op/index.html) | `CeilingMod` |  |  |  |  | ✓ |
 
 `floor` and `ceiling`, which return an `Integer`, are checked by Azurite's `AzRat.round` in the
 `Floor` and `Ceiling` modes, by GMP, and by num. The remainders of a `Rational` by a `Rational`
@@ -198,18 +198,25 @@ and `rem` also against num. `round_to_multiple` is covered by property tests alo
 | [pow](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/pow/index.html) | `Pow<u64>`, `Pow<i64>` | ✓ |  | ✓ | ✓ |  |
 | [sqrt](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/sqrt/index.html) | `CheckedSqrt` |  |  |  |  |  |
 | [root](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/root/index.html) | `CheckedRoot<u64>`, `CheckedRoot<i64>` |  |  |  |  |  |
-| [express_as_power](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/express_as_power/index.html) | `ExpressAsPower` |  |  |  |  |  |
-| [log_base_2](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/log_base_2/index.html) | `FloorLogBase2`, `CeilingLogBase2`, `floor_log_base_2_abs`, `ceiling_log_base_2_abs` | ✓ |  |  |  |  |
-| [log_base_2](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/log_base_2/index.html) | `CheckedLogBase2` |  |  |  |  |  |
-| [log_base](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/log_base/index.html) | `FloorLogBase`, `CeilingLogBase`, `CheckedLogBase` | ✓ |  |  |  |  |
-| [log_base](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/log_base/index.html) | `approx_log` |  |  |  |  |  |
-| [log_base_power_of_2](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/log_base_power_of_2/index.html) | `FloorLogBasePowerOf2`, `CeilingLogBasePowerOf2`, `CheckedLogBasePowerOf2` |  |  |  |  |  |
+| [express_as_power](https://docs.rs/malachite-q/latest/malachite_q/rational/factorization/express_as_power/index.html) | `ExpressAsPower` |  |  |  |  |  |
+| [log_base_2](https://docs.rs/malachite-q/latest/malachite_q/rational/exponential/log_base_2/index.html) | `FloorLogBase2`, `CeilingLogBase2`, `floor_log_base_2_abs`, `ceiling_log_base_2_abs` | ✓ |  |  |  |  |
+| [log_base_2](https://docs.rs/malachite-q/latest/malachite_q/rational/exponential/log_base_2/index.html) | `CheckedLogBase2` | ✓ |  |  |  |  |
+| [log_base](https://docs.rs/malachite-q/latest/malachite_q/rational/exponential/log_base/index.html) | `FloorLogBase`, `CeilingLogBase`, `CheckedLogBase` | ✓ |  |  |  |  |
+| [log_base](https://docs.rs/malachite-q/latest/malachite_q/rational/exponential/log_base/index.html) | `approx_log` |  |  |  |  |  |
+| [log_base_power_of_2](https://docs.rs/malachite-q/latest/malachite_q/rational/exponential/log_base_power_of_2/index.html) | `FloorLogBasePowerOf2`, `CeilingLogBasePowerOf2`, `CheckedLogBasePowerOf2` | ✓ |  |  |  |  |
 
 `pow`, with a non-negative or a negative exponent, is checked by Azurite (`AzRat.pow` and `zpow`),
 GMP, and num. The base-2 logarithms are checked by Azurite's `floorLogBase2Abs` and
-`ceilingLogBase2Abs`, and the logarithms to a `u64` base by `floorLogBaseAbs` (the ceiling and
-checked forms derived from it by an exact power comparison in the oracle). `checked_log_base_2`,
-the logarithms to a power-of-2 base, `checked_sqrt`, `checked_root`, and `express_as_power`, which
+`ceilingLogBase2Abs`, and `checked_log_base_2` by `AzRat.checkedLogBase2`, proven to return $$k$$
+exactly when the input is $$2^k$$; the logarithms to a `u64` base are checked by
+`floorLogBaseAbs`, `ceilingLogBaseAbs`, and `checkedLogBaseAbs`, proven to be the floor and ceiling
+of $$\log_b |x|$$ and the exponent $$e$$ exactly when $$|x| = b^e$$. The logarithms to a `Rational` base are checked
+the same way by `floorLogBaseRatAbs`, `ceilingLogBaseRatAbs`, and `checkedLogBaseRatAbs`, for bases
+both above and below 1. The logarithms to a power-of-2 base are checked by
+`floorLogBasePowerOf2Abs`, `ceilingLogBasePowerOf2Abs`, and `checkedLogBasePowerOf2Abs` for a
+positive exponent; for a negative one, a base below 1, the oracle checks the floor against the
+negated ceiling, the ceiling against the negated floor, and the checked form against the negated
+checked form, in the positive base. `checked_sqrt`, `checked_root`, and `express_as_power`, which
 return a value only when the answer is exact, are covered by property tests alone, as is
 `approx_log`, a floating-point estimate.
 
@@ -218,24 +225,25 @@ return a value only when the answer is exact, are covered by property tests alon
 | Operation | Functions | Azurite | FLINT | GMP | num | Reference |
 | --- | --- | :---: | :---: | :---: | :---: | :---: |
 | [power_of_2](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/power_of_2/index.html) | `PowerOf2<u64>`, `PowerOf2<i64>` |  |  |  |  |  |
-| [is_power_of_2](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/is_power_of_2/index.html) | `IsPowerOf2` |  |  |  |  |  |
+| [is_power_of_2](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/is_power_of_2/index.html) | `IsPowerOf2` | ✓ |  |  |  |  |
 | [next_power_of_2](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/next_power_of_2/index.html) | `NextPowerOf2` |  |  |  |  |  |
 
-The powers of 2, including negative ones ($$2^{-k}$$), `is_power_of_2`, and `next_power_of_2`
-(the smallest power of 2 at least the input, possibly a fraction) are covered by property tests
-alone.
+`is_power_of_2`, which recognizes the powers of 2 with negative exponents as well as positive
+ones, is checked against Azurite's `AzRat.isPowerOfTwo`. The powers of 2 themselves, including
+negative ones ($$2^{-k}$$), and `next_power_of_2` (the smallest power of 2 at least the input,
+possibly a fraction) are covered by property tests alone.
 
 ### Approximation {#approximation}
 
 | Operation | Functions | Azurite | FLINT | GMP | num | Reference |
 | --- | --- | :---: | :---: | :---: | :---: | :---: |
-| [approximate](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/approximate/index.html) | `Approximate` |  |  |  |  | ✓ |
-| [simplest_rational_in_interval](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/simplest_rational_in_interval/index.html) | `SimplestRationalInInterval` |  |  |  |  | ✓ |
-| [denominators_in_closed_interval](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/denominators_in_closed_interval/index.html) | `DenominatorsInClosedInterval` |  |  |  |  |  |
-| [farey_neighbors](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/farey_neighbors/index.html) | `Rational::farey_neighbors` |  | ✓ |  |  |  |
+| [approximate](https://docs.rs/malachite-q/latest/malachite_q/rational/number_theory/approximate/index.html) | `Approximate` |  |  |  |  | ✓ |
+| [simplest_rational_in_interval](https://docs.rs/malachite-q/latest/malachite_q/rational/number_theory/simplest_rational_in_interval/index.html) | `SimplestRationalInInterval` |  |  |  |  | ✓ |
+| [denominators_in_closed_interval](https://docs.rs/malachite-q/latest/malachite_q/rational/number_theory/denominators_in_closed_interval/index.html) | `DenominatorsInClosedInterval` |  |  |  |  |  |
+| [farey_neighbors](https://docs.rs/malachite-q/latest/malachite_q/rational/number_theory/farey_neighbors/index.html) | `Rational::farey_neighbors` |  | ✓ |  |  |  |
 | [height](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/height/index.html) | `Height`, `HeightRef`, `height_significant_bits` |  | ✓ |  |  |  |
-| [reconstruct](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/reconstruct/index.html) | `Rational::reconstruct`, `reconstruct_ref` |  | ✓ |  |  |  |
-| [reconstruct](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/reconstruct/index.html) | `Rational::reconstruct_with_bounds`, `reconstruct_with_bounds_ref` |  | ✓ |  |  |  |
+| [reconstruct](https://docs.rs/malachite-q/latest/malachite_q/rational/modular/reconstruct/index.html) | `Rational::reconstruct`, `reconstruct_ref` |  | ✓ |  |  |  |
+| [reconstruct](https://docs.rs/malachite-q/latest/malachite_q/rational/modular/reconstruct/index.html) | `Rational::reconstruct_with_bounds`, `reconstruct_with_bounds_ref` |  | ✓ |  |  |  |
 
 `approximate`, the closest `Rational` with a bounded denominator, is checked against a reference
 that tries every denominator; `simplest_rational_in_interval` against references that search by
@@ -250,16 +258,26 @@ default bounds and with explicit ones, against `fmpq_reconstruct_fmpz` and
 
 | Operation | Functions | Azurite | FLINT | GMP | num | Reference |
 | --- | --- | :---: | :---: | :---: | :---: | :---: |
-| [gcd](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/gcd/index.html) | `Gcd` |  | ✓ |  |  |  |
-| [extended_gcd](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/extended_gcd/index.html) | `ExtendedGcd` |  | ✓ |  |  |  |
-| [dedekind_sum](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/dedekind_sum/index.html) | `Rational::dedekind_sum` |  | ✓ |  |  | ✓ |
-| [harmonic_number](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/harmonic_number/index.html) | `Rational::harmonic_number` |  | ✓ |  |  | ✓ |
+| [gcd](https://docs.rs/malachite-q/latest/malachite_q/rational/number_theory/gcd/index.html) | `Gcd` |  | ✓ |  |  |  |
+| [extended_gcd](https://docs.rs/malachite-q/latest/malachite_q/rational/number_theory/extended_gcd/index.html) | `ExtendedGcd` |  | ✓ |  |  |  |
+| [dedekind_sum](https://docs.rs/malachite-q/latest/malachite_q/rational/number_theory/dedekind_sum/index.html) | `Rational::dedekind_sum` |  | ✓ |  |  | ✓ |
+| [harmonic_number](https://docs.rs/malachite-q/latest/malachite_q/rational/number_theory/harmonic_number/index.html) | `Rational::harmonic_number` |  | ✓ |  |  | ✓ |
+| [bernoulli_number](https://docs.rs/malachite-q/latest/malachite_q/rational/number_theory/bernoulli_number/index.html) | `Rational::bernoulli_number` | ✓ | ✓ |  |  | ✓ |
+| [bernoulli_number](https://docs.rs/malachite-q/latest/malachite_q/rational/number_theory/bernoulli_number/index.html) | `bernoulli_numbers_prefix` | ✓ | ✓ |  |  | ✓ |
+| [bernoulli_number](https://docs.rs/malachite-q/latest/malachite_q/rational/number_theory/bernoulli_number/index.html) | `even_bernoulli_numbers_prefix` | ✓ | ✓ |  |  | ✓ |
 
 The GCD of two `Rational`s, the largest `Rational` of which both are integer multiples, is checked
 against FLINT's `fmpq_gcd`, and the extended GCD, with its cofactors, against
 `fmpq_gcd_cofactors`. The Dedekind sum $$s(h, k)$$ is checked against FLINT's `fmpq_dedekind_sum`
 and against a reference that evaluates the defining sum term by term, and the harmonic numbers
-$$H_n$$ against FLINT's `fmpq_harmonic_ui` and the sum $$\sum_{i=1}^n 1/i$$.
+$$H_n$$ against FLINT's `fmpq_harmonic_ui` and the sum $$\sum_{i=1}^n 1/i$$. The Bernoulli numbers,
+singly and as prefixes, are checked against Azurite's `bernoulli` and `bernoulliEvens`, against
+FLINT's `arith_bernoulli_number` and `arith_bernoulli_number_vec`, and against a reference that
+derives them from the tangent numbers; the two algorithms of the prefix (Ramanujan's recursion and
+the multimodular algorithm) are also compared with each other, and the single numbers with the
+prefix. The Bernoulli and Euler polynomials are checked against FLINT's
+`arith_bernoulli_polynomial` and `arith_euler_polynomial`, and against their definitions; they
+have no page of their own yet.
 
 ## Conversion {#conversion}
 
@@ -351,17 +369,29 @@ from scratch. The continued fraction itself is tested by round trips through
 | Operation | Functions | Azurite | FLINT | GMP | num | Reference |
 | --- | --- | :---: | :---: | :---: | :---: | :---: |
 | [digits](https://docs.rs/malachite-q/latest/malachite_q/rational/conversion/digits/digits/index.html) | `Rational::digits` |  |  |  |  |  |
-| [to_digits](https://docs.rs/malachite-q/latest/malachite_q/rational/conversion/digits/to_digits/index.html) | `to_digits`, `into_digits` |  |  |  |  |  |
+| [factoradic_digits](https://docs.rs/malachite-q/latest/malachite_q/rational/conversion/digits/factoradic_digits/index.html) | `Rational::factoradic_digits` |  |  |  |  | ✓ |
+| [factoradic_digits](https://docs.rs/malachite-q/latest/malachite_q/rational/conversion/digits/factoradic_digits/index.html) | `Rational::from_factoradic_digits` |  |  |  |  | ✓ |
+| [foer_digits](https://docs.rs/malachite-q/latest/malachite_q/rational/conversion/digits/foer_digits/index.html) | `Rational::foer_digits` |  |  |  |  |  |
+| [to_digits](https://docs.rs/malachite-q/latest/malachite_q/rational/conversion/digits/to_digits/index.html) | `to_digits`, `into_digits` |  |  |  |  | ✓ |
 | [from_digits](https://docs.rs/malachite-q/latest/malachite_q/rational/conversion/digits/from_digits/index.html) | `Rational::from_digits`, `from_digits_ref` |  |  |  |  |  |
 | [power_of_2_digits](https://docs.rs/malachite-q/latest/malachite_q/rational/conversion/digits/power_of_2_digits/index.html) | `Rational::power_of_2_digits` |  |  |  |  |  |
-| [to_power_of_2_digits](https://docs.rs/malachite-q/latest/malachite_q/rational/conversion/digits/to_power_of_2_digits/index.html) | `to_power_of_2_digits`, `into_power_of_2_digits` |  |  |  |  |  |
+| [to_power_of_2_digits](https://docs.rs/malachite-q/latest/malachite_q/rational/conversion/digits/to_power_of_2_digits/index.html) | `to_power_of_2_digits`, `into_power_of_2_digits` |  |  |  |  | ✓ |
 | [from_power_of_2_digits](https://docs.rs/malachite-q/latest/malachite_q/rational/conversion/digits/from_power_of_2_digits/index.html) | `Rational::from_power_of_2_digits`, `from_power_of_2_digits_ref` |  |  |  |  |  |
 
 The expansion of a `Rational` in a base, an integer part and a fractional part that eventually
-repeats, and its inverse are covered by property tests alone: round trips through the
+repeats, and its inverse are covered by property tests: round trips through the
 `from_*` functions, agreement of the integer part with the `Natural` digit functions (which are
 checked by Azurite), and the expansion's shape, such as, in a power-of-2 base, a repeating part that
-is empty exactly when the denominator is a power of 2.
+is empty exactly when the denominator is a power of 2. `to_digits` and `to_power_of_2_digits`,
+which find where the repeating part begins from the denominator and keep a single remainder, are
+also compared with references that remember every remainder until one recurs. `foer_digits` is
+checked against `to_digits`: the same digits, the same number of digits before the repeating part,
+and the repeating and period-start marks exactly where the `FoerSequence` places them, over two
+whole periods.
+The factorial-number-system digits are compared with a reference that expands the fractional
+part with `Rational` arithmetic and one that sums each digit over its factorial, and the expansion
+is checked to end at the coefficient of $$1/k!$$ for the least $$k$$ whose factorial the
+denominator divides.
 
 ### Strings {#strings}
 

@@ -14,8 +14,8 @@ use rustc_ast::LitKind;
 use rustc_hir::def::DefKind;
 use rustc_hir::{BinOpKind, Expr, ExprKind};
 use rustc_lint::{LateContext, LateLintPass, LintContext};
+use rustc_lint::{declare_lint, declare_lint_pass};
 use rustc_middle::ty::Ty;
-use rustc_session::{declare_lint, declare_lint_pass};
 
 declare_lint! {
     /// ### What it does

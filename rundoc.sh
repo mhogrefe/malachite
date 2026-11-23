@@ -27,11 +27,18 @@ DOCTESTS=$ROOT/../doctest_workspace/doctests
 # them into its Cargo.toml), so the caller's feature flags are forwarded: extraction under
 # `--features random` produces doctests for random-gated items, which only compile if the lint
 # pass builds with those features too.
+# Two warnings that only the lint toolchain's nightly rustc and Cargo emit are irrelevant here:
+# - unstable_name_collisions: nightly has an unstable inherent `set_bit(self, u32, bool)` on the
+#   primitive integers (feature `get_set_bit`), which the BitAccess doc examples' `x.set_bit(2)`
+#   collides with; stable Rust has no such method.
+# - cargo::unused_dependencies: the extracted crate's dependencies are used only by its test
+#   target, not by its placeholder src/main.rs.
+printf '\n[lints.cargo]\nunused_dependencies = "allow"\n' >> "$DOCTESTS/Cargo.toml"
 (cd "$DOCTESTS" && MALACHITE_LINT_DOCTESTS=1 \
     DYLINT_RUSTFLAGS="-A runtime_literal_conversion -A redundant_nearest \
         -A assign_then_consumed_once -A assign_then_returned -A clone_with_ref_variant \
         -A use_const_block -A compare_with_primitive -A mul_div_by_power_of_2 \
-        -A mul_div_by_power_of_2_literal -A use_fused_mul" \
+        -A mul_div_by_power_of_2_literal -A use_fused_mul -A unstable_name_collisions" \
     CARGO_TARGET_DIR="$ROOT/../doctest_workspace/target" \
     cargo dylint --all -- --all-targets "$@")
 rm -rf "$DOCTESTS"

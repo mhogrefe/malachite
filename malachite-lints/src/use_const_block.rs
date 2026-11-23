@@ -14,7 +14,7 @@ use clippy_utils::{get_parent_expr, path_to_local_with_projections};
 use core::ops::ControlFlow;
 use rustc_hir::{Expr, ExprKind};
 use rustc_lint::{LateContext, LateLintPass};
-use rustc_session::{declare_lint, declare_lint_pass};
+use rustc_lint::{declare_lint, declare_lint_pass};
 
 declare_lint! {
     /// ### What it does
@@ -72,7 +72,7 @@ fn is_computed(e: &Expr<'_>) -> bool {
 // Whether `e` mentions any local binding. Such an expression cannot be lifted into a `const { .. }`
 // block, even if constant folding (e.g. short-circuiting) made it constant-*valued*.
 fn references_local<'tcx>(cx: &LateContext<'tcx>, e: &'tcx Expr<'tcx>) -> bool {
-    for_each_expr(cx, e, |sub| {
+    for_each_expr(cx.tcx, e, |sub| {
         if path_to_local_with_projections(sub).is_some() {
             ControlFlow::Break(())
         } else {

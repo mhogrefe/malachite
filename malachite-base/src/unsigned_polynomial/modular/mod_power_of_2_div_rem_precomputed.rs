@@ -933,12 +933,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2DivAssignRemPrecomputed<Self> for Unsigned
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::arithmetic::traits::*;
-    /// use malachite_base::polynomial::calculus::traits::*;
-    /// use malachite_base::polynomial::mod_polynomial::traits::*;
     /// use malachite_base::polynomial::modular::traits::*;
-    /// use malachite_base::polynomial::series::traits::*;
-    /// use malachite_base::polynomial::*;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// let q = UnsignedPolynomial::<u8>::from_str("3*x^2+x+1").unwrap();
@@ -1006,12 +1001,7 @@ impl<T: PrimitiveUnsigned> ModPowerOf2DivAssignRemPrecomputed<&Self> for Unsigne
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::arithmetic::traits::*;
-    /// use malachite_base::polynomial::calculus::traits::*;
-    /// use malachite_base::polynomial::mod_polynomial::traits::*;
     /// use malachite_base::polynomial::modular::traits::*;
-    /// use malachite_base::polynomial::series::traits::*;
-    /// use malachite_base::polynomial::*;
     /// use malachite_base::unsigned_polynomial::UnsignedPolynomial;
     ///
     /// let q = UnsignedPolynomial::<u8>::from_str("3*x^2+x+1").unwrap();

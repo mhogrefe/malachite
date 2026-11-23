@@ -13,7 +13,7 @@ use clippy_utils::visitors::for_each_expr;
 use core::ops::ControlFlow;
 use rustc_hir::{Expr, ExprKind, HirId, Node, PatKind};
 use rustc_lint::{LateContext, LateLintPass};
-use rustc_session::{declare_lint, declare_lint_pass};
+use rustc_lint::{declare_lint, declare_lint_pass};
 
 declare_lint! {
     /// ### What it does
@@ -56,7 +56,7 @@ fn use_count(cx: &LateContext<'_>, expr: &Expr<'_>, id: HirId) -> usize {
     let owner = cx.tcx.hir_enclosing_body_owner(expr.hir_id);
     let body = cx.tcx.hir_body_owned_by(owner);
     let mut count = 0;
-    for_each_expr(cx, body.value, |e| {
+    for_each_expr(cx.tcx, body.value, |e| {
         if e.res_local_id() == Some(id) {
             count += 1;
         }

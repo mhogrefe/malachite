@@ -11,7 +11,7 @@ use rustc_errors::Applicability;
 use rustc_hir::def::{DefKind, Res};
 use rustc_hir::{HirId, Path};
 use rustc_lint::{LateContext, LateLintPass};
-use rustc_session::{declare_lint, impl_lint_pass};
+use rustc_lint::{declare_lint, impl_lint_pass};
 use rustc_span::{Span, kw};
 use std::collections::HashSet;
 

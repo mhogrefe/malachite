@@ -10,8 +10,8 @@ use clippy_utils::diagnostics::span_lint;
 use rustc_hir::def::{DefKind, Res};
 use rustc_hir::{Expr, ExprKind};
 use rustc_lint::{LateContext, LateLintPass};
+use rustc_lint::{declare_lint, declare_lint_pass};
 use rustc_middle::ty;
-use rustc_session::{declare_lint, declare_lint_pass};
 
 declare_lint! {
     /// ### What it does
@@ -97,7 +97,11 @@ impl<'tcx> LateLintPass<'tcx> for RedundantNearest {
                 if !matches!(cx.tcx.def_kind(impl_did), DefKind::Impl { .. }) {
                     return;
                 }
-                let self_ty = cx.tcx.type_of(impl_did).instantiate_identity();
+                let self_ty = cx
+                    .tcx
+                    .type_of(impl_did)
+                    .instantiate_identity()
+                    .skip_normalization();
                 let ty::Adt(adt, _) = self_ty.kind() else {
                     return;
                 };

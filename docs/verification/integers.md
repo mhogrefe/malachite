@@ -144,6 +144,7 @@ shifting.
 | [shr](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/shr/index.html) | `Shr<u8>`, …, `Shr<isize>` | ✓ |  | ✓ | ✓ |  |
 | [shl_round](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/shl_round/index.html) | `ShlRound<i8>`, …, `ShlRound<isize>` |  |  |  |  |  |
 | [shr_round](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/shr_round/index.html) | `ShrRound<u8>`, …, `ShrRound<isize>` | ✓ |  |  |  |  |
+| [shr_round_with_ordering](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/shr_round_with_ordering/index.html) | `ShrRoundWithOrdering`, `ShrRoundWithOrderingAssign` | ✓ |  |  |  | ✓ |
 | [mul_shr_round](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/mul_shr_round/index.html) | `MulShrRound` |  |  |  |  |  |
 | [round_to_multiple_of_power_of_2](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/round_to_multiple_of_power_of_2/index.html) | `RoundToMultipleOfPowerOf2` |  |  |  |  |  |
 
@@ -153,6 +154,16 @@ against num. A right shift of a negative `Integer` rounds toward $$-\infty$$, as
 shift does, and Azurite's `shiftRight` has the same convention. `shr_round` is checked by Azurite's
 `shiftRightRound` in every rounding mode, `Exact` being checked as "the shift is exact and the
 `Ordering` is `Equal`".
+
+`shr_round_with_ordering` shifts a value that is itself an approximation, whose `Ordering` against
+the exact value is passed in. Under `Nearest` it is checked against Azurite's
+`shiftRightNearestTernary`, which is proven to round to the nearest integer with an exact half
+resolved by that `Ordering`; the returned `Ordering` is checked as that of the result shifted back
+against the input, or the passed-in one when they are equal. Under the directed modes the oracle
+represents the exact value by the input minus a quarter of the passed-in `Ordering`'s sign, which
+no rounding boundary separates from the input, and checks the result against `shiftRightRound` of
+four times that value by two more bits; the reference implementation in the property tests does the
+same, and the tests also check that rounding twice this way agrees with rounding once.
 
 ### Division {#division}
 
@@ -164,18 +175,18 @@ shift does, and Azurite's `shiftRight` has the same convention. `shr_round` is c
 | [div_mod](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/div_mod/index.html) | `DivRem` |  |  | ✓ | ✓ |  |
 | [div_mod](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/div_mod/index.html) | `CeilingDivMod` |  |  | ✓ |  |  |
 | [div_mod](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/div_mod/index.html) | `DivModPrecomputed` |  |  |  |  |  |
-| [mod_op](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/mod_op/index.html) | `Mod` | ✓ |  | ✓ | ✓ |  |
-| [mod_op](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/mod_op/index.html) | `Rem` |  |  | ✓ | ✓ |  |
-| [mod_op](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/mod_op/index.html) | `CeilingMod` |  |  | ✓ |  |  |
+| [mod_op](https://docs.rs/malachite-nz/latest/malachite_nz/integer/modular/mod_op/index.html) | `Mod` | ✓ |  | ✓ | ✓ |  |
+| [mod_op](https://docs.rs/malachite-nz/latest/malachite_nz/integer/modular/mod_op/index.html) | `Rem` |  |  | ✓ | ✓ |  |
+| [mod_op](https://docs.rs/malachite-nz/latest/malachite_nz/integer/modular/mod_op/index.html) | `CeilingMod` |  |  | ✓ |  |  |
 | [div_euclidean](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/div_euclidean/index.html) | `DivEuclidean` | ✓ |  |  |  |  |
-| [mod_euclidean](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/mod_euclidean/index.html) | `ModEuclidean` | ✓ |  |  |  |  |
+| [mod_euclidean](https://docs.rs/malachite-nz/latest/malachite_nz/integer/modular/mod_euclidean/index.html) | `ModEuclidean` | ✓ |  |  |  |  |
 | [div_mod_euclidean](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/div_mod_euclidean/index.html) | `DivModEuclidean` | ✓ |  |  |  |  |
 | [div_exact](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/div_exact/index.html) | `DivExact` | ✓ |  | ✓ |  |  |
 | [div_round](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/div_round/index.html) | `DivRound` | ✓ |  | ✓ | ✓ |  |
-| [divisible_by](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/divisible_by/index.html) | `DivisibleBy` |  |  | ✓ | ✓ |  |
-| [eq_mod](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/eq_mod/index.html) | `EqMod` |  |  | ✓ |  |  |
+| [divisible_by](https://docs.rs/malachite-nz/latest/malachite_nz/integer/modular/divisible_by/index.html) | `DivisibleBy` |  |  | ✓ | ✓ |  |
+| [eq_mod](https://docs.rs/malachite-nz/latest/malachite_nz/integer/modular/eq_mod/index.html) | `EqMod` |  |  | ✓ |  |  |
 | [round_to_multiple](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/round_to_multiple/index.html) | `RoundToMultiple` |  |  |  |  |  |
-| [balanced_mod](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/balanced_mod/index.html) | `BalancedMod` |  |  |  |  |  |
+| [balanced_mod](https://docs.rs/malachite-nz/latest/malachite_nz/integer/modular/balanced_mod/index.html) | `BalancedMod` |  |  |  |  |  |
 
 On `Integer`s the division conventions differ, so each gets its own row: `/` and `div_rem`
 truncate the quotient toward zero, `div_mod` and `mod_op` round it toward $$-\infty$$ (the
@@ -215,10 +226,10 @@ Gaussian integers and polynomials, where they are cross-checked.
 
 | Operation | Functions | Azurite | FLINT | GMP | num | Reference |
 | --- | --- | :---: | :---: | :---: | :---: | :---: |
-| [mod_power_of_2](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/mod_power_of_2/index.html) | `ModPowerOf2` | ✓ |  |  |  |  |
-| [mod_power_of_2](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/mod_power_of_2/index.html) | `RemPowerOf2` |  |  |  |  |  |
-| [mod_power_of_2](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/mod_power_of_2/index.html) | `CeilingModPowerOf2` |  |  |  |  |  |
-| [eq_mod_power_of_2](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/eq_mod_power_of_2/index.html) | `EqModPowerOf2` |  |  | ✓ |  |  |
+| [mod_power_of_2](https://docs.rs/malachite-nz/latest/malachite_nz/integer/modular/mod_power_of_2/index.html) | `ModPowerOf2` | ✓ |  |  |  |  |
+| [mod_power_of_2](https://docs.rs/malachite-nz/latest/malachite_nz/integer/modular/mod_power_of_2/index.html) | `RemPowerOf2` |  |  |  |  |  |
+| [mod_power_of_2](https://docs.rs/malachite-nz/latest/malachite_nz/integer/modular/mod_power_of_2/index.html) | `CeilingModPowerOf2` |  |  |  |  |  |
+| [eq_mod_power_of_2](https://docs.rs/malachite-nz/latest/malachite_nz/integer/modular/eq_mod_power_of_2/index.html) | `EqModPowerOf2` |  |  | ✓ |  |  |
 
 `mod_power_of_2`, the residue of an `Integer` in $$[0, 2^k)$$, is checked by Azurite's
 `AzZModPow2.ofAzInt`. The truncating and ceiling forms (`rem_power_of_2`, whose result takes the
@@ -229,7 +240,7 @@ it, and `eq_mod_power_of_2` is checked against GMP's `is_congruent_2pow`.
 
 | Operation | Functions | Azurite | FLINT | GMP | num | Reference |
 | --- | --- | :---: | :---: | :---: | :---: | :---: |
-| [crt](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/crt/index.html) | `BalancedCrt` |  | ✓ |  |  | ✓ |
+| [crt](https://docs.rs/malachite-nz/latest/malachite_nz/integer/modular/crt/index.html) | `BalancedCrt` |  | ✓ |  |  | ✓ |
 | [multi_crt](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html#method.multi_balanced_crt) | `Integer::multi_balanced_crt` |  | ✓ |  |  |  |
 
 The balanced Chinese remainder functions return the solution in $$(-M/2, M/2]$$ rather than
@@ -263,7 +274,7 @@ cross-checked for `Integer`, though their `Natural` counterparts are checked by 
 | --- | --- | :---: | :---: | :---: | :---: | :---: |
 | [power_of_2](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/power_of_2/index.html) | `PowerOf2<u64>` | ✓ |  |  |  |  |
 | [is_power_of_2](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/is_power_of_2/index.html) | `IsPowerOf2` | ✓ |  | ✓ |  |  |
-| [divisible_by_power_of_2](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/divisible_by_power_of_2/index.html) | `DivisibleByPowerOf2` |  |  | ✓ |  |  |
+| [divisible_by_power_of_2](https://docs.rs/malachite-nz/latest/malachite_nz/integer/modular/divisible_by_power_of_2/index.html) | `DivisibleByPowerOf2` |  |  | ✓ |  |  |
 
 `power_of_2` and `is_power_of_2` are checked by Azurite, and `is_power_of_2` and
 `divisible_by_power_of_2` by GMP.
@@ -272,11 +283,11 @@ cross-checked for `Integer`, though their `Natural` counterparts are checked by 
 
 | Operation | Functions | Azurite | FLINT | GMP | num | Reference |
 | --- | --- | :---: | :---: | :---: | :---: | :---: |
-| [gcd](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/gcd/index.html) | `Gcd` | ✓ |  |  |  |  |
-| [extended_gcd](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/extended_gcd/index.html) | `ExtendedGcd` |  |  | ✓ | ✓ |  |
-| [kronecker_symbol](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/kronecker_symbol/index.html) | `JacobiSymbol` |  |  | ✓ |  |  |
-| [kronecker_symbol](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/kronecker_symbol/index.html) | `LegendreSymbol` |  |  | ✓ |  |  |
-| [kronecker_symbol](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/kronecker_symbol/index.html) | `KroneckerSymbol` |  |  | ✓ |  |  |
+| [gcd](https://docs.rs/malachite-nz/latest/malachite_nz/integer/number_theory/gcd/index.html) | `Gcd` | ✓ |  |  |  |  |
+| [extended_gcd](https://docs.rs/malachite-nz/latest/malachite_nz/integer/number_theory/extended_gcd/index.html) | `ExtendedGcd` |  |  | ✓ | ✓ |  |
+| [kronecker_symbol](https://docs.rs/malachite-nz/latest/malachite_nz/integer/number_theory/kronecker_symbol/index.html) | `JacobiSymbol` |  |  | ✓ |  |  |
+| [kronecker_symbol](https://docs.rs/malachite-nz/latest/malachite_nz/integer/number_theory/kronecker_symbol/index.html) | `LegendreSymbol` |  |  | ✓ |  |  |
+| [kronecker_symbol](https://docs.rs/malachite-nz/latest/malachite_nz/integer/number_theory/kronecker_symbol/index.html) | `KroneckerSymbol` |  |  | ✓ |  |  |
 
 `gcd`, which returns a `Natural`, is checked by Azurite's `NormalizedGcd` instance on `AzInt`. `extended_gcd` is checked
 against GMP and num, which compare the Bézout pair exactly; Azurite's extended GCD is run on the
@@ -288,13 +299,23 @@ are checked against GMP.
 
 | Operation | Functions | Azurite | FLINT | GMP | num | Reference |
 | --- | --- | :---: | :---: | :---: | :---: | :---: |
-| [binomial_coefficient](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/binomial_coefficient/index.html) | `BinomialCoefficient` |  |  | ✓ |  |  |
-| [falling_factorial](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/falling_factorial/index.html) | `FallingFactorial` |  |  |  |  | ✓ |
-| [rising_factorial](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/rising_factorial/index.html) | `RisingFactorial` |  | ✓ |  |  |  |
+| [binomial_coefficient](https://docs.rs/malachite-nz/latest/malachite_nz/integer/number_theory/binomial_coefficient/index.html) | `BinomialCoefficient` |  |  | ✓ |  |  |
+| [euler_number](https://docs.rs/malachite-nz/latest/malachite_nz/integer/number_theory/euler_number/index.html) | `Integer::euler_number` |  | ✓ |  |  | ✓ |
+| [euler_number](https://docs.rs/malachite-nz/latest/malachite_nz/integer/number_theory/euler_number/index.html) | `euler_numbers_prefix` |  | ✓ |  |  | ✓ |
+| [falling_factorial](https://docs.rs/malachite-nz/latest/malachite_nz/integer/number_theory/falling_factorial/index.html) | `FallingFactorial` |  |  |  |  | ✓ |
+| [rising_factorial](https://docs.rs/malachite-nz/latest/malachite_nz/integer/number_theory/rising_factorial/index.html) | `RisingFactorial` |  | ✓ |  |  |  |
+| [stirling_number_of_the_first_kind](https://docs.rs/malachite-nz/latest/malachite_nz/integer/number_theory/stirling_number_of_the_first_kind/index.html) | `StirlingNumberOfTheFirstKind` |  | ✓ |  |  | ✓ |
 
 The binomial coefficient, which takes a negative first argument through the identity
-$$\binom{-n}{k} = (-1)^k \binom{n+k-1}{k}$$, is checked against GMP; `falling_factorial` against the defining product;
-and `rising_factorial` against FLINT's `fmpz_rfac`.
+$$\binom{-n}{k} = (-1)^k \binom{n+k-1}{k}$$, is checked against GMP; `falling_factorial` against the
+defining product; `rising_factorial` against FLINT's `fmpz_rfac`; and
+`stirling_number_of_the_first_kind` against FLINT's `arith_stirling_number_1` for exhaustive and
+random pairs $$(n, k)$$, and against its recurrence, the coefficients of the falling factorial
+polynomials, the unsigned Stirling numbers of the first kind, and the primitive versions wherever
+the result fits. The Euler numbers, singly and as a prefix, are checked against FLINT's
+`arith_euler_number` and `arith_euler_number_vec` and against the zigzag numbers of the
+Seidel–Entringer triangle; the single numbers from index 36 on, which come from enclosures of
+Dirichlet's beta function and of $$\pi$$, are also checked against the prefix.
 
 ## Conversion {#conversion}
 

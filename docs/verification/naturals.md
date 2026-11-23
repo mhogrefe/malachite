@@ -145,6 +145,7 @@ checked against a reference that multiplies by $$2^k$$ instead of shifting.
 | [shr](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/shr/index.html) | `Shr<u8>`, …, `Shr<isize>` | ✓ |  | ✓ | ✓ |  |
 | [shl_round](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/shl_round/index.html) | `ShlRound<i8>`, …, `ShlRound<isize>` |  |  |  |  |  |
 | [shr_round](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/shr_round/index.html) | `ShrRound<u8>`, …, `ShrRound<isize>` | ✓ |  |  |  |  |
+| [shr_round_with_ordering](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/shr_round_with_ordering/index.html) | `ShrRoundWithOrdering`, `ShrRoundWithOrderingAssign` | ✓ |  |  |  | ✓ |
 | [mul_shr_round](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mul_shr_round/index.html) | `MulShrRound` |  |  |  |  |  |
 | [round_to_multiple_of_power_of_2](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/round_to_multiple_of_power_of_2/index.html) | `RoundToMultipleOfPowerOf2` |  |  |  |  |  |
 
@@ -155,6 +156,16 @@ num. `shr_round`, which shifts right and rounds the result in a given mode, is c
 `Exact` mode, which Azurite does not have, is checked as "the shift is exact and the `Ordering` is
 `Equal`".
 
+`shr_round_with_ordering` shifts a value that is itself an approximation, whose `Ordering` against
+the exact value is passed in. Under `Nearest` it is checked against Azurite's
+`shiftRightNearestTernary`, which is proven to round to the nearest integer with an exact half
+resolved by that `Ordering`; the returned `Ordering` is checked as that of the result shifted back
+against the input, or the passed-in one when they are equal. Under the directed modes the oracle
+represents the exact value by the input minus a quarter of the passed-in `Ordering`'s sign, which
+no rounding boundary separates from the input, and checks the result against `shiftRightRound` of
+four times that value by two more bits; the reference implementation in the property tests does the
+same, and the tests also check that rounding twice this way agrees with rounding once.
+
 ### Division {#division}
 
 | Operation | Functions | Azurite | FLINT | GMP | num | Reference |
@@ -164,16 +175,16 @@ num. `shr_round`, which shifts right and rounds the result in a given mode, is c
 | [div_mod](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/div_mod/index.html) | `DivMod`, `DivRem` | ✓ |  | ✓ | ✓ |  |
 | [div_mod](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/div_mod/index.html) | `CeilingDivNegMod` |  |  | ✓ |  |  |
 | [div_mod](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/div_mod/index.html) | `DivModPrecomputed` |  |  |  |  |  |
-| [mod_op](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_op/index.html) | `Mod`, `Rem` | ✓ |  | ✓ | ✓ |  |
-| [mod_op](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_op/index.html) | `NegMod` |  |  | ✓ |  |  |
+| [mod_op](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_op/index.html) | `Mod`, `Rem` | ✓ |  | ✓ | ✓ |  |
+| [mod_op](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_op/index.html) | `NegMod` |  |  | ✓ |  |  |
 | [div_euclidean](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/div_euclidean/index.html) | `DivEuclidean` | ✓ |  |  |  |  |
-| [mod_euclidean](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_euclidean/index.html) | `ModEuclidean` | ✓ |  |  |  |  |
+| [mod_euclidean](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_euclidean/index.html) | `ModEuclidean` | ✓ |  |  |  |  |
 | [div_mod_euclidean](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/div_mod_euclidean/index.html) | `DivModEuclidean` | ✓ |  |  |  |  |
 | [div_exact](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/div_exact/index.html) | `DivExact` |  |  | ✓ |  |  |
 | [div_round](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/div_round/index.html) | `DivRound` | ✓ |  | ✓ | ✓ |  |
-| [divisible_by](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/divisible_by/index.html) | `DivisibleBy` | ✓ |  | ✓ | ✓ |  |
+| [divisible_by](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/divisible_by/index.html) | `DivisibleBy` | ✓ |  | ✓ | ✓ |  |
 | [round_to_multiple](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/round_to_multiple/index.html) | `RoundToMultiple` |  |  |  |  |  |
-| [balanced_mod](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/balanced_mod/index.html) | `BalancedMod` |  |  |  |  |  |
+| [balanced_mod](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/balanced_mod/index.html) | `BalancedMod` |  |  |  |  |  |
 
 Truncating division is checked three ways: `/`, `div_mod`, `div_rem`, `%`, and `mod_op` (which
 coincide on naturals) against Azurite's `div`, `mod`, and `divMod`, and against GMP and num. The
@@ -206,29 +217,29 @@ The functions that take a modulus $$m$$ and require their inputs to be reduced m
 
 | Operation | Functions | Azurite | FLINT | GMP | num | Reference |
 | --- | --- | :---: | :---: | :---: | :---: | :---: |
-| [mod_is_reduced](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_is_reduced/index.html) | `ModIsReduced` | ✓ |  |  |  |  |
-| [mod_add](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_add/index.html) | `ModAdd` | ✓ |  |  |  |  |
-| [mod_add_mul](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_add_mul/index.html) | `ModAddMul` |  |  |  |  | ✓ |
-| [mod_add_mul_shl](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_add_mul_shl/index.html) | `ModAddMulShl` |  |  |  |  | ✓ |
-| [mod_sub](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_sub/index.html) | `ModSub` | ✓ |  |  |  |  |
-| [mod_sub_mul](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_sub_mul/index.html) | `ModSubMul` |  |  |  |  | ✓ |
-| [mod_sub_mul_shl](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_sub_mul_shl/index.html) | `ModSubMulShl` |  |  |  |  | ✓ |
-| [mod_sum](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_sum/index.html) | `ModSum` |  |  |  |  | ✓ |
-| [mod_neg](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_neg/index.html) | `ModNeg` | ✓ |  |  |  |  |
-| [mod_mul](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_mul/index.html) | `ModMul` | ✓ |  |  |  |  |
-| [mod_mul](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_mul/index.html) | `ModMulPrecomputed` | ✓ |  |  |  |  |
-| [mod_square](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_square/index.html) | `ModSquare` | ✓ |  |  |  |  |
-| [mod_square](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_square/index.html) | `ModSquarePrecomputed` | ✓ |  |  |  |  |
-| [mod_pow](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_pow/index.html) | `ModPow` | ✓ |  | ✓ | ✓ | ✓ |
-| [mod_product](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_product/index.html) | `ModProduct` |  |  |  |  | ✓ |
-| [mod_pow](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_pow/index.html) | `ModPowPrecomputed` | ✓ |  |  |  |  |
-| [mod_shl](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_shl/index.html) | `ModShl<u8>`, …, `ModShl<isize>` | ✓ |  |  |  |  |
-| [mod_shr](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_shr/index.html) | `ModShr<i8>`, …, `ModShr<isize>` | ✓ |  |  |  |  |
-| [mod_inverse](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_inverse/index.html) | `ModInverse` | ✓ |  |  |  | ✓ |
-| [mod_div](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_div/index.html) | `ModDiv` | ≈ | ✓ |  |  | ✓ |
-| [mod_div_list](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_div_list/index.html) | `ModDivList` |  | ✓ |  |  | ✓ |
-| [mod_sqrt](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_sqrt/index.html) | `ModSqrt` | ≈ | ≈ |  |  |  |
-| [eq_mod](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/eq_mod/index.html) | `EqMod` | ✓ |  | ✓ |  |  |
+| [mod_is_reduced](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_is_reduced/index.html) | `ModIsReduced` | ✓ |  |  |  |  |
+| [mod_add](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_add/index.html) | `ModAdd` | ✓ |  |  |  |  |
+| [mod_add_mul](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_add_mul/index.html) | `ModAddMul` |  |  |  |  | ✓ |
+| [mod_add_mul_shl](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_add_mul_shl/index.html) | `ModAddMulShl` |  |  |  |  | ✓ |
+| [mod_sub](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_sub/index.html) | `ModSub` | ✓ |  |  |  |  |
+| [mod_sub_mul](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_sub_mul/index.html) | `ModSubMul` |  |  |  |  | ✓ |
+| [mod_sub_mul_shl](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_sub_mul_shl/index.html) | `ModSubMulShl` |  |  |  |  | ✓ |
+| [mod_sum](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_sum/index.html) | `ModSum` |  |  |  |  | ✓ |
+| [mod_neg](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_neg/index.html) | `ModNeg` | ✓ |  |  |  |  |
+| [mod_mul](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_mul/index.html) | `ModMul` | ✓ |  |  |  |  |
+| [mod_mul](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_mul/index.html) | `ModMulPrecomputed` | ✓ |  |  |  |  |
+| [mod_square](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_square/index.html) | `ModSquare` | ✓ |  |  |  |  |
+| [mod_square](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_square/index.html) | `ModSquarePrecomputed` | ✓ |  |  |  |  |
+| [mod_pow](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_pow/index.html) | `ModPow` | ✓ |  | ✓ | ✓ | ✓ |
+| [mod_product](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_product/index.html) | `ModProduct` |  |  |  |  | ✓ |
+| [mod_pow](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_pow/index.html) | `ModPowPrecomputed` | ✓ |  |  |  |  |
+| [mod_shl](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_shl/index.html) | `ModShl<u8>`, …, `ModShl<isize>` | ✓ |  |  |  |  |
+| [mod_shr](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_shr/index.html) | `ModShr<i8>`, …, `ModShr<isize>` | ✓ |  |  |  |  |
+| [mod_inverse](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_inverse/index.html) | `ModInverse` | ✓ |  |  |  | ✓ |
+| [mod_div](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_div/index.html) | `ModDiv` | ≈ | ✓ |  |  | ✓ |
+| [mod_div_list](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_div_list/index.html) | `ModDivList` |  | ✓ |  |  | ✓ |
+| [mod_sqrt](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_sqrt/index.html) | `ModSqrt` | ≈ | ≈ |  |  |  |
+| [eq_mod](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/eq_mod/index.html) | `EqMod` | ✓ |  | ✓ |  |  |
 
 Azurite checks the whole family through its residue type `AzZMod m`, whose invariant (a value in
 $$[0, m)$$) is the precondition these functions assert, so every input is first checked to be
@@ -260,27 +271,27 @@ every odd modulus included, is compared exactly.
 
 | Operation | Functions | Azurite | FLINT | GMP | num | Reference |
 | --- | --- | :---: | :---: | :---: | :---: | :---: |
-| [mod_power_of_2](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_power_of_2/index.html) | `ModPowerOf2` | ✓ |  |  |  |  |
-| [mod_power_of_2](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_power_of_2/index.html) | `RemPowerOf2` | ✓ |  |  |  |  |
-| [mod_power_of_2](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_power_of_2/index.html) | `NegModPowerOf2` | ✓ |  |  |  |  |
-| [mod_power_of_2_is_reduced](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_power_of_2_is_reduced/index.html) | `ModPowerOf2IsReduced` | ✓ |  |  |  |  |
-| [mod_power_of_2_add](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_power_of_2_add/index.html) | `ModPowerOf2Add` | ✓ |  |  |  |  |
-| [mod_power_of_2_add_mul](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_power_of_2_add_mul/index.html) | `ModPowerOf2AddMul` |  |  |  |  | ✓ |
-| [mod_power_of_2_add_mul_shl](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_power_of_2_add_mul_shl/index.html) | `ModPowerOf2AddMulShl` |  |  |  |  | ✓ |
-| [mod_power_of_2_sub](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_power_of_2_sub/index.html) | `ModPowerOf2Sub` | ✓ |  |  |  |  |
-| [mod_power_of_2_sub_mul](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_power_of_2_sub_mul/index.html) | `ModPowerOf2SubMul` |  |  |  |  | ✓ |
-| [mod_power_of_2_sub_mul_shl](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_power_of_2_sub_mul_shl/index.html) | `ModPowerOf2SubMulShl` |  |  |  |  | ✓ |
-| [mod_power_of_2_sum](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_power_of_2_sum/index.html) | `ModPowerOf2Sum` |  |  |  |  | ✓ |
-| [mod_power_of_2_neg](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_power_of_2_neg/index.html) | `ModPowerOf2Neg` | ✓ |  |  |  |  |
-| [mod_power_of_2_mul](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_power_of_2_mul/index.html) | `ModPowerOf2Mul` | ✓ |  |  |  |  |
-| [mod_power_of_2_square](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_power_of_2_square/index.html) | `ModPowerOf2Square` | ✓ |  |  |  |  |
-| [mod_power_of_2_pow](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_power_of_2_pow/index.html) | `ModPowerOf2Pow` | ✓ |  |  |  | ✓ |
-| [mod_power_of_2_product](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_power_of_2_product/index.html) | `ModPowerOf2Product` |  |  |  |  | ✓ |
-| [mod_power_of_2_inverse](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_power_of_2_inverse/index.html) | `ModPowerOf2Inverse` | ✓ |  |  |  |  |
-| [mod_power_of_2_sqrt](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_power_of_2_sqrt/index.html) | `ModPowerOf2Sqrt` | ✓ |  |  |  | ✓ |
-| [mod_power_of_2_shl](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_power_of_2_shl/index.html) | `ModPowerOf2Shl<u8>`, …, `ModPowerOf2Shl<isize>` | ✓ |  |  |  |  |
-| [mod_power_of_2_shr](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/mod_power_of_2_shr/index.html) | `ModPowerOf2Shr<i8>`, …, `ModPowerOf2Shr<isize>` | ✓ |  |  |  |  |
-| [eq_mod_power_of_2](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/eq_mod_power_of_2/index.html) | `EqModPowerOf2` | ✓ |  | ✓ |  |  |
+| [mod_power_of_2](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_power_of_2/index.html) | `ModPowerOf2` | ✓ |  |  |  |  |
+| [mod_power_of_2](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_power_of_2/index.html) | `RemPowerOf2` | ✓ |  |  |  |  |
+| [mod_power_of_2](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_power_of_2/index.html) | `NegModPowerOf2` | ✓ |  |  |  |  |
+| [mod_power_of_2_is_reduced](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_power_of_2_is_reduced/index.html) | `ModPowerOf2IsReduced` | ✓ |  |  |  |  |
+| [mod_power_of_2_add](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_power_of_2_add/index.html) | `ModPowerOf2Add` | ✓ |  |  |  |  |
+| [mod_power_of_2_add_mul](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_power_of_2_add_mul/index.html) | `ModPowerOf2AddMul` |  |  |  |  | ✓ |
+| [mod_power_of_2_add_mul_shl](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_power_of_2_add_mul_shl/index.html) | `ModPowerOf2AddMulShl` |  |  |  |  | ✓ |
+| [mod_power_of_2_sub](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_power_of_2_sub/index.html) | `ModPowerOf2Sub` | ✓ |  |  |  |  |
+| [mod_power_of_2_sub_mul](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_power_of_2_sub_mul/index.html) | `ModPowerOf2SubMul` |  |  |  |  | ✓ |
+| [mod_power_of_2_sub_mul_shl](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_power_of_2_sub_mul_shl/index.html) | `ModPowerOf2SubMulShl` |  |  |  |  | ✓ |
+| [mod_power_of_2_sum](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_power_of_2_sum/index.html) | `ModPowerOf2Sum` |  |  |  |  | ✓ |
+| [mod_power_of_2_neg](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_power_of_2_neg/index.html) | `ModPowerOf2Neg` | ✓ |  |  |  |  |
+| [mod_power_of_2_mul](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_power_of_2_mul/index.html) | `ModPowerOf2Mul` | ✓ |  |  |  |  |
+| [mod_power_of_2_square](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_power_of_2_square/index.html) | `ModPowerOf2Square` | ✓ |  |  |  |  |
+| [mod_power_of_2_pow](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_power_of_2_pow/index.html) | `ModPowerOf2Pow` | ✓ |  |  |  | ✓ |
+| [mod_power_of_2_product](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_power_of_2_product/index.html) | `ModPowerOf2Product` |  |  |  |  | ✓ |
+| [mod_power_of_2_inverse](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_power_of_2_inverse/index.html) | `ModPowerOf2Inverse` | ✓ |  |  |  |  |
+| [mod_power_of_2_sqrt](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_power_of_2_sqrt/index.html) | `ModPowerOf2Sqrt` | ✓ |  |  |  | ✓ |
+| [mod_power_of_2_shl](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_power_of_2_shl/index.html) | `ModPowerOf2Shl<u8>`, …, `ModPowerOf2Shl<isize>` | ✓ |  |  |  |  |
+| [mod_power_of_2_shr](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/mod_power_of_2_shr/index.html) | `ModPowerOf2Shr<i8>`, …, `ModPowerOf2Shr<isize>` | ✓ |  |  |  |  |
+| [eq_mod_power_of_2](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/eq_mod_power_of_2/index.html) | `EqModPowerOf2` | ✓ |  | ✓ |  |  |
 
 Azurite checks these through its type `AzZModPow2 k`, the residues modulo $$2^k$$, in the same way
 as the general family, and `ModPowerOf2` and `rem_power_of_2` (which coincide on naturals) through
@@ -299,7 +310,7 @@ $$x \pm yz2^b$$) exactly and reduces it once. `mod_power_of_2_sum` is checked ag
 
 | Operation | Functions | Azurite | FLINT | GMP | num | Reference |
 | --- | --- | :---: | :---: | :---: | :---: | :---: |
-| [crt](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/crt/index.html) | `Crt` | ✓ | ✓ |  |  | ✓ |
+| [crt](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/crt/index.html) | `Crt` | ✓ | ✓ |  |  | ✓ |
 | [multi_crt](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html#method.multi_crt) | `Natural::multi_crt`, `MultiCrt::new`, `MultiCrt::apply` | ✓ | ✓ |  |  | ✓ |
 | [multi_crt](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html#method.multi_crt) | `MultiCrt::apply_balanced` |  |  |  |  |  |
 | crt_comb | `CrtComb::new`, `CrtComb::reduce` |  | ✓ |  |  |  |
@@ -328,21 +339,25 @@ in $$(-M/2, M/2]$$, is not yet. The `CrtComb` precomputation is checked against 
 | [root](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/root/index.html) | `CeilingRoot<u64>` |  |  |  |  | ✓ |
 | [root](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/root/index.html) | `CheckedRoot<u64>` | ✓ |  |  |  | ✓ |
 | [root](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/root/index.html) | `RootRem<u64>` |  |  | ✓ |  | ✓ |
-| [log_base](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/log_base/index.html) | `FloorLogBase`, `CeilingLogBase`, `CheckedLogBase` | ✓ |  |  |  | ✓ |
-| [log_base](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/log_base/index.html) | `approx_ln` |  |  |  |  |  |
-| [log_base_2](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/log_base_2/index.html) | `FloorLogBase2`, `CeilingLogBase2`, `CheckedLogBase2` | ✓ |  |  |  |  |
-| [log_base_power_of_2](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/log_base_power_of_2/index.html) | `FloorLogBasePowerOf2`, `CheckedLogBasePowerOf2` | ✓ |  |  |  |  |
-| [log_base_power_of_2](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/log_base_power_of_2/index.html) | `CeilingLogBasePowerOf2` | ✓ |  |  |  | ✓ |
+| [log_base](https://docs.rs/malachite-nz/latest/malachite_nz/natural/exponential/log_base/index.html) | `FloorLogBase`, `CeilingLogBase`, `CheckedLogBase` | ✓ |  |  |  | ✓ |
+| [log_base](https://docs.rs/malachite-nz/latest/malachite_nz/natural/exponential/log_base/index.html) | `approx_ln` |  |  |  |  |  |
+| [log_base_2](https://docs.rs/malachite-nz/latest/malachite_nz/natural/exponential/log_base_2/index.html) | `FloorLogBase2`, `CeilingLogBase2`, `CheckedLogBase2` | ✓ |  |  |  |  |
+| [log_base_power_of_2](https://docs.rs/malachite-nz/latest/malachite_nz/natural/exponential/log_base_power_of_2/index.html) | `FloorLogBasePowerOf2`, `CheckedLogBasePowerOf2` | ✓ |  |  |  |  |
+| [log_base_power_of_2](https://docs.rs/malachite-nz/latest/malachite_nz/natural/exponential/log_base_power_of_2/index.html) | `CeilingLogBasePowerOf2` | ✓ |  |  |  | ✓ |
 
 `pow`, `floor_sqrt`, `sqrt_rem`, `ceiling_sqrt`, `checked_sqrt`, `floor_root` (cube roots included),
 and `checked_root` are checked by Azurite (the ceiling and checked square roots read off `sqrtRem`),
 and the floor and remainder forms by GMP (and the floors by num). Every root function is also
 checked against a reference that finds the root by binary search, and `pow` against both repeated
 multiplication and square-and-multiply; `ceiling_root` is cross-checked only through that reference.
-The logarithms are checked by Azurite: the base-2 and base-$$2^k$$ logarithms from `AzNat.size` and
-`isPowerOfTwo`, and `floor_log_base` and its siblings by `AzRat.floorLogBaseAbs` and `cmpPowAbs` for
-a base that fits in a limb (and by repeated multiplication in `AzNat` arithmetic for a larger one);
-the general logarithms are also compared with two references (a naive loop of multiplications and a
+The logarithms are checked by Azurite: the base-2 logarithms by `AzNat.floorLogBase2`,
+`ceilingLogBase2`, and `checkedLogBase2`, which are proven equal to Mathlib's `Nat.log 2` and
+`Nat.clog 2` and to the exact exponent of a power of 2, the base-$$2^k$$ logarithms by
+`floorLogBasePowerOf2`, `ceilingLogBasePowerOf2`, and `checkedLogBasePowerOf2`, proven equal to
+`Nat.log (2^k)` and `Nat.clog (2^k)` and to the exact exponent of a power of $$2^k$$, and
+`floor_log_base` and its siblings by `AzNat.floorLogBase`, `ceilingLogBase`, and `checkedLogBase`,
+proven equal to `Nat.log b` and `Nat.clog b` and to the exact exponent of a power of $$b$$, for
+bases of any size; the general logarithms are also compared with two references (a naive loop of multiplications and a
 search by repeated squaring). `approx_ln`, a floating-point estimate, is covered by property tests
 alone.
 
@@ -353,7 +368,7 @@ alone.
 | [power_of_2](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/power_of_2/index.html) | `PowerOf2<u64>` | ✓ |  |  |  |  |
 | [is_power_of_2](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/is_power_of_2/index.html) | `IsPowerOf2` | ✓ |  | ✓ |  |  |
 | [next_power_of_2](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/next_power_of_2/index.html) | `NextPowerOf2` |  |  | ✓ |  |  |
-| [divisible_by_power_of_2](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/divisible_by_power_of_2/index.html) | `DivisibleByPowerOf2` | ✓ |  | ✓ |  |  |
+| [divisible_by_power_of_2](https://docs.rs/malachite-nz/latest/malachite_nz/natural/modular/divisible_by_power_of_2/index.html) | `DivisibleByPowerOf2` | ✓ |  | ✓ |  |  |
 
 `power_of_2`, `is_power_of_2`, and `divisible_by_power_of_2` are checked by Azurite, and the last
 three functions by GMP.
@@ -362,14 +377,14 @@ three functions by GMP.
 
 | Operation | Functions | Azurite | FLINT | GMP | num | Reference |
 | --- | --- | :---: | :---: | :---: | :---: | :---: |
-| [gcd](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/gcd/index.html) | `Gcd` | ✓ |  | ✓ | ✓ | ✓ |
-| [gcd](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/gcd/extended_gcd/index.html) | `ExtendedGcd` | ≈ |  | ✓ |  | ✓ |
+| [gcd](https://docs.rs/malachite-nz/latest/malachite_nz/natural/number_theory/gcd/index.html) | `Gcd` | ✓ |  | ✓ | ✓ | ✓ |
+| [gcd](https://docs.rs/malachite-nz/latest/malachite_nz/natural/number_theory/gcd/extended_gcd/index.html) | `ExtendedGcd` | ≈ |  | ✓ |  | ✓ |
 | gcd | `extended_gcd_partial` |  | ✓ |  |  |  |
-| [lcm](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/lcm/index.html) | `Lcm` |  |  | ✓ | ✓ |  |
-| [coprime_with](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/coprime_with/index.html) | `CoprimeWith` | ✓ |  |  |  |  |
-| [kronecker_symbol](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/kronecker_symbol/index.html) | `JacobiSymbol` | ✓ |  | ✓ |  | ✓ |
-| [kronecker_symbol](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/kronecker_symbol/index.html) | `LegendreSymbol` |  |  | ✓ |  | ✓ |
-| [kronecker_symbol](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/kronecker_symbol/index.html) | `KroneckerSymbol` |  |  | ✓ |  |  |
+| [lcm](https://docs.rs/malachite-nz/latest/malachite_nz/natural/number_theory/lcm/index.html) | `Lcm` |  |  | ✓ | ✓ |  |
+| [coprime_with](https://docs.rs/malachite-nz/latest/malachite_nz/natural/number_theory/coprime_with/index.html) | `CoprimeWith` | ✓ |  |  |  |  |
+| [kronecker_symbol](https://docs.rs/malachite-nz/latest/malachite_nz/natural/number_theory/kronecker_symbol/index.html) | `JacobiSymbol` | ✓ |  | ✓ |  | ✓ |
+| [kronecker_symbol](https://docs.rs/malachite-nz/latest/malachite_nz/natural/number_theory/kronecker_symbol/index.html) | `LegendreSymbol` |  |  | ✓ |  | ✓ |
+| [kronecker_symbol](https://docs.rs/malachite-nz/latest/malachite_nz/natural/number_theory/kronecker_symbol/index.html) | `KroneckerSymbol` |  |  | ✓ |  |  |
 
 `gcd` is checked by Azurite's binary GCD, GMP, num, and two references (Euclid's algorithm and the
 binary algorithm), and `coprime_with` by Azurite. `extended_gcd` is ≈ for Azurite because a Bézout
@@ -385,31 +400,43 @@ Legendre and Kronecker symbols by GMP.
 
 | Operation | Functions | Azurite | FLINT | GMP | num | Reference |
 | --- | --- | :---: | :---: | :---: | :---: | :---: |
-| [factorial](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/factorial/index.html) | `Factorial` | ✓ |  | ✓ |  | ✓ |
-| [factorial](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/factorial/index.html) | `DoubleFactorial` | ✓ |  | ✓ |  | ✓ |
-| [factorial](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/factorial/index.html) | `Multifactorial` | ✓ |  | ✓ |  | ✓ |
-| [factorial](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/factorial/index.html) | `Subfactorial` | ✓ |  |  |  | ✓ |
-| [falling_factorial](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/falling_factorial/index.html) | `FallingFactorial` | ✓ |  |  |  | ✓ |
-| [rising_factorial](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/rising_factorial/index.html) | `RisingFactorial` | ✓ | ✓ |  |  |  |
-| [binomial_coefficient](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/binomial_coefficient/index.html) | `BinomialCoefficient` | ✓ |  | ✓ |  | ✓ |
-| [fibonacci](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/fibonacci/index.html) | `Fibonacci` (`fibonacci`, `fibonacci_pair`) | ✓ |  | ✓ |  | ✓ |
-| [fibonacci](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/fibonacci/index.html) | `LucasNumber` (`lucas_number`, `lucas_number_pair`) | ✓ |  | ✓ |  | ✓ |
-| [primorial](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/primorial/index.html) | `Primorial::primorial` | ✓ |  | ✓ |  | ✓ |
-| [primorial](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/primorial/index.html) | `Primorial::product_of_first_n_primes` | ✓ |  |  |  | ✓ |
-| [bell_number](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/bell_number/index.html) | `BellNumber` | ✓ | ✓ |  |  |  |
-| [bell_number](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/bell_number/index.html) | `bell_numbers_prefix` | ✓ | ✓ |  |  |  |
-| [landau_function](https://docs.rs/malachite-nz/latest/malachite_nz/natural/arithmetic/landau_function/index.html) | `landau_function_prefix` | ✓ | ✓ |  |  |  |
+| [factorial](https://docs.rs/malachite-nz/latest/malachite_nz/natural/number_theory/factorial/index.html) | `Factorial` | ✓ |  | ✓ |  | ✓ |
+| [factorial](https://docs.rs/malachite-nz/latest/malachite_nz/natural/number_theory/factorial/index.html) | `DoubleFactorial` | ✓ |  | ✓ |  | ✓ |
+| [factorial](https://docs.rs/malachite-nz/latest/malachite_nz/natural/number_theory/factorial/index.html) | `Multifactorial` | ✓ |  | ✓ |  | ✓ |
+| [factorial](https://docs.rs/malachite-nz/latest/malachite_nz/natural/number_theory/factorial/index.html) | `Subfactorial` | ✓ |  |  |  | ✓ |
+| [falling_factorial](https://docs.rs/malachite-nz/latest/malachite_nz/natural/number_theory/falling_factorial/index.html) | `FallingFactorial` | ✓ |  |  |  | ✓ |
+| [rising_factorial](https://docs.rs/malachite-nz/latest/malachite_nz/natural/number_theory/rising_factorial/index.html) | `RisingFactorial` | ✓ | ✓ |  |  |  |
+| [binomial_coefficient](https://docs.rs/malachite-nz/latest/malachite_nz/natural/number_theory/binomial_coefficient/index.html) | `BinomialCoefficient` | ✓ |  | ✓ |  | ✓ |
+| [fibonacci](https://docs.rs/malachite-nz/latest/malachite_nz/natural/number_theory/fibonacci/index.html) | `Fibonacci` (`fibonacci`, `fibonacci_pair`) | ✓ |  | ✓ |  | ✓ |
+| [fibonacci](https://docs.rs/malachite-nz/latest/malachite_nz/natural/number_theory/fibonacci/index.html) | `LucasNumber` (`lucas_number`, `lucas_number_pair`) | ✓ |  | ✓ |  | ✓ |
+| [primorial](https://docs.rs/malachite-nz/latest/malachite_nz/natural/number_theory/primorial/index.html) | `Primorial::primorial` | ✓ |  | ✓ |  | ✓ |
+| [primorial](https://docs.rs/malachite-nz/latest/malachite_nz/natural/number_theory/primorial/index.html) | `Primorial::product_of_first_n_primes` | ✓ |  |  |  | ✓ |
+| [bernoulli_number_denominator](https://docs.rs/malachite-nz/latest/malachite_nz/natural/number_theory/bernoulli_number_denominator/index.html) | `Natural::bernoulli_number_denominator` |  | ✓ |  |  | ✓ |
+| [bell_number](https://docs.rs/malachite-nz/latest/malachite_nz/natural/number_theory/bell_number/index.html) | `BellNumber` | ✓ | ✓ |  |  |  |
+| [bell_number](https://docs.rs/malachite-nz/latest/malachite_nz/natural/number_theory/bell_number/index.html) | `bell_numbers_prefix` | ✓ | ✓ |  |  |  |
+| [landau_function](https://docs.rs/malachite-nz/latest/malachite_nz/natural/number_theory/landau_function/index.html) | `landau_function_prefix` | ✓ | ✓ |  |  |  |
+| [tangent_numbers](https://docs.rs/malachite-nz/latest/malachite_nz/natural/number_theory/tangent_numbers/index.html) | `tangent_numbers_prefix` | ✓ |  |  |  | ✓ |
+| [stirling_number_of_the_second_kind](https://docs.rs/malachite-nz/latest/malachite_nz/natural/number_theory/stirling_number_of_the_second_kind/index.html) | `StirlingNumberOfTheSecondKind` |  | ✓ |  |  | ✓ |
+| [unsigned_stirling_number_of_the_first_kind](https://docs.rs/malachite-nz/latest/malachite_nz/natural/number_theory/unsigned_stirling_number_of_the_first_kind/index.html) | `UnsignedStirlingNumberOfTheFirstKind` |  | ✓ |  |  | ✓ |
 
-Every combinatorial function is checked against Azurite's proven implementations. The functions of
-a `u64` index (the factorials, Fibonacci and Lucas numbers, the primorials, and the Bell and Landau
-functions) are checked for every index the exhaustive generator reaches (every $$n < 10000$$, and
-every length below 256 for the Bell and Landau functions) and for random indices; the rising and
-falling factorials and binomial coefficients for exhaustive, random, and special random inputs.
-Almost every one is also compared with a naive reference (the defining product, sum, or
-recurrence), and most with GMP. `rising_factorial`, `bell_number` (with its prefix table), and
-`landau_function_prefix` are also checked against FLINT. Azurite's `binomial` uses the symmetry
-$$\binom{n}{k} = \binom{n}{n - k}$$ only when $$n$$ fits in one limb, so the oracle applies it before
-calling `binomial`; that is a textbook identity, not an adaptation of the specification.
+Every combinatorial function except the Stirling numbers is checked against Azurite's proven
+implementations. The functions of a `u64` index (the factorials, Fibonacci and Lucas numbers, the
+primorials, and the Bell and Landau functions) are checked for every index the exhaustive generator
+reaches (every $$n < 10000$$, and every length below 256 for the Bell and Landau functions) and for
+random indices; the rising and falling factorials and binomial coefficients for exhaustive, random,
+and special random inputs. Almost every one is also compared with a naive reference (the defining
+product, sum, or recurrence), and most with GMP. `rising_factorial`, `bell_number` (with its prefix
+table), and `landau_function_prefix` are also checked against FLINT. `tangent_numbers_prefix` is checked against
+Azurite's `tangentNumbers` for every length below 256, and against a reference that reads the
+tangent numbers off the boustrophedon triangle. The denominators of the Bernoulli numbers are
+checked against FLINT's `arith_bernoulli_number_denom` and against the von Staudt–Clausen product
+with its primes found by trial division.
+`stirling_number_of_the_second_kind` and `unsigned_stirling_number_of_the_first_kind` are checked
+against FLINT for exhaustive and random pairs $$(n, k)$$, and against their recurrences, their row
+sums (the Bell numbers and $$n!$$), the coefficients of the Touchard and rising factorial
+polynomials, and the primitive versions wherever the result fits. Azurite's `binomial` uses the
+symmetry $$\binom{n}{k} = \binom{n}{n - k}$$ only when $$n$$ fits in one limb, so the oracle applies
+it before calling `binomial`; that is a textbook identity, not an adaptation of the specification.
 
 ## Conversion {#conversion}
 
@@ -461,6 +488,8 @@ an exact rational and rounds it to the float format, subnormals included, before
 | [to_limbs](https://docs.rs/malachite-nz/latest/malachite_nz/natural/conversion/to_limbs/index.html) | `limbs` | ✓ |  |  |  |  |
 | [to_limbs](https://docs.rs/malachite-nz/latest/malachite_nz/natural/conversion/to_limbs/index.html) | `to_limbs_asc`, `into_limbs_asc`, `as_limbs_asc`, `to_limbs_desc`, `into_limbs_desc` | ✓ |  |  |  |  |
 | [limb_count](https://docs.rs/malachite-nz/latest/malachite_nz/natural/conversion/limb_count/index.html) | `limb_count` | ✓ |  |  |  |  |
+| [factoradic_digits](https://docs.rs/malachite-nz/latest/malachite_nz/natural/conversion/digits/factoradic_digits/index.html) | `FactoradicDigits::to_factoradic_digits_asc`, `FactoradicDigits::to_factoradic_digits_desc` |  |  |  |  | ✓ |
+| [factoradic_digits](https://docs.rs/malachite-nz/latest/malachite_nz/natural/conversion/digits/factoradic_digits/index.html) | `FactoradicDigits::from_factoradic_digits_asc`, `FactoradicDigits::from_factoradic_digits_desc` |  |  |  |  | ✓ |
 | [general_digits](https://docs.rs/malachite-nz/latest/malachite_nz/natural/conversion/digits/general_digits/index.html) | `Digits::to_digits_asc`, `Digits::to_digits_desc` | ✓ |  |  |  | ✓ |
 | [general_digits](https://docs.rs/malachite-nz/latest/malachite_nz/natural/conversion/digits/general_digits/index.html) | `Digits::from_digits_asc`, `Digits::from_digits_desc` | ✓ |  |  |  | ✓ |
 | [power_of_2_digits](https://docs.rs/malachite-nz/latest/malachite_nz/natural/conversion/digits/power_of_2_digits/index.html) | `PowerOf2Digits` | ✓ |  |  |  | ✓ |
@@ -472,7 +501,11 @@ constructors) and `limb_count` by the number of `AzNat` limbs. Base-$$b$$ digits
 and both orders, are checked by Azurite (`limbDigits` and `ofLimbDigits` for primitive digits, and
 division and Horner's rule in `AzNat` arithmetic for `Natural` digits) and by references that
 convert one digit at a time; the power-of-2 digits by Azurite's `limbDigitsPow2` and
-`ofLimbDigitsPow2` and by references that extract and assemble bit fields.
+`ofLimbDigitsPow2` and by references that extract and assemble bit fields. Factorial-number-system
+digits are checked by references that work from the top, dividing by each factorial no greater
+than the number, and that sum each digit times its factorial, as well as by round trips, by
+agreement with the primitive-type implementations, and by the bound that the number of digits is
+the largest $$k$$ with $$k! \leq x$$.
 
 ### Strings {#strings}
 

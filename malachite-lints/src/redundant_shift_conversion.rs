@@ -9,11 +9,12 @@
 use clippy_utils::diagnostics::span_lint_and_help;
 use clippy_utils::source::snippet;
 use clippy_utils::ty::implements_trait;
+use rustc_attr_ir::LangItem;
 use rustc_hir::def::{DefKind, Res};
-use rustc_hir::{AssignOpKind, BinOpKind, Expr, ExprKind, LangItem};
+use rustc_hir::{AssignOpKind, BinOpKind, Expr, ExprKind};
 use rustc_lint::{LateContext, LateLintPass};
+use rustc_lint::{declare_lint, declare_lint_pass};
 use rustc_middle::ty::Ty;
-use rustc_session::{declare_lint, declare_lint_pass};
 
 declare_lint! {
     /// ### What it does

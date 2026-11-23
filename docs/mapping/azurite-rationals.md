@@ -146,6 +146,8 @@ compares $$wx$$ with $$-yz$$, the sign of $$wx + yz$$; in Azurite that is
 | ✓ | `AzRat.zpow (q : AzRat) : ℤ → AzRat`, the `Field` `zpow` | [`Pow<i64>`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Pow.html) |
 | ✓ | `AzRat.shiftLeft (x : AzRat) (n : Nat) : AzRat`, `instance : HShiftLeft AzRat Nat AzRat` | [`Shl`](https://doc.rust-lang.org/nightly/std/ops/trait.Shl.html), [`ShlAssign`](https://doc.rust-lang.org/nightly/std/ops/trait.ShlAssign.html) |
 | ✓ | `AzRat.shiftRight (x : AzRat) (n : Nat) : AzRat`, `instance : HShiftRight AzRat Nat AzRat` | [`Shr`](https://doc.rust-lang.org/nightly/std/ops/trait.Shr.html), [`ShrAssign`](https://doc.rust-lang.org/nightly/std/ops/trait.ShrAssign.html) |
+| ✓ | `AzRat.isPowerOfTwo (q : AzRat) : Bool` | [`IsPowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.IsPowerOf2.html) |
+| ≈ | `AzRat.powerOfTwoExponent (q : AzRat) : AzInt` | [`CheckedLogBase2`](https://docs.rs/malachite-base/latest/malachite_base/num/exponential/traits/trait.CheckedLogBase2.html) |
 | ✓ | `sum (l : List AzRat) : AzRat`, `sumArray (a : Array AzRat) : AzRat` | [`Sum`](https://doc.rust-lang.org/nightly/std/iter/trait.Sum.html) |
 | ✓ | `product (l : List AzRat) : AzRat`, `productArray (a : Array AzRat) : AzRat` | [`Product`](https://doc.rust-lang.org/nightly/std/iter/trait.Product.html) |
 | — | `combineSigned (sx sy : Bool) (u v : AzNat) : Bool × AzNat` | |
@@ -161,9 +163,17 @@ count may be any primitive integer, a negative count reversing the direction. Ma
 [`AddMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.AddMul.html),
 and the other derived operations of the GMP and FLINT pages, which Azurite spells with the ring
 operations, and functions with no Azurite counterpart at all
-([`approximate`](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/traits/trait.Approximate.html),
+([`approximate`](https://docs.rs/malachite-q/latest/malachite_q/rational/number_theory/traits/trait.Approximate.html),
 [`simplest_rational_in_interval`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.simplest_rational_in_interval),
 continued fractions, roots). `combineSigned` is the sign bookkeeping shared by `add` and `sub`.
+
+**Powers of 2.** `isPowerOfTwo q` and `is_power_of_2()` both decide whether $$q = 2^k$$ for an
+integer $$k$$, possibly negative: $$q$$ is positive and its numerator and denominator, one of which
+is then 1, are powers of 2. `powerOfTwoExponent q` is that $$k$$, the difference of the bit lengths
+of the numerator and denominator, and is meaningful only when `isPowerOfTwo q` holds;
+`checked_log_base_2()` returns `Some(k)` exactly for the powers of 2 and `None` for every other
+positive rational, and panics on a nonpositive one. Malachite's oracle tests check `is_power_of_2`
+against `isPowerOfTwo`.
 
 **Sums and products.** `sum xs` and `product xs` are `Rational::sum(xs.into_iter())` and
 `Rational::product(xs.into_iter())`, or `xs.iter().sum()` and `xs.iter().product()`; the empty sum
@@ -176,8 +186,18 @@ a left fold would keep combining a large running total with small terms.
 | | Azurite | Malachite |
 | :---: | --- | --- |
 | ✓ | `round (q : AzRat) (mode : RoundingMode) : AzInt × Ordering` | [`RoundingFrom<Rational>`](https://docs.rs/malachite-q/latest/malachite_q/rational/conversion/integer_from_rational/index.html) for `Integer` |
-| ✓ | `floorLogBase2Abs (q : AzRat) : ℤ`, `ceilingLogBase2Abs (q : AzRat) : ℤ` | [`floor_log_base_2_abs`](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/log_base_2/index.html), [`ceiling_log_base_2_abs`](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/log_base_2/index.html) |
-| ✓ | `floorLogBaseAbs (b : UInt64) (q : AzRat) : ℤ` | [`FloorLogBase<u64>`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.FloorLogBase.html) |
+| ✓ | `floorLogBase2Abs (q : AzRat) : ℤ`, `ceilingLogBase2Abs (q : AzRat) : ℤ` | [`floor_log_base_2_abs`](https://docs.rs/malachite-q/latest/malachite_q/rational/exponential/log_base_2/index.html), [`ceiling_log_base_2_abs`](https://docs.rs/malachite-q/latest/malachite_q/rational/exponential/log_base_2/index.html) |
+| ✓ | `AzRat.checkedLogBase2 (q : AzRat) : Option AzInt` | [`CheckedLogBase2`](https://docs.rs/malachite-base/latest/malachite_base/num/exponential/traits/trait.CheckedLogBase2.html) |
+| ✓ | `floorLogBaseAbs (b : UInt64) (q : AzRat) : ℤ` | [`FloorLogBase<u64>`](https://docs.rs/malachite-base/latest/malachite_base/num/exponential/traits/trait.FloorLogBase.html) |
+| ✓ | `ceilingLogBaseAbs (b : UInt64) (q : AzRat) : ℤ` | [`CeilingLogBase<u64>`](https://docs.rs/malachite-base/latest/malachite_base/num/exponential/traits/trait.CeilingLogBase.html) |
+| ✓ | `checkedLogBaseAbs (b : UInt64) (q : AzRat) : Option ℤ` | [`CheckedLogBase<u64>`](https://docs.rs/malachite-base/latest/malachite_base/num/exponential/traits/trait.CheckedLogBase.html) |
+| ✓ | `floorLogBaseRatAbs (b q : AzRat) : Option ℤ` | [`FloorLogBase<&Rational>`](https://docs.rs/malachite-base/latest/malachite_base/num/exponential/traits/trait.FloorLogBase.html) |
+| ✓ | `ceilingLogBaseRatAbs (b q : AzRat) : Option ℤ` | [`CeilingLogBase<&Rational>`](https://docs.rs/malachite-base/latest/malachite_base/num/exponential/traits/trait.CeilingLogBase.html) |
+| ✓ | `checkedLogBaseRatAbs (b q : AzRat) : Option ℤ` | [`CheckedLogBase<&Rational>`](https://docs.rs/malachite-base/latest/malachite_base/num/exponential/traits/trait.CheckedLogBase.html) |
+| — | `isLogBase`, `cmpPowRatAbs`, `floorLogSearchRat`, `bracketHi`, `bracketLo`, `estimateLogBaseRat`, `bracketFuel`, `floorLogBaseRatAbsCore`, `ceilingLogBaseRatAbsCore` | |
+| ✓ | `floorLogBasePowerOf2Abs (q : AzRat) (k : Nat) : Option ℤ` | [`FloorLogBasePowerOf2<i64>`](https://docs.rs/malachite-base/latest/malachite_base/num/exponential/traits/trait.FloorLogBasePowerOf2.html) |
+| ✓ | `ceilingLogBasePowerOf2Abs (q : AzRat) (k : Nat) : Option ℤ` | [`CeilingLogBasePowerOf2<i64>`](https://docs.rs/malachite-base/latest/malachite_base/num/exponential/traits/trait.CeilingLogBasePowerOf2.html) |
+| ✓ | `checkedLogBasePowerOf2Abs (q : AzRat) (k : Nat) : Option ℤ` | [`CheckedLogBasePowerOf2<i64>`](https://docs.rs/malachite-base/latest/malachite_base/num/exponential/traits/trait.CheckedLogBasePowerOf2.html) |
 | — | `cmpPowAbs (b : UInt64) (e : ℤ) (q : AzRat) : Ordering`, `floorLogSearch` | |
 
 **Rounding to an integer.** `round q mode` is `Integer::rounding_from(q, mode)`: both return the
@@ -194,14 +214,31 @@ rounds to a multiple of another rational, which Azurite spells as `round (q / m)
 the numerator and denominator. `floorLogBaseAbs b q` is `q.floor_log_base(b)` for a `u64` base,
 where Malachite requires `q > 0` and Azurite takes `|q|` (returning `0` for `q = 0`); Azurite
 brackets the exponent and binary-searches it, Malachite estimates it with floating-point
-logarithms and corrects, and the results agree. Malachite's
-[`CeilingLogBase`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CeilingLogBase.html)
-and
-[`CheckedLogBase`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CheckedLogBase.html)
-follow from the floor and a comparison of $$b^e$$ with $$|q|$$ (`cmpPowAbs`), and its
-`floor_log_base(&Rational)` family takes a rational base, which Azurite does not. The three
-`FloorLogBase2`/`CeilingLogBase2`/`CheckedLogBase2` traits are the positive-only versions of the
-`_abs` functions.
+logarithms and corrects, and the results agree. `ceilingLogBaseAbs` and `checkedLogBaseAbs` are
+`q.ceiling_log_base(b)` and `q.checked_log_base(b)`, the floor followed by a comparison of
+$$b^e$$ with $$|q|$$ (`cmpPowAbs`) in both libraries; for `q = 0` they return `0` and `none` where
+Malachite panics.
+
+**Rational bases.** `floorLogBaseRatAbs b q` is `q.floor_log_base(&b)`, and likewise for the
+ceiling and the checked form, for any base $$b > 0$$ other than 1; a base below 1 gives
+logarithms of the opposite sign. Azurite returns `none` for `q = 0` or an invalid base, where
+Malachite panics, and takes `|q|` where Malachite requires `q > 0`. Azurite reduces a base below 1
+to its reciprocal, brackets the exponent from a floating-point estimate (or by repeated doubling
+when the estimate fails), and binary-searches it with exact comparisons; the helpers listed
+under — are those internal steps. Malachite starts from a floating-point estimate too and steps the
+exponent up or down, comparing exact powers, until it is confirmed.
+
+**Power-of-2 bases.** `floorLogBasePowerOf2Abs q k` is `q.floor_log_base_power_of_2(k)`, and
+likewise for the ceiling and the checked form: the base-2 logarithm divided by $$k$$ and rounded
+down or up, and for the checked form `some e` exactly when $$|q| = 2^{ke}$$. Azurite's `k` is a
+positive `Nat`; Malachite's is an `i64` that may also be negative, a base $$2^k$$ below 1, for which
+$$\lfloor \log_{2^k} x \rfloor = -\lceil \log_{2^{-k}} x \rceil$$ and the checked logarithm
+changes sign. Azurite returns `none` for `q = 0` or `k = 0` and takes `|q|`, where Malachite
+panics unless `q > 0` and `k ≠ 0`. The three
+`FloorLogBase2`/`CeilingLogBase2` traits are the positive-only versions of the `_abs` functions.
+`checkedLogBase2 q` and `checked_log_base_2()` are both $$k$$ exactly when $$q = 2^k$$, for an
+integer $$k$$ of either sign; for $$q \leq 0$$ Azurite returns `none` and Malachite panics, and
+neither library has an `_abs` form.
 
 ## Strings and scientific notation {#strings-and-scientific-notation}
 
@@ -244,6 +281,26 @@ $$10^{-6}$$). Malachite's `Exact` rounding mode is Azurite's `toSciExact` predic
 `from_sci_string_simplest` finds the simplest rational in the string's rounding interval and has
 no Azurite counterpart. `lengthAfterPoint b q` is `q.length_after_point_in_small_base(b)`, the
 number of digits after the point in a terminating base-`b` expansion.
+
+## Bernoulli numbers {#bernoulli-numbers}
+
+| | Azurite | Malachite |
+| :---: | --- | --- |
+| ✓ | `bernoulli (n : Nat) : AzRat` | `Rational::bernoulli_number(n)` |
+| ✓ | `bernoulliEvens (m : Nat) : Array AzRat` | `even_bernoulli_numbers_prefix(m)` |
+| — | `bernoulliOfTangent (j : Nat) (T : AzNat) : AzRat` | |
+
+`bernoulli n` is the Bernoulli number $$B_n$$, with the convention $$B_1 = -1/2$$:
+$$1, -1/2, 1/6, 0, -1/30, 0, 1/42, \ldots$$. `bernoulliEvens m` is the array
+$$B_2, B_4, \ldots, B_{2m}$$. Azurite takes the even ones from the tangent numbers
+([`tangentNumbers`](/mapping/azurite-naturals/#combinatorics), which Malachite has as
+`tangent_numbers_prefix`) by
+$$B_{2j} = (-1)^{j-1}\, 2j\, T_j / (4^{2j} - 2^{2j})$$, reduced to lowest terms
+(`bernoulliOfTangent`), an internal step with no counterpart. Malachite uses the same
+convention, $$B_1 = -1/2$$. `even_bernoulli_numbers_prefix` is in
+`malachite_q::rational::number_theory::bernoulli_number`, alongside `bernoulli_numbers_prefix(n)`,
+which returns $$B_0, \ldots, B_{n-1}$$; see also
+[the FLINT arithmetic-functions page](/mapping/flint-arithmetic-functions/#bernoulli-numbers-and-polynomials).
 
 ## Exhaustive generation {#exhaustive-generation}
 

@@ -6,14 +6,14 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::eq_expr_value;
 use clippy_utils::diagnostics::span_lint_and_sugg;
-use clippy_utils::eq_expr_value;
 use clippy_utils::source::snippet;
 use rustc_errors::Applicability;
 use rustc_hir::def::{DefKind, Res};
 use rustc_hir::{Expr, ExprKind};
 use rustc_lint::{LateContext, LateLintPass};
-use rustc_session::{declare_lint, declare_lint_pass};
+use rustc_lint::{declare_lint, declare_lint_pass};
 
 declare_lint! {
     /// ### What it does
@@ -140,7 +140,11 @@ impl<'tcx> LateLintPass<'tcx> for ManualFloatFromPrimitive {
         let ty_name = if matches!(cx.tcx.def_kind(parent), DefKind::Impl { .. })
             && crate::bignum_name(
                 cx,
-                cx.tcx.type_of(parent).instantiate_identity().peel_refs(),
+                cx.tcx
+                    .type_of(parent)
+                    .instantiate_identity()
+                    .skip_normalization()
+                    .peel_refs(),
             ) == Some(name)
         {
             "Self"

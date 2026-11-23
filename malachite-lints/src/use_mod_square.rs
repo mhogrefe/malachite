@@ -9,7 +9,7 @@
 use clippy_utils::SpanlessEq;
 use rustc_hir::{Expr, ExprKind};
 use rustc_lint::{LateContext, LateLintPass};
-use rustc_session::{declare_lint, declare_lint_pass};
+use rustc_lint::{declare_lint, declare_lint_pass};
 
 declare_lint! {
     /// ### What it does
@@ -86,7 +86,7 @@ impl<'tcx> LateLintPass<'tcx> for UseModSquare {
         }
         let x = crate::peel_clone_and_borrows(receiver);
         let y = crate::peel_clone_and_borrows(multiplicand);
-        if SpanlessEq::new(cx).eq_expr(x, y) {
+        if SpanlessEq::new(cx).eq_expr(x.span.ctxt(), x, y) {
             clippy_utils::diagnostics::span_lint(
                 cx,
                 USE_MOD_SQUARE,

@@ -150,7 +150,7 @@ Conversions to and from primitives follow the policy-trait scheme
 | ≈ | `slong fmpz_get_si (const fmpz_t f)` | [`TryFrom`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/conversion/primitive_int_from_integer/index.html), [`WrappingFrom`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/conversion/primitive_int_from_integer/index.html), [`SaturatingFrom`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/conversion/primitive_int_from_integer/index.html) |
 | ≈ | `ulong fmpz_get_ui (const fmpz_t f)` | [`TryFrom`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/conversion/primitive_int_from_integer/index.html), [`WrappingFrom`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/conversion/primitive_int_from_integer/index.html), [`SaturatingFrom`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/conversion/primitive_int_from_integer/index.html) |
 | ≈ | `void fmpz_get_uiui (ulong * hi, ulong * low, const fmpz_t f)` | [`TryFrom`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/conversion/primitive_int_from_integer/index.html), [`WrappingFrom`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/conversion/primitive_int_from_integer/index.html) |
-| ✓ | `ulong fmpz_get_nmod (const fmpz_t f, nmod_t mod)` | [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Mod.html) |
+| ✓ | `ulong fmpz_get_nmod (const fmpz_t f, nmod_t mod)` | [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.Mod.html) |
 | ≈ | `double fmpz_get_d (const fmpz_t f)` | [`RoundingFrom`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/conversion/primitive_float_from_integer/index.html), [`TryFrom`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/conversion/primitive_float_from_integer/index.html) |
 | — | `void fmpz_set_mpf (fmpz_t f, const mpf_t x)` | |
 | — | `void fmpz_get_mpf (mpf_t x, const fmpz_t f)` | |
@@ -176,7 +176,7 @@ Conversions to and from primitives follow the policy-trait scheme
 | ✓ | `void fmpz_get_signed_uiui (ulong * hi, ulong * lo, const fmpz_t in)` | [`WrappingFrom`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/conversion/primitive_int_from_integer/index.html) |
 | — | `void fmpz_set_mpz (fmpz_t f, const mpz_t x)` | |
 | ✓ | `int fmpz_set_str (fmpz_t f, const char * str, int b)` | [`FromStringBase`](https://docs.rs/malachite-base/latest/malachite_base/num/conversion/traits/trait.FromStringBase.html), [`FromStr`](https://doc.rust-lang.org/nightly/std/str/trait.FromStr.html) |
-| ✓ | `void fmpz_set_ui_smod (fmpz_t f, ulong x, ulong m)` | [`BalancedMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BalancedMod.html) |
+| ✓ | `void fmpz_set_ui_smod (fmpz_t f, ulong x, ulong m)` | [`BalancedMod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.BalancedMod.html) |
 | — | `void flint_mpz_init_set_readonly (mpz_t z, const fmpz_t f)` | |
 | — | `void flint_mpz_clear_readonly (mpz_t z)` | |
 | — | `void fmpz_init_set_readonly (fmpz_t f, const mpz_t z)` | |
@@ -234,7 +234,7 @@ takes the target precision explicitly and also returns an
 direction.
 
 **`fmpz_get_nmod`.** Reduce with `Natural::from(m)` and
-[`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Mod.html),
+[`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.Mod.html),
 then convert the result to a word. Malachite has no public counterpart of the precomputed
 `nmod_t` context; see [the mod-n page](/mapping/flint-integers-mod-n/#conventions).
 
@@ -249,7 +249,7 @@ no whitespace, accepts a single leading `+` that FLINT rejects, and, like FLINT,
 minus sign.
 
 **`fmpz_set_ui_smod`.** The representative of `x` modulo `m` in `(-m/2, m/2]`, which is
-[`BalancedMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BalancedMod.html),
+[`BalancedMod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.BalancedMod.html),
 returning an
 [`Integer`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html). FLINT
 requires (without checking) `0 <= x < m`; `balanced_mod` accepts any
@@ -287,7 +287,7 @@ encoding differences behind the ≈.
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✓ | `size_t fmpz_sizeinbase (const fmpz_t f, int b)` | [`SignificantBits`](https://docs.rs/malachite-base/latest/malachite_base/num/logic/traits/trait.SignificantBits.html), [`FloorLogBase`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.FloorLogBase.html) |
+| ✓ | `size_t fmpz_sizeinbase (const fmpz_t f, int b)` | [`SignificantBits`](https://docs.rs/malachite-base/latest/malachite_base/num/logic/traits/trait.SignificantBits.html), [`FloorLogBase`](https://docs.rs/malachite-base/latest/malachite_base/num/exponential/traits/trait.FloorLogBase.html) |
 | ✓ | `flint_bitcnt_t fmpz_bits (const fmpz_t f)` | [`SignificantBits`](https://docs.rs/malachite-base/latest/malachite_base/num/logic/traits/trait.SignificantBits.html) |
 | ✓ | `slong fmpz_size (const fmpz_t f)` | [`limb_count`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html#method.limb_count) |
 | ✓ | `int fmpz_sgn (const fmpz_t f)` | [`Sign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Sign.html) |
@@ -439,10 +439,10 @@ negative infinity, and `tdiv` toward zero. As
 [on the GMP page](/mapping/gmp-integers/#division-functions), `cdiv` is
 [`CeilingDivMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CeilingDivMod.html)
 and
-[`CeilingMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CeilingMod.html),
+[`CeilingMod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.CeilingMod.html),
 `fdiv` is
 [`DivMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivMod.html)
-and [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Mod.html),
+and [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.Mod.html),
 `tdiv` is
 [`DivRem`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivRem.html)
 and [`Rem`](https://doc.rust-lang.org/nightly/std/ops/trait.Rem.html) (the `/` and `%`
@@ -469,12 +469,12 @@ Malachite.
 | ✓ | `void fmpz_cdiv_q_2exp (fmpz_t f, const fmpz_t g, ulong exp)` | [`ShrRound`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ShrRound.html) |
 | ✓ | `void fmpz_fdiv_q_2exp (fmpz_t f, const fmpz_t g, ulong exp)` | [`Shr`](https://doc.rust-lang.org/nightly/std/ops/trait.Shr.html), [`ShrRound`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ShrRound.html) |
 | ✓ | `void fmpz_tdiv_q_2exp (fmpz_t f, const fmpz_t g, ulong exp)` | [`ShrRound`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ShrRound.html) |
-| ✓ | `void fmpz_fdiv_r (fmpz_t s, const fmpz_t g, const fmpz_t h)` | [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Mod.html) |
-| ✓ | `void fmpz_cdiv_r_2exp (fmpz_t s, const fmpz_t g, ulong exp)` | [`CeilingModPowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CeilingModPowerOf2.html) |
-| ✓ | `void fmpz_fdiv_r_2exp (fmpz_t s, const fmpz_t g, ulong exp)` | [`ModPowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2.html) |
-| ✓ | `void fmpz_tdiv_r_2exp (fmpz_t s, const fmpz_t g, ulong exp)` | [`RemPowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.RemPowerOf2.html) |
-| ✓ | `ulong fmpz_cdiv_ui (const fmpz_t g, ulong h)` | [`CeilingMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CeilingMod.html), [`UnsignedAbs`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.UnsignedAbs.html) |
-| ✓ | `ulong fmpz_fdiv_ui (const fmpz_t g, ulong h)` | [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Mod.html) |
+| ✓ | `void fmpz_fdiv_r (fmpz_t s, const fmpz_t g, const fmpz_t h)` | [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.Mod.html) |
+| ✓ | `void fmpz_cdiv_r_2exp (fmpz_t s, const fmpz_t g, ulong exp)` | [`CeilingModPowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.CeilingModPowerOf2.html) |
+| ✓ | `void fmpz_fdiv_r_2exp (fmpz_t s, const fmpz_t g, ulong exp)` | [`ModPowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2.html) |
+| ✓ | `void fmpz_tdiv_r_2exp (fmpz_t s, const fmpz_t g, ulong exp)` | [`RemPowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.RemPowerOf2.html) |
+| ✓ | `ulong fmpz_cdiv_ui (const fmpz_t g, ulong h)` | [`CeilingMod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.CeilingMod.html), [`UnsignedAbs`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.UnsignedAbs.html) |
+| ✓ | `ulong fmpz_fdiv_ui (const fmpz_t g, ulong h)` | [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.Mod.html) |
 | ✓ | `ulong fmpz_tdiv_ui (const fmpz_t g, ulong h)` | [`Rem`](https://doc.rust-lang.org/nightly/std/ops/trait.Rem.html), [`UnsignedAbs`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.UnsignedAbs.html) |
 
 **`fmpz_ndiv_qr`.** `DivRound` with `Nearest` rounds the quotient to the nearest integer, but
@@ -503,12 +503,12 @@ since the ceiling remainder is nonpositive and the truncated one takes `g`'s sig
 | ✓ | `void fmpz_divexact_si (fmpz_t f, const fmpz_t g, slong h)` | [`DivExact`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivExact.html) |
 | ✓ | `void fmpz_divexact_ui (fmpz_t f, const fmpz_t g, ulong h)` | [`DivExact`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivExact.html) |
 | ✓ | `void fmpz_divexact2_uiui (fmpz_t f, const fmpz_t g, ulong x, ulong y)` | [`DivExact`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivExact.html) |
-| ✓ | `int fmpz_divisible (const fmpz_t f, const fmpz_t g)` | [`DivisibleBy`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivisibleBy.html) |
-| ✓ | `int fmpz_divisible_si (const fmpz_t f, slong g)` | [`DivisibleBy`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivisibleBy.html) |
+| ✓ | `int fmpz_divisible (const fmpz_t f, const fmpz_t g)` | [`DivisibleBy`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.DivisibleBy.html) |
+| ✓ | `int fmpz_divisible_si (const fmpz_t f, slong g)` | [`DivisibleBy`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.DivisibleBy.html) |
 | ✓ | `int fmpz_divides (fmpz_t q, const fmpz_t f, const fmpz_t g)` | [`DivMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivMod.html) |
-| ✓ | `void fmpz_mod (fmpz_t f, const fmpz_t g, const fmpz_t h)` | [`ModEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModEuclidean.html) |
-| ✓ | `ulong fmpz_mod_ui (fmpz_t f, const fmpz_t g, ulong h)` | [`ModEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModEuclidean.html) |
-| ✓ | `void fmpz_smod (fmpz_t f, const fmpz_t g, const fmpz_t h)` | [`BalancedMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BalancedMod.html) |
+| ✓ | `void fmpz_mod (fmpz_t f, const fmpz_t g, const fmpz_t h)` | [`ModEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModEuclidean.html) |
+| ✓ | `ulong fmpz_mod_ui (fmpz_t f, const fmpz_t g, ulong h)` | [`ModEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModEuclidean.html) |
+| ✓ | `void fmpz_smod (fmpz_t f, const fmpz_t g, const fmpz_t h)` | [`BalancedMod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.BalancedMod.html) |
 | ✓ | `void fmpz_preinvn_init (fmpz_preinvn_t inv, const fmpz_t f)` | [`DivModPrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivModPrecomputed.html) |
 | — | `void fmpz_preinvn_clear (fmpz_preinvn_t inv)` | |
 | ✓ | `void fmpz_fdiv_qr_preinvn (fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h, const fmpz_preinvn_t hinv)` | [`DivModPrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivModPrecomputed.html), [`DivAssignModPrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivAssignModPrecomputed.html) |
@@ -523,13 +523,13 @@ whether `f` is zero, while `div_mod` by zero panics, so test the divisor first i
 
 **`fmpz_mod`, `fmpz_mod_ui`.** `fmpz_mod` returns a nonnegative remainder whatever the sign of
 `h`, which is
-[`ModEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModEuclidean.html)
+[`ModEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModEuclidean.html)
 (`mod_euclidean`, returning a `Natural`). For a positive divisor, as in `fmpz_mod_ui`,
-[`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Mod.html)
+[`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.Mod.html)
 agrees.
 
 **`fmpz_smod`.** The remainder in `(-|h|/2, |h|/2]`, which is
-[`BalancedMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BalancedMod.html).
+[`BalancedMod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.BalancedMod.html).
 As in FLINT, only the magnitude of `h` matters, and a remainder of exactly `|h|/2` is positive.
 
 **The `preinvn` trio.**
@@ -547,12 +547,12 @@ replaced by [`Drop`](https://doc.rust-lang.org/nightly/std/ops/trait.Drop.html).
 | ✓ | `void fmpz_pow_ui (fmpz_t f, const fmpz_t g, ulong x)` | [`Pow`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Pow.html), [`PowAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.PowAssign.html) |
 | ✓ | `void fmpz_ui_pow_ui (fmpz_t f, ulong g, ulong x)` | [`Pow`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Pow.html) |
 | ✓ | `int fmpz_pow_fmpz (fmpz_t f, const fmpz_t g, const fmpz_t x)` | [`Pow`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Pow.html), [`TryFrom`](https://doc.rust-lang.org/nightly/std/convert/trait.TryFrom.html) |
-| ≈ | `void fmpz_powm_ui (fmpz_t f, const fmpz_t g, ulong e, const fmpz_t m)` | [`ModPow`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPow.html) |
-| ≈ | `void fmpz_powm (fmpz_t f, const fmpz_t g, const fmpz_t e, const fmpz_t m)` | [`ModPow`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPow.html) |
-| ✓ | `slong fmpz_clog (const fmpz_t x, const fmpz_t b)` | [`CeilingLogBase`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CeilingLogBase.html) |
-| ✓ | `slong fmpz_clog_ui (const fmpz_t x, ulong b)` | [`CeilingLogBase`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CeilingLogBase.html) |
-| ✓ | `slong fmpz_flog (const fmpz_t x, const fmpz_t b)` | [`FloorLogBase`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.FloorLogBase.html) |
-| ✓ | `slong fmpz_flog_ui (const fmpz_t x, ulong b)` | [`FloorLogBase`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.FloorLogBase.html) |
+| ≈ | `void fmpz_powm_ui (fmpz_t f, const fmpz_t g, ulong e, const fmpz_t m)` | [`ModPow`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPow.html) |
+| ≈ | `void fmpz_powm (fmpz_t f, const fmpz_t g, const fmpz_t e, const fmpz_t m)` | [`ModPow`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPow.html) |
+| ✓ | `slong fmpz_clog (const fmpz_t x, const fmpz_t b)` | [`CeilingLogBase`](https://docs.rs/malachite-base/latest/malachite_base/num/exponential/traits/trait.CeilingLogBase.html) |
+| ✓ | `slong fmpz_clog_ui (const fmpz_t x, ulong b)` | [`CeilingLogBase`](https://docs.rs/malachite-base/latest/malachite_base/num/exponential/traits/trait.CeilingLogBase.html) |
+| ✓ | `slong fmpz_flog (const fmpz_t x, const fmpz_t b)` | [`FloorLogBase`](https://docs.rs/malachite-base/latest/malachite_base/num/exponential/traits/trait.FloorLogBase.html) |
+| ✓ | `slong fmpz_flog_ui (const fmpz_t x, ulong b)` | [`FloorLogBase`](https://docs.rs/malachite-base/latest/malachite_base/num/exponential/traits/trait.FloorLogBase.html) |
 | ✓ | `double fmpz_dlog (const fmpz_t x)` | [`approx_log`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.approx_log) |
 
 **`fmpz_pow_ui`, `fmpz_ui_pow_ui`, `fmpz_pow_fmpz`.** `g.pow(x)`, with $$0^0 = 1$$ in both
@@ -560,11 +560,11 @@ libraries. For `fmpz_pow_fmpz`, convert the exponent with `u64::try_from(&x)`; i
 the place of FLINT's failure return (and of FLINT's throw on a negative exponent). FLINT succeeds
 for bases -1, 0, and 1 at any exponent, so handle those before converting.
 
-**`fmpz_powm`, `fmpz_powm_ui`.** [`ModPow`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPow.html),
+**`fmpz_powm`, `fmpz_powm_ui`.** [`ModPow`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPow.html),
 with the [differences explained on the GMP page](/mapping/gmp-integers/#exponentiation-functions)
 for `mpz_powm`: the base must already be reduced, the residues are `Natural`s, and a negative
 exponent is spelled as
-[`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModInverse.html)
+[`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModInverse.html)
 followed by a positive power. FLINT's `abort` on a zero modulus is a panic.
 
 **`fmpz_clog`, `fmpz_flog`.** `x.ceiling_log_base(&b)` and `x.floor_log_base(&b)`. Both panic
@@ -580,7 +580,7 @@ via `Rational::from(&x)`. FLINT's result depends on the platform's C `log`; Mala
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✓ | `int fmpz_sqrtmod (fmpz_t b, const fmpz_t a, const fmpz_t p)` | [`ModSqrt`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModSqrt.html) |
+| ✓ | `int fmpz_sqrtmod (fmpz_t b, const fmpz_t a, const fmpz_t p)` | [`ModSqrt`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModSqrt.html) |
 | ✓ | `void fmpz_sqrt (fmpz_t f, const fmpz_t g)` | [`FloorSqrt`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.FloorSqrt.html) |
 | ✓ | `void fmpz_sqrtrem (fmpz_t f, fmpz_t r, const fmpz_t g)` | [`SqrtRem`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.SqrtRem.html) |
 | ✓ | `int fmpz_is_square (const fmpz_t f)` | [`IsSquare`](https://docs.rs/malachite-base/latest/malachite_base/num/factorization/traits/trait.IsSquare.html) |
@@ -604,7 +604,7 @@ For FLINT's exactness flag, use
 
 **`fmpz_sqrtmod`.** `a.mod_sqrt(&p)`, returning an `Option` where FLINT sets an output and
 returns a flag;
-[`ModSqrt`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModSqrt.html)
+[`ModSqrt`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModSqrt.html)
 is implemented for
 [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html) and the
 unsigned primitives. As in FLINT, `p` is assumed prime but not checked, and for a composite `p`
@@ -625,11 +625,11 @@ exponent is always odd ($$-8 = (-2)^3$$). The predicate alone is
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✓ | `void fmpz_fac_ui (fmpz_t f, ulong n)` | [`Factorial`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Factorial.html) |
-| ✓ | `void fmpz_fib_ui (fmpz_t f, ulong n)` | [`Fibonacci`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Fibonacci.html) |
-| ✓ | `void fmpz_bin_uiui (fmpz_t f, ulong n, ulong k)` | [`BinomialCoefficient`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BinomialCoefficient.html) |
-| ✓ | `void fmpz_rfac_ui (fmpz_t r, const fmpz_t x, ulong k)` | [`RisingFactorial`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.RisingFactorial.html) |
-| ✓ | `void fmpz_rfac_uiui (fmpz_t r, ulong x, ulong k)` | [`RisingFactorial`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.RisingFactorial.html) |
+| ✓ | `void fmpz_fac_ui (fmpz_t f, ulong n)` | [`Factorial`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.Factorial.html) |
+| ✓ | `void fmpz_fib_ui (fmpz_t f, ulong n)` | [`Fibonacci`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.Fibonacci.html) |
+| ✓ | `void fmpz_bin_uiui (fmpz_t f, ulong n, ulong k)` | [`BinomialCoefficient`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.BinomialCoefficient.html) |
+| ✓ | `void fmpz_rfac_ui (fmpz_t r, const fmpz_t x, ulong k)` | [`RisingFactorial`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.RisingFactorial.html) |
+| ✓ | `void fmpz_rfac_uiui (fmpz_t r, ulong x, ulong k)` | [`RisingFactorial`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.RisingFactorial.html) |
 | ✓ | `void fmpz_mul_tdiv_q_2exp (fmpz_t f, const fmpz_t g, const fmpz_t h, ulong exp)` | [`MulShrRound`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.MulShrRound.html), [`MulShrRoundAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.MulShrRoundAssign.html) |
 | ✓ | `void fmpz_mul_si_tdiv_q_2exp (fmpz_t f, const fmpz_t g, slong x, ulong exp)` | [`MulShrRound`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.MulShrRound.html), [`MulShrRoundAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.MulShrRoundAssign.html) |
 
@@ -649,19 +649,19 @@ the exact quotient. A plain `>>` floors, so a negative product needs `Down` expl
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✓ | `void fmpz_gcd_ui (fmpz_t f, const fmpz_t g, ulong h)` | [`Gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Gcd.html) |
-| ✓ | `void fmpz_gcd (fmpz_t f, const fmpz_t g, const fmpz_t h)` | [`Gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Gcd.html) |
-| ✓ | `void fmpz_gcd3 (fmpz_t f, const fmpz_t a, const fmpz_t b, const fmpz_t c)` | [`Gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Gcd.html) |
-| ✓ | `void fmpz_lcm (fmpz_t f, const fmpz_t g, const fmpz_t h)` | [`Lcm`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Lcm.html) |
-| ≈ | `void fmpz_gcdinv (fmpz_t d, fmpz_t a, const fmpz_t f, const fmpz_t g)` | [`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModInverse.html), [`ExtendedGcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ExtendedGcd.html) |
-| ≈ | `void fmpz_xgcd (fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)` | [`ExtendedGcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ExtendedGcd.html) |
-| ✓ | `void fmpz_xgcd_canonical_bezout (fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)` | [`ExtendedGcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ExtendedGcd.html) |
+| ✓ | `void fmpz_gcd_ui (fmpz_t f, const fmpz_t g, ulong h)` | [`Gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.Gcd.html) |
+| ✓ | `void fmpz_gcd (fmpz_t f, const fmpz_t g, const fmpz_t h)` | [`Gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.Gcd.html) |
+| ✓ | `void fmpz_gcd3 (fmpz_t f, const fmpz_t a, const fmpz_t b, const fmpz_t c)` | [`Gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.Gcd.html) |
+| ✓ | `void fmpz_lcm (fmpz_t f, const fmpz_t g, const fmpz_t h)` | [`Lcm`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.Lcm.html) |
+| ≈ | `void fmpz_gcdinv (fmpz_t d, fmpz_t a, const fmpz_t f, const fmpz_t g)` | [`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModInverse.html), [`ExtendedGcd`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.ExtendedGcd.html) |
+| ≈ | `void fmpz_xgcd (fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)` | [`ExtendedGcd`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.ExtendedGcd.html) |
+| ✓ | `void fmpz_xgcd_canonical_bezout (fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)` | [`ExtendedGcd`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.ExtendedGcd.html) |
 | ⚙ | `void fmpz_xgcd_partial (fmpz_t co2, fmpz_t co1, fmpz_t r2, fmpz_t r1, const fmpz_t L)` | internal |
 
 **`fmpz_gcd`, `fmpz_gcd3`, `fmpz_lcm`.**
-[`Gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Gcd.html)
+[`Gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.Gcd.html)
 and
-[`Lcm`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Lcm.html)
+[`Lcm`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.Lcm.html)
 are defined on
 [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html); since
 FLINT's results are nonnegative, take
@@ -672,13 +672,13 @@ of each
 
 **The `xgcd` family.** `fmpz_xgcd_canonical_bezout` normalizes the cofactors by
 $$|a| < |g/2d|$$ and $$|b| < |f/2d|$$, the same normalization, edge cases included, as
-[`ExtendedGcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ExtendedGcd.html),
+[`ExtendedGcd`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.ExtendedGcd.html),
 so `extended_gcd` returns identical cofactors, as a tuple. Plain `fmpz_xgcd` follows the
 `fmpz_gcdinv` convention instead, hence ≈.
 
 **`fmpz_gcdinv`.** For `0 <= f < g`, returns `d = gcd(f, g)` and `a` with
 $$af \equiv d \pmod{g}$$. For a modular inverse,
-[`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModInverse.html)
+[`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModInverse.html)
 returns [`None`](https://doc.rust-lang.org/nightly/std/option/enum.Option.html) when `f` and `g`
 are not coprime. For `d` and a cofactor in every case, `extended_gcd`'s first cofactor satisfies
 the same congruence after reduction modulo `g`, but is normalized differently, hence ≈.
@@ -686,7 +686,7 @@ the same congruence after reduction modulo `g`, but is normalized differently, h
 **`fmpz_xgcd_partial`.** Malachite has an internal port of this function (Lehmer's extended GCD
 with early termination), but it is not public. There is no public way to stop the reduction at a
 bound;
-[`ExtendedGcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ExtendedGcd.html)
+[`ExtendedGcd`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.ExtendedGcd.html)
 computes the complete GCD and cofactors.
 
 ## [Modular arithmetic](https://flintlib.org/doc/fmpz.html#modular-arithmetic) {#modular-arithmetic}
@@ -694,17 +694,17 @@ computes the complete GCD and cofactors.
 | | FLINT | Malachite |
 | :---: | --- | --- |
 | ✓ | `slong fmpz_remove (fmpz_t rop, const fmpz_t op, const fmpz_t f)` | [`RemovePower`](https://docs.rs/malachite-base/latest/malachite_base/num/factorization/traits/trait.RemovePower.html) |
-| ≈ | `int fmpz_invmod (fmpz_t f, const fmpz_t g, const fmpz_t h)` | [`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModInverse.html) |
-| ✓ | `void fmpz_negmod (fmpz_t f, const fmpz_t g, const fmpz_t h)` | [`ModNeg`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModNeg.html), [`NegMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.NegMod.html) |
-| ≈ | `int fmpz_jacobi (const fmpz_t a, const fmpz_t n)` | [`JacobiSymbol`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.JacobiSymbol.html), [`KroneckerSymbol`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.KroneckerSymbol.html) |
-| ✓ | `int fmpz_kronecker (const fmpz_t a, const fmpz_t n)` | [`KroneckerSymbol`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.KroneckerSymbol.html) |
-| ✓ | `void fmpz_divides_mod_list (fmpz_t xstart, fmpz_t xstride, fmpz_t xlength, const fmpz_t a, const fmpz_t b, const fmpz_t n)` | [`ModDivList`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModDivList.html) |
+| ≈ | `int fmpz_invmod (fmpz_t f, const fmpz_t g, const fmpz_t h)` | [`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModInverse.html) |
+| ✓ | `void fmpz_negmod (fmpz_t f, const fmpz_t g, const fmpz_t h)` | [`ModNeg`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModNeg.html), [`NegMod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.NegMod.html) |
+| ≈ | `int fmpz_jacobi (const fmpz_t a, const fmpz_t n)` | [`JacobiSymbol`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.JacobiSymbol.html), [`KroneckerSymbol`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.KroneckerSymbol.html) |
+| ✓ | `int fmpz_kronecker (const fmpz_t a, const fmpz_t n)` | [`KroneckerSymbol`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.KroneckerSymbol.html) |
+| ✓ | `void fmpz_divides_mod_list (fmpz_t xstart, fmpz_t xstride, fmpz_t xlength, const fmpz_t a, const fmpz_t b, const fmpz_t n)` | [`ModDivList`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModDivList.html) |
 
 **`fmpz_remove`.** [`RemovePower`](https://docs.rs/malachite-base/latest/malachite_base/num/factorization/traits/trait.RemovePower.html),
 which returns the reduced number and the count as a tuple. As in FLINT, a zero input removes
 nothing, and a factor of 1 or less is rejected (FLINT aborts; Malachite panics).
 
-**`fmpz_invmod`.** [`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModInverse.html)
+**`fmpz_invmod`.** [`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModInverse.html)
 returns [`Option`](https://doc.rust-lang.org/nightly/std/option/enum.Option.html) instead of a
 flag. It is ≈ for two reasons: `mod_inverse` requires its input already reduced and nonzero,
 where FLINT reduces it; and FLINT treats every value as invertible modulo `h = ±1`, with inverse
@@ -712,9 +712,9 @@ where FLINT reduces it; and FLINT treats every value as invertible modulo `h = �
 occur.
 
 **`fmpz_negmod`.** FLINT requires `g` to be reduced but does not check. `g.mod_neg(&h)`, from
-[`ModNeg`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModNeg.html),
+[`ModNeg`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModNeg.html),
 has the same precondition and panics if it fails. `g.neg_mod(&h)`, from
-[`NegMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.NegMod.html),
+[`NegMod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.NegMod.html),
 accepts any `g`. Both agree on reduced inputs.
 
 **`fmpz_jacobi`, `fmpz_kronecker`.** As
@@ -784,8 +784,8 @@ values.
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✓ | `void fmpz_CRT_ui (fmpz_t out, const fmpz_t r1, const fmpz_t m1, ulong r2, ulong m2, int sign)` | [`Crt`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Crt.html), [`BalancedCrt`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BalancedCrt.html) |
-| ✓ | `void fmpz_CRT (fmpz_t out, const fmpz_t r1, const fmpz_t m1, const fmpz_t r2, const fmpz_t m2, int sign)` | [`Crt`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Crt.html), [`BalancedCrt`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BalancedCrt.html) |
+| ✓ | `void fmpz_CRT_ui (fmpz_t out, const fmpz_t r1, const fmpz_t m1, ulong r2, ulong m2, int sign)` | [`Crt`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.Crt.html), [`BalancedCrt`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BalancedCrt.html) |
+| ✓ | `void fmpz_CRT (fmpz_t out, const fmpz_t r1, const fmpz_t m1, const fmpz_t r2, const fmpz_t m2, int sign)` | [`Crt`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.Crt.html), [`BalancedCrt`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BalancedCrt.html) |
 
 **`fmpz_CRT`, `fmpz_CRT_ui`.** FLINT's `sign` flag selects the representative in
 $$[0, m_1m_2)$$ or in $$(-m_1m_2/2, m_1m_2/2]$$; Malachite has a function for each.
@@ -836,7 +836,7 @@ This section is not mapped row by row. Malachite does not test the primality of 
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✓ | `void fmpz_primorial (fmpz_t res, ulong n)` | [`Primorial`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Primorial.html) |
+| ✓ | `void fmpz_primorial (fmpz_t res, ulong n)` | [`Primorial`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.Primorial.html) |
 | ✗ | `void fmpz_euler_phi (fmpz_t res, const fmpz_t n)` | |
 | ✗ | `void fmpz_factor_euler_phi (fmpz_t res, const fmpz_factor_t fac)` | |
 | ✗ | `int fmpz_moebius_mu (const fmpz_t n)` | |

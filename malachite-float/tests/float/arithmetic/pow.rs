@@ -4860,6 +4860,68 @@ fn test_rational_pow_rational() {
         "0x1.00000#20",
         Greater,
     );
+    // - pow_squeeze_t, hi_eq (32-bit limbs only): x = 2^22 / d with d just above 2^248, so the
+    //   squeeze's x' = 1 / d is below 2^-248 by a relative 2^-78. At working precision 65 the upper
+    //   log bracket rounds x' up to exactly 2^-248, so t_hi = 2^20 * (22 - 248) is an integer and
+    //   2^t_hi is exact at prec 1. With 64-bit limbs, working precision 129 resolves the gap.
+    test(
+        "4194304/452312848583266388373325633383838941663016148003471521320317102270529404927",
+        "1048576",
+        1,
+        Floor,
+        "2.5e-71337540",
+        "0x8.0E-59244545#1",
+        Less,
+    );
+    test(
+        "4194304/452312848583266388373325633383838941663016148003471521320317102270529404927",
+        "1048576",
+        1,
+        Ceiling,
+        "5.1e-71337540",
+        "0x1.0E-59244544#1",
+        Greater,
+    );
+    test(
+        "4194304/452312848583266388373325633383838941663016148003471521320317102270529404927",
+        "1048576",
+        1,
+        Nearest,
+        "5.1e-71337540",
+        "0x1.0E-59244544#1",
+        Greater,
+    );
+    // - pow_squeeze_t, lo_eq (32-bit limbs only), the mirror case: x = 2^11 / (2^75 - 1), so the
+    //   squeeze's x' = 1 / (2^75 - 1) is above 2^-75 by a relative 2^-75. At working precision 69
+    //   the lower log bracket rounds x' down to exactly 2^-75, so t_lo = (32767/4) * (11 - 75) is
+    //   an integer and 2^t_lo is exact at prec 5.
+    test(
+        "2048/37778931862957161709567",
+        "32767/4",
+        5,
+        Floor,
+        "2.52e-157822",
+        "0x1.0E-131068#5",
+        Less,
+    );
+    test(
+        "2048/37778931862957161709567",
+        "32767/4",
+        5,
+        Ceiling,
+        "2.68e-157822",
+        "0x1.1E-131068#5",
+        Greater,
+    );
+    test(
+        "2048/37778931862957161709567",
+        "32767/4",
+        5,
+        Nearest,
+        "2.52e-157822",
+        "0x1.0E-131068#5",
+        Less,
+    );
 }
 
 #[test]

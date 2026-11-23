@@ -62,7 +62,6 @@ impl CheckedModPowerOf2Lcm<Self> for NaturalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::polynomial::modular::traits::CheckedModPowerOf2Lcm;
-    /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// let p = NaturalPolynomial::from_str("x^3+x^2+3*x+3").unwrap();
@@ -127,7 +126,6 @@ impl CheckedModPowerOf2Lcm<&Self> for NaturalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::polynomial::modular::traits::CheckedModPowerOf2Lcm;
-    /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// let p = NaturalPolynomial::from_str("x^3+x^2+3*x+3").unwrap();
@@ -192,7 +190,6 @@ impl CheckedModPowerOf2Lcm<NaturalPolynomial> for &NaturalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::polynomial::modular::traits::CheckedModPowerOf2Lcm;
-    /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// let p = NaturalPolynomial::from_str("x^3+x^2+3*x+3").unwrap();
@@ -261,7 +258,6 @@ impl CheckedModPowerOf2Lcm<&NaturalPolynomial> for &NaturalPolynomial {
     /// ```
     /// use core::str::FromStr;
     /// use malachite_base::polynomial::modular::traits::CheckedModPowerOf2Lcm;
-    /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// let p = NaturalPolynomial::from_str("x^3+x^2+3*x+3").unwrap();

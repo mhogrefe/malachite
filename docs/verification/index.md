@@ -60,5 +60,15 @@ columns record only what is independent of Malachite.
   [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html).
 - [Floats](/verification/floats/): every function of
   [`Float`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html).
+- [Big-exponent floats](/verification/big-exponent-floats/): every function of
+  [`BigExponentFloat`](https://docs.rs/malachite-float/latest/malachite_float/big_exponent_float/struct.BigExponentFloat.html).
+- [Natural vectors](/verification/natural-vectors/): every function of
+  [`NaturalVector`](https://docs.rs/malachite-nz/latest/malachite_nz/natural_vector/struct.NaturalVector.html).
+- [Unsigned vectors](/verification/unsigned-vectors/): every function of
+  [`UnsignedVector<T>`](https://docs.rs/malachite-base/latest/malachite_base/unsigned_vector/struct.UnsignedVector.html).
+- [Integer vectors](/verification/integer-vectors/): every function of
+  [`IntegerVector`](https://docs.rs/malachite-nz/latest/malachite_nz/integer_vector/struct.IntegerVector.html).
+- [Rational vectors](/verification/rational-vectors/): every function of
+  [`RationalVector`](https://docs.rs/malachite-q/latest/malachite_q/rational_vector/struct.RationalVector.html).
 
-Pages for the polynomial types will follow.
+Pages for the polynomial and matrix types will follow.

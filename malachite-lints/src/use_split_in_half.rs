@@ -11,7 +11,7 @@ use rustc_hir::def::Res;
 use rustc_hir::intravisit::{Visitor, walk_expr};
 use rustc_hir::{BindingMode, Body, Expr, ExprKind, HirId, Mutability, Node, PatKind};
 use rustc_lint::{LateContext, LateLintPass};
-use rustc_session::{declare_lint, declare_lint_pass};
+use rustc_lint::{declare_lint, declare_lint_pass};
 use rustc_span::Span;
 use std::collections::HashMap;
 

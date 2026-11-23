@@ -6,14 +6,14 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::eq_expr_value;
 use crate::use_fused_mul::{
     as_mul, camel, has_trait_impl, inside_own_definition, operand_ty, trait_path,
 };
 use clippy_utils::diagnostics::span_lint;
-use clippy_utils::eq_expr_value;
 use rustc_hir::{AssignOpKind, BinOpKind, Expr, ExprKind};
 use rustc_lint::{LateContext, LateLintPass};
-use rustc_session::{declare_lint, declare_lint_pass};
+use rustc_lint::{declare_lint, declare_lint_pass};
 
 declare_lint! {
     /// ### What it does

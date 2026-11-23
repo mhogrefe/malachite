@@ -697,6 +697,7 @@ impl Iterator for RandomNaturalMatricesWithPermutedDiagonal {
 /// # Examples
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::num::basic::traits::Two;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::natural::Natural;
 /// use malachite_nz::natural_matrix::random::random_natural_matrices_with_permuted_diagonal;
@@ -707,7 +708,7 @@ impl Iterator for RandomNaturalMatricesWithPermutedDiagonal {
 ///             EXAMPLE_SEED,
 ///             3,
 ///             4,
-///             vec![Natural::from(2u32), Natural::from(3u32), Natural::from(5u32)]
+///             vec![Natural::TWO, Natural::from(3u32), Natural::from(5u32)]
 ///         )
 ///         .map(|(m, odd)| format!("({m}, {odd})")),
 ///         3

@@ -7,7 +7,6 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use itertools::Itertools;
-use malachite_base::nevers::Never;
 use malachite_base::options::exhaustive::exhaustive_options;
 use std::fmt::Debug;
 
@@ -22,7 +21,7 @@ fn exhaustive_options_helper<T: Clone + Debug + Eq>(xs: &[T], out: &[Option<T>])
 
 #[test]
 fn test_exhaustive_options() {
-    exhaustive_options_helper::<Never>(&[], &[None]);
+    exhaustive_options_helper::<!>(&[], &[None]);
     exhaustive_options_helper(&[5], &[None, Some(5)]);
     exhaustive_options_helper(&[1, 2, 3], &[None, Some(1), Some(2), Some(3)]);
     exhaustive_options_helper(

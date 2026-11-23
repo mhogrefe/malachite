@@ -11,7 +11,7 @@ use clippy_utils::ty::is_copy;
 use rustc_hir::def::Res;
 use rustc_hir::{Block, Expr, ExprKind, HirId, Path, QPath, StmtKind};
 use rustc_lint::{LateContext, LateLintPass};
-use rustc_session::{declare_lint, declare_lint_pass};
+use rustc_lint::{declare_lint, declare_lint_pass};
 
 declare_lint! {
     /// ### What it does

@@ -433,8 +433,8 @@ pub fn striped_random_rational_vectors_with_dimension(
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::basic::traits::{NegativeOne, One};
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_q::rational::random::random_rational_range;
 /// use malachite_q::Rational;
+/// use malachite_q::rational::random::random_rational_range;
 /// use malachite_q::rational_vector::random::*;
 ///
 /// assert_eq!(

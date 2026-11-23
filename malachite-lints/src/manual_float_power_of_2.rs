@@ -12,7 +12,7 @@ use clippy_utils::source::snippet;
 use rustc_hir::def::{DefKind, Res};
 use rustc_hir::{BinOpKind, Expr, ExprKind};
 use rustc_lint::{LateContext, LateLintPass};
-use rustc_session::{declare_lint, declare_lint_pass};
+use rustc_lint::{declare_lint, declare_lint_pass};
 
 declare_lint! {
     /// ### What it does
@@ -267,7 +267,11 @@ fn type_name(cx: &LateContext<'_>, e: &Expr<'_>, name: &'static str) -> &'static
     if matches!(cx.tcx.def_kind(parent), DefKind::Impl { .. })
         && crate::bignum_name(
             cx,
-            cx.tcx.type_of(parent).instantiate_identity().peel_refs(),
+            cx.tcx
+                .type_of(parent)
+                .instantiate_identity()
+                .skip_normalization()
+                .peel_refs(),
         ) == Some(name)
     {
         "Self"

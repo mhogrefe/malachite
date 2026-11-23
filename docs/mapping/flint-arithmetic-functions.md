@@ -51,17 +51,52 @@ while `harmonic_number` takes a `u64`, so map negative values to zero before the
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✗ | `void arith_stirling_number_1u (fmpz_t s, ulong n, ulong k)` | |
-| ✗ | `void arith_stirling_number_1 (fmpz_t s, ulong n, ulong k)` | |
-| ✗ | `void arith_stirling_number_2 (fmpz_t s, ulong n, ulong k)` | |
-| ✗ | `void arith_stirling_number_1u_vec (fmpz * row, ulong n, slong klen)` | |
-| ✗ | `void arith_stirling_number_1_vec (fmpz * row, ulong n, slong klen)` | |
-| ✗ | `void arith_stirling_number_2_vec (fmpz * row, ulong n, slong klen)` | |
-| ✗ | `void arith_stirling_matrix_1u (fmpz_mat_t mat)` | |
-| ✗ | `void arith_stirling_matrix_1 (fmpz_mat_t mat)` | |
-| ✗ | `void arith_stirling_matrix_2 (fmpz_mat_t mat)` | |
+| ✓ | `void arith_stirling_number_1u (fmpz_t s, ulong n, ulong k)` | `Natural::unsigned_stirling_number_of_the_first_kind(n, k)` |
+| ✓ | `void arith_stirling_number_1 (fmpz_t s, ulong n, ulong k)` | `Integer::stirling_number_of_the_first_kind(n, k)` |
+| ✓ | `void arith_stirling_number_2 (fmpz_t s, ulong n, ulong k)` | `Natural::stirling_number_of_the_second_kind(n, k)` |
+| ≈ | `void arith_stirling_number_1u_vec (fmpz * row, ulong n, slong klen)` | [`rising_factorial_polynomial_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/special/traits/trait.RisingFactorialPolynomialTruncated.html#tymethod.rising_factorial_polynomial_truncated), [`rising_factorial_polynomial`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/special/traits/trait.RisingFactorialPolynomial.html#tymethod.rising_factorial_polynomial) |
+| ≈ | `void arith_stirling_number_1_vec (fmpz * row, ulong n, slong klen)` | [`falling_factorial_polynomial_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/special/traits/trait.FallingFactorialPolynomialTruncated.html#tymethod.falling_factorial_polynomial_truncated), [`falling_factorial_polynomial`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/special/traits/trait.FallingFactorialPolynomial.html#tymethod.falling_factorial_polynomial) |
+| ≈ | `void arith_stirling_number_2_vec (fmpz * row, ulong n, slong klen)` | [`touchard_polynomial_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/special/traits/trait.TouchardPolynomialTruncated.html#tymethod.touchard_polynomial_truncated), [`touchard_polynomial`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/special/traits/trait.TouchardPolynomial.html#tymethod.touchard_polynomial) |
+| ✓ | `void arith_stirling_matrix_1u (fmpz_mat_t mat)` | `NaturalMatrix::unsigned_stirling_matrix_of_the_first_kind(height, width)` |
+| ✓ | `void arith_stirling_matrix_1 (fmpz_mat_t mat)` | `IntegerMatrix::stirling_matrix_of_the_first_kind(height, width)` |
+| ✓ | `void arith_stirling_matrix_2 (fmpz_mat_t mat)` | `NaturalMatrix::stirling_matrix_of_the_second_kind(height, width)` |
 
-Malachite has no Stirling numbers.
+A row of Stirling numbers of the second kind is the coefficient list of a Touchard polynomial,
+$$T_n(x) = \sum_k S(n, k) x^k$$, so `arith_stirling_number_2_vec` corresponds to [`touchard_polynomial_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/special/traits/trait.TouchardPolynomialTruncated.html#tymethod.touchard_polynomial_truncated) on
+[`NaturalPolynomial`](https://docs.rs/malachite-nz/latest/malachite_nz/natural_polynomial/struct.NaturalPolynomial.html),
+which returns the first `klen` coefficients as a polynomial rather than writing them to `row`;
+[`touchard_polynomial`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/special/traits/trait.TouchardPolynomial.html#tymethod.touchard_polynomial) gives the whole row. Malachite chooses among FLINT's three algorithms with its own thresholds,
+using the recurrence for longer rows than FLINT does. For single Stirling numbers of the second
+kind, Malachite uses FLINT's closed forms, recurrences, alternating power sum, and multimodular
+computation, but replaces its exponential generating function with a sum over the second-order
+Eulerian numbers, whose cost depends on $$n - k$$ alone, so values such as
+$$S(2^{64} - 1, 2^{64} - 3)$$ are fast; the primitive unsigned types also implement
+[`StirlingNumberOfTheSecondKind`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.StirlingNumberOfTheSecondKind.html),
+with [`CheckedStirlingNumberOfTheSecondKind`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.CheckedStirlingNumberOfTheSecondKind.html)
+returning `None` on overflow.
+
+Similarly, a row of unsigned Stirling numbers of the first kind is the coefficient list of the
+rising factorial polynomial $$x(x + 1) \cdots (x + n - 1)$$, so `arith_stirling_number_1u_vec`
+corresponds to [`rising_factorial_polynomial_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/special/traits/trait.RisingFactorialPolynomialTruncated.html#tymethod.rising_factorial_polynomial_truncated)
+on `NaturalPolynomial`, with [`rising_factorial_polynomial`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/special/traits/trait.RisingFactorialPolynomial.html#tymethod.rising_factorial_polynomial)
+giving the whole row. Malachite uses FLINT's binary splitting, also expanding groups of factors in
+double words. `arith_stirling_number_1u` corresponds to
+`Natural::unsigned_stirling_number_of_the_first_kind`, which uses the same binary splitting and,
+in place of FLINT's exponential generating function, the second-order Eulerian numbers, as for the
+second kind; the primitive unsigned types also implement
+[`UnsignedStirlingNumberOfTheFirstKind`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.UnsignedStirlingNumberOfTheFirstKind.html),
+with [`CheckedUnsignedStirlingNumberOfTheFirstKind`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.CheckedUnsignedStirlingNumberOfTheFirstKind.html)
+returning `None` on overflow. The signed Stirling numbers of the first kind are the coefficients
+of the falling factorial polynomial $$x(x - 1) \cdots (x - n + 1)$$: `arith_stirling_number_1_vec`
+corresponds to [`falling_factorial_polynomial_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/special/traits/trait.FallingFactorialPolynomialTruncated.html#tymethod.falling_factorial_polynomial_truncated)
+on [`IntegerPolynomial`](https://docs.rs/malachite-nz/latest/malachite_nz/integer_polynomial/struct.IntegerPolynomial.html),
+and `arith_stirling_number_1` to `Integer::stirling_number_of_the_first_kind`; the primitive signed
+types also implement
+[`StirlingNumberOfTheFirstKind`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.StirlingNumberOfTheFirstKind.html),
+with [`CheckedStirlingNumberOfTheFirstKind`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.CheckedStirlingNumberOfTheFirstKind.html)
+returning `None` on overflow. The Stirling matrices are constructed with their dimensions,
+`NaturalMatrix::unsigned_stirling_matrix_of_the_first_kind(height, width)` and so on, rather than
+filling a given matrix, and the unsigned ones are `NaturalMatrix`es.
 
 ## [Bell numbers](https://flintlib.org/doc/arith.html#bell-numbers) {#bell-numbers}
 
@@ -96,28 +131,39 @@ modular routines, so reduce the full values instead, using the `Mod*` traits des
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✗ | `void _arith_bernoulli_number (fmpz_t num, fmpz_t den, ulong n)` | |
-| ✗ | `void arith_bernoulli_number (fmpq_t x, ulong n)` | |
-| ✗ | `void _arith_bernoulli_number_vec (fmpz * num, fmpz * den, slong n)` | |
-| ✗ | `void arith_bernoulli_number_vec (fmpq * x, slong n)` | |
-| ✗ | `void arith_bernoulli_number_denom (fmpz_t den, ulong n)` | |
-| ✗ | `double arith_bernoulli_number_size (ulong n)` | |
-| ✗ | `void arith_bernoulli_polynomial (fmpq_poly_t poly, ulong n)` | |
-| ✗ | `void _arith_bernoulli_number_vec_recursive (fmpz * num, fmpz * den, slong n)` | |
-| ✗ | `void _arith_bernoulli_number_vec_multi_mod (fmpz * num, fmpz * den, slong n)` | |
+| ✓ | `void _arith_bernoulli_number (fmpz_t num, fmpz_t den, ulong n)` | `Rational::bernoulli_number(n).into_numerator_and_denominator()` |
+| ✓ | `void arith_bernoulli_number (fmpq_t x, ulong n)` | `Rational::bernoulli_number(n)` |
+| ✓ | `void _arith_bernoulli_number_vec (fmpz * num, fmpz * den, slong n)` | `bernoulli_numbers_prefix(n)` |
+| ✓ | `void arith_bernoulli_number_vec (fmpq * x, slong n)` | `bernoulli_numbers_prefix(n)` |
+| ✓ | `void arith_bernoulli_number_denom (fmpz_t den, ulong n)` | `Natural::bernoulli_number_denominator(n)` |
+| — | `double arith_bernoulli_number_size (ulong n)` | |
+| ✓ | `void arith_bernoulli_polynomial (fmpq_poly_t poly, ulong n)` | `RationalPolynomial::bernoulli_polynomial(n)` |
+| ✓ | `void _arith_bernoulli_number_vec_recursive (fmpz * num, fmpz * den, slong n)` | `bernoulli_numbers_prefix(n)` |
+| ✓ | `void _arith_bernoulli_number_vec_multi_mod (fmpz * num, fmpz * den, slong n)` | `bernoulli_numbers_prefix(n)` |
 
-Malachite has no Bernoulli numbers or polynomials.
+The Bernoulli numbers use the same convention as FLINT, $$B_1 = -1/2$$. `bernoulli_numbers_prefix(n)`
+returns $$B_0, \ldots, B_{n-1}$$ as a `Vec<Rational>`, and takes a `u64` where FLINT takes an
+`slong`; it chooses between the recursive and multimodular algorithms itself, so it stands for all
+three vector functions. To get separate numerators and denominators, call
+`into_numerator_and_denominator` on each entry. `even_bernoulli_numbers_prefix(n)` returns just the
+nonzero numbers after $$B_1$$, $$B_2, B_4, \ldots, B_{2n}$$. Both functions are in
+`malachite_q::rational::number_theory::bernoulli_number`.
+
+`arith_bernoulli_number_size` is a bit-size estimate used internally by the multimodular routine,
+so it needs no counterpart.
 
 ## [Euler numbers and polynomials](https://flintlib.org/doc/arith.html#euler-numbers-and-polynomials) {#euler-numbers-and-polynomials}
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✗ | `void arith_euler_number (fmpz_t res, ulong n)` | |
-| ✗ | `void arith_euler_number_vec (fmpz * res, slong n)` | |
-| ✗ | `double arith_euler_number_size (ulong n)` | |
-| ✗ | `void arith_euler_polynomial (fmpq_poly_t poly, ulong n)` | |
+| ✓ | `void arith_euler_number (fmpz_t res, ulong n)` | `Integer::euler_number(n)` |
+| ✓ | `void arith_euler_number_vec (fmpz * res, slong n)` | `euler_numbers_prefix(n)` |
+| — | `double arith_euler_number_size (ulong n)` | |
+| ✓ | `void arith_euler_polynomial (fmpq_poly_t poly, ulong n)` | `RationalPolynomial::euler_polynomial(n)` |
 
-Malachite has no Euler numbers or polynomials.
+`euler_numbers_prefix(n)`, in `malachite_nz::integer::number_theory::euler_number`, returns
+$$E_0, \ldots, E_{n-1}$$ as a `Vec<Integer>`. `arith_euler_number_size` is a bit-size estimate
+used internally, so it needs no counterpart.
 
 ## [Multiplicative functions](https://flintlib.org/doc/arith.html#multiplicative-functions) {#multiplicative-functions}
 

@@ -9,7 +9,7 @@
 use clippy_utils::SpanlessEq;
 use rustc_hir::{Block, Expr, ExprKind, Stmt, StmtKind};
 use rustc_lint::{LateContext, LateLintPass};
-use rustc_session::{declare_lint, declare_lint_pass};
+use rustc_lint::{declare_lint, declare_lint_pass};
 
 declare_lint! {
     /// ### What it does
@@ -122,7 +122,9 @@ impl<'tcx> LateLintPass<'tcx> for CollapseAdjacentIfs {
                 let Some((_, body)) = as_plain_if(stmt) else {
                     break;
                 };
-                if stmt.span.from_expansion() || !SpanlessEq::new(cx).eq_block(first_body, body) {
+                if stmt.span.from_expansion()
+                    || !SpanlessEq::new(cx).eq_block(first_body.span.ctxt(), first_body, body)
+                {
                     break;
                 }
                 run_len += 1;

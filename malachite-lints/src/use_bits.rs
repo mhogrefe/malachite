@@ -6,15 +6,15 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::eq_expr_value;
 use clippy_utils::diagnostics::span_lint_and_help;
-use clippy_utils::eq_expr_value;
 use clippy_utils::higher::While;
 use clippy_utils::visitors::for_each_expr;
 use core::ops::ControlFlow;
 use rustc_hir::{AssignOpKind, BinOpKind, Expr, ExprKind, StmtKind};
 use rustc_lint::{LateContext, LateLintPass};
+use rustc_lint::{declare_lint, declare_lint_pass};
 use rustc_middle::ty::Ty;
-use rustc_session::{declare_lint, declare_lint_pass};
 
 declare_lint! {
     /// ### What it does
@@ -166,7 +166,7 @@ impl<'tcx> LateLintPass<'tcx> for UseBits {
         let mut low_bit_reads = 0;
         let mut other_use = false;
         for stmt in rest {
-            let _: Option<()> = for_each_expr(cx, stmt, |e| {
+            let _: Option<()> = for_each_expr(cx.tcx, stmt, |e| {
                 if is_low_bit_read(cx, e, x) {
                     low_bit_reads += 1;
                     return ControlFlow::Continue(clippy_utils::visitors::Descend::No);

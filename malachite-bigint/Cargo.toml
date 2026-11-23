@@ -1,6 +1,6 @@
 [package]
 name = "malachite-bigint"
-version = "0.14.0"
+version = "0.15.0"
 authors = ["Steve Shi <shikangzhi@gmail.com>"]
 rust-version.workspace = true
 edition.workspace = true

@@ -12,8 +12,8 @@ use clippy_utils::{expr_or_init, get_parent_expr};
 use rustc_hir::def::{DefKind, Res};
 use rustc_hir::{BinOpKind, Expr, ExprKind};
 use rustc_lint::{LateContext, LateLintPass};
+use rustc_lint::{declare_lint, declare_lint_pass};
 use rustc_middle::ty::Ty;
-use rustc_session::{declare_lint, declare_lint_pass};
 
 declare_lint! {
     /// ### What it does

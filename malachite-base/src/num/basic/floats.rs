@@ -660,7 +660,6 @@ macro_rules! impl_basic_traits_primitive_float {
         $sqrt_5: expr,
         $sqrt_3_over_3: expr,
         $sqrt_5_over_5: expr,
-        $phi: expr,
         $sqrt_pi: expr,
         $one_over_sqrt_pi: expr,
         $one_over_sqrt_tau: expr,
@@ -671,7 +670,6 @@ macro_rules! impl_basic_traits_primitive_float {
         $lemniscate_constant: expr,
         $ramanujans_constant: expr,
         $catalans_constant: expr,
-        $eulers_constant: expr,
         $liouvilles_constant: expr,
         $champernowne_constant: expr,
         $copeland_erdos_constant: expr
@@ -865,7 +863,7 @@ macro_rules! impl_basic_traits_primitive_float {
 
         /// $\varphi$, the golden ratio.
         impl Phi for $t {
-            const PHI: $t = $phi;
+            const PHI: $t = core::$t::consts::GOLDEN_RATIO;
         }
 
         /// $\pi$.
@@ -970,7 +968,7 @@ macro_rules! impl_basic_traits_primitive_float {
 
         /// $\gamma=\lim_{n\to\infty}\left(\sum_{k=1}^n\frac{1}{k}-\log n\right)$.
         impl EulersConstant for $t {
-            const EULERS_CONSTANT: $t = $eulers_constant;
+            const EULERS_CONSTANT: $t = core::$t::consts::EULER_GAMMA;
         }
 
         /// $\sum_{n=1}^{\infty} 10^{-n!}$.
@@ -1001,7 +999,6 @@ impl_basic_traits_primitive_float!(
     2.236068,
     0.57735026,
     0.4472136,
-    1.618034,
     1.7724539,
     0.5641896,
     0.3989423,
@@ -1012,7 +1009,6 @@ impl_basic_traits_primitive_float!(
     2.6220574,
     2.6253742e17,
     0.9159656,
-    0.5772157,
     0.110001,
     0.12345679,
     0.23571113
@@ -1029,7 +1025,6 @@ impl_basic_traits_primitive_float!(
     2.23606797749979,
     0.5773502691896257,
     0.4472135954999579,
-    1.618033988749895,
     1.772453850905516,
     0.5641895835477563,
     0.3989422804014327,
@@ -1040,7 +1035,6 @@ impl_basic_traits_primitive_float!(
     2.6220575542921196,
     2.6253741264076874e17,
     0.915965594177219,
-    0.5772156649015329,
     0.110001,
     0.12345678910111213,
     0.23571113171923294

@@ -7,7 +7,6 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use itertools::Itertools;
-use malachite_base::nevers::Never;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::slices::random_values_from_slice;
 use malachite_base::test_util::stats::common_values_map::common_values_map_debug;
@@ -56,5 +55,5 @@ fn test_random_values_from_slice() {
 #[test]
 #[should_panic]
 fn random_values_from_slice_fail() {
-    random_values_from_slice::<Never>(EXAMPLE_SEED, &[]);
+    random_values_from_slice::<!>(EXAMPLE_SEED, &[]);
 }

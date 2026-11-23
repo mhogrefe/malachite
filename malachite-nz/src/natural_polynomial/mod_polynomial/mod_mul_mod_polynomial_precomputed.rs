@@ -1341,12 +1341,8 @@ impl ModMulModPolynomialPrecomputedAssign<Self, Self, Natural> for NaturalPolyno
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::arithmetic::traits::*;
-    /// use malachite_base::polynomial::calculus::traits::*;
     /// use malachite_base::polynomial::mod_polynomial::traits::*;
-    /// use malachite_base::polynomial::modular::traits::*;
-    /// use malachite_base::polynomial::series::traits::*;
-    /// use malachite_base::polynomial::*;
+    /// use malachite_base::polynomial::modular::traits::ModDivRemPrecomputed;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
@@ -1414,12 +1410,8 @@ impl ModMulModPolynomialPrecomputedAssign<Self, Self, &Natural> for NaturalPolyn
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::arithmetic::traits::*;
-    /// use malachite_base::polynomial::calculus::traits::*;
     /// use malachite_base::polynomial::mod_polynomial::traits::*;
-    /// use malachite_base::polynomial::modular::traits::*;
-    /// use malachite_base::polynomial::series::traits::*;
-    /// use malachite_base::polynomial::*;
+    /// use malachite_base::polynomial::modular::traits::ModDivRemPrecomputed;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
@@ -1487,12 +1479,8 @@ impl ModMulModPolynomialPrecomputedAssign<Self, &Self, Natural> for NaturalPolyn
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::arithmetic::traits::*;
-    /// use malachite_base::polynomial::calculus::traits::*;
     /// use malachite_base::polynomial::mod_polynomial::traits::*;
-    /// use malachite_base::polynomial::modular::traits::*;
-    /// use malachite_base::polynomial::series::traits::*;
-    /// use malachite_base::polynomial::*;
+    /// use malachite_base::polynomial::modular::traits::ModDivRemPrecomputed;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
@@ -1560,12 +1548,8 @@ impl ModMulModPolynomialPrecomputedAssign<Self, &Self, &Natural> for NaturalPoly
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::arithmetic::traits::*;
-    /// use malachite_base::polynomial::calculus::traits::*;
     /// use malachite_base::polynomial::mod_polynomial::traits::*;
-    /// use malachite_base::polynomial::modular::traits::*;
-    /// use malachite_base::polynomial::series::traits::*;
-    /// use malachite_base::polynomial::*;
+    /// use malachite_base::polynomial::modular::traits::ModDivRemPrecomputed;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
@@ -1633,12 +1617,8 @@ impl ModMulModPolynomialPrecomputedAssign<&Self, Self, Natural> for NaturalPolyn
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::arithmetic::traits::*;
-    /// use malachite_base::polynomial::calculus::traits::*;
     /// use malachite_base::polynomial::mod_polynomial::traits::*;
-    /// use malachite_base::polynomial::modular::traits::*;
-    /// use malachite_base::polynomial::series::traits::*;
-    /// use malachite_base::polynomial::*;
+    /// use malachite_base::polynomial::modular::traits::ModDivRemPrecomputed;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
@@ -1706,12 +1686,8 @@ impl ModMulModPolynomialPrecomputedAssign<&Self, Self, &Natural> for NaturalPoly
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::arithmetic::traits::*;
-    /// use malachite_base::polynomial::calculus::traits::*;
     /// use malachite_base::polynomial::mod_polynomial::traits::*;
-    /// use malachite_base::polynomial::modular::traits::*;
-    /// use malachite_base::polynomial::series::traits::*;
-    /// use malachite_base::polynomial::*;
+    /// use malachite_base::polynomial::modular::traits::ModDivRemPrecomputed;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
@@ -1779,12 +1755,8 @@ impl ModMulModPolynomialPrecomputedAssign<&Self, &Self, Natural> for NaturalPoly
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::arithmetic::traits::*;
-    /// use malachite_base::polynomial::calculus::traits::*;
     /// use malachite_base::polynomial::mod_polynomial::traits::*;
-    /// use malachite_base::polynomial::modular::traits::*;
-    /// use malachite_base::polynomial::series::traits::*;
-    /// use malachite_base::polynomial::*;
+    /// use malachite_base::polynomial::modular::traits::ModDivRemPrecomputed;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
@@ -1852,12 +1824,8 @@ impl ModMulModPolynomialPrecomputedAssign<&Self, &Self, &Natural> for NaturalPol
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::arithmetic::traits::*;
-    /// use malachite_base::polynomial::calculus::traits::*;
     /// use malachite_base::polynomial::mod_polynomial::traits::*;
-    /// use malachite_base::polynomial::modular::traits::*;
-    /// use malachite_base::polynomial::series::traits::*;
-    /// use malachite_base::polynomial::*;
+    /// use malachite_base::polynomial::modular::traits::ModDivRemPrecomputed;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///

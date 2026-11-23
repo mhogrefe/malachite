@@ -7,9 +7,11 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 #![feature(rustc_private)]
+#![feature(default_field_values)]
 #![warn(unused_extern_crates)]
 
 extern crate rustc_ast;
+extern crate rustc_attr_ir;
 extern crate rustc_errors;
 extern crate rustc_hir;
 extern crate rustc_lint;
@@ -215,6 +217,18 @@ fn qpath_last_segment_name<'a>(qpath: &'a rustc_hir::QPath<'a>) -> Option<&'a st
         rustc_hir::QPath::Resolved(_, path) => path.segments.last().map(|s| s.ident.name.as_str()),
         rustc_hir::QPath::TypeRelative(_, seg) => Some(seg.ident.name.as_str()),
     }
+}
+
+// Whether two expressions evaluate to the same value and have no side effects, compared in the
+// syntax context of the first. `clippy_utils::eq_expr_value` takes the context of the expression
+// that encloses both, which matters for operands that come from macro expansions; the lints skip
+// code from expansions, so there the two contexts are the same.
+fn eq_expr_value(
+    cx: &rustc_lint::LateContext<'_>,
+    left: &rustc_hir::Expr<'_>,
+    right: &rustc_hir::Expr<'_>,
+) -> bool {
+    clippy_utils::eq_expr_value(cx, left.span.ctxt(), left, right)
 }
 
 fn peel_clone_and_borrows<'tcx>(e: &'tcx rustc_hir::Expr<'tcx>) -> &'tcx rustc_hir::Expr<'tcx> {
@@ -460,7 +474,7 @@ fn in_const_context(cx: &rustc_lint::LateContext<'_>, e: &rustc_hir::Expr<'_>) -
     let owner = cx.tcx.hir_enclosing_body_owner(e.hir_id);
     match cx.tcx.hir_body_owner_kind(owner) {
         BodyOwnerKind::Const { .. } | BodyOwnerKind::Static(_) => true,
-        BodyOwnerKind::Fn => cx.tcx.constness(owner) == Constness::Const,
+        BodyOwnerKind::Fn => matches!(cx.tcx.constness(owner), Constness::Const { .. }),
         _ => false,
     }
 }
@@ -669,94 +683,161 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         use_abs_comparison::USE_ABS_COMPARISON,
         use_width_mask::USE_WIDTH_MASK,
     ]);
-    lint_store.register_late_pass(|_| {
+    lint_store.register_late_lint_pass(Box::new(|_| {
         Box::new(assert_ordering_equal_prefer_exact::AssertOrderingEqualPreferExact)
-    });
-    lint_store.register_late_pass(|_| Box::new(adjacent_vec_allocations::AdjacentVecAllocations));
-    lint_store.register_late_pass(|_| Box::new(collapse_adjacent_ifs::CollapseAdjacentIfs));
-    lint_store.register_late_pass(|_| Box::new(div_mod_projection::DivModProjection));
-    lint_store.register_late_pass(|_| Box::new(assign_then_consumed_once::AssignThenConsumedOnce));
-    lint_store.register_late_pass(|_| Box::new(assign_then_returned::AssignThenReturned));
-    lint_store.register_late_pass(|_| Box::new(bignum_literal_suffix::BignumLiteralSuffix));
-    lint_store.register_late_pass(|_| Box::new(compare_with_power_of_2::CompareWithPowerOf2));
-    lint_store.register_late_pass(|_| Box::new(compare_with_primitive::CompareWithPrimitive));
-    lint_store.register_late_pass(|_| Box::new(duplicate_const::DuplicateConst::default()));
-    lint_store.register_late_pass(|_| Box::new(hoist_shifts::HoistShifts));
+    }));
+    lint_store.register_late_lint_pass(Box::new(|_| {
+        Box::new(adjacent_vec_allocations::AdjacentVecAllocations)
+    }));
+    lint_store.register_late_lint_pass(Box::new(|_| {
+        Box::new(collapse_adjacent_ifs::CollapseAdjacentIfs)
+    }));
     lint_store
-        .register_late_pass(|_| Box::new(let_tuple_underscore_to_field::LetTupleUnderscoreToField));
-    lint_store.register_late_pass(|_| Box::new(long_lines::LongLines));
-    lint_store
-        .register_late_pass(|_| Box::new(manual_float_from_primitive::ManualFloatFromPrimitive));
-    lint_store.register_late_pass(|_| Box::new(manual_float_power_of_2::ManualFloatPowerOf2));
-    lint_store.register_late_pass(|_| Box::new(manual_from_sign_and_abs::ManualFromSignAndAbs));
-    lint_store.register_late_pass(|_| Box::new(manual_half_functions::ManualHalfFunctions));
-    lint_store.register_late_pass(|_| Box::new(manual_lexicographic_cmp::ManualLexicographicCmp));
-    lint_store.register_late_pass(|_| {
+        .register_late_lint_pass(Box::new(|_| Box::new(div_mod_projection::DivModProjection)));
+    lint_store.register_late_lint_pass(Box::new(|_| {
+        Box::new(assign_then_consumed_once::AssignThenConsumedOnce)
+    }));
+    lint_store.register_late_lint_pass(Box::new(|_| {
+        Box::new(assign_then_returned::AssignThenReturned)
+    }));
+    lint_store.register_late_lint_pass(Box::new(|_| {
+        Box::new(bignum_literal_suffix::BignumLiteralSuffix)
+    }));
+    lint_store.register_late_lint_pass(Box::new(|_| {
+        Box::new(compare_with_power_of_2::CompareWithPowerOf2)
+    }));
+    lint_store.register_late_lint_pass(Box::new(|_| {
+        Box::new(compare_with_primitive::CompareWithPrimitive)
+    }));
+    lint_store.register_late_lint_pass(Box::new(|_| {
+        Box::new(duplicate_const::DuplicateConst::default())
+    }));
+    lint_store.register_late_lint_pass(Box::new(|_| Box::new(hoist_shifts::HoistShifts)));
+    lint_store.register_late_lint_pass(Box::new(|_| {
+        Box::new(let_tuple_underscore_to_field::LetTupleUnderscoreToField)
+    }));
+    lint_store.register_late_lint_pass(Box::new(|_| Box::new(long_lines::LongLines)));
+    lint_store.register_late_lint_pass(Box::new(|_| {
+        Box::new(manual_float_from_primitive::ManualFloatFromPrimitive)
+    }));
+    lint_store.register_late_lint_pass(Box::new(|_| {
+        Box::new(manual_float_power_of_2::ManualFloatPowerOf2)
+    }));
+    lint_store.register_late_lint_pass(Box::new(|_| {
+        Box::new(manual_from_sign_and_abs::ManualFromSignAndAbs)
+    }));
+    lint_store.register_late_lint_pass(Box::new(|_| {
+        Box::new(manual_half_functions::ManualHalfFunctions)
+    }));
+    lint_store.register_late_lint_pass(Box::new(|_| {
+        Box::new(manual_lexicographic_cmp::ManualLexicographicCmp)
+    }));
+    lint_store.register_late_lint_pass(Box::new(|_| {
         Box::new(manual_rational_significant_bits::ManualRationalSignificantBits)
-    });
-    lint_store
-        .register_late_pass(|_| Box::new(missing_inline_on_delegator::MissingInlineOnDelegator));
-    lint_store.register_late_pass(|_| Box::new(mul_div_by_power_of_2::MulDivByPowerOf2));
-    lint_store
-        .register_late_pass(|_| Box::new(mul_div_by_power_of_2_literal::MulDivByPowerOf2Literal));
-    lint_store.register_late_pass(|_| Box::new(redundant_cmp_reverse::RedundantCmpReverse));
-    lint_store
-        .register_late_pass(|_| Box::new(redundant_from_in_comparison::RedundantFromInComparison));
-    lint_store.register_late_pass(|_| {
+    }));
+    lint_store.register_late_lint_pass(Box::new(|_| {
+        Box::new(missing_inline_on_delegator::MissingInlineOnDelegator)
+    }));
+    lint_store.register_late_lint_pass(Box::new(|_| {
+        Box::new(mul_div_by_power_of_2::MulDivByPowerOf2)
+    }));
+    lint_store.register_late_lint_pass(Box::new(|_| {
+        Box::new(mul_div_by_power_of_2_literal::MulDivByPowerOf2Literal)
+    }));
+    lint_store.register_late_lint_pass(Box::new(|_| {
+        Box::new(redundant_cmp_reverse::RedundantCmpReverse)
+    }));
+    lint_store.register_late_lint_pass(Box::new(|_| {
+        Box::new(redundant_from_in_comparison::RedundantFromInComparison)
+    }));
+    lint_store.register_late_lint_pass(Box::new(|_| {
         Box::new(redundant_from_in_literal_comparison::RedundantFromInLiteralComparison)
-    });
-    lint_store.register_late_pass(|_| Box::new(redundant_nearest::RedundantNearest));
-    lint_store.register_late_pass(|_| {
+    }));
+    lint_store.register_late_lint_pass(Box::new(|_| Box::new(redundant_nearest::RedundantNearest)));
+    lint_store.register_late_lint_pass(Box::new(|_| {
         Box::new(redundant_prec_round_of_exact_constant::RedundantPrecRoundOfExactConstant)
-    });
+    }));
+    lint_store.register_late_lint_pass(Box::new(|_| {
+        Box::new(redundant_shift_conversion::RedundantShiftConversion)
+    }));
+    lint_store.register_late_lint_pass(Box::new(|_| {
+        Box::new(redundant_tuple_rebuild::RedundantTupleRebuild)
+    }));
+    lint_store.register_late_lint_pass(Box::new(|_| {
+        Box::new(runtime_literal_conversion::RuntimeLiteralConversion)
+    }));
+    lint_store.register_late_lint_pass(Box::new(|_| {
+        Box::new(manual_fractional_part::ManualFractionalPart)
+    }));
+    lint_store.register_late_lint_pass(Box::new(|_| Box::new(shift_of_one::ShiftOfOne)));
+    lint_store.register_late_lint_pass(Box::new(|_| {
+        Box::new(clone_with_ref_variant::CloneWithRefVariant)
+    }));
+    lint_store.register_early_lint_pass(Box::new(|| {
+        Box::new(collapse_adjacent_imports::CollapseAdjacentImports)
+    }));
     lint_store
-        .register_late_pass(|_| Box::new(redundant_shift_conversion::RedundantShiftConversion));
-    lint_store.register_late_pass(|_| Box::new(redundant_tuple_rebuild::RedundantTupleRebuild));
+        .register_late_lint_pass(Box::new(|_| Box::new(use_assign_variant::UseAssignVariant)));
+    lint_store.register_late_lint_pass(Box::new(|_| Box::new(use_bits::UseBits)));
+    lint_store.register_late_lint_pass(Box::new(|_| {
+        Box::new(use_checked_log_base_2::UseCheckedLogBase2)
+    }));
+    lint_store.register_late_lint_pass(Box::new(|_| Box::new(use_cmp_double::UseCmpDouble)));
+    lint_store.register_late_lint_pass(Box::new(|_| Box::new(use_cmp_product::UseCmpProduct)));
+    lint_store.register_late_lint_pass(Box::new(|_| Box::new(use_const_binding::UseConstBinding)));
+    lint_store.register_late_lint_pass(Box::new(|_| Box::new(use_const_block::UseConstBlock)));
+    lint_store.register_late_lint_pass(Box::new(|_| Box::new(use_const_cast::UseConstCast)));
+    lint_store.register_late_lint_pass(Box::new(|_| Box::new(use_coprime_with::UseCoprimeWith)));
+    lint_store.register_late_lint_pass(Box::new(|_| {
+        Box::new(use_determinant_sign::UseDeterminantSign)
+    }));
+    lint_store.register_late_lint_pass(Box::new(|_| Box::new(use_divisible_by::UseDivisibleBy)));
+    lint_store.register_late_lint_pass(Box::new(|_| Box::new(use_exact_from::UseExactFrom)));
+    lint_store.register_late_lint_pass(Box::new(|_| Box::new(use_fused_mul::UseFusedMul)));
+    lint_store.register_late_lint_pass(Box::new(|_| Box::new(use_fused_mul_shl::UseFusedMulShl)));
+    lint_store.register_late_lint_pass(Box::new(|_| Box::new(use_div_mod::UseDivMod)));
+    lint_store.register_late_lint_pass(Box::new(|_| {
+        Box::new(use_div_mod_precomputed::UseDivModPrecomputed)
+    }));
+    lint_store.register_late_lint_pass(Box::new(|_| {
+        Box::new(factor_out_assignment::FactorOutAssignment)
+    }));
+    lint_store.register_late_lint_pass(Box::new(|_| Box::new(use_get_bit::UseGetBit)));
+    lint_store.register_late_lint_pass(Box::new(|_| Box::new(use_mod_power_of_2::UseModPowerOf2)));
+    lint_store.register_late_lint_pass(Box::new(|_| Box::new(use_mod_square::UseModSquare)));
+    lint_store.register_late_lint_pass(Box::new(|_| Box::new(use_mul_shr_round::UseMulShrRound)));
     lint_store
-        .register_late_pass(|_| Box::new(runtime_literal_conversion::RuntimeLiteralConversion));
-    lint_store.register_late_pass(|_| Box::new(manual_fractional_part::ManualFractionalPart));
-    lint_store.register_late_pass(|_| Box::new(shift_of_one::ShiftOfOne));
-    lint_store.register_late_pass(|_| Box::new(clone_with_ref_variant::CloneWithRefVariant));
-    lint_store.register_early_pass(|| Box::new(collapse_adjacent_imports::CollapseAdjacentImports));
-    lint_store.register_late_pass(|_| Box::new(use_assign_variant::UseAssignVariant));
-    lint_store.register_late_pass(|_| Box::new(use_bits::UseBits));
-    lint_store.register_late_pass(|_| Box::new(use_checked_log_base_2::UseCheckedLogBase2));
-    lint_store.register_late_pass(|_| Box::new(use_cmp_double::UseCmpDouble));
-    lint_store.register_late_pass(|_| Box::new(use_cmp_product::UseCmpProduct));
-    lint_store.register_late_pass(|_| Box::new(use_const_binding::UseConstBinding));
-    lint_store.register_late_pass(|_| Box::new(use_const_block::UseConstBlock));
-    lint_store.register_late_pass(|_| Box::new(use_const_cast::UseConstCast));
-    lint_store.register_late_pass(|_| Box::new(use_coprime_with::UseCoprimeWith));
-    lint_store.register_late_pass(|_| Box::new(use_determinant_sign::UseDeterminantSign));
-    lint_store.register_late_pass(|_| Box::new(use_divisible_by::UseDivisibleBy));
-    lint_store.register_late_pass(|_| Box::new(use_exact_from::UseExactFrom));
-    lint_store.register_late_pass(|_| Box::new(use_fused_mul::UseFusedMul));
-    lint_store.register_late_pass(|_| Box::new(use_fused_mul_shl::UseFusedMulShl));
-    lint_store.register_late_pass(|_| Box::new(use_div_mod::UseDivMod));
-    lint_store.register_late_pass(|_| Box::new(use_div_mod_precomputed::UseDivModPrecomputed));
-    lint_store.register_late_pass(|_| Box::new(factor_out_assignment::FactorOutAssignment));
-    lint_store.register_late_pass(|_| Box::new(use_get_bit::UseGetBit));
-    lint_store.register_late_pass(|_| Box::new(use_mod_power_of_2::UseModPowerOf2));
-    lint_store.register_late_pass(|_| Box::new(use_mod_square::UseModSquare));
-    lint_store.register_late_pass(|_| Box::new(use_mul_shr_round::UseMulShrRound));
-    lint_store.register_late_pass(|_| Box::new(use_named_constant::UseNamedConstant));
-    lint_store.register_late_pass(|_| Box::new(use_parity::UseParity));
-    lint_store.register_late_pass(|_| Box::new(use_sign::UseSign));
-    lint_store.register_late_pass(|_| Box::new(use_slice_test_zero::UseSliceTestZero));
-    lint_store.register_late_pass(|_| Box::new(use_reciprocal::UseReciprocal));
-    lint_store.register_late_pass(|_| Box::new(use_round_variant::UseRoundVariant));
-    lint_store.register_late_pass(|_| Box::new(use_saturating_from::UseSaturatingFrom));
-    lint_store.register_late_pass(|_| Box::new(use_split_in_half::UseSplitInHalf));
-    lint_store.register_late_pass(|_| Box::new(use_split_into_chunks::UseSplitIntoChunks));
-    lint_store.register_late_pass(|_| Box::new(use_square::UseSquare));
-    lint_store.register_late_pass(|_| Box::new(use_to_string_variant::UseToStringVariant));
-    lint_store.register_late_pass(|_| Box::new(use_trailing_zeros::UseTrailingZeros));
-    lint_store.register_late_pass(|_| Box::new(use_unary_assign::UseUnaryAssign));
-    lint_store.register_late_pass(|_| Box::new(use_abs_comparison::UseAbsComparison));
-    lint_store.register_late_pass(|_| Box::new(use_width_mask::UseWidthMask));
-    lint_store.register_late_pass(|_| Box::new(fully_qualified_path::FullyQualifiedPath));
+        .register_late_lint_pass(Box::new(|_| Box::new(use_named_constant::UseNamedConstant)));
+    lint_store.register_late_lint_pass(Box::new(|_| Box::new(use_parity::UseParity)));
+    lint_store.register_late_lint_pass(Box::new(|_| Box::new(use_sign::UseSign)));
+    lint_store.register_late_lint_pass(Box::new(|_| {
+        Box::new(use_slice_test_zero::UseSliceTestZero)
+    }));
+    lint_store.register_late_lint_pass(Box::new(|_| Box::new(use_reciprocal::UseReciprocal)));
+    lint_store.register_late_lint_pass(Box::new(|_| Box::new(use_round_variant::UseRoundVariant)));
+    lint_store.register_late_lint_pass(Box::new(|_| {
+        Box::new(use_saturating_from::UseSaturatingFrom)
+    }));
+    lint_store.register_late_lint_pass(Box::new(|_| Box::new(use_split_in_half::UseSplitInHalf)));
+    lint_store.register_late_lint_pass(Box::new(|_| {
+        Box::new(use_split_into_chunks::UseSplitIntoChunks)
+    }));
+    lint_store.register_late_lint_pass(Box::new(|_| Box::new(use_square::UseSquare)));
+    lint_store.register_late_lint_pass(Box::new(|_| {
+        Box::new(use_to_string_variant::UseToStringVariant)
+    }));
     lint_store
-        .register_late_pass(|_| Box::new(redundant_crate_prefix::RedundantCratePrefix::default()));
+        .register_late_lint_pass(Box::new(|_| Box::new(use_trailing_zeros::UseTrailingZeros)));
+    lint_store.register_late_lint_pass(Box::new(|_| Box::new(use_unary_assign::UseUnaryAssign)));
+    lint_store
+        .register_late_lint_pass(Box::new(|_| Box::new(use_abs_comparison::UseAbsComparison)));
+    lint_store.register_late_lint_pass(Box::new(|_| Box::new(use_width_mask::UseWidthMask)));
+    lint_store.register_late_lint_pass(Box::new(|_| {
+        Box::new(fully_qualified_path::FullyQualifiedPath)
+    }));
+    lint_store.register_late_lint_pass(Box::new(|_| {
+        Box::new(redundant_crate_prefix::RedundantCratePrefix::default())
+    }));
 }
 
 #[test]

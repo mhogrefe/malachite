@@ -8,12 +8,11 @@
 
 use itertools::__std_iter::empty;
 use malachite_base::iterators::iterator_cache::IteratorCache;
-use malachite_base::nevers::Never;
 use malachite_base::num::exhaustive::exhaustive_signeds;
 
 #[test]
 fn test_iterator_cache() {
-    let mut xs = IteratorCache::new(empty::<Never>());
+    let mut xs = IteratorCache::new(empty::<!>());
     assert_eq!(xs.known_len(), None);
     assert_eq!(xs.get(1), None);
     assert_eq!(xs.known_len(), Some(0));
@@ -47,5 +46,5 @@ fn test_iterator_cache() {
 #[test]
 #[should_panic]
 fn iterator_cache_fail() {
-    IteratorCache::new(empty::<Never>()).assert_get(0);
+    IteratorCache::new(empty::<!>()).assert_get(0);
 }

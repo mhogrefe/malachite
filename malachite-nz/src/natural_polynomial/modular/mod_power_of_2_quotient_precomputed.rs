@@ -615,12 +615,7 @@ impl ModPowerOf2QuotientPrecomputedAssign<Self> for NaturalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::arithmetic::traits::*;
-    /// use malachite_base::polynomial::calculus::traits::*;
-    /// use malachite_base::polynomial::mod_polynomial::traits::*;
     /// use malachite_base::polynomial::modular::traits::*;
-    /// use malachite_base::polynomial::series::traits::*;
-    /// use malachite_base::polynomial::*;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// let q = NaturalPolynomial::from_str("3*x^2+x+1").unwrap();
@@ -684,12 +679,7 @@ impl ModPowerOf2QuotientPrecomputedAssign<&Self> for NaturalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::arithmetic::traits::*;
-    /// use malachite_base::polynomial::calculus::traits::*;
-    /// use malachite_base::polynomial::mod_polynomial::traits::*;
     /// use malachite_base::polynomial::modular::traits::*;
-    /// use malachite_base::polynomial::series::traits::*;
-    /// use malachite_base::polynomial::*;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// let q = NaturalPolynomial::from_str("3*x^2+x+1").unwrap();

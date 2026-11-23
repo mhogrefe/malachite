@@ -59,7 +59,7 @@ the naturals page. Azurite's `ExactDiv` and `NormalizedGcd` typeclass instances 
 Malachite's
 [`DivExact`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivExact.html)
 and
-[`Gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Gcd.html)
+[`Gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.Gcd.html)
 traits.
 
 ### Categories
@@ -177,10 +177,10 @@ both libraries multiply in a balanced tree.
 | :---: | --- | --- |
 | ✓ | `AzInt.edivMod (a b : AzInt) : AzInt × AzInt`, `AzInt.divMod` | [`DivModEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivModEuclidean.html) |
 | ✓ | `AzInt.ediv (a b : AzInt) : AzInt`, `AzInt.div`, `instance : Div AzInt` | [`DivEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivEuclidean.html) |
-| ✓ | `AzInt.emod (a b : AzInt) : AzInt`, `AzInt.mod`, `instance : Mod AzInt` | [`ModEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModEuclidean.html) |
+| ✓ | `AzInt.emod (a b : AzInt) : AzInt`, `AzInt.mod`, `instance : Mod AzInt` | [`ModEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModEuclidean.html) |
 | ✓ | `AzInt.fdivMod (a b : AzInt) : AzInt × AzInt` | [`DivMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivMod.html) |
 | ✓ | `AzInt.fdiv (a b : AzInt) : AzInt` | [`DivRound`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivRound.html), [`DivMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivMod.html) |
-| ✓ | `AzInt.fmod (a b : AzInt) : AzInt` | [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Mod.html) |
+| ✓ | `AzInt.fmod (a b : AzInt) : AzInt` | [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.Mod.html) |
 | ✓ | `AzInt.divRound (a b : AzInt) (mode : RoundingMode) : AzInt × Ordering` | [`DivRound`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivRound.html) |
 | ✓ | `instance : ExactDiv AzInt` | [`DivExact`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivExact.html) |
 
@@ -215,12 +215,22 @@ divisor is unspecified in Azurite and panics in Malachite.
 | ✓ | `shiftLeft (z : AzInt) (sh : Nat) : AzInt`, `instance : HShiftLeft AzInt Nat AzInt` | [`Shl`](https://doc.rust-lang.org/nightly/std/ops/trait.Shl.html), [`ShlAssign`](https://doc.rust-lang.org/nightly/std/ops/trait.ShlAssign.html) |
 | ✓ | `shiftRight (z : AzInt) (sh : Nat) : AzInt`, `instance : HShiftRight AzInt Nat AzInt` | [`Shr`](https://doc.rust-lang.org/nightly/std/ops/trait.Shr.html), [`ShrAssign`](https://doc.rust-lang.org/nightly/std/ops/trait.ShrAssign.html) |
 | ✓ | `AzInt.shiftRightRound (z : AzInt) (mode : RoundingMode) (sh : Nat) : AzInt × Ordering` | [`ShrRound`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ShrRound.html) |
+| ✓ | `AzInt.shiftRightNearestTernary (z : AzInt) (o : Ordering) (sh : Nat) : AzInt` | [`ShrRoundWithOrdering`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ShrRoundWithOrdering.html), [`ShrRoundWithOrderingAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ShrRoundWithOrderingAssign.html) |
 
 **Rounding of right shifts.** Both `z >>> sh` and `z >> sh` floor, so a negative value's
 magnitude rounds away from zero: $$-7 \gg 1 = -4$$ on both sides. `shiftRightRound` and `shr_round`
 take the mode explicitly and return the `Ordering`, with the argument order swapped. Shift amounts
 are `Nat` in Azurite and any primitive integer in Malachite, a negative count reversing the
 direction.
+
+**Shifting an inexact value.** `shiftRightNearestTernary o sh` and
+`shr_round_with_ordering(sh, Nearest, o)` round $$x/2^{sh}$$ to the nearest integer when $$x$$ is
+itself an approximation and `o` is its ordering against the exact value: an exact half rounds up if
+`o` is `Less` (the exact value is larger), down if `Greater`, and to even if `Equal`. This is the
+second rounding of a double rounding, which then gives what a single rounding of the exact value
+would have. Malachite's function takes every rounding mode, not only `Nearest`, and also returns
+the result's `Ordering` against the shifted exact value; Azurite's returns only the
+integer. For a negative value both apply the rule to the magnitude with the ordering reversed.
 
 ## Bits {#bits}
 
@@ -248,8 +258,8 @@ Malachite is `z.unsigned_abs()` followed by the `Natural` operation.
 | | Azurite | Malachite |
 | :---: | --- | --- |
 | ✓ | `pow (z : AzInt) (n : ℕ) : AzInt`, the `CommRing` `npow` | [`Pow`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Pow.html) |
-| ✓ | `instance : NormalizedGcd AzInt` | [`Gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Gcd.html) |
-| ≈ | `egcd (a b : AzNat) : AzNat × AzInt × AzInt` | [`ExtendedGcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ExtendedGcd.html) |
+| ✓ | `instance : NormalizedGcd AzInt` | [`Gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.Gcd.html) |
+| ≈ | `egcd (a b : AzNat) : AzNat × AzInt × AzInt` | [`ExtendedGcd`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.ExtendedGcd.html) |
 
 **`pow`.** Exact exponentiation, the sign following the exponent's parity; Malachite's `pow` takes
 a `u64` exponent.

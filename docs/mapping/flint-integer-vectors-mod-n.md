@@ -17,13 +17,9 @@ n](/mapping/flint-integers-mod-n/), whose [conventions](/mapping/flint-integers-
 apply here as well, and to [Malachite for FLINT Users: Integer
 Vectors](/mapping/flint-integer-vectors/); the [mapping index](/mapping/) lists the whole family.
 
-Every section of the chapter is mapped below: 11 rows across 5 sections, of which 8 are ✓ and 3
-✗. All of the chapter's functions have names beginning with an underscore, and all are included
-(see [Representation](#representation)). The ✗ rows are division by a scalar, the reversed dot
-product, and the pointwise product, which
-[`NaturalVector`](https://docs.rs/malachite-nz/latest/malachite_nz/natural_vector/struct.NaturalVector.html)
-does not yet provide as methods; each note gives the interim way to do the same thing one element
-at a time.
+Every section of the chapter is mapped below: 11 rows across 5 sections, all of them ✓. All of
+the chapter's functions have names beginning with an underscore, and all are included (see
+[Representation](#representation)).
 
 ## Conventions {#conventions}
 
@@ -37,7 +33,7 @@ page](/mapping/flint-integer-vectors/#underscore-functions), those functions are
 The Malachite counterpart is a
 [`NaturalVector`](https://docs.rs/malachite-nz/latest/malachite_nz/natural_vector/struct.NaturalVector.html)
 whose elements are all less than $$n$$, which
-[`ModIsReduced`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModIsReduced.html)
+[`ModIsReduced`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModIsReduced.html)
 checks. Every function in the chapter takes an `fmpz_mod_ctx_t` holding the modulus; the `Mod*`
 traits take the modulus as an ordinary
 [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html)
@@ -67,12 +63,12 @@ Each function falls into one of five categories:
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✓ | `void _fmpz_mod_vec_set_fmpz_vec(fmpz * A, const fmpz * B, slong len, const fmpz_mod_ctx_t ctx)` | [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Mod.html) |
-| ✓ | `void _fmpz_mod_vec_get_fmpz_vec_smod(fmpz * res, const fmpz * vec, slong len, const fmpz_mod_ctx_t ctx)` | [`BalancedMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BalancedMod.html) |
+| ✓ | `void _fmpz_mod_vec_set_fmpz_vec(fmpz * A, const fmpz * B, slong len, const fmpz_mod_ctx_t ctx)` | [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.Mod.html) |
+| ✓ | `void _fmpz_mod_vec_get_fmpz_vec_smod(fmpz * res, const fmpz * vec, slong len, const fmpz_mod_ctx_t ctx)` | [`BalancedMod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.BalancedMod.html) |
 
 `_fmpz_mod_vec_set_fmpz_vec` reduces every element of an integer vector into $$[0, n)$$, using
 several threads for long vectors or large elements. It is
-[`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Mod.html)
+[`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.Mod.html)
 on an
 [`IntegerVector`](https://docs.rs/malachite-nz/latest/malachite_nz/integer_vector/struct.IntegerVector.html)
 with a [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html)
@@ -83,12 +79,12 @@ page](/mapping/flint-integer-vectors/#reduction-mod-p)); Malachite does not spli
 threads.
 [`NaturalVector`](https://docs.rs/malachite-nz/latest/malachite_nz/natural_vector/struct.NaturalVector.html)
 also implements
-[`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Mod.html),
+[`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.Mod.html),
 for reducing a vector of nonnegative integers that are not yet less than $$n$$.
 
 `_fmpz_mod_vec_get_fmpz_vec_smod` converts residues in $$[0, n)$$ to their balanced
 representatives in $$(-n/2, n/2]$$. It is
-[`BalancedMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BalancedMod.html)
+[`BalancedMod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.BalancedMod.html)
 on a
 [`NaturalVector`](https://docs.rs/malachite-nz/latest/malachite_nz/natural_vector/struct.NaturalVector.html)
 with a [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html)
@@ -102,9 +98,9 @@ elements that are not yet reduced, since producing reduced output is its purpose
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✓ | `void _fmpz_mod_vec_neg(fmpz * A, const fmpz * B, slong len, const fmpz_mod_ctx_t ctx)` | [`ModNeg`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModNeg.html), [`ModNegAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModNegAssign.html) |
-| ✓ | `void _fmpz_mod_vec_add(fmpz * a, const fmpz * b, const fmpz * c, slong n, const fmpz_mod_ctx_t ctx)` | [`ModAdd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModAdd.html), [`ModAddAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModAddAssign.html) |
-| ✓ | `void _fmpz_mod_vec_sub(fmpz * a, const fmpz * b, const fmpz * c, slong n, const fmpz_mod_ctx_t ctx)` | [`ModSub`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModSub.html), [`ModSubAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModSubAssign.html) |
+| ✓ | `void _fmpz_mod_vec_neg(fmpz * A, const fmpz * B, slong len, const fmpz_mod_ctx_t ctx)` | [`ModNeg`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModNeg.html), [`ModNegAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModNegAssign.html) |
+| ✓ | `void _fmpz_mod_vec_add(fmpz * a, const fmpz * b, const fmpz * c, slong n, const fmpz_mod_ctx_t ctx)` | [`ModAdd`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModAdd.html), [`ModAddAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModAddAssign.html) |
+| ✓ | `void _fmpz_mod_vec_sub(fmpz * a, const fmpz * b, const fmpz * c, slong n, const fmpz_mod_ctx_t ctx)` | [`ModSub`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModSub.html), [`ModSubAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModSubAssign.html) |
 
 Each function applies the corresponding single-residue operation (`fmpz_mod_neg`, `fmpz_mod_add`,
 or `fmpz_mod_sub`; see [the integers mod n page](/mapping/flint-integers-mod-n/)) to every
@@ -115,10 +111,10 @@ the modulus by value or by reference. Writing the result over the first operand,
 by passing the same array twice, is the `*_assign` form: `v.mod_add_assign(&w, &m)`. Malachite
 panics if the two vectors have different dimensions or if any element of either is not less than
 $$m$$; FLINT checks neither. The power-of-2 forms,
-[`ModPowerOf2Neg`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2Neg.html),
-[`ModPowerOf2Add`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2Add.html),
+[`ModPowerOf2Neg`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2Neg.html),
+[`ModPowerOf2Add`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2Add.html),
 and
-[`ModPowerOf2Sub`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2Sub.html),
+[`ModPowerOf2Sub`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2Sub.html),
 take the exponent $$k$$ of a modulus $$2^k$$ instead.
 
 In the manual, the descriptions of `_fmpz_mod_vec_add` and `_fmpz_mod_vec_sub` are missing an
@@ -129,50 +125,55 @@ opening backtick and name the arguments `A`, `B`, and `C`, while the prototypes 
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✓ | `void _fmpz_mod_vec_scalar_mul_fmpz_mod(fmpz * A, const fmpz * B, slong len, const fmpz_t c, const fmpz_mod_ctx_t ctx)` | [`ModMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModMul.html), [`ModMulAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModMulAssign.html) |
-| ✓ | `void _fmpz_mod_vec_scalar_addmul_fmpz_mod(fmpz * A, const fmpz * B, slong len, const fmpz_t c, const fmpz_mod_ctx_t ctx)` | [`ModAddMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModAddMul.html), [`ModAddMulAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModAddMulAssign.html) |
-| ✗ | `void _fmpz_mod_vec_scalar_div_fmpz_mod(fmpz * A, const fmpz * B, slong len, const fmpz_t c, const fmpz_mod_ctx_t ctx)` | |
+| ✓ | `void _fmpz_mod_vec_scalar_mul_fmpz_mod(fmpz * A, const fmpz * B, slong len, const fmpz_t c, const fmpz_mod_ctx_t ctx)` | [`ModMul`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModMul.html), [`ModMulAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModMulAssign.html) |
+| ✓ | `void _fmpz_mod_vec_scalar_addmul_fmpz_mod(fmpz * A, const fmpz * B, slong len, const fmpz_t c, const fmpz_mod_ctx_t ctx)` | [`ModAddMul`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModAddMul.html), [`ModAddMulAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModAddMulAssign.html) |
+| ✓ | `void _fmpz_mod_vec_scalar_div_fmpz_mod(fmpz * A, const fmpz * B, slong len, const fmpz_t c, const fmpz_mod_ctx_t ctx)` | [`ModDiv`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModDiv.html) |
 
 `scalar_mul_fmpz_mod` multiplies each element by $$c$$ modulo $$n$$, which is
-[`ModMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModMul.html)
+[`ModMul`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModMul.html)
 of a [`NaturalVector`](https://docs.rs/malachite-nz/latest/malachite_nz/natural_vector/struct.NaturalVector.html)
 by a [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html)
 modulo another, or
-[`ModMulAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModMulAssign.html)
+[`ModMulAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModMulAssign.html)
 when `A` is `B`. Like FLINT's context, it computes the data for multiplying modulo $$n$$ once and
 reuses it for every element. Malachite panics if $$c$$ or any element is not less than $$n$$;
 FLINT does not check.
 
 `scalar_addmul_fmpz_mod` adds $$c$$ times each element of `B` to the corresponding element of
-`A`, which is [`ModAddMulAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModAddMulAssign.html) of a
+`A`, which is [`ModAddMulAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModAddMulAssign.html) of a
 [`NaturalVector`](https://docs.rs/malachite-nz/latest/malachite_nz/natural_vector/struct.NaturalVector.html),
 another `NaturalVector`, a [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html)
-scalar, and a `Natural` modulus; [`ModAddMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModAddMul.html) returns the result instead.
+scalar, and a `Natural` modulus; [`ModAddMul`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModAddMul.html) returns the result instead.
 Like FLINT, it handles $$c$$ equal to 0 and 1 directly (and also $$n - 1$$, which FLINT does not)
 and otherwise computes the data for multiplying modulo $$n$$ once. Malachite panics if the
 dimensions differ or if $$c$$ or any element is not less than $$n$$; FLINT checks neither.
-[`ModSubMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModSubMul.html) and [`ModSubMulAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModSubMulAssign.html) subtract the
+[`ModSubMul`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModSubMul.html) and [`ModSubMulAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModSubMulAssign.html) subtract the
 multiple instead, which this chapter has no function for.
 
-The vector types do not yet have `scalar_div_fmpz_mod`, which divides each element by $$c$$.
-FLINT computes the inverse of $$c$$ once and multiplies by it; until the vector types have it, do
-the same with
-[`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModInverse.html) followed by [`ModMulAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModMulAssign.html) on the
-vector.
-
-The manual says only that `scalar_div_fmpz_mod` assumes $$c$$ is nonzero, but what it needs
-is that $$c$$ be invertible modulo $$n$$: FLINT throws an exception when $$\gcd(c, n) \ne 1$$,
-which for a composite modulus can happen even when $$c$$ is nonzero.
-[`mod_inverse`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModInverse.html#tymethod.mod_inverse) returns
-[`None`](https://doc.rust-lang.org/nightly/core/option/enum.Option.html#variant.None) in that
-case.
+`scalar_div_fmpz_mod` divides each element by $$c$$, which is [`ModDiv`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModDiv.html) of a
+[`NaturalVector`](https://docs.rs/malachite-nz/latest/malachite_nz/natural_vector/struct.NaturalVector.html)
+by a [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html)
+modulo another. Like FLINT, it computes the inverse of $$c$$ once and multiplies every element by
+it. The manual says only that `scalar_div_fmpz_mod` assumes $$c$$ is nonzero, but what it needs is
+that $$c$$ be invertible modulo $$n$$: FLINT throws an exception when $$\gcd(c, n) \ne 1$$, which
+for a composite modulus can happen even when $$c$$ is nonzero. Malachite handles that case too:
+an element $$x$$ then has a quotient if and only if $$\gcd(c, n)$$ divides $$x$$, and
+[`mod_div`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModDiv.html#tymethod.mod_div)
+returns
+[`None`](https://doc.rust-lang.org/nightly/core/option/enum.Option.html#variant.None) if some
+element has no quotient, and otherwise the quotient that the scalar `mod_div`, like
+[`fmpz_mod_divides`](/mapping/flint-integers-mod-n/), returns for each element. The trait is also
+implemented for
+[`UnsignedVector`](https://docs.rs/malachite-base/latest/malachite_base/unsigned_vector/struct.UnsignedVector.html)
+with a `T` divisor and modulus. There is no in-place form, as there is none for the scalar
+`ModDiv`; taking the vector by value reuses its storage.
 
 ## [Dot Product](https://flintlib.org/doc/fmpz_mod_vec.html#dot-product) {#dot-product}
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✓ | `void _fmpz_mod_vec_dot(fmpz_t d, const fmpz * A, const fmpz * B, slong len, const fmpz_mod_ctx_t ctx)` | [`ModDot`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModDot.html) |
-| ✗ | `void _fmpz_mod_vec_dot_rev(fmpz_t d, const fmpz * A, const fmpz * B, slong len, const fmpz_mod_ctx_t ctx)` | |
+| ✓ | `void _fmpz_mod_vec_dot(fmpz_t d, const fmpz * A, const fmpz * B, slong len, const fmpz_mod_ctx_t ctx)` | [`ModDot`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModDot.html) |
+| ✓ | `void _fmpz_mod_vec_dot_rev(fmpz_t d, const fmpz * A, const fmpz * B, slong len, const fmpz_mod_ctx_t ctx)` | [`ModDotReversed`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModDotReversed.html) |
 
 `_fmpz_mod_vec_dot` is $$\sum_i a_i b_i \bmod n$$, and `_fmpz_mod_vec_dot_rev` pairs
 $$a_i$$ with $$b_{\mathit{len}-1-i}$$ instead, reversing the second vector. Neither reduces as
@@ -180,26 +181,28 @@ it goes: each computes the whole sum of products as an integer, with the [intege
 product](/mapping/flint-integer-vectors/#dot-product), and reduces it modulo $$n$$ once at the
 end.
 
-`_fmpz_mod_vec_dot` is [`ModDot`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModDot.html)'s `v.mod_dot(w, n)` for `NaturalVector`, with the
+`_fmpz_mod_vec_dot` is [`ModDot`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModDot.html)'s `v.mod_dot(w, n)` for `NaturalVector`, with the
 vectors and the modulus each taken by value or by reference. It uses the same strategy: the whole
 dot product, computed as an integer, reduced once. When $$n$$ fits in a limb, every element does
 too, and the products are summed in one to three limbs instead, as by the word-sized
 `_nmod_vec_dot`. For a power-of-2 modulus,
-[`ModPowerOf2Dot`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2Dot.html) does the same with the low $$k$$ bits. The reversed form has no counterpart
-yet; until it does, apply
-[`AddMulAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.AddMulAssign.html)
-to each pair of elements, iterating over the second vector in reverse, and reduce the result once
-with [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Mod.html).
+[`ModPowerOf2Dot`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2Dot.html) does the same with the low $$k$$ bits. `_fmpz_mod_vec_dot_rev` is
+[`ModDotReversed`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModDotReversed.html)'s `v.mod_dot_reversed(w, n)`, by the same strategy.
+[`ModAddDot`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModAddDot.html), [`ModSubDot`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModSubDot.html), and their reversed
+and power-of-2 forms add or subtract the dot product to or from a residue in one step, which this
+chapter has no function for.
 
 ## [Multiplication](https://flintlib.org/doc/fmpz_mod_vec.html#multiplication) {#multiplication}
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✗ | `void _fmpz_mod_vec_mul(fmpz * A, const fmpz * B, const fmpz * C, slong len, const fmpz_mod_ctx_t ctx)` | |
+| ✓ | `void _fmpz_mod_vec_mul(fmpz * A, const fmpz * B, const fmpz * C, slong len, const fmpz_mod_ctx_t ctx)` | [`ModEntrywiseMul`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModEntrywiseMul.html), [`ModEntrywiseMulAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModEntrywiseMulAssign.html) |
 
 `_fmpz_mod_vec_mul` multiplies two vectors element by element, setting $$a_i$$ to
-$$b_i c_i \bmod n$$; it is the pointwise product, not a convolution. The vector types do not yet
-have it. Until they do, zip the two
-[`elements`](https://docs.rs/malachite-nz/latest/malachite_nz/natural_vector/struct.NaturalVector.html#structfield.elements)
-fields and apply [`ModMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModMul.html) or [`ModMulAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModMulAssign.html) to each
-pair.
+$$b_i c_i \bmod n$$; it is the pointwise product, not a convolution.
+[`ModEntrywiseMul`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModEntrywiseMul.html) computes the same thing, and [`ModEntrywiseMulAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModEntrywiseMulAssign.html) does it in
+place, the counterpart of calling `_fmpz_mod_vec_mul` with `A` equal to `B`. The data for
+multiplying modulo $$n$$ is precomputed once per call and shared by all the elements. The same
+traits are implemented for `UnsignedVector`, and
+[`ModPowerOf2EntrywiseMul`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2EntrywiseMul.html) and [`ModPowerOf2EntrywiseMulAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2EntrywiseMulAssign.html) do the same modulo
+$$2^k$$.

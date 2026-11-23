@@ -248,7 +248,7 @@ come closest to being one: most rows are the same trait name in two crates.
 | — | `Saturating` (legacy two-method umbrella) | |
 | ✓ | `WrappingAdd`, `WrappingSub`, `WrappingMul`, `WrappingNeg` | [`WrappingAdd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.WrappingAdd.html) and kin |
 | ≈ | `WrappingShl`, `WrappingShr` | [`Shl`](https://doc.rust-lang.org/nightly/std/ops/trait.Shl.html), [`Shr`](https://doc.rust-lang.org/nightly/std/ops/trait.Shr.html) |
-| ≈ | `Euclid`, `CheckedEuclid` | [`DivEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivEuclidean.html), [`ModEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModEuclidean.html) |
+| ≈ | `Euclid`, `CheckedEuclid` | [`DivEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivEuclidean.html), [`ModEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModEuclidean.html) |
 | ✓ | `Inv` | [`Reciprocal`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Reciprocal.html) |
 | ✓ | `MulAdd` | [`AddMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.AddMul.html) |
 | ≈ | `MulAddAssign` | [`AddMulAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.AddMulAssign.html) |
@@ -277,7 +277,7 @@ wants the value-based question, and should choose deliberately.
 **`Euclid` and `Inv`.** `div_euclid` is
 [`DivEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivEuclidean.html)
 and `rem_euclid` is
-[`ModEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModEuclidean.html),
+[`ModEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModEuclidean.html),
 on the primitives as on
 [`Integer`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html), and the
 provided `div_rem_euclid` pair is
@@ -377,13 +377,13 @@ methods.
 
 | | num | Malachite |
 | :---: | --- | --- |
-| ≈ | `num_integer::Integer` (as a bound) | [`DivMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivMod.html), [`Gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Gcd.html), [`Parity`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Parity.html), and kin |
+| ≈ | `num_integer::Integer` (as a bound) | [`DivMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivMod.html), [`Gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.Gcd.html), [`Parity`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Parity.html), and kin |
 | ≈ | `Roots` (as a bound) | [`FloorSqrt`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.FloorSqrt.html), [`FloorRoot`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.FloorRoot.html) |
 | ✓ | `Average` (`average_floor`, `average_ceil`; free functions) | [`AverageRound`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.AverageRound.html), [`Average`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Average.html) |
 | — | `ExtendedGcd` (the struct) | |
 | — | free functions `div_rem` through `gcd_lcm`, `sqrt`, `cbrt`, `nth_root` | |
-| ✓ | `binomial (n, k)` | [`BinomialCoefficient`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BinomialCoefficient.html) |
-| ≈ | `multinomial (k: &[T])` | [`BinomialCoefficient`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BinomialCoefficient.html) |
+| ✓ | `binomial (n, k)` | [`BinomialCoefficient`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.BinomialCoefficient.html) |
+| ≈ | `multinomial (k: &[T])` | [`BinomialCoefficient`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.BinomialCoefficient.html) |
 | — | `IterBinomial` | |
 
 **The traits as bounds.** `num_integer::Integer`'s *methods* were mapped in detail on
@@ -413,7 +413,7 @@ well, where they exist for convenience rather than overflow safety; num-bigint i
 trait for neither of its bignum types.
 
 **The combinatorial functions.** `binomial(n, k)` is
-[`BinomialCoefficient`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BinomialCoefficient.html)'s
+[`BinomialCoefficient`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.BinomialCoefficient.html)'s
 `T::binomial_coefficient(n, k)`, on the primitives and the bignums alike, with
 `CheckedBinomialCoefficient` for the primitive cases that overflow. `multinomial` is a fold
 of binomials on both sides of the boundary,

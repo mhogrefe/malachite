@@ -138,13 +138,20 @@ impl Iterator for ExhaustiveChars {
                     }
                 }
                 CharType::NonAsciiGraphic => {
-                    if self.c == '\u{33479}' {
-                        self.current_type = CharType::NonGraphic;
-                        self.c = '\0';
-                    } else {
-                        increment_char(&mut self.c);
-                        while !CharType::NonAsciiGraphic.contains(self.c) {
-                            increment_char(&mut self.c);
+                    // The next graphic `char`, if there is one. Which `char`s are graphic depends
+                    // on the Unicode version of the standard library, so the last one is not
+                    // hardcoded.
+                    let mut next = self.c;
+                    loop {
+                        if next == char::MAX {
+                            self.current_type = CharType::NonGraphic;
+                            self.c = '\0';
+                            break;
+                        }
+                        increment_char(&mut next);
+                        if CharType::NonAsciiGraphic.contains(next) {
+                            self.c = next;
+                            break;
                         }
                     }
                 }

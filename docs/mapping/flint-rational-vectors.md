@@ -17,10 +17,9 @@ companion to [Malachite for FLINT Users: Integer Vectors](/mapping/flint-integer
 for FLINT Users: Rationals](/mapping/flint-rationals/); the [mapping index](/mapping/) lists the
 whole family.
 
-Every section of the chapter is mapped below: 13 rows across 8 sections, of which 8 are ✓, 3 ≈,
-1 —, and 1 ✗. All of the chapter's functions have names beginning with an underscore, and all are
-included (see [Representation](#representation)). The one ✗ row is a random generator,
-`_fmpq_vec_randtest_uniq_sorted`.
+Every section of the chapter is mapped below: 13 rows across 8 sections, of which 8 are ✓, 4 ≈,
+and 1 —. All of the chapter's functions have names beginning with an underscore, and all are
+included (see [Representation](#representation)).
 
 ## Conventions {#conventions}
 
@@ -70,7 +69,7 @@ that returns the zero vector of a given dimension: `RationalVector::zero(n)`. `_
 | | FLINT | Malachite |
 | :---: | --- | --- |
 | ≈ | `void _fmpq_vec_randtest(fmpq * f, flint_rand_t state, slong len, flint_bitcnt_t bits)` | [`random_rational_vectors_with_dimension`](https://docs.rs/malachite-q/latest/malachite_q/rational_vector/random/fn.random_rational_vectors_with_dimension.html), [`striped_random_rational_vectors_with_dimension`](https://docs.rs/malachite-q/latest/malachite_q/rational_vector/random/fn.striped_random_rational_vectors_with_dimension.html), [`random_rational_vectors_with_dimension_from_iterator`](https://docs.rs/malachite-q/latest/malachite_q/rational_vector/random/fn.random_rational_vectors_with_dimension_from_iterator.html) |
-| ✗ | `void _fmpq_vec_randtest_uniq_sorted(fmpq * vec, flint_rand_t state, slong len, flint_bitcnt_t bits)` | |
+| ≈ | `void _fmpq_vec_randtest_uniq_sorted(fmpq * vec, flint_rand_t state, slong len, flint_bitcnt_t bits)` | [`random_ordered_unique_rational_vectors_with_dimension`](https://docs.rs/malachite-q/latest/malachite_q/rational_vector/random/fn.random_ordered_unique_rational_vectors_with_dimension.html), [`striped_random_ordered_unique_rational_vectors_with_dimension`](https://docs.rs/malachite-q/latest/malachite_q/rational_vector/random/fn.striped_random_ordered_unique_rational_vectors_with_dimension.html), [`random_ordered_unique_rational_vectors_with_dimension_from_iterator`](https://docs.rs/malachite-q/latest/malachite_q/rational_vector/random/fn.random_ordered_unique_rational_vectors_with_dimension_from_iterator.html) |
 
 `_fmpq_vec_randtest` fills a vector of length `len`, drawing each element with
 [`fmpq_randtest`](/mapping/flint-rationals/#random-number-generation), which caps the numerator
@@ -88,10 +87,18 @@ gives a hard bound on the values.
 
 `_fmpq_vec_randtest_uniq_sorted` produces distinct elements in ascending order. It draws a vector
 with `_fmpq_vec_randtest`, then repeatedly sorts it and redraws any element equal to its
-neighbour until none are. Malachite has no generator of distinct sorted vectors yet. The
-implementation throws an error unless `bits` is at least four times the bit length of `len`, a
-requirement the manual does not state; since FLINT counts the bit length of 0 as 1, this means
-`bits` must be at least 4 even when `len` is 0 or 1.
+neighbour until none are. The implementation throws an error unless `bits` is at least four times
+the bit length of `len`, a requirement the manual does not state; since FLINT counts the bit
+length of 0 as 1, this means `bits` must be at least 4 even when `len` is 0 or 1. Malachite's
+counterparts mirror the three generators above: each vector draws elements until it has
+`dimension` distinct ones, and then sorts them. The elements have the same distributions as
+above, so the outputs differ from FLINT's in the same ways. There is no restriction on the
+dimension or the mean bit length, though a large dimension with a small mean bit length needs many
+redraws. The generator that takes an iterator hangs if the iterator has fewer than `dimension`
+distinct values. There is also
+[`exhaustive_ordered_unique_rational_vectors_with_dimension`](https://docs.rs/malachite-q/latest/malachite_q/rational_vector/exhaustive/fn.exhaustive_ordered_unique_rational_vectors_with_dimension.html),
+which generates every such vector once. The same generators exist for `UnsignedVector`,
+`NaturalVector`, and `IntegerVector`.
 
 ## [Bit sizes and heights](https://flintlib.org/doc/fmpq_vec.html#bit-sizes-and-heights) {#bit-sizes-and-heights}
 
@@ -190,8 +197,11 @@ the vectors must have the same dimension. FLINT computes it with one `fmpq_addmu
 reducing to lowest terms (see [`fmpq_addmul`](/mapping/flint-rationals/#arithmetic)). `Dot` instead
 writes each vector as integer numerators over a common denominator, takes one integer dot product,
 and reduces once.
-Unlike [`_fmpz_vec_dot`](/mapping/flint-integer-vectors/#dot-product), there is no
-`_fmpq_vec_dot_general` with an initial term, subtraction, or reversal.
+FLINT has no `_fmpq_vec_dot_general`, but Malachite's counterparts of
+[`_fmpz_vec_dot_general`](/mapping/flint-integer-vectors/#dot-product),
+[`AddDot`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.AddDot.html), [`SubDot`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.SubDot.html),
+[`DotReversed`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DotReversed.html), and their reversed forms, are implemented for
+`RationalVector` too.
 
 ## [Input and output](https://flintlib.org/doc/fmpq_vec.html#input-and-output) {#input-and-output}
 

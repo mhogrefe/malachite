@@ -194,7 +194,8 @@ pub mod chars;
 pub mod comparison;
 /// Functions and adaptors for iterators.
 pub mod iterators;
-/// [`Never`](nevers::Never), a type that cannot be instantiated.
+/// The generator and the trait implementations of [`!`](prim@never), the never type, which cannot
+/// be instantiated.
 pub mod nevers;
 /// Functions for working with primitive integers and floats.
 #[macro_use]

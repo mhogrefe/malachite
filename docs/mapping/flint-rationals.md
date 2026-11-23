@@ -276,8 +276,8 @@ the `*Assign` traits cover the in-place case, and every operator has borrowing f
 | ✓ | `void fmpq_div_fmpz (fmpq_t res, const fmpq_t op, const fmpz_t x)` | [`Div`](https://doc.rust-lang.org/nightly/std/ops/trait.Div.html) |
 | ✓ | `void fmpq_mul_2exp (fmpq_t res, const fmpq_t x, flint_bitcnt_t exp)` | [`Shl`](https://doc.rust-lang.org/nightly/std/ops/trait.Shl.html), [`ShlAssign`](https://doc.rust-lang.org/nightly/std/ops/trait.ShlAssign.html) |
 | ✓ | `void fmpq_div_2exp (fmpq_t res, const fmpq_t x, flint_bitcnt_t exp)` | [`Shr`](https://doc.rust-lang.org/nightly/std/ops/trait.Shr.html), [`ShrAssign`](https://doc.rust-lang.org/nightly/std/ops/trait.ShrAssign.html) |
-| ✓ | `void fmpq_gcd (fmpq_t res, const fmpq_t op1, const fmpq_t op2)` | [`Gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Gcd.html), [`GcdAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.GcdAssign.html) |
-| ≈ | `void fmpq_gcd_cofactors (fmpq_t g, fmpz_t abar, fmpz_t bbar, const fmpq_t a, const fmpq_t b)` | [`ExtendedGcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ExtendedGcd.html) |
+| ✓ | `void fmpq_gcd (fmpq_t res, const fmpq_t op1, const fmpq_t op2)` | [`Gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.Gcd.html), [`GcdAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.GcdAssign.html) |
+| ≈ | `void fmpq_gcd_cofactors (fmpq_t g, fmpz_t abar, fmpz_t bbar, const fmpq_t a, const fmpq_t b)` | [`ExtendedGcd`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.ExtendedGcd.html) |
 
 **The operators and mixed forms.** `op1 + op2` through `op1 / op2`, with division by zero a
 panic where FLINT raises an error, and FLINT's blanket aliasing permission answered by the
@@ -310,14 +310,14 @@ Bézout cofactors $$u$$ and $$v$$ with $$ua + vb = g$$. FLINT's quotients are th
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✓ | `int fmpq_mod_fmpz (fmpz_t res, const fmpq_t x, const fmpz_t mod)` | [`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModInverse.html), [`ModMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModMul.html) |
+| ✓ | `int fmpq_mod_fmpz (fmpz_t res, const fmpq_t x, const fmpz_t mod)` | [`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModInverse.html), [`ModMul`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModMul.html) |
 | ✓ | `int fmpq_reconstruct_fmpz_2 (fmpq_t res, const fmpz_t a, const fmpz_t m, const fmpz_t N, const fmpz_t D)` | [`Rational::reconstruct_with_bounds`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.reconstruct_with_bounds) |
 | ✓ | `int fmpq_reconstruct_fmpz (fmpq_t res, const fmpz_t a, const fmpz_t m)` | [`Rational::reconstruct`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.reconstruct) |
 
 **`fmpq_mod_fmpz`.** The residue `a` with $$n \equiv a d \pmod m$$: reduce the denominator,
 invert it, and multiply by the reduced numerator, as on
 [the fmpz_mod page](/mapping/flint-integers-mod-n/#arithmetic). FLINT's failure return is
-[`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModInverse.html)'s
+[`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModInverse.html)'s
 [`None`](https://doc.rust-lang.org/nightly/std/option/enum.Option.html): FLINT fails exactly when
 the denominator has no inverse.
 
@@ -350,7 +350,7 @@ each step an iterator's `next`.
 | ✓ | `void fmpq_next_calkin_wilf (fmpq_t res, const fmpq_t x)` | [`exhaustive_non_negative_rationals`](https://docs.rs/malachite-q/latest/malachite_q/rational/exhaustive/fn.exhaustive_non_negative_rationals.html) |
 | ✓ | `void fmpq_next_signed_calkin_wilf (fmpq_t res, const fmpq_t x)` | [`exhaustive_rationals`](https://docs.rs/malachite-q/latest/malachite_q/rational/exhaustive/fn.exhaustive_rationals.html) |
 | ✓ | `void fmpq_farey_neighbors (fmpq_t l, fmpq_t r, const fmpq_t x, const fmpz_t Q)` | [`Rational::farey_neighbors`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.farey_neighbors) |
-| ≈ | `void fmpq_simplest_between (fmpq_t x, const fmpq_t l, const fmpq_t r)` | [`SimplestRationalInInterval`](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/traits/trait.SimplestRationalInInterval.html) |
+| ≈ | `void fmpq_simplest_between (fmpq_t x, const fmpq_t l, const fmpq_t r)` | [`SimplestRationalInInterval`](https://docs.rs/malachite-q/latest/malachite_q/rational/number_theory/traits/trait.SimplestRationalInInterval.html) |
 
 **`fmpq_next_calkin_wilf`, `fmpq_next_signed_calkin_wilf`, `fmpq_next_minimal`,
 `fmpq_next_signed_minimal`.** Each iterator yields FLINT's sequence term for term, from the

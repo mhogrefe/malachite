@@ -8,11 +8,12 @@
 
 use clippy_utils::diagnostics::span_lint;
 use clippy_utils::ty::implements_trait;
+use rustc_attr_ir::LangItem;
 use rustc_hir::def::{DefKind, Res};
-use rustc_hir::{BinOpKind, Expr, ExprKind, LangItem};
+use rustc_hir::{BinOpKind, Expr, ExprKind};
 use rustc_lint::{LateContext, LateLintPass};
+use rustc_lint::{declare_lint, declare_lint_pass};
 use rustc_middle::ty::Ty;
-use rustc_session::{declare_lint, declare_lint_pass};
 
 declare_lint! {
     /// ### What it does
@@ -194,7 +195,11 @@ impl<'tcx> LateLintPass<'tcx> for CloneWithRefVariant {
                 if !matches!(cx.tcx.def_kind(parent), DefKind::Impl { .. }) {
                     return;
                 }
-                let self_ty = cx.tcx.type_of(parent).instantiate_identity();
+                let self_ty = cx
+                    .tcx
+                    .type_of(parent)
+                    .instantiate_identity()
+                    .skip_normalization();
                 let Some(adt_did) = crate::bignum_adt_did(cx, self_ty) else {
                     return;
                 };

@@ -12,7 +12,7 @@ use clippy_utils::path_to_local_with_projections;
 use rustc_hir::def::{DefKind, Res};
 use rustc_hir::{Block, Expr, ExprKind, HirId, PatKind, StmtKind};
 use rustc_lint::{LateContext, LateLintPass};
-use rustc_session::{declare_lint, declare_lint_pass};
+use rustc_lint::{declare_lint, declare_lint_pass};
 
 declare_lint! {
     /// ### What it does
@@ -89,7 +89,11 @@ fn callee_inherent_bignum_fn<'tcx>(
     };
     // Inherent impls only; a trait method has no bignum-specific `_round` sibling to point to.
     let impl_did = cx.tcx.inherent_impl_of_assoc(def_id)?;
-    let self_ty = cx.tcx.type_of(impl_did).instantiate_identity();
+    let self_ty = cx
+        .tcx
+        .type_of(impl_did)
+        .instantiate_identity()
+        .skip_normalization();
     let adt_did = crate::bignum_adt_did(cx, self_ty)?;
     Some((cx.tcx.item_name(def_id).to_string(), adt_did))
 }

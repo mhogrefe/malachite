@@ -28,7 +28,7 @@ An `AzZModPow2 k` is a structure holding an `AzNat` residue `val` together with 
 $$k$$ is a type index, fixed at compile time, and `AzZModPow2 0` is the trivial ring. Malachite
 has no residue type. Its modular arithmetic is a family of traits on `Natural` that take the
 modulus as a runtime argument,
-[`ModPowerOf2Add`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2Add.html)
+[`ModPowerOf2Add`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2Add.html)
 and its siblings, every one of which requires its inputs to be already reduced and panics
 otherwise. So Azurite's type invariant and Malachite's precondition are the same statement: an
 `AzZModPow2 k` *is* a reduced `Natural` with the modulus remembered, and each row below maps a
@@ -61,14 +61,14 @@ Each definition falls into one of five categories:
 
 | | Azurite | Malachite |
 | :---: | --- | --- |
-| ✓ | `ofAzNat (k : Nat) (n : AzNat) : AzZModPow2 k` | [`ModPowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2.html) |
-| ✓ | `ofAzInt (k : Nat) (z : AzInt) : AzZModPow2 k` | [`ModPowerOf2`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/mod_power_of_2/index.html) for `Integer` |
-| ✓ | `ofNat (k m : Nat) : AzZModPow2 k`, `instance : OfNat (AzZModPow2 k) m`, `instance : NatCast (AzZModPow2 k)` | [`Natural::from`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/conversion/from_primitive_int/index.html) then [`ModPowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2.html) |
-| ✓ | `instance : IntCast (AzZModPow2 k)` | [`Integer::from`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/conversion/from_primitive_int/index.html) then [`ModPowerOf2`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/mod_power_of_2/index.html) |
+| ✓ | `ofAzNat (k : Nat) (n : AzNat) : AzZModPow2 k` | [`ModPowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2.html) |
+| ✓ | `ofAzInt (k : Nat) (z : AzInt) : AzZModPow2 k` | [`ModPowerOf2`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/modular/mod_power_of_2/index.html) for `Integer` |
+| ✓ | `ofNat (k m : Nat) : AzZModPow2 k`, `instance : OfNat (AzZModPow2 k) m`, `instance : NatCast (AzZModPow2 k)` | [`Natural::from`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/conversion/from_primitive_int/index.html) then [`ModPowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2.html) |
+| ✓ | `instance : IntCast (AzZModPow2 k)` | [`Integer::from`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/conversion/from_primitive_int/index.html) then [`ModPowerOf2`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/modular/mod_power_of_2/index.html) |
 | ✓ | `instance : Zero (AzZModPow2 k)`, `instance : One (AzZModPow2 k)` | [`Natural::ZERO`](https://docs.rs/malachite-base/latest/malachite_base/num/basic/traits/trait.Zero.html), [`Natural::ONE`](https://docs.rs/malachite-base/latest/malachite_base/num/basic/traits/trait.One.html) |
 | — | `toAzNat (a : AzZModPow2 k) : AzNat`, `AzZModPow2.val : AzNat` | |
-| ⚙ | `AzZModPow2.isLt : val.toNat < 2 ^ k` | [`ModPowerOf2IsReduced`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2IsReduced.html) |
-| ✓ | `deriving DecidableEq` | [`Eq`](https://doc.rust-lang.org/nightly/std/cmp/trait.Eq.html), [`EqModPowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.EqModPowerOf2.html) |
+| ⚙ | `AzZModPow2.isLt : val.toNat < 2 ^ k` | [`ModPowerOf2IsReduced`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2IsReduced.html) |
+| ✓ | `deriving DecidableEq` | [`Eq`](https://doc.rust-lang.org/nightly/std/cmp/trait.Eq.html), [`EqModPowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.EqModPowerOf2.html) |
 
 **Reduction.** `ofAzNat k n` masks `n` to its low $$k$$ bits, which is `n.mod_power_of_2(k)`; the
 result is the `Natural` that stands for the residue from then on. `ofAzInt k z` reduces the
@@ -89,16 +89,16 @@ reduced values, and `x.eq_mod_power_of_2(&y, k)` compares two unreduced ones, as
 
 | | Azurite | Malachite |
 | :---: | --- | --- |
-| ✓ | `add (a b : AzZModPow2 k) : AzZModPow2 k`, `instance : Add (AzZModPow2 k)` | [`ModPowerOf2Add`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2Add.html), [`ModPowerOf2AddAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2AddAssign.html) |
-| ✓ | `sub (a b : AzZModPow2 k) : AzZModPow2 k`, `instance : Sub (AzZModPow2 k)` | [`ModPowerOf2Sub`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2Sub.html), [`ModPowerOf2SubAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2SubAssign.html) |
-| ✓ | `neg (a : AzZModPow2 k) : AzZModPow2 k`, `instance : Neg (AzZModPow2 k)` | [`ModPowerOf2Neg`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2Neg.html), [`ModPowerOf2NegAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2NegAssign.html) |
-| ✓ | `mul (a b : AzZModPow2 k) : AzZModPow2 k`, `instance : Mul (AzZModPow2 k)` | [`ModPowerOf2Mul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2Mul.html), [`ModPowerOf2MulAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2MulAssign.html) |
-| ✓ | `instance instSquare : Square (AzZModPow2 k)` | [`ModPowerOf2Square`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2Square.html), [`ModPowerOf2SquareAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2SquareAssign.html) |
-| ✓ | `pow (a : AzZModPow2 k) (n : ℕ) : AzZModPow2 k`, the `CommRing` `npow` | [`ModPowerOf2Pow`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2Pow.html), [`ModPowerOf2PowAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2PowAssign.html) |
+| ✓ | `add (a b : AzZModPow2 k) : AzZModPow2 k`, `instance : Add (AzZModPow2 k)` | [`ModPowerOf2Add`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2Add.html), [`ModPowerOf2AddAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2AddAssign.html) |
+| ✓ | `sub (a b : AzZModPow2 k) : AzZModPow2 k`, `instance : Sub (AzZModPow2 k)` | [`ModPowerOf2Sub`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2Sub.html), [`ModPowerOf2SubAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2SubAssign.html) |
+| ✓ | `neg (a : AzZModPow2 k) : AzZModPow2 k`, `instance : Neg (AzZModPow2 k)` | [`ModPowerOf2Neg`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2Neg.html), [`ModPowerOf2NegAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2NegAssign.html) |
+| ✓ | `mul (a b : AzZModPow2 k) : AzZModPow2 k`, `instance : Mul (AzZModPow2 k)` | [`ModPowerOf2Mul`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2Mul.html), [`ModPowerOf2MulAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2MulAssign.html) |
+| ✓ | `instance instSquare : Square (AzZModPow2 k)` | [`ModPowerOf2Square`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2Square.html), [`ModPowerOf2SquareAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2SquareAssign.html) |
+| ✓ | `pow (a : AzZModPow2 k) (n : ℕ) : AzZModPow2 k`, the `CommRing` `npow` | [`ModPowerOf2Pow`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2Pow.html), [`ModPowerOf2PowAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2PowAssign.html) |
 | ✓ | `isOdd (a : AzZModPow2 k) : Bool` | [`Parity`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Parity.html) |
-| ✓ | `invOdd (a : AzZModPow2 k) (h : a.isOdd = true) : AzZModPow2 k` | [`ModPowerOf2Inverse`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2Inverse.html) |
+| ✓ | `invOdd (a : AzZModPow2 k) (h : a.isOdd = true) : AzZModPow2 k` | [`ModPowerOf2Inverse`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2Inverse.html) |
 | — | `invOddAux (a : AzZModPow2 k) : Nat → AzZModPow2 k` | |
-| ✓ | `sqrt? (a : AzZModPow2 k) : Option (AzZModPow2 k)` | [`ModPowerOf2Sqrt`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2Sqrt.html) |
+| ✓ | `sqrt? (a : AzZModPow2 k) : Option (AzZModPow2 k)` | [`ModPowerOf2Sqrt`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2Sqrt.html) |
 | — | `invSqrtStep`, `invSqrtAux`, `oddSqrt`, `leastRoot` | |
 | — | `instance instCommRing : CommRing (AzZModPow2 k)` | |
 
@@ -125,9 +125,9 @@ primitive unsigned type implements it too, for $$k$$ up to its width. `oddSqrt`,
 `invSqrtStep`, `invSqrtAux`, and `leastRoot` are the steps of the algorithm.
 
 **Shifts.** Malachite also has
-[`ModPowerOf2Shl`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2Shl.html)
+[`ModPowerOf2Shl`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2Shl.html)
 and
-[`ModPowerOf2Shr`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2Shr.html),
+[`ModPowerOf2Shr`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2Shr.html),
 multiplication and floor division by a power of 2 modulo $$2^k$$, with a negative shift count
 reversing the direction. `AzZModPow2` has no shift operations; the spellings are
 `ofAzNat k (a.val <<< s)` and `ofAzNat k (a.val >>> s)`, the second of which needs no reduction.
@@ -137,7 +137,7 @@ reversing the direction. `AzZModPow2` has no shift operations; the spellings are
 | | Azurite | Malachite |
 | :---: | --- | --- |
 | ✓ | `toString (a : AzZModPow2 k) : String`, `instance : ToString (AzZModPow2 k)` | [`Display`](https://doc.rust-lang.org/nightly/std/fmt/trait.Display.html) |
-| ≈ | `parse (s : String) : Option (AzZModPow2 k)` | [`FromStr`](https://doc.rust-lang.org/nightly/std/str/trait.FromStr.html) then [`ModPowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2.html) |
+| ≈ | `parse (s : String) : Option (AzZModPow2 k)` | [`FromStr`](https://doc.rust-lang.org/nightly/std/str/trait.FromStr.html) then [`ModPowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2.html) |
 | — | `toChars`, `parseChars`, `instance : ParsableElement (AzZModPow2 k)` | |
 
 **Formatting and parsing.** `toString` prints the representative in decimal, which is `Display`

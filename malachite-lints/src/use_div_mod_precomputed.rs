@@ -10,7 +10,7 @@ use clippy_utils::path_to_local_with_projections;
 use clippy_utils::usage::mutated_variables;
 use rustc_hir::{BinOpKind, Expr, ExprKind, HirId, Node};
 use rustc_lint::{LateContext, LateLintPass};
-use rustc_session::{declare_lint, declare_lint_pass};
+use rustc_lint::{declare_lint, declare_lint_pass};
 
 declare_lint! {
     /// ### What it does

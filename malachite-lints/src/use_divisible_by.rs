@@ -11,8 +11,8 @@ use clippy_utils::macros::{find_assert_eq_args, root_macro_call_first_node};
 use clippy_utils::source::snippet;
 use rustc_hir::{BinOpKind, Expr, ExprKind};
 use rustc_lint::{LateContext, LateLintPass};
+use rustc_lint::{declare_lint, declare_lint_pass};
 use rustc_middle::ty::Ty;
-use rustc_session::{declare_lint, declare_lint_pass};
 use rustc_span::sym;
 
 declare_lint! {

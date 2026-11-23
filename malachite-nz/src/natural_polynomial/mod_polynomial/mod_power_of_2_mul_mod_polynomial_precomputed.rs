@@ -78,12 +78,8 @@ impl ModPowerOf2MulModPolynomialPrecomputed<Self, Self> for NaturalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::arithmetic::traits::*;
-    /// use malachite_base::polynomial::calculus::traits::*;
     /// use malachite_base::polynomial::mod_polynomial::traits::*;
-    /// use malachite_base::polynomial::modular::traits::*;
-    /// use malachite_base::polynomial::series::traits::*;
-    /// use malachite_base::polynomial::*;
+    /// use malachite_base::polynomial::modular::traits::ModPowerOf2DivRemPrecomputed;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// let f = NaturalPolynomial::from_str("x^3+2*x+1").unwrap();
@@ -157,12 +153,8 @@ impl ModPowerOf2MulModPolynomialPrecomputed<Self, &Self> for NaturalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::arithmetic::traits::*;
-    /// use malachite_base::polynomial::calculus::traits::*;
     /// use malachite_base::polynomial::mod_polynomial::traits::*;
-    /// use malachite_base::polynomial::modular::traits::*;
-    /// use malachite_base::polynomial::series::traits::*;
-    /// use malachite_base::polynomial::*;
+    /// use malachite_base::polynomial::modular::traits::ModPowerOf2DivRemPrecomputed;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// let f = NaturalPolynomial::from_str("x^3+2*x+1").unwrap();
@@ -236,12 +228,8 @@ impl ModPowerOf2MulModPolynomialPrecomputed<&Self, Self> for NaturalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::arithmetic::traits::*;
-    /// use malachite_base::polynomial::calculus::traits::*;
     /// use malachite_base::polynomial::mod_polynomial::traits::*;
-    /// use malachite_base::polynomial::modular::traits::*;
-    /// use malachite_base::polynomial::series::traits::*;
-    /// use malachite_base::polynomial::*;
+    /// use malachite_base::polynomial::modular::traits::ModPowerOf2DivRemPrecomputed;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// let f = NaturalPolynomial::from_str("x^3+2*x+1").unwrap();
@@ -315,12 +303,8 @@ impl ModPowerOf2MulModPolynomialPrecomputed<&Self, &Self> for NaturalPolynomial 
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::arithmetic::traits::*;
-    /// use malachite_base::polynomial::calculus::traits::*;
     /// use malachite_base::polynomial::mod_polynomial::traits::*;
-    /// use malachite_base::polynomial::modular::traits::*;
-    /// use malachite_base::polynomial::series::traits::*;
-    /// use malachite_base::polynomial::*;
+    /// use malachite_base::polynomial::modular::traits::ModPowerOf2DivRemPrecomputed;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// let f = NaturalPolynomial::from_str("x^3+2*x+1").unwrap();
@@ -396,12 +380,8 @@ impl ModPowerOf2MulModPolynomialPrecomputed<NaturalPolynomial, NaturalPolynomial
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::arithmetic::traits::*;
-    /// use malachite_base::polynomial::calculus::traits::*;
     /// use malachite_base::polynomial::mod_polynomial::traits::*;
-    /// use malachite_base::polynomial::modular::traits::*;
-    /// use malachite_base::polynomial::series::traits::*;
-    /// use malachite_base::polynomial::*;
+    /// use malachite_base::polynomial::modular::traits::ModPowerOf2DivRemPrecomputed;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// let f = NaturalPolynomial::from_str("x^3+2*x+1").unwrap();
@@ -477,12 +457,8 @@ impl ModPowerOf2MulModPolynomialPrecomputed<NaturalPolynomial, &NaturalPolynomia
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::arithmetic::traits::*;
-    /// use malachite_base::polynomial::calculus::traits::*;
     /// use malachite_base::polynomial::mod_polynomial::traits::*;
-    /// use malachite_base::polynomial::modular::traits::*;
-    /// use malachite_base::polynomial::series::traits::*;
-    /// use malachite_base::polynomial::*;
+    /// use malachite_base::polynomial::modular::traits::ModPowerOf2DivRemPrecomputed;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// let f = NaturalPolynomial::from_str("x^3+2*x+1").unwrap();
@@ -558,12 +534,8 @@ impl ModPowerOf2MulModPolynomialPrecomputed<&NaturalPolynomial, NaturalPolynomia
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::arithmetic::traits::*;
-    /// use malachite_base::polynomial::calculus::traits::*;
     /// use malachite_base::polynomial::mod_polynomial::traits::*;
-    /// use malachite_base::polynomial::modular::traits::*;
-    /// use malachite_base::polynomial::series::traits::*;
-    /// use malachite_base::polynomial::*;
+    /// use malachite_base::polynomial::modular::traits::ModPowerOf2DivRemPrecomputed;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// let f = NaturalPolynomial::from_str("x^3+2*x+1").unwrap();
@@ -639,12 +611,8 @@ impl ModPowerOf2MulModPolynomialPrecomputed<&NaturalPolynomial, &NaturalPolynomi
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::arithmetic::traits::*;
-    /// use malachite_base::polynomial::calculus::traits::*;
     /// use malachite_base::polynomial::mod_polynomial::traits::*;
-    /// use malachite_base::polynomial::modular::traits::*;
-    /// use malachite_base::polynomial::series::traits::*;
-    /// use malachite_base::polynomial::*;
+    /// use malachite_base::polynomial::modular::traits::ModPowerOf2DivRemPrecomputed;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// let f = NaturalPolynomial::from_str("x^3+2*x+1").unwrap();
@@ -715,12 +683,8 @@ impl ModPowerOf2MulModPolynomialPrecomputedAssign<Self, Self> for NaturalPolynom
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::arithmetic::traits::*;
-    /// use malachite_base::polynomial::calculus::traits::*;
     /// use malachite_base::polynomial::mod_polynomial::traits::*;
-    /// use malachite_base::polynomial::modular::traits::*;
-    /// use malachite_base::polynomial::series::traits::*;
-    /// use malachite_base::polynomial::*;
+    /// use malachite_base::polynomial::modular::traits::ModPowerOf2DivRemPrecomputed;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// let f = NaturalPolynomial::from_str("x^3+2*x+1").unwrap();
@@ -785,12 +749,8 @@ impl ModPowerOf2MulModPolynomialPrecomputedAssign<Self, &Self> for NaturalPolyno
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::arithmetic::traits::*;
-    /// use malachite_base::polynomial::calculus::traits::*;
     /// use malachite_base::polynomial::mod_polynomial::traits::*;
-    /// use malachite_base::polynomial::modular::traits::*;
-    /// use malachite_base::polynomial::series::traits::*;
-    /// use malachite_base::polynomial::*;
+    /// use malachite_base::polynomial::modular::traits::ModPowerOf2DivRemPrecomputed;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// let f = NaturalPolynomial::from_str("x^3+2*x+1").unwrap();
@@ -855,12 +815,8 @@ impl ModPowerOf2MulModPolynomialPrecomputedAssign<&Self, Self> for NaturalPolyno
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::arithmetic::traits::*;
-    /// use malachite_base::polynomial::calculus::traits::*;
     /// use malachite_base::polynomial::mod_polynomial::traits::*;
-    /// use malachite_base::polynomial::modular::traits::*;
-    /// use malachite_base::polynomial::series::traits::*;
-    /// use malachite_base::polynomial::*;
+    /// use malachite_base::polynomial::modular::traits::ModPowerOf2DivRemPrecomputed;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// let f = NaturalPolynomial::from_str("x^3+2*x+1").unwrap();
@@ -925,12 +881,8 @@ impl ModPowerOf2MulModPolynomialPrecomputedAssign<&Self, &Self> for NaturalPolyn
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::polynomial::arithmetic::traits::*;
-    /// use malachite_base::polynomial::calculus::traits::*;
     /// use malachite_base::polynomial::mod_polynomial::traits::*;
-    /// use malachite_base::polynomial::modular::traits::*;
-    /// use malachite_base::polynomial::series::traits::*;
-    /// use malachite_base::polynomial::*;
+    /// use malachite_base::polynomial::modular::traits::ModPowerOf2DivRemPrecomputed;
     /// use malachite_nz::natural_polynomial::NaturalPolynomial;
     ///
     /// let f = NaturalPolynomial::from_str("x^3+2*x+1").unwrap();

@@ -10,8 +10,8 @@ use crate::use_fused_mul::{as_mul, operand_ty};
 use clippy_utils::diagnostics::span_lint_and_help;
 use rustc_hir::{BinOpKind, Expr, ExprKind, UnOp};
 use rustc_lint::{LateContext, LateLintPass};
+use rustc_lint::{declare_lint, declare_lint_pass};
 use rustc_middle::ty::Ty;
-use rustc_session::{declare_lint, declare_lint_pass};
 
 declare_lint! {
     /// ### What it does

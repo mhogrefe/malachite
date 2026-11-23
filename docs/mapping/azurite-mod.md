@@ -30,8 +30,8 @@ reduction (`AzNat.mod` against `m`) never routes a large modulus through `Nat` a
 nonzero modulus is required wherever a residue is constructed, as the instance argument
 `[NeZero m.toNat]`, mirroring Mathlib's `ZMod`. Malachite has no residue type; its modular
 arithmetic is the family of traits
-[`ModAdd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModAdd.html),
-[`ModMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModMul.html),
+[`ModAdd`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModAdd.html),
+[`ModMul`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModMul.html),
 and so on, which take the modulus as a runtime `Natural` argument `m`, require their inputs to be
 reduced, and panic otherwise. As on the power-of-two page, the type invariant and the precondition
 are the same statement, and each row below maps a method of the type onto the trait method applied
@@ -61,15 +61,15 @@ Each definition falls into one of five categories:
 
 | | Azurite | Malachite |
 | :---: | --- | --- |
-| ✓ | `ofAzNat (m : AzNat) [NeZero m.toNat] (n : AzNat) : AzZMod m` | [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Mod.html) |
-| ⚙ | `ofAzInt (m : AzNat) [NeZero m.toNat] (z : AzInt) : AzZMod m` | [`Mod`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/mod_op/index.html) for `Integer`, then [`UnsignedAbs`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.UnsignedAbs.html) |
-| ✓ | `ofNat (m : AzNat) [NeZero m.toNat] (a : Nat) : AzZMod m`, `instance : OfNat (AzZMod m) a`, `instance : NatCast (AzZMod m)` | [`Natural::from`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/conversion/from_primitive_int/index.html) then [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Mod.html) |
-| ⚙ | `instance : IntCast (AzZMod m)` | [`Integer::from`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/conversion/from_primitive_int/index.html) then [`Mod`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/arithmetic/mod_op/index.html) and [`UnsignedAbs`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.UnsignedAbs.html) |
+| ✓ | `ofAzNat (m : AzNat) [NeZero m.toNat] (n : AzNat) : AzZMod m` | [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.Mod.html) |
+| ⚙ | `ofAzInt (m : AzNat) [NeZero m.toNat] (z : AzInt) : AzZMod m` | [`Mod`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/modular/mod_op/index.html) for `Integer`, then [`UnsignedAbs`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.UnsignedAbs.html) |
+| ✓ | `ofNat (m : AzNat) [NeZero m.toNat] (a : Nat) : AzZMod m`, `instance : OfNat (AzZMod m) a`, `instance : NatCast (AzZMod m)` | [`Natural::from`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/conversion/from_primitive_int/index.html) then [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.Mod.html) |
+| ⚙ | `instance : IntCast (AzZMod m)` | [`Integer::from`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/conversion/from_primitive_int/index.html) then [`Mod`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/modular/mod_op/index.html) and [`UnsignedAbs`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.UnsignedAbs.html) |
 | ✓ | `instance : Zero (AzZMod m)`, `instance : One (AzZMod m)` | [`Natural::ZERO`](https://docs.rs/malachite-base/latest/malachite_base/num/basic/traits/trait.Zero.html), [`Natural::ONE`](https://docs.rs/malachite-base/latest/malachite_base/num/basic/traits/trait.One.html) |
 | — | `toAzNat (a : AzZMod m) : AzNat`, `AzZMod.val : AzNat` | |
-| ⚙ | `AzZMod.isLt : val.toNat < m.toNat` | [`ModIsReduced`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModIsReduced.html) |
+| ⚙ | `AzZMod.isLt : val.toNat < m.toNat` | [`ModIsReduced`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModIsReduced.html) |
 | — | `instance instNeZeroToNatOfNat (n : Nat) [NeZero n] : NeZero (AzNat.ofNat n).toNat` | |
-| ✓ | `deriving DecidableEq` | [`Eq`](https://doc.rust-lang.org/nightly/std/cmp/trait.Eq.html), [`EqMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.EqMod.html) |
+| ✓ | `deriving DecidableEq` | [`Eq`](https://doc.rust-lang.org/nightly/std/cmp/trait.Eq.html), [`EqMod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.EqMod.html) |
 | ✓ | `instance instLinearOrder : LinearOrder (AzZMod m)` | [`Ord`](https://doc.rust-lang.org/nightly/std/cmp/trait.Ord.html) |
 | — | `ofAzNatRingHom : AzNat →+* AzZMod m`, `ofAzIntRingHom : AzInt →+* AzZMod m` | |
 | — | `finEquiv (m : AzNat) : AzZMod m ≃ Fin m.toNat`, `instance instFintype : Fintype (AzZMod m)` | |
@@ -95,28 +95,28 @@ ring homomorphisms package `ofAzNat` and `ofAzInt` for mapping polynomial coeffi
 
 | | Azurite | Malachite |
 | :---: | --- | --- |
-| ✓ | `add (a b : AzZMod m) : AzZMod m`, `instance : Add (AzZMod m)` | [`ModAdd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModAdd.html), [`ModAddAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModAddAssign.html) |
-| ✓ | `sub (a b : AzZMod m) : AzZMod m`, `instance : Sub (AzZMod m)` | [`ModSub`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModSub.html), [`ModSubAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModSubAssign.html) |
-| ✓ | `neg (a : AzZMod m) : AzZMod m`, `instance : Neg (AzZMod m)` | [`ModNeg`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModNeg.html), [`ModNegAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModNegAssign.html) |
-| ✓ | `mul (a b : AzZMod m) : AzZMod m`, `instance : Mul (AzZMod m)` | [`ModMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModMul.html), [`ModMulAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModMulAssign.html) |
-| ✓ | `instance instSquare : Square (AzZMod m)` | [`ModSquare`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModSquare.html), [`ModSquareAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModSquareAssign.html) |
-| ✓ | `pow (a : AzZMod m) (n : ℕ) : AzZMod m`, the `CommRing` `npow` | [`ModPow`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPow.html), [`ModPowAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowAssign.html) |
-| ✓ | `powAzNat (a : AzZMod m) (n : AzNat) : AzZMod m` | [`ModPow`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPow.html) |
-| ✓ | `inv (a : AzZMod m) (h : Nat.Coprime a.val.toNat m.toNat) : AzZMod m` | [`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModInverse.html) |
-| ✓ | `tryInv (x : AzZMod m) : Option (AzZMod m)` | [`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModInverse.html) |
-| ⚙ | `fieldInv [Fact (Nat.Prime p.toNat)] (a : AzZMod p) : AzZMod p` | [`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModInverse.html) |
-| ≈ | `sqrt? [NeZero m.toNat] (a : AzZMod m) : Option (AzZMod m)` | [`ModSqrt`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModSqrt.html) |
-| ≈ | `instance instField [Fact (Nat.Prime p.toNat)] : Field (AzZMod p)` | [`ModDiv`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModDiv.html), [`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModInverse.html) |
+| ✓ | `add (a b : AzZMod m) : AzZMod m`, `instance : Add (AzZMod m)` | [`ModAdd`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModAdd.html), [`ModAddAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModAddAssign.html) |
+| ✓ | `sub (a b : AzZMod m) : AzZMod m`, `instance : Sub (AzZMod m)` | [`ModSub`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModSub.html), [`ModSubAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModSubAssign.html) |
+| ✓ | `neg (a : AzZMod m) : AzZMod m`, `instance : Neg (AzZMod m)` | [`ModNeg`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModNeg.html), [`ModNegAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModNegAssign.html) |
+| ✓ | `mul (a b : AzZMod m) : AzZMod m`, `instance : Mul (AzZMod m)` | [`ModMul`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModMul.html), [`ModMulAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModMulAssign.html) |
+| ✓ | `instance instSquare : Square (AzZMod m)` | [`ModSquare`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModSquare.html), [`ModSquareAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModSquareAssign.html) |
+| ✓ | `pow (a : AzZMod m) (n : ℕ) : AzZMod m`, the `CommRing` `npow` | [`ModPow`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPow.html), [`ModPowAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowAssign.html) |
+| ✓ | `powAzNat (a : AzZMod m) (n : AzNat) : AzZMod m` | [`ModPow`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPow.html) |
+| ✓ | `inv (a : AzZMod m) (h : Nat.Coprime a.val.toNat m.toNat) : AzZMod m` | [`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModInverse.html) |
+| ✓ | `tryInv (x : AzZMod m) : Option (AzZMod m)` | [`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModInverse.html) |
+| ⚙ | `fieldInv [Fact (Nat.Prime p.toNat)] (a : AzZMod p) : AzZMod p` | [`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModInverse.html) |
+| ≈ | `sqrt? [NeZero m.toNat] (a : AzZMod m) : Option (AzZMod m)` | [`ModSqrt`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModSqrt.html) |
+| ≈ | `instance instField [Fact (Nat.Prime p.toNat)] : Field (AzZMod p)` | [`ModDiv`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModDiv.html), [`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModInverse.html) |
 | — | `instance instCommRing : CommRing (AzZMod m)`, `instance instNeZeroToNatOfPrime` | |
 
 **Ring operations.** `a + b` is `a.mod_add(b, &m)`, and likewise `sub`, `mul`, and `neg`, with
 $$-0 = 0$$ on both sides; the `Square` instance is `mod_square`, and `pow` and `powAzNat` are
 both `mod_pow`, whose exponent is a `Natural`, so `powAzNat` is the exact match and `pow` the
 same function on a Lean `Nat`. Malachite additionally offers
-[`ModMulPrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModMulPrecomputed.html),
-[`ModSquarePrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModSquarePrecomputed.html),
+[`ModMulPrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModMulPrecomputed.html),
+[`ModSquarePrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModSquarePrecomputed.html),
 and
-[`ModPowPrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowPrecomputed.html),
+[`ModPowPrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowPrecomputed.html),
 which take precomputed data about the modulus (from `precompute_mod_mul_data` and
 `precompute_mod_pow_data`) to speed up repeated operations with the same `m`; they return the same
 values as the plain versions. Azurite reduces by `AzNat` division each time and has no
@@ -128,16 +128,16 @@ proof of coprimality; `tryInv` tests it and returns `none` otherwise, which is e
 with the convention $$0^{-1} = 0$$; `mod_inverse` returns `None` there (and panics on an input of
 `0` when the modulus is composite), so the spelling is `n.mod_inverse(&p).unwrap_or(Natural::ZERO)`.
 The `Field` instance's `a / b` is `a · b⁻¹` for a prime modulus;
-[`ModDiv`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModDiv.html)
+[`ModDiv`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModDiv.html)
 works for any modulus and returns `Some(q)` with $$qb \equiv a$$ whenever $$\gcd(b, m)$$ divides
 $$a$$, choosing one quotient when `b` is not a unit, and `None` otherwise, hence ≈: the two agree
 for a prime modulus and `b ≠ 0`, and differ at `b = 0`, where the field gives `0` and `mod_div`
 gives `Some(0)` for `a = 0` and `None` for other `a`.
 
 **Shifts and square roots.** Malachite also has
-[`ModShl`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModShl.html)
+[`ModShl`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModShl.html)
 and
-[`ModShr`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModShr.html),
+[`ModShr`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModShr.html),
 multiplication and floor division by a power of 2 modulo `m` with a negative count reversing the
 direction, spelled `ofAzNat m (a.val <<< s)` and `ofAzNat m (a.val >>> s)` in Azurite. `sqrt? a`
 is `a.val.mod_sqrt(&m)`, hence ≈ on two counts. For a prime modulus both return a root exactly
@@ -153,7 +153,7 @@ root, so a root it returns for a modulus not known to be prime should be squared
 | | Azurite | Malachite |
 | :---: | --- | --- |
 | ✓ | `toString (a : AzZMod m) : String`, `instance : ToString (AzZMod m)` | [`Display`](https://doc.rust-lang.org/nightly/std/fmt/trait.Display.html) |
-| ≈ | `parse (s : String) : Option (AzZMod m)` | [`FromStr`](https://doc.rust-lang.org/nightly/std/str/trait.FromStr.html) then [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Mod.html) |
+| ≈ | `parse (s : String) : Option (AzZMod m)` | [`FromStr`](https://doc.rust-lang.org/nightly/std/str/trait.FromStr.html) then [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.Mod.html) |
 | — | `toChars`, `parseChars`, `instance : ParsableElement (AzZMod m)` | |
 
 **Formatting and parsing.** `toString` prints the representative in decimal, which is `Display`

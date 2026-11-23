@@ -16,8 +16,8 @@ from the `malachite-nz` crate. It follows the organization of the
 whose [conventions](/mapping/flint-integers/#conventions), including word types and aliasing,
 apply here as well; the [mapping index](/mapping/) lists the whole family.
 
-Every section of the chapter is mapped below: 254 rows across 49 sections, of which 51 are ✓,
-22 ⚙, 26 ≈, 25 —, and 130 ✗. Functions whose names begin with an underscore are omitted, as on
+Every section of the chapter is mapped below: 254 rows across 49 sections, of which 66 are ✓,
+45 ⚙, 36 ≈, 26 —, and 81 ✗. Functions whose names begin with an underscore are omitted, as on
 [the fmpq page](/mapping/flint-rationals/), except in [Newton basis](#newton-basis) and
 [Subproduct trees](#subproduct-trees), which have no public functions.
 
@@ -226,7 +226,7 @@ zeros are dropped afterwards.
 | | FLINT | Malachite |
 | :---: | --- | --- |
 | ✓ | `int fmpz_poly_equal (const fmpz_poly_t poly1, const fmpz_poly_t poly2)` | [`PartialEq`](https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html) |
-| ✓ | `int fmpz_poly_equal_trunc (const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong n)` | [`eq_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.EqTruncated.html#tymethod.eq_truncated) |
+| ✓ | `int fmpz_poly_equal_trunc (const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong n)` | [`eq_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.EqTruncated.html#tymethod.eq_truncated) |
 | ✓ | `int fmpz_poly_is_zero (const fmpz_poly_t poly)` | `p == 0u32` ([`PartialEq`](https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html)) |
 | ✓ | `int fmpz_poly_is_one (const fmpz_poly_t poly)` | `p == 1u32` ([`PartialEq`](https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html)) |
 | ✓ | `int fmpz_poly_is_unit (const fmpz_poly_t poly)` | [`IsUnit`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.IsUnit.html) |
@@ -238,7 +238,7 @@ An `IntegerPolynomial` compares with a value of any primitive integer type, in e
 `equal_trunc`, comparing `coefficients_asc().iter().take(n)` with
 [`Iterator::eq`](https://doc.rust-lang.org/nightly/core/iter/trait.Iterator.html#method.eq) is
 wrong because it also compares lengths; use
-[`eq_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.EqTruncated.html#tymethod.eq_truncated).
+[`eq_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.EqTruncated.html#tymethod.eq_truncated).
 FLINT has no `fmpz_poly_cmp`; Malachite's default
 [`Ord`](https://doc.rust-lang.org/nightly/core/cmp/trait.Ord.html) is asymptotic ($$p < q$$ when
 $$p(x) < q(x)$$ for all sufficiently large $$x$$), and
@@ -250,17 +250,17 @@ compares degree first and then coefficients from the leading one down, as `fmpq_
 | | FLINT | Malachite |
 | :---: | --- | --- |
 | ✓ | `void fmpz_poly_add (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)` | [`Add`](https://doc.rust-lang.org/nightly/core/ops/trait.Add.html) |
-| ✓ | `void fmpz_poly_add_series (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong n)` | [`add_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.AddTruncated.html#tymethod.add_truncated) |
+| ✓ | `void fmpz_poly_add_series (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong n)` | [`add_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.AddTruncated.html#tymethod.add_truncated) |
 | ✓ | `void fmpz_poly_sub (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)` | [`Sub`](https://doc.rust-lang.org/nightly/core/ops/trait.Sub.html) |
-| ✓ | `void fmpz_poly_sub_series (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong n)` | [`sub_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.SubTruncated.html#tymethod.sub_truncated) |
+| ✓ | `void fmpz_poly_sub_series (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong n)` | [`sub_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.SubTruncated.html#tymethod.sub_truncated) |
 | ✓ | `void fmpz_poly_neg (fmpz_poly_t res, const fmpz_poly_t poly)` | [`Neg`](https://doc.rust-lang.org/nightly/core/ops/trait.Neg.html) |
 
 Each operator takes either operand by value or by reference and has an `Assign` form
 ([`NegAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.NegAssign.html)
 for negation). FLINT's `_series` suffix becomes `_truncated` throughout this page:
-[`add_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.AddTruncated.html#tymethod.add_truncated)
+[`add_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.AddTruncated.html#tymethod.add_truncated)
 and
-[`sub_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.SubTruncated.html#tymethod.sub_truncated)
+[`sub_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.SubTruncated.html#tymethod.sub_truncated)
 read only the first `len` coefficients of each operand. FLINT clamps a negative `n` to zero;
 `len` is a `u64`, so it cannot be negative.
 
@@ -288,8 +288,8 @@ read only the first `len` coefficients of each operand. FLINT clamps a negative 
 | ✓ | `void fmpz_poly_scalar_divexact_fmpz (fmpz_poly_t poly1, const fmpz_poly_t poly2, const fmpz_t x)` | [`DivExact`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivExact.html) |
 | ✗ | `void fmpz_poly_scalar_divexact_si (fmpz_poly_t poly1, const fmpz_poly_t poly2, slong x)` | |
 | ✗ | `void fmpz_poly_scalar_divexact_ui (fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong x)` | |
-| ✓ | `void fmpz_poly_scalar_mod_fmpz (fmpz_poly_t poly1, const fmpz_poly_t poly2, const fmpz_t p)` | [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Mod.html) |
-| ✓ | `void fmpz_poly_scalar_smod_fmpz (fmpz_poly_t poly1, const fmpz_poly_t poly2, const fmpz_t p)` | [`BalancedMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BalancedMod.html) |
+| ✓ | `void fmpz_poly_scalar_mod_fmpz (fmpz_poly_t poly1, const fmpz_poly_t poly2, const fmpz_t p)` | [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.Mod.html) |
+| ✓ | `void fmpz_poly_scalar_smod_fmpz (fmpz_poly_t poly1, const fmpz_poly_t poly2, const fmpz_t p)` | [`BalancedMod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.BalancedMod.html) |
 
 `scalar_mul_2exp` is `<<` by a
 [`u64`](https://doc.rust-lang.org/nightly/core/primitive.u64.html): throughout Malachite `<<` and
@@ -299,9 +299,9 @@ read only the first `len` coefficients of each operand. FLINT clamps a negative 
 by an [`Integer`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html).
 
 `scalar_mod_fmpz` reduces each coefficient into $$[0, p)$$. On `IntegerPolynomial`,
-[`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Mod.html)
+[`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.Mod.html)
 and
-[`ModPowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2.html)
+[`ModPowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2.html)
 take a positive [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html)
 or a power of 2 and return a
 [`NaturalPolynomial`](https://docs.rs/malachite-nz/latest/malachite_nz/natural_polynomial/struct.NaturalPolynomial.html),
@@ -310,22 +310,22 @@ not an `IntegerPolynomial`.
 [`Integer`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html), returns
 an `IntegerPolynomial`, and keeps each coefficient's sign (the remainder of `scalar_tdiv_fmpz`,
 which FLINT does not provide). `scalar_smod_fmpz` takes the representative in $$(-p/2, p/2]$$, as
-[`BalancedMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BalancedMod.html)
+[`BalancedMod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.BalancedMod.html)
 does.
 
 ## [Bit packing](https://flintlib.org/doc/fmpz_poly.html#bit-packing) {#bit-packing}
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ≈ | `void fmpz_poly_bit_pack (fmpz_t f, const fmpz_poly_t poly, flint_bitcnt_t bit_size)` | [`bit_pack`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.BitPack.html#tymethod.bit_pack) |
-| ≈ | `void fmpz_poly_bit_unpack (fmpz_poly_t poly, const fmpz_t f, flint_bitcnt_t bit_size)` | [`bit_unpack`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.BitUnpack.html#tymethod.bit_unpack) |
-| ≈ | `void fmpz_poly_bit_unpack_unsigned (fmpz_poly_t poly, const fmpz_t f, flint_bitcnt_t bit_size)` | [`bit_unpack`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.BitUnpack.html#tymethod.bit_unpack) |
+| ≈ | `void fmpz_poly_bit_pack (fmpz_t f, const fmpz_poly_t poly, flint_bitcnt_t bit_size)` | [`bit_pack`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.BitPack.html#tymethod.bit_pack) |
+| ≈ | `void fmpz_poly_bit_unpack (fmpz_poly_t poly, const fmpz_t f, flint_bitcnt_t bit_size)` | [`bit_unpack`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.BitUnpack.html#tymethod.bit_unpack) |
+| ≈ | `void fmpz_poly_bit_unpack_unsigned (fmpz_poly_t poly, const fmpz_t f, flint_bitcnt_t bit_size)` | [`bit_unpack`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.BitUnpack.html#tymethod.bit_unpack) |
 
-[`bit_pack`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.BitPack.html#tymethod.bit_pack)
+[`bit_pack`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.BitPack.html#tymethod.bit_pack)
 always returns $$p(2^b)$$, hence ≈: it agrees with `fmpz_poly_bit_pack` when
 $$b > 0$$ and every coefficient's absolute value is less than $$2^b$$, but FLINT gives 0 for
 $$b = 0$$ and truncates wider coefficients, while `bit_pack` lets them overlap the fields above.
-[`bit_unpack`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.BitUnpack.html#tymethod.bit_unpack) reads the fields as signed on
+[`bit_unpack`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.BitUnpack.html#tymethod.bit_unpack) reads the fields as signed on
 `IntegerPolynomial`, exactly as `fmpz_poly_bit_unpack` does (each negative field borrows from the
 one above, and a negative input negates every coefficient), and as unsigned on
 `NaturalPolynomial`, as `fmpz_poly_bit_unpack_unsigned` does; both are ≈ only because they panic
@@ -340,24 +340,32 @@ for $$b = 0$$, where FLINT returns the zero polynomial.
 | ⚙ | `void fmpz_poly_mul_karatsuba (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)` | [`*`](https://doc.rust-lang.org/nightly/core/ops/trait.Mul.html) |
 | ⚙ | `void fmpz_poly_mul_KS (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)` | [`*`](https://doc.rust-lang.org/nightly/core/ops/trait.Mul.html) |
 | ⚙ | `void fmpz_poly_mul_SS (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)` | [`*`](https://doc.rust-lang.org/nightly/core/ops/trait.Mul.html) |
-| ✓ | `void fmpz_poly_mullow (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong n)` | [`mul_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.MulTruncated.html#tymethod.mul_truncated) |
-| ⚙ | `void fmpz_poly_mullow_classical (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong n)` | [`mul_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.MulTruncated.html#tymethod.mul_truncated) |
-| ⚙ | `void fmpz_poly_mullow_karatsuba_n (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong n)` | [`mul_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.MulTruncated.html#tymethod.mul_truncated) |
-| ⚙ | `void fmpz_poly_mullow_KS (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong n)` | [`mul_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.MulTruncated.html#tymethod.mul_truncated) |
-| ⚙ | `void fmpz_poly_mullow_SS (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong n)` | [`mul_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.MulTruncated.html#tymethod.mul_truncated) |
+| ✓ | `void fmpz_poly_mullow (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong n)` | [`mul_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.MulTruncated.html#tymethod.mul_truncated) |
+| ⚙ | `void fmpz_poly_mullow_classical (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong n)` | [`mul_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.MulTruncated.html#tymethod.mul_truncated) |
+| ⚙ | `void fmpz_poly_mullow_karatsuba_n (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong n)` | [`mul_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.MulTruncated.html#tymethod.mul_truncated) |
+| ⚙ | `void fmpz_poly_mullow_KS (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong n)` | [`mul_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.MulTruncated.html#tymethod.mul_truncated) |
+| ⚙ | `void fmpz_poly_mullow_SS (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong n)` | [`mul_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.MulTruncated.html#tymethod.mul_truncated) |
 | ✗ | `void fmpz_poly_mulhigh_n (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong n)` | |
 | ✗ | `void fmpz_poly_mulhigh_classical (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong start)` | |
 | ✗ | `void fmpz_poly_mulhigh_karatsuba_n (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong len)` | |
-| ✗ | `void fmpz_poly_mulmid (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)` | |
-| ✗ | `void fmpz_poly_mulmid_classical (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)` | |
-| ✗ | `void fmpz_poly_mulmid_KS (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)` | |
-| ✗ | `void fmpz_poly_mulmid_SS (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)` | |
+| ≈ | `void fmpz_poly_mulmid (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)` | [`mul_middle`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.MulMiddle.html#tymethod.mul_middle) |
+| ⚙ | `void fmpz_poly_mulmid_classical (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)` | [`mul_middle`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.MulMiddle.html#tymethod.mul_middle) |
+| ⚙ | `void fmpz_poly_mulmid_KS (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)` | [`mul_middle`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.MulMiddle.html#tymethod.mul_middle) |
+| ⚙ | `void fmpz_poly_mulmid_SS (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)` | [`mul_middle`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.MulMiddle.html#tymethod.mul_middle) |
 
 Malachite chooses the multiplication algorithm itself, so the `_classical`, `_karatsuba`, `_KS`,
 and `_SS` functions map to the same operation as their dispatcher: `*` (with `*=`) for the whole
 product, and
-[`mul_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.MulTruncated.html#tymethod.mul_truncated)
-(with `mul_truncated_assign`) for the low $$n$$ coefficients.
+[`mul_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.MulTruncated.html#tymethod.mul_truncated)
+(with `mul_truncated_assign`) for the low $$n$$ coefficients, and
+[`mul_middle`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.MulMiddle.html#tymethod.mul_middle)
+(with `mul_middle_assign`) for the coefficients from $$x^{nlo}$$ to $$x^{nhi - 1}$$.
+
+FLINT's documentation leaves the `nlo` and `nhi` arguments out of the `fmpz_poly_mulmid`
+signatures, but its header has them: the result is
+$$\lfloor (\mathrm{poly1} \cdot \mathrm{poly2} \bmod x^{nhi}) / x^{nlo} \rfloor$$. `mul_middle`
+computes the same, with `low` and `high` for `nlo` and `nhi`, and cuts a range that extends past
+the end of the product off there, as FLINT does; it panics if `low > high`, where FLINT returns 0.
 
 ## [FFT precached multiplication](https://flintlib.org/doc/fmpz_poly.html#fft-precached-multiplication) {#fft-precached}
 
@@ -380,15 +388,15 @@ multiplication algorithms, so there is nothing to cache; `_precache_clear` is
 | ⚙ | `void fmpz_poly_sqr_classical (fmpz_poly_t rop, const fmpz_poly_t op)` | [`square`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Square.html#tymethod.square) |
 | ⚙ | `void fmpz_poly_sqr_karatsuba (fmpz_poly_t rop, const fmpz_poly_t op)` | [`square`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Square.html#tymethod.square) |
 | ⚙ | `void fmpz_poly_sqr_KS (fmpz_poly_t rop, const fmpz_poly_t op)` | [`square`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Square.html#tymethod.square) |
-| ✓ | `void fmpz_poly_sqrlow (fmpz_poly_t res, const fmpz_poly_t poly, slong n)` | [`square_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.SquareTruncated.html#tymethod.square_truncated) |
-| ⚙ | `void fmpz_poly_sqrlow_classical (fmpz_poly_t res, const fmpz_poly_t poly, slong n)` | [`square_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.SquareTruncated.html#tymethod.square_truncated) |
-| ⚙ | `void fmpz_poly_sqrlow_karatsuba_n (fmpz_poly_t res, const fmpz_poly_t poly, slong n)` | [`square_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.SquareTruncated.html#tymethod.square_truncated) |
-| ⚙ | `void fmpz_poly_sqrlow_KS (fmpz_poly_t res, const fmpz_poly_t poly, slong n)` | [`square_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.SquareTruncated.html#tymethod.square_truncated) |
+| ✓ | `void fmpz_poly_sqrlow (fmpz_poly_t res, const fmpz_poly_t poly, slong n)` | [`square_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.SquareTruncated.html#tymethod.square_truncated) |
+| ⚙ | `void fmpz_poly_sqrlow_classical (fmpz_poly_t res, const fmpz_poly_t poly, slong n)` | [`square_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.SquareTruncated.html#tymethod.square_truncated) |
+| ⚙ | `void fmpz_poly_sqrlow_karatsuba_n (fmpz_poly_t res, const fmpz_poly_t poly, slong n)` | [`square_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.SquareTruncated.html#tymethod.square_truncated) |
+| ⚙ | `void fmpz_poly_sqrlow_KS (fmpz_poly_t res, const fmpz_poly_t poly, slong n)` | [`square_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.SquareTruncated.html#tymethod.square_truncated) |
 
 As with [multiplication](#multiplication), the algorithm variants map to
 [`square`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Square.html#tymethod.square)
 (with `square_assign`) and
-[`square_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.SquareTruncated.html#tymethod.square_truncated)
+[`square_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.SquareTruncated.html#tymethod.square_truncated)
 (with `square_truncated_assign`).
 
 ## [Powering](https://flintlib.org/doc/fmpz_poly.html#powering) {#powering}
@@ -400,7 +408,7 @@ As with [multiplication](#multiplication), the algorithm variants map to
 | ⚙ | `void fmpz_poly_pow_binomial (fmpz_poly_t res, const fmpz_poly_t poly, ulong e)` | [`pow`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Pow.html#tymethod.pow) |
 | ⚙ | `void fmpz_poly_pow_addchains (fmpz_poly_t res, const fmpz_poly_t poly, ulong e)` | [`pow`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Pow.html#tymethod.pow) |
 | ⚙ | `void fmpz_poly_pow_binexp (fmpz_poly_t res, const fmpz_poly_t poly, ulong e)` | [`pow`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Pow.html#tymethod.pow) |
-| ✓ | `void fmpz_poly_pow_trunc (fmpz_poly_t res, const fmpz_poly_t poly, ulong e, slong n)` | [`pow_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.PowTruncated.html#tymethod.pow_truncated) |
+| ✓ | `void fmpz_poly_pow_trunc (fmpz_poly_t res, const fmpz_poly_t poly, ulong e, slong n)` | [`pow_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.PowTruncated.html#tymethod.pow_truncated) |
 
 [`Pow`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Pow.html)
 and
@@ -409,7 +417,7 @@ take a [`u64`](https://doc.rust-lang.org/nightly/core/primitive.u64.html) expone
 chooses among several algorithms itself, so FLINT's four algorithm-specific functions all map to
 it, without the domain restrictions of `pow_binomial` (length exactly 2) or `pow_addchains`
 ($$e \leq 148$$).
-[`PowTruncatedAssign`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.PowTruncatedAssign.html)
+[`PowTruncatedAssign`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.PowTruncatedAssign.html)
 is the in-place form of `pow_truncated`, which reads only the first `len` coefficients. Both
 libraries take $$0^0 = 1$$.
 
@@ -417,8 +425,8 @@ libraries take $$0^0 = 1$$.
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✓ | `void fmpz_poly_shift_left (fmpz_poly_t res, const fmpz_poly_t poly, slong n)` | [`mul_power_of_x`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.MulPowerOfX.html#tymethod.mul_power_of_x) |
-| ✓ | `void fmpz_poly_shift_right (fmpz_poly_t res, const fmpz_poly_t poly, slong n)` | [`div_power_of_x`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.DivPowerOfX.html#tymethod.div_power_of_x) |
+| ✓ | `void fmpz_poly_shift_left (fmpz_poly_t res, const fmpz_poly_t poly, slong n)` | [`mul_power_of_x`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.MulPowerOfX.html#tymethod.mul_power_of_x) |
+| ✓ | `void fmpz_poly_shift_right (fmpz_poly_t res, const fmpz_poly_t poly, slong n)` | [`div_power_of_x`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.DivPowerOfX.html#tymethod.div_power_of_x) |
 
 `div_power_of_x`, like `shift_right`, discards the low coefficients, and yields zero when `n` is
 at or beyond the length. Neither operation is `<<` or `>>`, which throughout Malachite scale by a
@@ -431,7 +439,7 @@ power of two (see [the scalar section](#scalar)).
 | — | `ulong fmpz_poly_max_limbs (const fmpz_poly_t poly)` | |
 | ≈ | `slong fmpz_poly_max_bits (const fmpz_poly_t poly)` | [`height_significant_bits`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Height.html#tymethod.height_significant_bits) |
 | ✓ | `void fmpz_poly_height (fmpz_t height, const fmpz_poly_t poly)` | [`Height`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Height.html), [`HeightRef`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.HeightRef.html) |
-| ✓ | `void fmpz_poly_2norm (fmpz_t res, const fmpz_poly_t poly)` | [`floor_l2_norm`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.FloorL2Norm.html#tymethod.floor_l2_norm) |
+| ✓ | `void fmpz_poly_2norm (fmpz_t res, const fmpz_poly_t poly)` | [`floor_l2_norm`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.FloorL2Norm.html#tymethod.floor_l2_norm) |
 
 `fmpz_poly_height` is
 [`Height`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Height.html)'s
@@ -447,19 +455,19 @@ returns $$|b|$$ as a plain
 and the sign flag must come from elsewhere, hence ≈. `max_limbs` is a memory-estimation helper;
 limbs are an implementation detail in Malachite. `2norm` (the integer square root of the sum of
 squared coefficients) is
-[`floor_l2_norm`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.FloorL2Norm.html#tymethod.floor_l2_norm);
+[`floor_l2_norm`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.FloorL2Norm.html#tymethod.floor_l2_norm);
 the exact sum of squares is
-[`l2_norm_squared`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.L2NormSquared.html#tymethod.l2_norm_squared).
+[`l2_norm_squared`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.L2NormSquared.html#tymethod.l2_norm_squared).
 
 ## [Greatest common divisor](https://flintlib.org/doc/fmpz_poly.html#greatest-common-divisor) {#gcd}
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✗ | `void fmpz_poly_gcd (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)` | |
-| ✗ | `void fmpz_poly_gcd_subresultant (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)` | |
-| ✗ | `int fmpz_poly_gcd_heuristic (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)` | |
-| ✗ | `void fmpz_poly_gcd_modular (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)` | |
-| ✗ | `void fmpz_poly_lcm (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)` | |
+| ✓ | `void fmpz_poly_gcd (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)` | [`Gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.Gcd.html), [`GcdAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.GcdAssign.html) |
+| ⚙ | `void fmpz_poly_gcd_subresultant (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)` | [`gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.Gcd.html#tymethod.gcd) |
+| ⚙ | `int fmpz_poly_gcd_heuristic (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)` | [`gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.Gcd.html#tymethod.gcd) |
+| ⚙ | `void fmpz_poly_gcd_modular (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)` | [`gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.Gcd.html#tymethod.gcd) |
+| ✓ | `void fmpz_poly_lcm (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)` | [`Lcm`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.Lcm.html), [`LcmAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.LcmAssign.html) |
 | ✗ | `void fmpz_poly_xgcd (fmpz_t r, fmpz_poly_t s, fmpz_poly_t t, const fmpz_poly_t f, const fmpz_poly_t g)` | |
 | ✗ | `void fmpz_poly_xgcd_modular (fmpz_t r, fmpz_poly_t s, fmpz_poly_t t, const fmpz_poly_t f, const fmpz_poly_t g)` | |
 | ✗ | `void fmpz_poly_resultant (fmpz_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)` | |
@@ -470,8 +478,12 @@ the exact sum of squares is
 
 `fmpz_poly_xgcd` is not an extended gcd: it sets $$r$$ to the resultant of $$f$$ and $$g$$ and
 finds $$s, t$$ with $$sf + tg = r$$, so it does not correspond to
-[`ExtendedGcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ExtendedGcd.html)
-on the scalar types. `resultant_modular_div` is — because it asks the caller to supply
+[`ExtendedGcd`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.ExtendedGcd.html)
+on the scalar types; Malachite does not expose it yet. The GCD has a positive leading coefficient,
+as in FLINT, and the LCM too; the GCD of 0 and 0 is 0, and the LCM is 0 when either polynomial is.
+`_subresultant`, `_heuristic` and `_modular` are algorithm choices, which Malachite makes inside
+`gcd` as FLINT's `gcd` does: the subresultant algorithm for short polynomials, the heuristic when
+the coefficients are small, and otherwise the multimodular algorithm. `resultant_modular_div` is — because it asks the caller to supply
 unverifiable facts (that `div` divides the resultant exactly and that the result fits in `nbits`)
 in exchange for skipping a bound computation.
 
@@ -521,21 +533,28 @@ requires of its input.
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✗ | `void fmpz_poly_divrem (fmpz_poly_t Q, fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B)` | |
-| ✗ | `void fmpz_poly_divrem_basecase (fmpz_poly_t Q, fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B)` | |
-| ✗ | `void fmpz_poly_divrem_divconquer (fmpz_poly_t Q, fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B)` | |
-| ✗ | `void fmpz_poly_div (fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B)` | |
-| ✗ | `void fmpz_poly_div_basecase (fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B)` | |
-| ✗ | `void fmpz_poly_div_divconquer (fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B)` | |
-| ✗ | `void fmpz_poly_rem (fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B)` | |
-| ✗ | `void fmpz_poly_rem_basecase (fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B)` | |
-| ✗ | `void fmpz_poly_divexact (fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B)` | |
-| ✗ | `void fmpz_poly_div_root_fmpz (fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_t c)` | |
+| ≈ | `void fmpz_poly_divrem (fmpz_poly_t Q, fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B)` | [`DivRem`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivRem.html), [`DivAssignRem`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivAssignRem.html), [`CheckedDivRem`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.CheckedDivRem.html) |
+| ⚙ | `void fmpz_poly_divrem_basecase (fmpz_poly_t Q, fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B)` | [`div_rem`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivRem.html#tymethod.div_rem) |
+| ⚙ | `void fmpz_poly_divrem_divconquer (fmpz_poly_t Q, fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B)` | [`div_rem`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivRem.html#tymethod.div_rem) |
+| ≈ | `void fmpz_poly_div (fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B)` | [`Div`](https://doc.rust-lang.org/nightly/core/ops/trait.Div.html), [`DivAssign`](https://doc.rust-lang.org/nightly/core/ops/trait.DivAssign.html), [`CheckedDiv`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CheckedDiv.html) |
+| ⚙ | `void fmpz_poly_div_basecase (fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B)` | [`Div`](https://doc.rust-lang.org/nightly/core/ops/trait.Div.html) |
+| ⚙ | `void fmpz_poly_div_divconquer (fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B)` | [`Div`](https://doc.rust-lang.org/nightly/core/ops/trait.Div.html) |
+| ≈ | `void fmpz_poly_rem (fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B)` | [`Rem`](https://doc.rust-lang.org/nightly/core/ops/trait.Rem.html), [`RemAssign`](https://doc.rust-lang.org/nightly/core/ops/trait.RemAssign.html), [`CheckedRem`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.CheckedRem.html) |
+| ⚙ | `void fmpz_poly_rem_basecase (fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B)` | [`Rem`](https://doc.rust-lang.org/nightly/core/ops/trait.Rem.html) |
+| ✓ | `void fmpz_poly_divexact (fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B)` | [`DivExact`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivExact.html), [`DivExactAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivExactAssign.html) |
+| ✓ | `void fmpz_poly_div_root_fmpz (fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_t c)` | [`DivRoot`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.DivRoot.html), [`DivRootAssign`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.DivRootAssign.html) |
 | ✗ | `void fmpz_poly_divexact_root_fmpq (fmpz_poly_t Q, const fmpz_poly_t A, const fmpq_t c)` | |
 
 Over $$\mathbb{Z}[x]$$ FLINT's `divrem` is $$A = BQ + R$$ where each coefficient of $$R$$ beyond
 $$\operatorname{len}(B) - 1$$ is reduced modulo the leading coefficient of $$B$$, so the remainder
 may keep high-degree terms; see also [pseudo-division](#pseudo-division).
+Malachite's [`DivRem`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivRem.html), `/`, and `%` divide only when the quotient over the rationals has
+integer coefficients, which is when FLINT's internal `_fmpz_poly_divrem` with `exact` set
+succeeds; they then agree with `divrem`, `div`, and `rem`, and give $$\deg R < \deg B$$.
+Otherwise they panic, and [`CheckedDivRem`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.CheckedDivRem.html), [`CheckedDiv`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CheckedDiv.html), and [`CheckedRem`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.CheckedRem.html) return
+`None`; for the general case, use [pseudo-division](#pseudo-division). The `_basecase` and
+`_divconquer` rows are algorithm choices. FLINT's `div_root_fmpz` returns only the quotient;
+[`DivRoot`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.DivRoot.html) also returns the remainder, the value at $$c$$.
 
 ## [Division with precomputed inverse](https://flintlib.org/doc/fmpz_poly.html#division-with-precomputed-inverse) {#division-preinv}
 
@@ -544,21 +563,30 @@ may keep high-degree terms; see also [pseudo-division](#pseudo-division).
 | ✗ | `void fmpz_poly_preinvert (fmpz_poly_t B_inv, const fmpz_poly_t B)` | |
 | ✗ | `void fmpz_poly_div_preinv (fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B, const fmpz_poly_t B_inv)` | |
 | ✗ | `void fmpz_poly_divrem_preinv (fmpz_poly_t Q, fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B, const fmpz_poly_t B_inv)` | |
-| ✗ | `void fmpz_poly_powers_precompute (fmpz_poly_powers_precomp_t pinv, fmpz_poly_t poly)` | |
-| ✗ | `void fmpz_poly_rem_powers_precomp (fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B, fmpz_poly_powers_precomp_t B_inv)` | |
+| ≈ | `void fmpz_poly_powers_precompute (fmpz_poly_powers_precomp_t pinv, fmpz_poly_t poly)` | [`precompute_rem_data`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.RemPrecomputed.html#tymethod.precompute_rem_data) |
+| ≈ | `void fmpz_poly_rem_powers_precomp (fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B, fmpz_poly_powers_precomp_t B_inv)` | [`RemPrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.RemPrecomputed.html), [`RemPrecomputedAssign`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.RemPrecomputedAssign.html) |
 | — | `void fmpz_poly_powers_clear (fmpz_poly_powers_precomp_t pinv)` | |
 
 `powers_clear` frees the powers table, which is
 [`Drop`](https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html).
 
+FLINT's `powers_precompute` reduces each power of $$x$$ by subtracting its leading coefficient
+times the divisor, without dividing by the divisor's leading coefficient, so its powers, and the
+remainders of `rem_powers_precomp`, are correct only for a monic divisor; the documentation does
+not say so. Malachite's [`precompute_rem_data`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.RemPrecomputed.html#tymethod.precompute_rem_data) accepts a leading coefficient of 1 or $$-1$$, the
+divisors by which every remainder has integer coefficients, and panics otherwise; for other
+divisors, use [`%`](https://doc.rust-lang.org/nightly/core/ops/trait.Rem.html) or
+[`CheckedRem`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.CheckedRem.html).
+
 ## [Divisibility testing](https://flintlib.org/doc/fmpz_poly.html#divisibility-testing) {#divisibility-testing}
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✗ | `int fmpz_poly_divides (fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B)` | |
-| ✗ | `slong fmpz_poly_remove (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)` | |
+| ✓ | `int fmpz_poly_divides (fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B)` | [`CheckedDivExact`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.CheckedDivExact.html), [`DivisibleBy`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.DivisibleBy.html) |
+| ✓ | `slong fmpz_poly_remove (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)` | [`RemovePower`](https://docs.rs/malachite-base/latest/malachite_base/num/factorization/traits/trait.RemovePower.html), [`RemovePowerAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/factorization/traits/trait.RemovePowerAssign.html) |
 
-`fmpz_poly_divides` returns a flag and, on success, the quotient. `fmpz_poly_remove` returns the
+`fmpz_poly_divides` returns a flag and, on success, the quotient, which is
+[`CheckedDivExact`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.CheckedDivExact.html); [`DivisibleBy`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.DivisibleBy.html) returns the flag alone. `fmpz_poly_remove` returns the
 quotient through `res` and the exponent as its return value, and raises an exception for a
 divisor of 0 or $$\pm 1$$, the inputs on which the scalar
 [`RemovePower`](https://docs.rs/malachite-base/latest/malachite_base/num/factorization/traits/trait.RemovePower.html)
@@ -578,27 +606,36 @@ unchecked preconditions, so they are —.
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✗ | `void fmpz_poly_inv_series (fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)` | |
-| ✗ | `void fmpz_poly_inv_series_basecase (fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)` | |
-| ✗ | `void fmpz_poly_inv_series_newton (fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)` | |
-| ✗ | `void fmpz_poly_div_series (fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B, slong n)` | |
-| ✗ | `void fmpz_poly_div_series_basecase (fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B, slong n)` | |
-| ✗ | `void fmpz_poly_div_series_divconquer (fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B, slong n)` | |
+| ≈ | `void fmpz_poly_inv_series (fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)` | [`InverseTruncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.InverseTruncated.html) |
+| ⚙ | `void fmpz_poly_inv_series_basecase (fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)` | [`inverse_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.InverseTruncated.html#tymethod.inverse_truncated) |
+| ⚙ | `void fmpz_poly_inv_series_newton (fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)` | [`inverse_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.InverseTruncated.html#tymethod.inverse_truncated) |
+| ≈ | `void fmpz_poly_div_series (fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B, slong n)` | [`DivTruncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.DivTruncated.html), [`DivTruncatedAssign`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.DivTruncatedAssign.html), [`CheckedDivTruncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.CheckedDivTruncated.html) |
+| ⚙ | `void fmpz_poly_div_series_basecase (fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B, slong n)` | [`div_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.DivTruncated.html#tymethod.div_truncated) |
+| ⚙ | `void fmpz_poly_div_series_divconquer (fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B, slong n)` | [`div_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.DivTruncated.html#tymethod.div_truncated) |
 
-These work in $$\mathbb{Z}[[x]]/(x^n)$$ and require the constant term of the series being
-inverted (`Q` or `B`) to be $$\pm 1$$, the only units of $$\mathbb{Z}$$, without checking it.
+These work in $$\mathbb{Z}[[x]]/(x^n)$$. FLINT's inversion requires the constant term of `Q`
+to be $$\pm 1$$, the only units of $$\mathbb{Z}$$, without checking it; `inverse_truncated`
+returns `None` otherwise. FLINT's division accepts any divisor with a nonzero constant term and
+throws when the quotient does not have integer coefficients; `div_truncated` and
+`div_truncated_assign` panic there, and `checked_div_truncated` returns `None`. Modulo $$x^0$$,
+where FLINT throws on any input, Malachite returns 0, and a divisor with constant term 0 is
+rejected even when the dividend is 0 modulo $$x^n$$, where FLINT returns 0. Malachite's algorithm choices differ
+from FLINT's: where FLINT switches from the basecase at a length of 64 (inversion) or 72
+(division) whatever the coefficients' sizes, Malachite's cutoffs depend on them, and division
+never inverts the divisor, which is much slower when the quotient's coefficients stay small;
+long divisions use reversed polynomial division instead.
 
 ## [Pseudo division](https://flintlib.org/doc/fmpz_poly.html#pseudo-division) {#pseudo-division}
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✗ | `void fmpz_poly_pseudo_divrem (fmpz_poly_t Q, fmpz_poly_t R, ulong * d, const fmpz_poly_t A, const fmpz_poly_t B)` | |
-| ✗ | `void fmpz_poly_pseudo_divrem_basecase (fmpz_poly_t Q, fmpz_poly_t R, ulong * d, const fmpz_poly_t A, const fmpz_poly_t B)` | |
-| ✗ | `void fmpz_poly_pseudo_divrem_divconquer (fmpz_poly_t Q, fmpz_poly_t R, ulong * d, const fmpz_poly_t A, const fmpz_poly_t B)` | |
-| ✗ | `void fmpz_poly_pseudo_divrem_cohen (fmpz_poly_t Q, fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B)` | |
-| ✗ | `void fmpz_poly_pseudo_div (fmpz_poly_t Q, ulong * d, const fmpz_poly_t A, const fmpz_poly_t B)` | |
-| ✗ | `void fmpz_poly_pseudo_rem (fmpz_poly_t R, ulong * d, const fmpz_poly_t A, const fmpz_poly_t B)` | |
-| ✗ | `void fmpz_poly_pseudo_rem_cohen (fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B)` | |
+| ✓ | `void fmpz_poly_pseudo_divrem (fmpz_poly_t Q, fmpz_poly_t R, ulong * d, const fmpz_poly_t A, const fmpz_poly_t B)` | [`PseudoDivRem`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.PseudoDivRem.html), [`PseudoDivAssignRem`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.PseudoDivAssignRem.html) |
+| ⚙ | `void fmpz_poly_pseudo_divrem_basecase (fmpz_poly_t Q, fmpz_poly_t R, ulong * d, const fmpz_poly_t A, const fmpz_poly_t B)` | [`pseudo_div_rem`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.PseudoDivRem.html#tymethod.pseudo_div_rem) |
+| ⚙ | `void fmpz_poly_pseudo_divrem_divconquer (fmpz_poly_t Q, fmpz_poly_t R, ulong * d, const fmpz_poly_t A, const fmpz_poly_t B)` | [`pseudo_div_rem`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.PseudoDivRem.html#tymethod.pseudo_div_rem) |
+| ≈ | `void fmpz_poly_pseudo_divrem_cohen (fmpz_poly_t Q, fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B)` | [`pseudo_div_rem`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.PseudoDivRem.html#tymethod.pseudo_div_rem), then multiply by $$\ell^{\deg A - \deg B + 1 - d}$$ |
+| ✓ | `void fmpz_poly_pseudo_div (fmpz_poly_t Q, ulong * d, const fmpz_poly_t A, const fmpz_poly_t B)` | [`PseudoDiv`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.PseudoDiv.html), [`PseudoDivAssign`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.PseudoDivAssign.html) |
+| ✓ | `void fmpz_poly_pseudo_rem (fmpz_poly_t R, ulong * d, const fmpz_poly_t A, const fmpz_poly_t B)` | [`PseudoRem`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.PseudoRem.html), [`PseudoRemAssign`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.PseudoRemAssign.html) |
+| ≈ | `void fmpz_poly_pseudo_rem_cohen (fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B)` | [`pseudo_rem`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.PseudoRem.html#tymethod.pseudo_rem), then multiply by $$\ell^{\deg A - \deg B + 1 - d}$$ |
 
 Pseudo-division computes $$Q$$, $$R$$, and $$d$$ with $$\ell^d A = BQ + R$$ and $$\deg R <
 \deg B$$, where $$\ell$$ is the leading coefficient of $$B$$:
@@ -608,12 +645,20 @@ Pseudo-division computes $$Q$$, $$R$$, and $$d$$ with $$\ell^d A = BQ + R$$ and 
 | [`divrem`](#euclidean-division) | $$A$$ itself | may keep high-degree terms, reduced modulo $$\ell$$ |
 | `pseudo_divrem` | scaled to $$\ell^d A$$ | $$\deg R < \deg B$$, as in a field |
 
+The exponent $$d$$ is not unique, but once it is fixed, $$Q$$ and $$R$$ are.
+[`PseudoDivRem`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.PseudoDivRem.html)
+returns the least $$d$$ for which $$Q$$ is integral, which is what the `_basecase` and `_divconquer`
+algorithms compute (and so what `pseudo_divrem`, `pseudo_div`, and `pseudo_rem` return); the
+`_cohen` functions always use $$d = \deg A - \deg B + 1$$, so their results are Malachite's times
+$$\ell^{\deg A - \deg B + 1 - d}$$. The dividend is divided coefficient by coefficient when the
+divisor is short, and otherwise by FLINT's divide-and-conquer algorithm.
+
 ## [Derivative](https://flintlib.org/doc/fmpz_poly.html#derivative) {#derivative}
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✓ | `void fmpz_poly_derivative (fmpz_poly_t res, const fmpz_poly_t poly)` | [`derivative`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.Derivative.html#tymethod.derivative) |
-| ✓ | `void fmpz_poly_nth_derivative (fmpz_poly_t res, const fmpz_poly_t poly, ulong n)` | [`nth_derivative`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.NthDerivative.html#tymethod.nth_derivative) |
+| ✓ | `void fmpz_poly_derivative (fmpz_poly_t res, const fmpz_poly_t poly)` | [`derivative`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/calculus/traits/trait.Derivative.html#tymethod.derivative) |
+| ✓ | `void fmpz_poly_nth_derivative (fmpz_poly_t res, const fmpz_poly_t poly, ulong n)` | [`nth_derivative`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/calculus/traits/trait.NthDerivative.html#tymethod.nth_derivative) |
 
 Both return zero when the length is at most `n` (at most 1 for `derivative`). The chapter has no
 integral, because integration divides by $$i + 1$$ and leaves $$\mathbb{Z}$$; `fmpq_poly` has one.
@@ -622,25 +667,25 @@ integral, because integration divides by $$i + 1$$ and leaves $$\mathbb{Z}$$; `f
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✓ | `void fmpz_poly_evaluate_fmpz (fmpz_t res, const fmpz_poly_t f, const fmpz_t a)` | [`evaluate`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.Evaluate.html#tymethod.evaluate) |
-| ⚙ | `void fmpz_poly_evaluate_horner_fmpz (fmpz_t res, const fmpz_poly_t f, const fmpz_t a)` | [`evaluate`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.Evaluate.html#tymethod.evaluate) |
-| ⚙ | `void fmpz_poly_evaluate_divconquer_fmpz (fmpz_t res, const fmpz_poly_t poly, const fmpz_t a)` | [`evaluate`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.Evaluate.html#tymethod.evaluate) |
-| ✓ | `void fmpz_poly_evaluate_fmpq (fmpq_t res, const fmpz_poly_t f, const fmpq_t a)` | [`evaluate`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.Evaluate.html#tymethod.evaluate) |
-| ⚙ | `void fmpz_poly_evaluate_horner_fmpq (fmpq_t res, const fmpz_poly_t f, const fmpq_t a)` | [`evaluate`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.Evaluate.html#tymethod.evaluate) |
-| ⚙ | `void fmpz_poly_evaluate_divconquer_fmpq (fmpq_t res, const fmpz_poly_t poly, const fmpq_t a)` | [`evaluate`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.Evaluate.html#tymethod.evaluate) |
-| ≈ | `ulong fmpz_poly_evaluate_mod (const fmpz_poly_t poly, ulong a, ulong n)` | [`mod_evaluate`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.ModEvaluate.html#tymethod.mod_evaluate) |
-| ✓ | `void fmpz_poly_evaluate_fmpz_vec (fmpz * res, const fmpz_poly_t f, const fmpz * a, slong n)` | [`evaluate_many`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.EvaluateMany.html#tymethod.evaluate_many) |
+| ✓ | `void fmpz_poly_evaluate_fmpz (fmpz_t res, const fmpz_poly_t f, const fmpz_t a)` | [`evaluate`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.Evaluate.html#tymethod.evaluate) |
+| ⚙ | `void fmpz_poly_evaluate_horner_fmpz (fmpz_t res, const fmpz_poly_t f, const fmpz_t a)` | [`evaluate`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.Evaluate.html#tymethod.evaluate) |
+| ⚙ | `void fmpz_poly_evaluate_divconquer_fmpz (fmpz_t res, const fmpz_poly_t poly, const fmpz_t a)` | [`evaluate`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.Evaluate.html#tymethod.evaluate) |
+| ✓ | `void fmpz_poly_evaluate_fmpq (fmpq_t res, const fmpz_poly_t f, const fmpq_t a)` | [`evaluate`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.Evaluate.html#tymethod.evaluate) |
+| ⚙ | `void fmpz_poly_evaluate_horner_fmpq (fmpq_t res, const fmpz_poly_t f, const fmpq_t a)` | [`evaluate`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.Evaluate.html#tymethod.evaluate) |
+| ⚙ | `void fmpz_poly_evaluate_divconquer_fmpq (fmpq_t res, const fmpz_poly_t poly, const fmpq_t a)` | [`evaluate`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.Evaluate.html#tymethod.evaluate) |
+| ≈ | `ulong fmpz_poly_evaluate_mod (const fmpz_poly_t poly, ulong a, ulong n)` | [`mod_evaluate`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModEvaluate.html#tymethod.mod_evaluate) |
+| ✓ | `void fmpz_poly_evaluate_fmpz_vec (fmpz * res, const fmpz_poly_t f, const fmpz * a, slong n)` | [`evaluate_many`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.EvaluateMany.html#tymethod.evaluate_many) |
 | — | `double fmpz_poly_evaluate_horner_d (const fmpz_poly_t poly, double d)` | |
 | — | `double fmpz_poly_evaluate_horner_d_2exp (slong * exp, const fmpz_poly_t poly, double d)` | |
 
-[`evaluate`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.Evaluate.html#tymethod.evaluate)
+[`evaluate`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.Evaluate.html#tymethod.evaluate)
 chooses between Horner's rule and divide and conquer itself, so the `_horner` and `_divconquer`
 rows map to it as well. Its result type is its argument type: at an
 [`Integer`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html) it
 returns an `Integer`, and at a
 [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html) (the
 `_fmpq` rows) a `Rational` in lowest terms.
-[`mod_evaluate`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.ModEvaluate.html#tymethod.mod_evaluate)
+[`mod_evaluate`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModEvaluate.html#tymethod.mod_evaluate)
 evaluates at a [`u64`](https://doc.rust-lang.org/nightly/core/primitive.u64.html) modulo a `u64`,
 reducing each coefficient (negative ones into $$[0, n)$$) as FLINT does, but it panics unless `a`
 is already reduced, hence ≈. The two `double` rows are — because FLINT itself says they make "no
@@ -683,70 +728,108 @@ function.
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✗ | `void fmpz_poly_compose (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)` | |
-| ✗ | `void fmpz_poly_compose_horner (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)` | |
-| ✗ | `void fmpz_poly_compose_divconquer (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)` | |
+| ✓ | `void fmpz_poly_compose (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)` | [`Compose`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.Compose.html), [`ComposeAssign`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.ComposeAssign.html) |
+| ⚙ | `void fmpz_poly_compose_horner (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)` | [`compose`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.Compose.html#tymethod.compose) |
+| ⚙ | `void fmpz_poly_compose_divconquer (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)` | [`compose`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.Compose.html#tymethod.compose) |
 
-`fmpz_poly_compose` sets `res` to $$g(h(x))$$ for `poly1` $$= g$$ and `poly2` $$= h$$; the
-`_horner` and `_divconquer` rows are algorithm choices. The same result comes from Horner's rule,
-running over the coefficients $$c$$ of $$g$$ from the top with
-`acc = acc * h + IntegerPolynomial::from(c)`; when $$h$$ is $$x^k$$, `compose` is
-[`compose_power_of_x`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.ComposePowerOfX.html#tymethod.compose_power_of_x).
+`fmpz_poly_compose` sets `res` to $$g(h(x))$$ for `poly1` $$= g$$ and `poly2` $$= h$$, which is
+[`Compose`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.Compose.html)
+of two
+[`IntegerPolynomial`](https://docs.rs/malachite-nz/latest/malachite_nz/integer_polynomial/struct.IntegerPolynomial.html)s,
+`g.compose(h)`, or
+[`ComposeAssign`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.ComposeAssign.html)
+when `res` is `poly1`. The `_horner` and `_divconquer` rows are algorithm choices, which Malachite
+makes internally. FLINT uses Horner's rule up to 4 coefficients whatever their size; Malachite
+switches by the size of the coefficients, from 7 coefficients when they are small down to 2 when
+they have more than about 500 bits. Like FLINT, it composes with a linear $$h$$ by a Taylor shift
+and a scaling, and does that in place when it owns $$g$$. The same traits compose
+[`NaturalPolynomial`](https://docs.rs/malachite-nz/latest/malachite_nz/natural_polynomial/struct.NaturalPolynomial.html)s.
+When $$h$$ is $$x^k$$, `compose` is
+[`compose_power_of_x`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.ComposePowerOfX.html#tymethod.compose_power_of_x).
 
 ## [Inflation and deflation](https://flintlib.org/doc/fmpz_poly.html#inflation-and-deflation) {#inflation-and-deflation}
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✓ | `void fmpz_poly_inflate (fmpz_poly_t result, const fmpz_poly_t input, ulong inflation)` | [`compose_power_of_x`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.ComposePowerOfX.html#tymethod.compose_power_of_x) |
-| ≈ | `void fmpz_poly_deflate (fmpz_poly_t result, const fmpz_poly_t input, ulong deflation)` | [`deflate_power_of_x`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.DeflatePowerOfX.html#tymethod.deflate_power_of_x) |
-| ≈ | `ulong fmpz_poly_deflation (const fmpz_poly_t input)` | [`exponent_gcd`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.ExponentGcd.html#tymethod.exponent_gcd) |
+| ✓ | `void fmpz_poly_inflate (fmpz_poly_t result, const fmpz_poly_t input, ulong inflation)` | [`compose_power_of_x`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.ComposePowerOfX.html#tymethod.compose_power_of_x) |
+| ≈ | `void fmpz_poly_deflate (fmpz_poly_t result, const fmpz_poly_t input, ulong deflation)` | [`deflate_power_of_x`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.DeflatePowerOfX.html#tymethod.deflate_power_of_x) |
+| ≈ | `ulong fmpz_poly_deflation (const fmpz_poly_t input)` | [`exponent_gcd`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.ExponentGcd.html#tymethod.exponent_gcd) |
 
-[`compose_power_of_x`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.ComposePowerOfX.html#tymethod.compose_power_of_x),
+[`compose_power_of_x`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.ComposePowerOfX.html#tymethod.compose_power_of_x),
 like `fmpz_poly_inflate`, gives the constant $$p(1)$$ for $$n = 0$$. `fmpz_poly_deflate` silently
 discards the coefficients at exponents that are not multiples of $$n$$, so deflating $$x^2 + x$$
 by 2 returns $$x$$;
-[`deflate_power_of_x`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.DeflatePowerOfX.html#tymethod.deflate_power_of_x)
+[`deflate_power_of_x`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.DeflatePowerOfX.html#tymethod.deflate_power_of_x)
 panics instead, hence ≈. `fmpz_poly_deflation` returns 0 for the zero polynomial and 1 for a
 constant;
-[`exponent_gcd`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.ExponentGcd.html#tymethod.exponent_gcd)
+[`exponent_gcd`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.ExponentGcd.html#tymethod.exponent_gcd)
 returns 0 for every constant, hence ≈.
 
 ## [Taylor shift](https://flintlib.org/doc/fmpz_poly.html#taylor-shift) {#taylor-shift}
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✗ | `void fmpz_poly_taylor_shift (fmpz_poly_t g, const fmpz_poly_t f, const fmpz_t c)` | |
-| ✗ | `void fmpz_poly_taylor_shift_horner (fmpz_poly_t g, const fmpz_poly_t f, const fmpz_t c)` | |
-| ✗ | `void fmpz_poly_taylor_shift_divconquer (fmpz_poly_t g, const fmpz_poly_t f, const fmpz_t c)` | |
-| ✗ | `void fmpz_poly_taylor_shift_multi_mod (fmpz_poly_t g, const fmpz_poly_t f, const fmpz_t c)` | |
+| ✓ | `void fmpz_poly_taylor_shift (fmpz_poly_t g, const fmpz_poly_t f, const fmpz_t c)` | [`TaylorShift`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.TaylorShift.html), [`TaylorShiftAssign`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.TaylorShiftAssign.html) |
+| ⚙ | `void fmpz_poly_taylor_shift_horner (fmpz_poly_t g, const fmpz_poly_t f, const fmpz_t c)` | [`taylor_shift`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.TaylorShift.html#tymethod.taylor_shift) |
+| ⚙ | `void fmpz_poly_taylor_shift_divconquer (fmpz_poly_t g, const fmpz_poly_t f, const fmpz_t c)` | [`taylor_shift`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.TaylorShift.html#tymethod.taylor_shift) |
+| — | `void fmpz_poly_taylor_shift_multi_mod (fmpz_poly_t g, const fmpz_poly_t f, const fmpz_t c)` | |
 
-`fmpz_poly_taylor_shift` computes $$f(x + c)$$; the other three rows are algorithm choices. The
-same result comes from the Horner recipe under [composition](#composition), with inner polynomial
-$$x + c$$.
+`fmpz_poly_taylor_shift` computes $$f(x + c)$$, which is
+[`TaylorShift`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.TaylorShift.html)
+of an
+[`IntegerPolynomial`](https://docs.rs/malachite-nz/latest/malachite_nz/integer_polynomial/struct.IntegerPolynomial.html)
+by an [`Integer`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html), or
+[`TaylorShiftAssign`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.TaylorShiftAssign.html)
+when `g` is `f`. The `_horner` and `_divconquer` rows are algorithm choices, which Malachite makes
+internally. Like FLINT, it uses Horner's rule for short polynomials and divide and conquer for long
+ones, but it splits at shorter lengths than FLINT's cutoff, which grows with the square root of the
+coefficient size: on this machine the split pays from about 160 coefficients, or 256 when the
+coefficients are larger than a word and the shift is smaller than one. The same traits shift a
+[`NaturalPolynomial`](https://docs.rs/malachite-nz/latest/malachite_nz/natural_polynomial/struct.NaturalPolynomial.html)
+by a [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html),
+since a non-negative shift keeps every coefficient non-negative.
+
+The `_multi_mod` row is — because Malachite is single-threaded. FLINT's version reduces the
+polynomial modulo many word-sized primes, shifts each image on its own thread, and recombines the
+results with the Chinese remainder theorem; its own `fmpz_poly_taylor_shift` never calls it.
 
 ## [Power series composition](https://flintlib.org/doc/fmpz_poly.html#power-series-composition) {#power-series-composition}
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✗ | `void fmpz_poly_compose_series (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong n)` | |
-| ✗ | `void fmpz_poly_compose_series_horner (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong n)` | |
-| ✗ | `void fmpz_poly_compose_series_brent_kung (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong n)` | |
+| ✓ | `void fmpz_poly_compose_series (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong n)` | [`ComposeTruncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.ComposeTruncated.html) |
+| ⚙ | `void fmpz_poly_compose_series_horner (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong n)` | internal |
+| ⚙ | `void fmpz_poly_compose_series_brent_kung (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong n)` | internal |
 
 `compose_series` is [composition](#composition) truncated to $$n$$ terms, and requires the inner
-polynomial to have zero constant term. The same result comes from the Horner recipe under
-composition with
-[`mul_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.MulTruncated.html#tymethod.mul_truncated)
-in place of `*`.
+polynomial to have zero constant term. In Malachite it is
+[`ComposeTruncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.ComposeTruncated.html)
+(and `ComposeTruncatedAssign`) on an `IntegerPolynomial` or a `NaturalPolynomial`, with either
+polynomial by value or by reference, following the `_series` → `Truncated` naming of
+[`MulTruncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.MulTruncated.html);
+like FLINT, it panics if the inner polynomial's constant coefficient is nonzero. The Horner and
+Brent–Kung algorithms are internal choices behind it, as is the algorithm of Kinoshita and Li
+(2024), which `fmpz_poly_compose_series` uses from length 500 on through the generic `gr_poly`
+code. Malachite chooses among them differently, from benchmarks: Horner's rule up to about
+$$2.5\sqrt n$$ outer coefficients, or for any number when the inner polynomial has at most 5
+coefficients that are not small, rather than up to 10; Kinoshita–Li only for long results with
+coefficients of at most 4 bits and an outer polynomial nearly as long as the result, rather than
+from length 500 whatever the coefficients; and the Brent–Kung algorithm otherwise. It also reads
+only the first $$\lceil n/v \rceil$$ coefficients of the outer polynomial when the inner one starts
+at $$x^v$$, and composes with an inner polynomial that has a single nonzero coefficient directly.
 
 ## [Power series reversion](https://flintlib.org/doc/fmpz_poly.html#power-series-reversion) {#power-series-reversion}
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✗ | `void fmpz_poly_revert_series (fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)` | |
+| ✓ | `void fmpz_poly_revert_series (fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)` | [`CompositionalInverseTruncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.CompositionalInverseTruncated.html) |
 
 `fmpz_poly_revert_series` computes the *compositional* inverse, with $$Q(Q^{-1}(x)) = x \bmod
 x^n$$, not the multiplicative one that [`inv_series`](#power-series-division) computes. It
-requires $$Q_0 = 0$$ and $$Q_1 = \pm 1$$, and checks neither.
+requires $$Q_0 = 0$$ and $$Q_1 = \pm 1$$, and throws otherwise;
+[`compositional_inverse_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.CompositionalInverseTruncated.html#tymethod.compositional_inverse_truncated)
+returns `None` instead, and 0 for $$n < 2$$. Both use the fast Lagrange algorithm below 2500 terms
+and Newton's iteration from there.
 
 ## [Square root](https://flintlib.org/doc/fmpz_poly.html#square-root) {#square-root}
 
@@ -829,7 +912,7 @@ takes the
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✓ | `void fmpz_poly_get_nmod_poly (nmod_poly_t Amod, const fmpz_poly_t A)` | [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Mod.html) |
+| ✓ | `void fmpz_poly_get_nmod_poly (nmod_poly_t Amod, const fmpz_poly_t A)` | [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.Mod.html) |
 | ✗ | `void fmpz_poly_set_nmod_poly (fmpz_poly_t A, const nmod_poly_t Amod)` | |
 | ✗ | `void fmpz_poly_set_nmod_poly_unsigned (fmpz_poly_t A, const nmod_poly_t Amod)` | |
 | ✗ | `void fmpz_poly_CRT_ui (fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_t m, const nmod_poly_t poly2, int sign)` | |
@@ -839,7 +922,7 @@ Malachite has no `nmod_poly` type: a polynomial with reduced coefficients is a
 or
 [`UnsignedPolynomial`](https://docs.rs/malachite-base/latest/malachite_base/unsigned_polynomial/struct.UnsignedPolynomial.html)
 satisfying
-[`ModIsReduced`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModIsReduced.html).
+[`ModIsReduced`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModIsReduced.html).
 `get_nmod_poly` is `(&a).mod_op(m)` with `m` of the same type as the result's coefficients (a
 `u64` modulus gives an `UnsignedPolynomial<u64>`).
 
@@ -847,14 +930,12 @@ satisfying
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✗ | `void fmpz_poly_product_roots_fmpz_vec (fmpz_poly_t poly, const fmpz * xs, slong n)` | |
-| ✗ | `void fmpz_poly_product_roots_fmpq_vec (fmpz_poly_t poly, const fmpq * xs, slong n)` | |
+| ✓ | `void fmpz_poly_product_roots_fmpz_vec (fmpz_poly_t poly, const fmpz * xs, slong n)` | [`from_roots`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.FromRoots.html#tymethod.from_roots) |
+| ✓ | `void fmpz_poly_product_roots_fmpq_vec (fmpz_poly_t poly, const fmpq * xs, slong n)` | [`from_rational_roots`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.FromRationalRoots.html#tymethod.from_rational_roots) |
 
 `product_roots_fmpz_vec` builds $$\prod_i (x - x_i)$$. The rational variant clears
 denominators, building $$\prod_i (q_i x - p_i)$$ for $$x_i = p_i/q_i$$, so its leading
-coefficient is the product of the denominators. Either product can be formed with `*` from linear
-factors built by
-[`from_coefficients_asc`](https://docs.rs/malachite-nz/latest/malachite_nz/integer_polynomial/struct.IntegerPolynomial.html#method.from_coefficients_asc).
+coefficient is the product of the denominators. [`from_roots`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.FromRoots.html#tymethod.from_roots) and [`from_rational_roots`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.FromRationalRoots.html#tymethod.from_rational_roots) build the same polynomials.
 
 ## [Subproduct trees](https://flintlib.org/doc/fmpz_poly.html#subproduct-trees) {#subproduct-trees}
 
@@ -925,9 +1006,9 @@ coefficients, are in `fmpq_poly`.
 
 FLINT's convention is $$F_0 = 0$$, $$F_1 = 1$$, $$F_n(x) = x F_{n-1}(x) + F_{n-2}(x)$$, a
 recurrence that can be run with
-[`mul_power_of_x`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.MulPowerOfX.html#tymethod.mul_power_of_x)
+[`mul_power_of_x`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.MulPowerOfX.html#tymethod.mul_power_of_x)
 and `+`. $$F_n(1)$$ is the $$n$$th Fibonacci number, which
-[`Fibonacci`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Fibonacci.html)
+[`Fibonacci`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.Fibonacci.html)
 provides directly.
 
 ## [Eulerian numbers and polynomials](https://flintlib.org/doc/fmpz_poly.html#eulerian-numbers-and-polynomials) {#eulerian}
@@ -951,7 +1032,7 @@ fractional power of $$q$$) and `theta_qexp` that of $$\vartheta(q)^r$$, with
 $$\vartheta(q) = 1 + 2\sum_{k \geq 1} q^{k^2}$$, both truncated to $$n$$ terms. The exponent
 $$r$$ may be negative, and $$r = -1$$ in `eta_qexp` gives the partition numbers. For
 $$r \geq 0$$, raising the $$r = 1$$ series to the $$r$$th power with
-[`pow_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.PowTruncated.html#tymethod.pow_truncated)
+[`pow_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.PowTruncated.html#tymethod.pow_truncated)
 gives the same result.
 
 ## [CLD bounds](https://flintlib.org/doc/fmpz_poly.html#cld-bounds) {#cld-bounds}

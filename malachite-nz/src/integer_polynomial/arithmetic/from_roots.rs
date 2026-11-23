@@ -74,7 +74,6 @@ impl FromRoots<Integer> for IntegerPolynomial {
     ///
     /// # Examples
     /// ```
-    /// use core::str::FromStr;
     /// use malachite_base::polynomial::arithmetic::traits::FromRoots;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;

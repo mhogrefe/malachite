@@ -38,6 +38,8 @@ MPFR, so the float mapping belongs with
   residues.
 - [Rationals](/mapping/flint-rationals/): the `fmpq_t` type, mapped onto
   [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html).
+- [Big-exponent floats](/mapping/flint-big-exponent-floats/): the `arf_t` type, mapped onto
+  [`BigExponentFloat`](https://docs.rs/malachite-float/latest/malachite_float/big_exponent_float/struct.BigExponentFloat.html).
 - [Gaussian integers](/mapping/flint-gaussian-integers/): the `fmpzi_t` type, mapped onto
   [`GaussianInteger`](https://docs.rs/malachite-nz/latest/malachite_nz/gaussian_integer/struct.GaussianInteger.html).
 - [Integer polynomials](/mapping/flint-integer-polynomials/): the `fmpz_poly_t` type, mapped onto
@@ -69,6 +71,20 @@ MPFR, so the float mapping belongs with
   `nmod_vec.h` module, mapped onto
   [`UnsignedVector`](https://docs.rs/malachite-base/latest/malachite_base/unsigned_vector/struct.UnsignedVector.html)
   with the `Mod*` traits. All 7 sections of `nmod_vec.h` are mapped.
+- [Integer matrices](/mapping/flint-integer-matrices/): the `fmpz_mat_t` type, mapped onto
+  [`IntegerMatrix`](https://docs.rs/malachite-nz/latest/malachite_nz/integer_matrix/struct.IntegerMatrix.html).
+  All 36 sections of `fmpz_mat.h` are mapped.
+- [Rational matrices](/mapping/flint-rational-matrices/): the `fmpq_mat_t` type, mapped onto
+  [`RationalMatrix`](https://docs.rs/malachite-q/latest/malachite_q/rational_matrix/struct.RationalMatrix.html).
+  All 25 sections of `fmpq_mat.h` are mapped.
+- [Integer matrices mod n](/mapping/flint-integer-matrices-mod-n/): the `fmpz_mod_mat.h` module,
+  mapped onto
+  [`NaturalMatrix`](https://docs.rs/malachite-nz/latest/malachite_nz/natural_matrix/struct.NaturalMatrix.html)
+  with the `Mod*` traits. All 23 sections of `fmpz_mod_mat.h` are mapped.
+- [Word-sized integer matrices mod n](/mapping/flint-word-sized-integer-matrices-mod-n/): the
+  `nmod_mat.h` module, mapped onto
+  [`UnsignedMatrix`](https://docs.rs/malachite-base/latest/malachite_base/unsigned_matrix/struct.UnsignedMatrix.html)
+  with the `Mod*` traits. All 25 sections of `nmod_mat.h` are mapped.
 - [Arithmetic functions](/mapping/flint-arithmetic-functions/): the `arith.h` module, which
   computes number-theoretic and combinatorial sequences.
 
@@ -109,5 +125,22 @@ num-complex has no page: Malachite has no complex type for it to map onto.
   [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html).
 - [Floats](/mapping/azurite-floats/): the `AzFloat` type, mapped onto
   [`Float`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html).
+- [Natural vectors](/mapping/azurite-natural-vectors/): the `AzVector AzNat n` type, mapped onto
+  [`NaturalVector`](https://docs.rs/malachite-nz/latest/malachite_nz/natural_vector/struct.NaturalVector.html).
+- [Integer vectors](/mapping/azurite-integer-vectors/): the `AzVector AzInt n` type, mapped onto
+  [`IntegerVector`](https://docs.rs/malachite-nz/latest/malachite_nz/integer_vector/struct.IntegerVector.html).
+- [Rational vectors](/mapping/azurite-rational-vectors/): the `AzVector AzRat n` type, mapped onto
+  [`RationalVector`](https://docs.rs/malachite-q/latest/malachite_q/rational_vector/struct.RationalVector.html).
+- [Vectors modulo a power of 2](/mapping/azurite-vectors-mod-power-of-2/): the
+  `AzVector (AzZModPow2 k) n` type, mapped onto the `mod_power_of_2_*` operations of
+  [`UnsignedVector<T>`](https://docs.rs/malachite-base/latest/malachite_base/unsigned_vector/struct.UnsignedVector.html)
+  and
+  [`NaturalVector`](https://docs.rs/malachite-nz/latest/malachite_nz/natural_vector/struct.NaturalVector.html).
+  It also covers vectors of Lean's fixed-width `UInt64`, `UInt32`, `UInt16`, and `UInt8`.
+- [Vectors modulo a natural](/mapping/azurite-vectors-mod/): the `AzVector (AzZMod m) n` type,
+  mapped onto the `mod_*` operations of
+  [`UnsignedVector<T>`](https://docs.rs/malachite-base/latest/malachite_base/unsigned_vector/struct.UnsignedVector.html)
+  and
+  [`NaturalVector`](https://docs.rs/malachite-nz/latest/malachite_nz/natural_vector/struct.NaturalVector.html).
 
 Azurite's polynomial and matrix types will get pages as they are mapped.

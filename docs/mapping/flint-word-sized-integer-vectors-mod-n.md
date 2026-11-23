@@ -18,16 +18,12 @@ Users: Word-Sized Modular Polynomials](/mapping/flint-word-sized-modular-polynom
 [conventions](/mapping/flint-word-sized-modular-polynomials/#conventions) on word sizes and
 precomputed data apply here as well; the [mapping index](/mapping/) lists the whole family.
 
-Every section of the chapter is mapped below: 35 rows across 7 sections, of which 14 are ✓, 13 ⚙,
-5 ≈, 1 —, and 2 ✗. All of the chapter's functions have names beginning with an underscore, and all
+Every section of the chapter is mapped below: 35 rows across 7 sections, of which 16 are ✓, 13 ⚙,
+5 ≈, and 1 —. All of the chapter's functions have names beginning with an underscore, and all
 are included (see [Representation](#representation)). Many rows are ⚙: much of the chapter exposes
 FLINT's choice of algorithm (Shoup or Montgomery multiplication, unreduced accumulation, dot
-product methods), which Malachite keeps internal. The two ✗ rows, `_nmod_vec_invert` and
-`_nmod_vec_dot_rev`, are operations that
-[`UnsignedVector`](https://docs.rs/malachite-base/latest/malachite_base/unsigned_vector/struct.UnsignedVector.html)
-does not yet provide as methods; each note gives the interim way to do the same thing one element
-at a time. Functions that `nmod_vec.h` declares but the chapter does not document have no rows;
-the sections that mention them name them.
+product methods), which Malachite keeps internal. Functions that `nmod_vec.h` declares but the
+chapter does not document have no rows; the sections that mention them name them.
 
 ## Conventions {#conventions}
 
@@ -42,7 +38,7 @@ reducing modulo it, and expect the entries to be residues in $$[0, n)$$.
 The Malachite counterpart is an
 [`UnsignedVector<T>`](https://docs.rs/malachite-base/latest/malachite_base/unsigned_vector/struct.UnsignedVector.html)
 whose elements are all less than $$n$$, which
-[`ModIsReduced`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModIsReduced.html)
+[`ModIsReduced`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModIsReduced.html)
 checks; the modulus is a `T` passed to each `Mod*` operation. `T` may be any primitive unsigned
 type, and this chapter is the `T = u64` case (see [word
 sizes](/mapping/flint-word-sized-modular-polynomials/#word-sized)). FLINT trusts that its inputs
@@ -113,7 +109,7 @@ directly. The distributions differ, and there is no sparse mode, hence ≈.
 | ✓ | `void _nmod_vec_set(nn_ptr res, nn_srcptr vec, slong len)` | [`Clone`](https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html) |
 | ✓ | `void _nmod_vec_zero(nn_ptr vec, slong len)` | [`set_zero`](https://docs.rs/malachite-base/latest/malachite_base/vector/trait.Vector.html#tymethod.set_zero) |
 | ✓ | `void _nmod_vec_swap(nn_ptr a, nn_ptr b, slong length)` | [`mem::swap`](https://doc.rust-lang.org/nightly/core/mem/fn.swap.html) |
-| ✓ | `void _nmod_vec_reduce(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod)` | [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Mod.html), [`ModAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModAssign.html) |
+| ✓ | `void _nmod_vec_reduce(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod)` | [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.Mod.html), [`ModAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModAssign.html) |
 | ✓ | `flint_bitcnt_t _nmod_vec_max_bits(nn_srcptr vec, slong len)` | [`height_significant_bits`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Height.html#tymethod.height_significant_bits), [`max_bits`](https://docs.rs/malachite-base/latest/malachite_base/vector/trait.Vector.html#tymethod.max_bits) |
 | ✓ | `int _nmod_vec_equal(nn_srcptr vec, nn_srcptr vec2, slong len)` | [`PartialEq`](https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html) |
 
@@ -127,9 +123,9 @@ supplies; [`PartialEq`](https://doc.rust-lang.org/nightly/core/cmp/trait.Partial
 requires the dimensions to match.
 
 `_nmod_vec_reduce` reduces arbitrary words into $$[0, n)$$, which is
-[`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Mod.html) on
+[`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.Mod.html) on
 [`UnsignedVector`](https://docs.rs/malachite-base/latest/malachite_base/unsigned_vector/struct.UnsignedVector.html)
-with a `T` modulus, or [`ModAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModAssign.html) in place;
+with a `T` modulus, or [`ModAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModAssign.html) in place;
 [`Rem`](https://doc.rust-lang.org/nightly/core/ops/trait.Rem.html) is the same for unsigned
 elements. Like FLINT's, it accepts unreduced input, since producing reduced elements is its
 purpose.
@@ -180,14 +176,14 @@ works with any Rust writer.
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✓ | `void _nmod_vec_add(nn_ptr res, nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod)` | [`ModAdd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModAdd.html), [`ModAddAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModAddAssign.html) |
-| ✓ | `void _nmod_vec_sub(nn_ptr res, nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod)` | [`ModSub`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModSub.html), [`ModSubAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModSubAssign.html) |
-| ✓ | `void _nmod_vec_neg(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod)` | [`ModNeg`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModNeg.html), [`ModNegAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModNegAssign.html) |
-| ✗ | `void _nmod_vec_invert(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod)` | |
-| ✓ | `void _nmod_vec_scalar_mul_nmod(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod)` | [`ModMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModMul.html), [`ModMulAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModMulAssign.html) |
+| ✓ | `void _nmod_vec_add(nn_ptr res, nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod)` | [`ModAdd`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModAdd.html), [`ModAddAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModAddAssign.html) |
+| ✓ | `void _nmod_vec_sub(nn_ptr res, nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod)` | [`ModSub`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModSub.html), [`ModSubAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModSubAssign.html) |
+| ✓ | `void _nmod_vec_neg(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod)` | [`ModNeg`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModNeg.html), [`ModNegAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModNegAssign.html) |
+| ✓ | `void _nmod_vec_invert(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod)` | [`ModEntrywiseInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModEntrywiseInverse.html) |
+| ✓ | `void _nmod_vec_scalar_mul_nmod(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod)` | [`ModMul`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModMul.html), [`ModMulAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModMulAssign.html) |
 | ⚙ | `void _nmod_vec_scalar_mul_nmod_shoup(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod)` | |
 | ⚙ | `void _nmod_vec_scalar_mul_nmod_redc(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod)` | |
-| ✓ | `void _nmod_vec_scalar_addmul_nmod(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod)` | [`ModAddMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModAddMul.html), [`ModAddMulAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModAddMulAssign.html) |
+| ✓ | `void _nmod_vec_scalar_addmul_nmod(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod)` | [`ModAddMul`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModAddMul.html), [`ModAddMulAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModAddMulAssign.html) |
 
 Addition, subtraction, and negation are the
 [`UnsignedVector`](https://docs.rs/malachite-base/latest/malachite_base/unsigned_vector/struct.UnsignedVector.html)
@@ -200,26 +196,31 @@ less than $$n$$; FLINT checks neither.
 checking, that every element is invertible. It does not invert each element separately: it
 multiplies all the elements together, inverts the product once, and recovers each inverse from
 partial products, so it computes one inverse and about three multiplications per element.
-The vector types do not yet have this; until they do, apply
-[`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModInverse.html) to each element, which returns
-[`None`](https://doc.rust-lang.org/nightly/core/option/enum.Option.html#variant.None) for an
-element that is not invertible, at the cost of one inverse per element.
+[`ModEntrywiseInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModEntrywiseInverse.html) does the same, but it returns
+[`None`](https://doc.rust-lang.org/nightly/core/option/enum.Option.html#variant.None) if some
+element is not invertible, which costs nothing extra, since the product is invertible exactly when
+every element is; FLINT's result is unspecified in that case. Modulo 1, every element is 0, and
+each is its own inverse. Taking the vector by value reuses its storage, the counterpart of calling
+`_nmod_vec_invert` with `res` equal to `vec`. The trait is also implemented for
+[`NaturalVector`](https://docs.rs/malachite-nz/latest/malachite_nz/natural_vector/struct.NaturalVector.html)
+with a [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html)
+modulus, which `fmpz_mod_vec.h` has no function for.
 
 `_nmod_vec_scalar_mul_nmod` multiplies each element by $$c$$, which is
-[`ModMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModMul.html)
+[`ModMul`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModMul.html)
 of an
 [`UnsignedVector`](https://docs.rs/malachite-base/latest/malachite_base/unsigned_vector/struct.UnsignedVector.html)
 by a `T` modulo a `T`, or
-[`ModMulAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModMulAssign.html)
+[`ModMulAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModMulAssign.html)
 when `res` is `vec`. It computes the data for multiplying modulo $$n$$ once and reuses it for every
 element, and panics if $$c$$ or any element is not less than $$n$$. `_nmod_vec_scalar_addmul_nmod`
 adds $$c$$ times each element of `vec` to the corresponding element of `res`, which is
-[`ModAddMulAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModAddMulAssign.html) of an `UnsignedVector`, another `UnsignedVector`, a
-`T` scalar, and a `T` modulus; [`ModAddMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModAddMul.html) returns the result instead.
+[`ModAddMulAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModAddMulAssign.html) of an `UnsignedVector`, another `UnsignedVector`, a
+`T` scalar, and a `T` modulus; [`ModAddMul`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModAddMul.html) returns the result instead.
 Like FLINT, it handles $$c$$ equal to 0, 1, or $$n - 1$$ directly and otherwise computes the data
 for multiplying modulo $$n$$ once. It panics if the dimensions differ or if $$c$$ or any element is
-not less than $$n$$. [`ModSubMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModSubMul.html) and
-[`ModSubMulAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModSubMulAssign.html) subtract the multiple instead, which FLINT has no
+not less than $$n$$. [`ModSubMul`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModSubMul.html) and
+[`ModSubMulAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModSubMulAssign.html) subtract the multiple instead, which FLINT has no
 `nmod_vec` function for.
 
 `_nmod_vec_scalar_mul_nmod` chooses among several algorithms: it handles $$c$$ equal to 0, 1,
@@ -263,8 +264,8 @@ higher-level operation that the delayed reduction serves.
 | :---: | --- | --- |
 | ⚙ | `dot_params_t` | |
 | ⚙ | `dot_params_t _nmod_vec_dot_params(slong len, nmod_t mod)` | |
-| ✓ | `ulong _nmod_vec_dot(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_params_t params)` | [`ModDot`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModDot.html) |
-| ✗ | `ulong _nmod_vec_dot_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_params_t params)` | |
+| ✓ | `ulong _nmod_vec_dot(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_params_t params)` | [`ModDot`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModDot.html) |
+| ✓ | `ulong _nmod_vec_dot_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_params_t params)` | [`ModDotReversed`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModDotReversed.html) |
 | ⚙ | `ulong _nmod_vec_dot_strided(nn_srcptr vec1, slong stride1, nn_srcptr vec2, slong stride2, slong len, nmod_t mod, dot_params_t params)` | |
 | ⚙ | `ulong _nmod_vec_dot_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slong len, nmod_t mod, dot_params_t params)` | |
 | ⚙ | `NMOD_VEC_DOT(res, i, len, expr1, expr2, mod, params)` | |
@@ -283,16 +284,17 @@ algorithm, which Malachite does not expose, hence ⚙.
 
 `_nmod_vec_dot` is $$\sum_i a_i b_i \bmod n$$, and `_nmod_vec_dot_rev` pairs $$a_i$$ with
 $$b_{\mathit{len}-1-i}$$, reversing the second vector. `_nmod_vec_dot` is
-[`ModDot`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModDot.html)'s `v.mod_dot(w, n)` for `UnsignedVector`, which accumulates the unreduced sum in
+[`ModDot`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModDot.html)'s `v.mod_dot(w, n)` for `UnsignedVector`, which accumulates the unreduced sum in
 one, two, or three words, as FLINT does, and reduces once; it chooses the number of words for each
 call, so there is nothing like `dot_params_t` to pass. For a power-of-2 modulus,
-[`ModPowerOf2Dot`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2Dot.html)'s `v.mod_power_of_2_dot(w, k)` sums the products in wrapping arithmetic
-and keeps the low $$k$$ bits. The reversed form has no counterpart yet; until it does, start from
-0 and, for each pair of elements, multiply with
-[`ModMulPrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModMulPrecomputed.html)
-and add with
-[`ModAddAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModAddAssign.html),
-iterating over the second vector in reverse.
+[`ModPowerOf2Dot`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2Dot.html)'s `v.mod_power_of_2_dot(w, k)` sums the products in wrapping arithmetic
+and keeps the low $$k$$ bits. `_nmod_vec_dot_rev` is
+[`ModDotReversed`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModDotReversed.html)'s `v.mod_dot_reversed(w, n)`, which uses the same
+accumulator as the polynomial products, and
+[`ModPowerOf2DotReversed`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2DotReversed.html) is the power-of-2 form. FLINT has
+no `nmod_vec` function with an initial term, but
+[`ModAddDot`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModAddDot.html), [`ModSubDot`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModSubDot.html), and their
+reversed and power-of-2 forms add or subtract the dot product to or from a residue in one step.
 
 The remaining three read their elements in other patterns: `_nmod_vec_dot_strided` takes every
 `stride1`-th and `stride2`-th element (the strides may be negative), `_nmod_vec_dot_ptr` takes

@@ -33,8 +33,11 @@ impl BigExponentFloat {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::{Infinity, NaN, One, Zero};
+    /// #[cfg(not(feature = "32_bit_limbs"))]
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_base::num::basic::traits::{Infinity, NaN, Zero};
     /// use malachite_float::BigExponentFloat;
+    /// #[cfg(not(feature = "32_bit_limbs"))]
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(BigExponentFloat::NAN.to_significand(), None);
@@ -66,8 +69,11 @@ impl BigExponentFloat {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::{Infinity, NaN, One, Zero};
+    /// #[cfg(not(feature = "32_bit_limbs"))]
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_base::num::basic::traits::{Infinity, NaN, Zero};
     /// use malachite_float::BigExponentFloat;
+    /// #[cfg(not(feature = "32_bit_limbs"))]
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(BigExponentFloat::NAN.into_significand(), None);
@@ -100,7 +106,9 @@ impl BigExponentFloat {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::{Infinity, NaN, One, Zero};
+    /// #[cfg(not(feature = "32_bit_limbs"))]
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_base::num::basic::traits::{Infinity, NaN, Zero};
     /// use malachite_float::BigExponentFloat;
     ///
     /// assert_eq!(BigExponentFloat::NAN.significand_ref(), None);

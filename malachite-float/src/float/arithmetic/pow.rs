@@ -6452,20 +6452,15 @@ fn pow_squeeze_t(
         let (p_lo, mut o_lo) = Float::power_of_2_rational_prec_round(t_lo, prec, rm);
         let (p_hi, mut o_hi) = Float::power_of_2_rational_prec_round(t_hi, prec, rm);
         // A bracket end landing exactly on a representable power rounds with `Equal`; the true
-        // value lies strictly between the ends, so the other end's ordering is the true one.
+        // value lies strictly between the ends, so the other end's ordering is the true one. Exact
+        // results are caught by each caller's exact decomposition, so the true t is never an
+        // integer here, but a bracket end can be: when xp is within about 2^-wprec of a power of 2,
+        // the directed rounding of xp in `log_2_rational_brackets` lands on that power, making the
+        // log bracket end, and with it t, an integer; at a low prec, 2^t is then representable.
         if o_lo == Equal {
-            fail_on_untested_path(
-                "pow_squeeze_t, lo_eq: exact results (t an integer) are caught by each caller's \
-                 exact decomposition before the squeeze, so t is never an integer here; a bracket \
-                 end equalling an integer is a measure-zero coincidence of the log brackets",
-            );
             o_lo = o_hi;
         }
         if o_hi == Equal {
-            fail_on_untested_path(
-                "pow_squeeze_t, hi_eq: as lo_eq -- t is never an integer in the squeeze, so a \
-                 bracket end equalling one is a measure-zero coincidence",
-            );
             o_hi = o_lo;
         }
         // `power_of_2_rational_prec_round` yields a positive value at precision `prec` (or `+inf`

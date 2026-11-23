@@ -13,7 +13,7 @@ use core::ops::ControlFlow;
 use rustc_hir::def::{DefKind, Res};
 use rustc_hir::{BindingMode, Block, ByRef, Expr, ExprKind, Mutability, PatKind, StmtKind};
 use rustc_lint::{LateContext, LateLintPass};
-use rustc_session::{declare_lint, declare_lint_pass};
+use rustc_lint::{declare_lint, declare_lint_pass};
 
 declare_lint! {
     /// ### What it does
@@ -107,7 +107,7 @@ impl<'tcx> LateLintPass<'tcx> for ManualFromSignAndAbs {
             // The rewrite moves the sign decision before the construction, so the condition must
             // not read the freshly built value; `if a.get_bit(0) { a.neg_assign(); }` has no
             // `from_sign_and_abs` form.
-            if for_each_expr(cx, cond, |e: &Expr<'tcx>| {
+            if for_each_expr(cx.tcx, cond, |e: &Expr<'tcx>| {
                 if path_to_local_with_projections(e) == Some(name_hir) {
                     ControlFlow::Break(())
                 } else {

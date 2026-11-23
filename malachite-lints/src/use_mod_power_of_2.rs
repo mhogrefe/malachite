@@ -10,8 +10,8 @@ use rustc_ast::ast::LitKind;
 use rustc_hir::def::{DefKind, Res};
 use rustc_hir::{BinOpKind, Expr, ExprKind, QPath};
 use rustc_lint::{LateContext, LateLintPass};
+use rustc_lint::{declare_lint, declare_lint_pass};
 use rustc_middle::ty::TyKind;
-use rustc_session::{declare_lint, declare_lint_pass};
 
 declare_lint! {
     /// ### What it does

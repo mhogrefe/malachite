@@ -209,14 +209,14 @@ exponent. Zero maps to zero with exponent 0, as in FLINT.
 | | FLINT | Malachite |
 | :---: | --- | --- |
 | — | `void fmpzi_gcd_euclidean (fmpzi_t res, const fmpzi_t x, const fmpzi_t y)` | |
-| ⚙ | `void fmpzi_gcd_euclidean_improved (fmpzi_t res, const fmpzi_t x, const fmpzi_t y)` | [`Gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Gcd.html), [`GcdAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.GcdAssign.html) |
+| ⚙ | `void fmpzi_gcd_euclidean_improved (fmpzi_t res, const fmpzi_t x, const fmpzi_t y)` | [`Gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.Gcd.html), [`GcdAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.GcdAssign.html) |
 | — | `void fmpzi_gcd_binary (fmpzi_t res, const fmpzi_t x, const fmpzi_t y)` | |
 | — | `void fmpzi_gcd_shortest (fmpzi_t res, const fmpzi_t x, const fmpzi_t y)` | |
-| ✓ | `void fmpzi_gcd (fmpzi_t res, const fmpzi_t x, const fmpzi_t y)` | [`Gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Gcd.html), [`GcdAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.GcdAssign.html) |
+| ✓ | `void fmpzi_gcd (fmpzi_t res, const fmpzi_t x, const fmpzi_t y)` | [`Gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.Gcd.html), [`GcdAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.GcdAssign.html) |
 
 **The GCD family.** Every FLINT variant returns the GCD in [canonical unit form](#units), so
 all five return the same value, and so does Malachite's
-[`gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Gcd.html).
+[`gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.Gcd.html).
 The named variants differ only in algorithm, and Malachite does not expose them separately.
 
 ## [Primality testing](https://flintlib.org/doc/fmpzi.html#primality-testing) {#primality-testing}

@@ -365,15 +365,15 @@ first, the additions after.
 | | num | Malachite |
 | :---: | --- | --- |
 | ✓ | `Integer::div_floor (&self, other: &Self) -> Self` | [`DivRound`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivRound.html) |
-| ✓ | `Integer::mod_floor (&self, other: &Self) -> Self` | [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Mod.html) |
+| ✓ | `Integer::mod_floor (&self, other: &Self) -> Self` | [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.Mod.html) |
 | ✓ | `Integer::div_mod_floor (&self, other: &Self) -> (Self, Self)` | [`DivMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivMod.html) |
 | ✓ | `Integer::div_rem (&self, other: &Self) -> (Self, Self)` | [`DivRem`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivRem.html) |
 | ✓ | `Integer::div_ceil (&self, other: &Self) -> Self` | [`DivRound`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivRound.html) |
-| ✓ | `Integer::is_multiple_of (&self, other: &Self) -> bool` | [`DivisibleBy`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivisibleBy.html) |
+| ✓ | `Integer::is_multiple_of (&self, other: &Self) -> bool` | [`DivisibleBy`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.DivisibleBy.html) |
 | ≈ | `Integer::next_multiple_of (&self, other: &Self) -> Self` | [`RoundToMultiple`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.RoundToMultiple.html) |
 | ≈ | `Integer::prev_multiple_of (&self, other: &Self) -> Self` | [`RoundToMultiple`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.RoundToMultiple.html) |
 | ✓ | `Euclid::div_euclid (&self, v: &Self) -> Self` | [`DivEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivEuclidean.html) |
-| ✓ | `Euclid::rem_euclid (&self, v: &Self) -> Self` | [`ModEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModEuclidean.html) |
+| ✓ | `Euclid::rem_euclid (&self, v: &Self) -> Self` | [`ModEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModEuclidean.html) |
 | ✓ | `Euclid::div_rem_euclid (&self, v: &Self) -> (Self, Self)` | [`DivModEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivModEuclidean.html) |
 | ≈ | `CheckedEuclid::checked_div_euclid`, `checked_rem_euclid` | [`DivEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivEuclidean.html) |
 
@@ -392,7 +392,7 @@ of these coincide with the plain operators. Malachite completes the matrix with
 and `CeilingMod`, the ceiling *pair* that num does not offer.
 
 **Divisibility and multiples.** `is_multiple_of`, and its deprecated alias `divides`, is
-[`DivisibleBy`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivisibleBy.html):
+[`DivisibleBy`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.DivisibleBy.html):
 `x.divisible_by(&y)`. The multiple-rounding pair is ≈ for a directional subtlety worth
 quoting: num's `next_multiple_of` moves in the direction of the *divisor's* sign, its doctest
 showing `(-23).next_multiple_of(&-8)` landing at $$-24$$, below its argument. Malachite's
@@ -406,10 +406,10 @@ so `next_multiple_of` is `round_to_multiple` with `Ceiling` for a positive divis
 $$[0, |d|)$$: `div_euclid` maps directly to
 [`DivEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivEuclidean.html)'s
 `div_euclidean`, with its assign form. `rem_euclid` is the
-[`ModEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModEuclidean.html)
+[`ModEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModEuclidean.html)
 companion: `x.mod_euclidean(&y)`, whose result is nonnegative and therefore comes back as a
 [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html), with
-[`ModEuclideanAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModEuclideanAssign.html)
+[`ModEuclideanAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModEuclideanAssign.html)
 as its in-place form. The provided `div_rem_euclid`, which computes both at once, is the
 simultaneous pair
 [`DivModEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivModEuclidean.html).
@@ -424,14 +424,14 @@ answered as `checked_div` was in
 accepts every `RoundingMode`, including `Nearest` with ties to even and the panicking `Exact`;
 [`DivExact`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivExact.html)
 is the fast path for quotients known to be exact;
-[`EqMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.EqMod.html)
+[`EqMod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.EqMod.html)
 tests $$x \equiv y \pmod m$$ without forming either remainder; and the power-of-2
 specializations,
-[`DivisibleByPowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivisibleByPowerOf2.html),
-[`ModPowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2.html),
+[`DivisibleByPowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.DivisibleByPowerOf2.html),
+[`ModPowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2.html),
 [`RoundToMultipleOfPowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.RoundToMultipleOfPowerOf2.html),
 and
-[`EqModPowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.EqModPowerOf2.html),
+[`EqModPowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.EqModPowerOf2.html),
 do their work with shifts and masks. None of these have num counterparts.
 
 ## Bits and logic {#bits-and-logic}
@@ -502,10 +502,10 @@ answering `None` for `Integer`s of opposite sign; and `Integer` gets `checked_co
 | | num | Malachite |
 | :---: | --- | --- |
 | ✓ | `pow (&self, exponent: u32)`; `Pow` (exponents `u8`..`u128`, `usize`, `BigUint`) | [`Pow`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Pow.html), [`PowAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.PowAssign.html) |
-| ✓ | `BigUint::modpow (&self, exponent: &Self, modulus: &Self) -> Self` | [`ModPow`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPow.html) |
-| ≈ | `BigInt::modpow (&self, exponent: &Self, modulus: &Self) -> Self` | [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Mod.html), [`ModPow`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPow.html) |
-| ✓ | `BigUint::modinv (&self, modulus: &Self) -> Option<Self>` | [`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModInverse.html) |
-| ≈ | `BigInt::modinv (&self, modulus: &Self) -> Option<Self>` | [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Mod.html), [`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModInverse.html) |
+| ✓ | `BigUint::modpow (&self, exponent: &Self, modulus: &Self) -> Self` | [`ModPow`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPow.html) |
+| ≈ | `BigInt::modpow (&self, exponent: &Self, modulus: &Self) -> Self` | [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.Mod.html), [`ModPow`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPow.html) |
+| ✓ | `BigUint::modinv (&self, modulus: &Self) -> Option<Self>` | [`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModInverse.html) |
+| ≈ | `BigInt::modinv (&self, modulus: &Self) -> Option<Self>` | [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.Mod.html), [`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModInverse.html) |
 | ✓ | `Roots::sqrt`, `cbrt`, `nth_root (n: u32)` (`BigUint`) | [`FloorSqrt`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.FloorSqrt.html), [`FloorRoot`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.FloorRoot.html) |
 | ✓ | `Roots::sqrt` (`BigInt`) | [`FloorSqrt`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.FloorSqrt.html) |
 | ≈ | `Roots::cbrt`, `nth_root` (`BigInt`) | [`FloorRoot`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.FloorRoot.html), [`CeilingRoot`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CeilingRoot.html) |
@@ -520,9 +520,9 @@ could ever finish computing has an exponent that fits comfortably in a `u64`, so
 `u64::try_from(&e)` loses nothing but the out-of-memory outcome.
 
 **Modular exponentiation and inversion.** `BigUint::modpow` is
-[`ModPow`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPow.html)'s
+[`ModPow`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPow.html)'s
 `x.mod_pow(&e, &m)`, and `BigUint::modinv` is
-[`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModInverse.html)'s
+[`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModInverse.html)'s
 `x.mod_inverse(&m)`, `Option` for `Option`, `None` exactly when no inverse exists. The
 `BigInt` versions are ≈ because Malachite's modular arithmetic lives on
 [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html)
@@ -554,7 +554,7 @@ is the dedicated squaring num spells as `&x * &x`. The power-of-2 family,
 `IsPowerOf2`, and `NextPowerOf2`, and the integer logarithms, `floor_log_base_2`,
 `ceiling_log_base_2`, and their general-base and checked relatives, are further additions. On
 the modular side, Malachite continues into the
-[`ModPowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2.html)
+[`ModPowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2.html)
 tower, arithmetic modulo $$2^k$$ with its own `mod_power_of_2_pow` and
 `mod_power_of_2_inverse`, where masks and shifts replace division throughout.
 
@@ -562,17 +562,17 @@ tower, arithmetic modulo $$2^k$$ with its own `mod_power_of_2_pow` and
 
 | | num | Malachite |
 | :---: | --- | --- |
-| ✓ | `Integer::gcd (&self, other: &Self) -> Self` (`BigUint`) | [`Gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Gcd.html), [`GcdAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.GcdAssign.html) |
-| ✓ | `Integer::lcm (&self, other: &Self) -> Self` (`BigUint`) | [`Lcm`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Lcm.html), [`LcmAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.LcmAssign.html) |
-| ≈ | `Integer::gcd` (`BigInt`) | [`UnsignedAbs`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.UnsignedAbs.html), [`Gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Gcd.html) |
-| ≈ | `Integer::lcm` (`BigInt`) | [`UnsignedAbs`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.UnsignedAbs.html), [`Lcm`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Lcm.html) |
-| ≈ | `Integer::gcd_lcm (&self, other: &Self) -> (Self, Self)` | [`Gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Gcd.html), [`Lcm`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Lcm.html) |
-| ≈ | `Integer::extended_gcd`, `extended_gcd_lcm` (`BigInt`) | [`ExtendedGcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ExtendedGcd.html) |
+| ✓ | `Integer::gcd (&self, other: &Self) -> Self` (`BigUint`) | [`Gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.Gcd.html), [`GcdAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.GcdAssign.html) |
+| ✓ | `Integer::lcm (&self, other: &Self) -> Self` (`BigUint`) | [`Lcm`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.Lcm.html), [`LcmAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.LcmAssign.html) |
+| ≈ | `Integer::gcd` (`BigInt`) | [`UnsignedAbs`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.UnsignedAbs.html), [`Gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.Gcd.html) |
+| ≈ | `Integer::lcm` (`BigInt`) | [`UnsignedAbs`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.UnsignedAbs.html), [`Lcm`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.Lcm.html) |
+| ≈ | `Integer::gcd_lcm (&self, other: &Self) -> (Self, Self)` | [`Gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.Gcd.html), [`Lcm`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.Lcm.html) |
+| ≈ | `Integer::extended_gcd`, `extended_gcd_lcm` (`BigInt`) | [`ExtendedGcd`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.ExtendedGcd.html) |
 | ✓ | `Integer::is_even`, `is_odd` (`BigUint`, `BigInt`) | [`Parity`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Parity.html) |
 
 **GCD and LCM.** On the unsigned types the mapping is direct, `x.gcd(&y)` on both sides, with
 `gcd(0, 0) = 0` and the assign forms in place. Malachite keeps
-[`Gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Gcd.html)
+[`Gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.Gcd.html)
 and `Lcm` on
 [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html)
 only, on the argument that a GCD is a property of magnitudes; num's `BigInt` versions, which
@@ -585,7 +585,7 @@ type is wanted. `gcd_lcm` returns both at once, and one GCD suffices for the pai
 `y` satisfying $$\gcd = ax + by$$, num returning its `ExtendedGcd` struct and Malachite a
 tuple. The cofactors are signed by nature, even for unsigned inputs, and the two libraries
 respond differently: Malachite's
-[`ExtendedGcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ExtendedGcd.html)
+[`ExtendedGcd`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.ExtendedGcd.html)
 is implemented for `Natural` and
 [`Integer`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html)
 alike, with the cofactors always `Integer`s, while num's `BigUint` instantiation inherits a
@@ -599,9 +599,9 @@ ported code should rely on the Bézout identity rather than on particular cofact
 `x.even()` and `x.odd()`, on both types.
 
 **Beyond the dictionary.** Malachite adds
-[`CoprimeWith`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CoprimeWith.html),
+[`CoprimeWith`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.CoprimeWith.html),
 a dedicated coprimality test that can stop earlier than a full GCD, and the number-theoretic
-symbols, [`LegendreSymbol`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.LegendreSymbol.html),
+symbols, [`LegendreSymbol`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.LegendreSymbol.html),
 `JacobiSymbol`, and `KroneckerSymbol`, on both types. In the other direction, num-integer
 defines an `Average` trait, but num-bigint does not implement it for the bignum types, so it
 appears with the generic machinery on

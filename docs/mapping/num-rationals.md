@@ -258,7 +258,7 @@ rounding modes its integer counterpart carries; num-integer's `Average` trait is
 | ✓ | `to_integer (&self) -> T` | [`RoundingFrom`](https://docs.rs/malachite-q/latest/malachite_q/rational/conversion/integer_from_rational/index.html) |
 | ✓ | `is_integer (&self) -> bool` | [`is_integer`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.is_integer) |
 | ✓ | `BigRational::from_float (f: T) -> Option<BigRational>` | [`TryFrom`](https://docs.rs/malachite-q/latest/malachite_q/rational/conversion/from_primitive_float/index.html) |
-| ≈ | `approximate_float`, `approximate_float_unsigned` | [`Approximate`](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/traits/trait.Approximate.html) |
+| ≈ | `approximate_float`, `approximate_float_unsigned` | [`Approximate`](https://docs.rs/malachite-q/latest/malachite_q/rational/number_theory/traits/trait.Approximate.html) |
 | ≈ | `ToPrimitive` (`to_i64`, `to_u64`, `to_f64`, ...) | [`RoundingFrom`](https://docs.rs/malachite-q/latest/malachite_q/rational/conversion/primitive_float_from_rational/index.html), [`TryFrom`](https://docs.rs/malachite-q/latest/malachite_q/rational/conversion/primitive_int_from_rational/index.html) |
 | ✓ | `FromPrimitive for BigRational` (`from_i64`, `from_f64`, ...) | [`From`](https://docs.rs/malachite-q/latest/malachite_q/rational/conversion/from_primitive_int/index.html), [`TryFrom`](https://docs.rs/malachite-q/latest/malachite_q/rational/conversion/from_primitive_float/index.html) |
 
@@ -290,7 +290,7 @@ to the [width story](#conventions) under Conventions.
 bounded by the component type and steered by default tolerances; it exists on the fixed-size
 instantiations, `Bounded` excluding `BigInt`. Malachite's relatives parameterize the goal
 explicitly:
-[`approximate`](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/traits/trait.Approximate.html)
+[`approximate`](https://docs.rs/malachite-q/latest/malachite_q/rational/number_theory/traits/trait.Approximate.html)
 finds the best approximation with the denominator bounded by a chosen limit, and
 [`from_float_simplest`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.from_float_simplest)
 finds the simplest

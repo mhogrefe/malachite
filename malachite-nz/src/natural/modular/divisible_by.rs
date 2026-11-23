@@ -104,7 +104,7 @@ limbs_divisible_by(ns: &mut [Limb], ds: &mut [Limb]) -> bool {
     let n_0 = ns[0];
     let d_0 = ds[0];
     // n must have at least as many low zero bits as d
-    let d_mask = (d_0 & d_0.wrapping_neg()).wrapping_sub(1);
+    let d_mask = d_0.isolate_lowest_one().wrapping_sub(1);
     if n_0 & d_mask != 0 {
         return false;
     }
@@ -201,7 +201,7 @@ limbs_divisible_by_val_ref(ns: &mut [Limb], ds: &[Limb]) -> bool {
     let n_0 = ns[0];
     let d_0 = ds[0];
     // n must have at least as many low zero bits as d
-    let d_mask = (d_0 & d_0.wrapping_neg()).wrapping_sub(1);
+    let d_mask = d_0.isolate_lowest_one().wrapping_sub(1);
     if n_0 & d_mask != 0 {
         return false;
     }
@@ -299,7 +299,7 @@ limbs_divisible_by_ref_val(ns: &[Limb], ds: &mut [Limb]) -> bool {
     let n_0 = ns[0];
     let d_0 = ds[0];
     // n must have at least as many low zero bits as d
-    let d_mask = (d_0 & d_0.wrapping_neg()).wrapping_sub(1);
+    let d_mask = d_0.isolate_lowest_one().wrapping_sub(1);
     if n_0 & d_mask != 0 {
         return false;
     }
@@ -394,7 +394,7 @@ limbs_divisible_by_ref_ref(ns: &[Limb], ds: &[Limb]) -> bool {
     let d_len = ds.len();
     let d_0 = ds[0];
     // n must have at least as many low zero bits as d
-    let d_mask = (d_0 & d_0.wrapping_neg()).wrapping_sub(1);
+    let d_mask = d_0.isolate_lowest_one().wrapping_sub(1);
     if ns[0] & d_mask != 0 {
         return false;
     }

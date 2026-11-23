@@ -28,14 +28,18 @@ type: a modular polynomial is a
 [`NaturalPolynomial`](https://docs.rs/malachite-nz/latest/malachite_nz/natural_polynomial/struct.NaturalPolynomial.html)
 and the modulus is an argument to each modular function, as it is for
 [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html) with
-[`ModMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModMul.html)
+[`ModMul`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModMul.html)
 and its relatives. A binary operation takes one modulus that applies to both operands.
 
 ### Two moduli, and both are arguments {#two-moduli}
 
-FLINT's arithmetic modulo a polynomial $$f$$, in $$(\mathbb{Z}/n\mathbb{Z})[x]/(f)$$ — `mulmod`,
-the `powmod` families, `invmod`, `gcdinv` and modular composition — has no Malachite counterpart.
-[`ModMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModMul.html)
+FLINT's arithmetic modulo a polynomial $$f$$, in $$(\mathbb{Z}/n\mathbb{Z})[x]/(f)$$, takes both
+moduli as arguments, and so do Malachite's
+[`ModMulModPolynomial`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/mod_polynomial/traits/trait.ModMulModPolynomial.html)
+and
+[`ModPowModPolynomial`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/mod_polynomial/traits/trait.ModPowModPolynomial.html);
+`invmod`, `gcdinv` and modular composition have no Malachite counterpart yet.
+[`ModMul`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModMul.html)
 and the other `Mod*` traits on
 [`NaturalPolynomial`](https://docs.rs/malachite-nz/latest/malachite_nz/natural_polynomial/struct.NaturalPolynomial.html)
 take a [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html)
@@ -46,10 +50,10 @@ modulus and reduce coefficients only.
 FLINT expects all inputs to be normalised and reduced modulo $$n$$ and does not check; unreduced
 input produces a wrong answer. Every Malachite modular function checks that its arguments are
 reduced and panics otherwise; the only exceptions are operations whose purpose is reduction:
-[`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Mod.html),
-[`ModPowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2.html)
+[`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.Mod.html),
+[`ModPowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2.html)
 and the
-[`ModIsReduced`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModIsReduced.html)
+[`ModIsReduced`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModIsReduced.html)
 predicates.
 
 ### The context does two jobs {#context}
@@ -58,10 +62,10 @@ predicates.
 argument, and precomputation exists only for scalar
 [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html)
 arithmetic, as the `Data` of
-[`ModMulPrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModMulPrecomputed.html),
-[`ModPowPrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowPrecomputed.html)
+[`ModMulPrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModMulPrecomputed.html),
+[`ModPowPrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowPrecomputed.html)
 and
-[`ModSquarePrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModSquarePrecomputed.html).
+[`ModSquarePrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModSquarePrecomputed.html).
 
 ### Why `NaturalPolynomial` is the target {#why-natural}
 
@@ -217,7 +221,7 @@ several `add_fmpz` / `sub_si` variants, have no rows here.
 | :---: | --- | --- |
 | ≈ | `void fmpz_mod_poly_set_ui (fmpz_mod_poly_t f, ulong c, const fmpz_mod_ctx_t ctx)` | [`From`](https://doc.rust-lang.org/nightly/core/convert/trait.From.html) |
 | ≈ | `void fmpz_mod_poly_set_fmpz (fmpz_mod_poly_t f, const fmpz_t c, const fmpz_mod_ctx_t ctx)` | [`From`](https://doc.rust-lang.org/nightly/core/convert/trait.From.html) |
-| ✓ | `void fmpz_mod_poly_set_fmpz_poly (fmpz_mod_poly_t f, const fmpz_poly_t g, const fmpz_mod_ctx_t ctx)` | [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Mod.html) |
+| ✓ | `void fmpz_mod_poly_set_fmpz_poly (fmpz_mod_poly_t f, const fmpz_poly_t g, const fmpz_mod_ctx_t ctx)` | [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.Mod.html) |
 | ✓ | `void fmpz_mod_poly_get_fmpz_poly (fmpz_poly_t f, const fmpz_mod_poly_t g, const fmpz_mod_ctx_t ctx)` | [`From`](https://doc.rust-lang.org/nightly/core/convert/trait.From.html)`<`[`NaturalPolynomial`](https://docs.rs/malachite-nz/latest/malachite_nz/natural_polynomial/struct.NaturalPolynomial.html)`>` |
 | ✓ | `void fmpz_mod_poly_get_nmod_poly (nmod_poly_t f, const fmpz_mod_poly_t g)` | [`TryFrom`](https://doc.rust-lang.org/nightly/core/convert/trait.TryFrom.html)`<&`[`NaturalPolynomial`](https://docs.rs/malachite-nz/latest/malachite_nz/natural_polynomial/struct.NaturalPolynomial.html)`>` |
 | ✓ | `void fmpz_mod_poly_set_nmod_poly (fmpz_mod_poly_t f, const nmod_poly_t g)` | [`From`](https://doc.rust-lang.org/nightly/core/convert/trait.From.html)`<`[`UnsignedPolynomial<T>`](https://docs.rs/malachite-base/latest/malachite_base/unsigned_polynomial/struct.UnsignedPolynomial.html)`>` |
@@ -242,13 +246,13 @@ a coefficient does not fit in `T`, so it always succeeds on the inputs `get_nmod
 | | FLINT | Malachite |
 | :---: | --- | --- |
 | ✓ | `int fmpz_mod_poly_equal (const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, const fmpz_mod_ctx_t ctx)` | [`Eq`](https://doc.rust-lang.org/nightly/core/cmp/trait.Eq.html) |
-| ✓ | `int fmpz_mod_poly_equal_trunc (const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, slong n, const fmpz_mod_ctx_t ctx)` | [`eq_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.EqTruncated.html#tymethod.eq_truncated) |
+| ✓ | `int fmpz_mod_poly_equal_trunc (const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, slong n, const fmpz_mod_ctx_t ctx)` | [`eq_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.EqTruncated.html#tymethod.eq_truncated) |
 | ✓ | `int fmpz_mod_poly_is_zero (const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)` | `p == 0u32` ([`PartialEq`](https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html)) |
 | ≈ | `int fmpz_mod_poly_is_one (const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)` | `p == 1u32` ([`PartialEq`](https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html)) |
 | ≈ | `int fmpz_mod_poly_is_gen (const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)` | `== `[`x()`](https://docs.rs/malachite-nz/latest/malachite_nz/natural_polynomial/struct.NaturalPolynomial.html#method.x) |
 
 [`Eq`](https://doc.rust-lang.org/nightly/core/cmp/trait.Eq.html) and
-[`eq_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.EqTruncated.html#tymethod.eq_truncated)
+[`eq_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.EqTruncated.html#tymethod.eq_truncated)
 need no modulus. A `NaturalPolynomial` also compares with a value of any unsigned primitive type,
 in either order: `p == c` holds exactly when `p` is the constant polynomial `c`, so `is_zero` and
 `is_one` are `p == 0u32` and `p == 1u32`. The ≈ rows differ only at $$n = 1$$: FLINT's `one`
@@ -280,47 +284,47 @@ are — because the header defines them as deprecation errors pointing at the `f
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✓ | `void fmpz_mod_poly_shift_left (fmpz_mod_poly_t f, const fmpz_mod_poly_t g, slong n, const fmpz_mod_ctx_t ctx)` | [`mul_power_of_x`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.MulPowerOfX.html#tymethod.mul_power_of_x) |
-| ✓ | `void fmpz_mod_poly_shift_right (fmpz_mod_poly_t f, const fmpz_mod_poly_t g, slong n, const fmpz_mod_ctx_t ctx)` | [`div_power_of_x`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.DivPowerOfX.html#tymethod.div_power_of_x) |
+| ✓ | `void fmpz_mod_poly_shift_left (fmpz_mod_poly_t f, const fmpz_mod_poly_t g, slong n, const fmpz_mod_ctx_t ctx)` | [`mul_power_of_x`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.MulPowerOfX.html#tymethod.mul_power_of_x) |
+| ✓ | `void fmpz_mod_poly_shift_right (fmpz_mod_poly_t f, const fmpz_mod_poly_t g, slong n, const fmpz_mod_ctx_t ctx)` | [`div_power_of_x`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.DivPowerOfX.html#tymethod.div_power_of_x) |
 
 `shift_left` is
-[`mul_power_of_x`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.MulPowerOfX.html#tymethod.mul_power_of_x)
+[`mul_power_of_x`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.MulPowerOfX.html#tymethod.mul_power_of_x)
 and `shift_right` is
-[`div_power_of_x`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.DivPowerOfX.html#tymethod.div_power_of_x);
+[`div_power_of_x`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.DivPowerOfX.html#tymethod.div_power_of_x);
 neither needs a modulus.
-[`ModShl`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModShl.html)
+[`ModShl`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModShl.html)
 and
-[`ModShr`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModShr.html)
+[`ModShr`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModShr.html)
 mean multiplication and division by $$2^k$$ modulo $$m$$, not coefficient shifts.
 
 ## [Addition and subtraction](https://flintlib.org/doc/fmpz_mod_poly.html#addition-and-subtraction) {#addition-and-subtraction}
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✓ | `void fmpz_mod_poly_add (fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, const fmpz_mod_ctx_t ctx)` | [`mod_add`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModAdd.html#tymethod.mod_add) |
-| ✓ | `void fmpz_mod_poly_add_series (fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, slong n, const fmpz_mod_ctx_t ctx)` | [`mod_add_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.ModAddTruncated.html#tymethod.mod_add_truncated) |
-| ✓ | `void fmpz_mod_poly_sub (fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, const fmpz_mod_ctx_t ctx)` | [`mod_sub`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModSub.html#tymethod.mod_sub) |
-| ✓ | `void fmpz_mod_poly_sub_series (fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, slong n, const fmpz_mod_ctx_t ctx)` | [`mod_sub_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.ModSubTruncated.html#tymethod.mod_sub_truncated) |
-| ✓ | `void fmpz_mod_poly_neg (fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)` | [`mod_neg`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModNeg.html#tymethod.mod_neg) |
+| ✓ | `void fmpz_mod_poly_add (fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, const fmpz_mod_ctx_t ctx)` | [`mod_add`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModAdd.html#tymethod.mod_add) |
+| ✓ | `void fmpz_mod_poly_add_series (fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, slong n, const fmpz_mod_ctx_t ctx)` | [`mod_add_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.ModAddTruncated.html#tymethod.mod_add_truncated) |
+| ✓ | `void fmpz_mod_poly_sub (fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, const fmpz_mod_ctx_t ctx)` | [`mod_sub`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModSub.html#tymethod.mod_sub) |
+| ✓ | `void fmpz_mod_poly_sub_series (fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, slong n, const fmpz_mod_ctx_t ctx)` | [`mod_sub_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.ModSubTruncated.html#tymethod.mod_sub_truncated) |
+| ✓ | `void fmpz_mod_poly_neg (fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)` | [`mod_neg`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModNeg.html#tymethod.mod_neg) |
 
-[`mod_add`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModAdd.html#tymethod.mod_add),
-[`mod_sub`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModSub.html#tymethod.mod_sub)
+[`mod_add`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModAdd.html#tymethod.mod_add),
+[`mod_sub`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModSub.html#tymethod.mod_sub)
 and `mod_neg` on
 [`NaturalPolynomial`](https://docs.rs/malachite-nz/latest/malachite_nz/natural_polynomial/struct.NaturalPolynomial.html)
 take the modulus as a
 [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html) in place
 of a context, check that the coefficients are reduced, and normalise the result as FLINT does;
-[`mod_power_of_2_add`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2Add.html#tymethod.mod_power_of_2_add)
+[`mod_power_of_2_add`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2Add.html#tymethod.mod_power_of_2_add)
 and
-[`mod_power_of_2_sub`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2Sub.html#tymethod.mod_power_of_2_sub)
+[`mod_power_of_2_sub`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2Sub.html#tymethod.mod_power_of_2_sub)
 do the same for a modulus that is a power of 2. The `_series` pair are
-[`mod_add_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.ModAddTruncated.html#tymethod.mod_add_truncated)
+[`mod_add_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.ModAddTruncated.html#tymethod.mod_add_truncated)
 and
-[`mod_sub_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.ModSubTruncated.html#tymethod.mod_sub_truncated),
+[`mod_sub_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.ModSubTruncated.html#tymethod.mod_sub_truncated),
 and for a power of 2
-[`mod_power_of_2_add_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.ModPowerOf2AddTruncated.html#tymethod.mod_power_of_2_add_truncated)
+[`mod_power_of_2_add_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.ModPowerOf2AddTruncated.html#tymethod.mod_power_of_2_add_truncated)
 and
-[`mod_power_of_2_sub_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.ModPowerOf2SubTruncated.html#tymethod.mod_power_of_2_sub_truncated),
+[`mod_power_of_2_sub_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.ModPowerOf2SubTruncated.html#tymethod.mod_power_of_2_sub_truncated),
 all of which check that the whole of each operand is reduced.
 
 ## [Scalar multiplication and division](https://flintlib.org/doc/fmpz_mod_poly.html#scalar-multiplication-and-division) {#scalar}
@@ -334,9 +338,9 @@ all of which check that the whole of each operand is reduced.
 
 `scalar_div_fmpz` aborts the process ("Impossible inverse") when $$x$$ is not invertible modulo
 $$p$$; for scalars,
-[`ModDiv`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModDiv.html)
+[`ModDiv`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModDiv.html)
 and
-[`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModInverse.html)
+[`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModInverse.html)
 on [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html)
 return an [`Option`](https://doc.rust-lang.org/nightly/core/option/enum.Option.html) instead.
 
@@ -344,22 +348,34 @@ return an [`Option`](https://doc.rust-lang.org/nightly/core/option/enum.Option.h
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✓ | `void fmpz_mod_poly_mul (fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, const fmpz_mod_ctx_t ctx)` | [`mod_mul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModMul.html#tymethod.mod_mul) |
-| ✓ | `void fmpz_mod_poly_mullow (fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, slong n, const fmpz_mod_ctx_t ctx)` | [`mod_mul_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.ModMulTruncated.html#tymethod.mod_mul_truncated) |
+| ✓ | `void fmpz_mod_poly_mul (fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, const fmpz_mod_ctx_t ctx)` | [`mod_mul`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModMul.html#tymethod.mod_mul) |
+| ✓ | `void fmpz_mod_poly_mullow (fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, slong n, const fmpz_mod_ctx_t ctx)` | [`mod_mul_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.ModMulTruncated.html#tymethod.mod_mul_truncated) |
 | ✗ | `void fmpz_mod_poly_mulmid (fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, slong nlo, slong nhi, const fmpz_mod_ctx_t ctx)` | |
 | ✗ | `void fmpz_mod_poly_mulhigh (fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, slong start, const fmpz_mod_ctx_t ctx)` | |
-| ✓ | `void fmpz_mod_poly_sqr (fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)` | [`mod_square`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModSquare.html#tymethod.mod_square) |
-| ✗ | `void fmpz_mod_poly_mulmod (fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, const fmpz_mod_poly_t f, const fmpz_mod_ctx_t ctx)` | |
-| ✗ | `void fmpz_mod_poly_mulmod_preinv (fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv, const fmpz_mod_ctx_t ctx)` | |
+| ✓ | `void fmpz_mod_poly_sqr (fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)` | [`mod_square`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModSquare.html#tymethod.mod_square) |
+| ≈ | `void fmpz_mod_poly_mulmod (fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, const fmpz_mod_poly_t f, const fmpz_mod_ctx_t ctx)` | [`ModMulModPolynomial`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/mod_polynomial/traits/trait.ModMulModPolynomial.html), [`ModMulModPolynomialAssign`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/mod_polynomial/traits/trait.ModMulModPolynomialAssign.html) |
+| ✓ | `void fmpz_mod_poly_mulmod_preinv (fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv, const fmpz_mod_ctx_t ctx)` | [`ModMulModPolynomialPrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/mod_polynomial/traits/trait.ModMulModPolynomialPrecomputed.html), [`ModMulModPolynomialPrecomputedAssign`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/mod_polynomial/traits/trait.ModMulModPolynomialPrecomputedAssign.html) |
 
-`mulmod` and `mulmod_preinv` reduce modulo a polynomial; see [Two moduli](#two-moduli).
+`mulmod` multiplies modulo a polynomial $$f$$, which is
+[`ModMulModPolynomial`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/mod_polynomial/traits/trait.ModMulModPolynomial.html)
+of `NaturalPolynomial`s, with an `Assign` form. FLINT's `mulmod` accepts factors of any degree,
+while Malachite requires both to be reduced modulo $$f$$ and panics otherwise, hence ≈.
+`mulmod_preinv` is
+[`ModMulModPolynomialPrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/mod_polynomial/traits/trait.ModMulModPolynomialPrecomputed.html),
+whose data is the same as for division and comes from
+[`precompute_mod_div_rem_data`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModDivRemPrecomputed.html#tymethod.precompute_mod_div_rem_data).
+The `ModPowerOf2` versions do the same modulo $$2^k$$. See also [Two moduli](#two-moduli).
 
 ## [Products](https://flintlib.org/doc/fmpz_mod_poly.html#products) {#products}
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✗ | `void fmpz_mod_poly_product_roots_fmpz_vec (fmpz_mod_poly_t poly, const fmpz * xs, slong n, const fmpz_mod_ctx_t ctx)` | |
+| ✓ | `void fmpz_mod_poly_product_roots_fmpz_vec (fmpz_mod_poly_t poly, const fmpz * xs, slong n, const fmpz_mod_ctx_t ctx)` | [`mod_from_roots`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModFromRoots.html#tymethod.mod_from_roots) |
 | ✗ | `int fmpz_mod_poly_find_distinct_nonzero_roots (fmpz * roots, const fmpz_mod_poly_t A, const fmpz_mod_ctx_t ctx)` | |
+
+`product_roots_fmpz_vec` builds $$\prod_i (x - x_i)$$;
+[`mod_from_roots`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModFromRoots.html#tymethod.mod_from_roots) does the same and panics unless the roots are reduced. The `ModPowerOf2` version does the
+same modulo $$2^k$$.
 
 The rendered manual also lists the powering functions under this heading, because the chapter's
 Powering title does not render; this page gives [Powering](#powering) its own section.
@@ -368,14 +384,14 @@ Powering title does not render; this page gives [Powering](#powering) its own se
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✓ | `void fmpz_mod_poly_pow (fmpz_mod_poly_t rop, const fmpz_mod_poly_t op, ulong e, const fmpz_mod_ctx_t ctx)` | [`mod_pow`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPow.html#tymethod.mod_pow) |
-| ✓ | `void fmpz_mod_poly_pow_trunc (fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, ulong e, slong trunc, const fmpz_mod_ctx_t ctx)` | [`mod_pow_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.ModPowTruncated.html#tymethod.mod_pow_truncated) |
-| ⚙ | `void fmpz_mod_poly_pow_trunc_binexp (fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, ulong e, slong trunc, const fmpz_mod_ctx_t ctx)` | [`mod_pow_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.ModPowTruncated.html#tymethod.mod_pow_truncated) |
-| ✗ | `void fmpz_mod_poly_powmod_ui_binexp (fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, ulong e, const fmpz_mod_poly_t f, const fmpz_mod_ctx_t ctx)` | |
-| ✗ | `void fmpz_mod_poly_powmod_ui_binexp_preinv (fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, ulong e, const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv, const fmpz_mod_ctx_t ctx)` | |
-| ✗ | `void fmpz_mod_poly_powmod_fmpz_binexp (fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, const fmpz_t e, const fmpz_mod_poly_t f, const fmpz_mod_ctx_t ctx)` | |
-| ✗ | `void fmpz_mod_poly_powmod_fmpz_binexp_preinv (fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, const fmpz_t e, const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv, const fmpz_mod_ctx_t ctx)` | |
-| ✗ | `void fmpz_mod_poly_powmod_x_fmpz_preinv (fmpz_mod_poly_t res, const fmpz_t e, const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv, const fmpz_mod_ctx_t ctx)` | |
+| ✓ | `void fmpz_mod_poly_pow (fmpz_mod_poly_t rop, const fmpz_mod_poly_t op, ulong e, const fmpz_mod_ctx_t ctx)` | [`mod_pow`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPow.html#tymethod.mod_pow) |
+| ✓ | `void fmpz_mod_poly_pow_trunc (fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, ulong e, slong trunc, const fmpz_mod_ctx_t ctx)` | [`mod_pow_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.ModPowTruncated.html#tymethod.mod_pow_truncated) |
+| ⚙ | `void fmpz_mod_poly_pow_trunc_binexp (fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, ulong e, slong trunc, const fmpz_mod_ctx_t ctx)` | [`mod_pow_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.ModPowTruncated.html#tymethod.mod_pow_truncated) |
+| ≈ | `void fmpz_mod_poly_powmod_ui_binexp (fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, ulong e, const fmpz_mod_poly_t f, const fmpz_mod_ctx_t ctx)` | [`ModPowModPolynomial`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/mod_polynomial/traits/trait.ModPowModPolynomial.html), [`ModPowModPolynomialAssign`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/mod_polynomial/traits/trait.ModPowModPolynomialAssign.html) |
+| ≈ | `void fmpz_mod_poly_powmod_ui_binexp_preinv (fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, ulong e, const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv, const fmpz_mod_ctx_t ctx)` | [`ModPowModPolynomialPrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/mod_polynomial/traits/trait.ModPowModPolynomialPrecomputed.html), [`ModPowModPolynomialPrecomputedAssign`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/mod_polynomial/traits/trait.ModPowModPolynomialPrecomputedAssign.html) |
+| ≈ | `void fmpz_mod_poly_powmod_fmpz_binexp (fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, const fmpz_t e, const fmpz_mod_poly_t f, const fmpz_mod_ctx_t ctx)` | [`ModPowModPolynomial`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/mod_polynomial/traits/trait.ModPowModPolynomial.html), [`ModPowModPolynomialAssign`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/mod_polynomial/traits/trait.ModPowModPolynomialAssign.html) |
+| ≈ | `void fmpz_mod_poly_powmod_fmpz_binexp_preinv (fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, const fmpz_t e, const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv, const fmpz_mod_ctx_t ctx)` | [`ModPowModPolynomialPrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/mod_polynomial/traits/trait.ModPowModPolynomialPrecomputed.html), [`ModPowModPolynomialPrecomputedAssign`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/mod_polynomial/traits/trait.ModPowModPolynomialPrecomputedAssign.html) |
+| ≈ | `void fmpz_mod_poly_powmod_x_fmpz_preinv (fmpz_mod_poly_t res, const fmpz_t e, const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv, const fmpz_mod_ctx_t ctx)` | [`ModPowModPolynomialPrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/mod_polynomial/traits/trait.ModPowModPolynomialPrecomputed.html), [`ModPowModPolynomialPrecomputedAssign`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/mod_polynomial/traits/trait.ModPowModPolynomialPrecomputedAssign.html) |
 | ✗ | `void fmpz_mod_poly_powers_mod_naive (fmpz_mod_poly_struct * res, const fmpz_mod_poly_t f, slong n, const fmpz_mod_poly_t g, const fmpz_mod_ctx_t ctx)` | |
 | ✗ | `void fmpz_mod_poly_powers_mod_bsgs (fmpz_mod_poly_struct * res, const fmpz_mod_poly_t f, slong n, const fmpz_mod_poly_t g, const fmpz_mod_ctx_t ctx)` | |
 | ✗ | `void fmpz_mod_poly_frobenius_powers_2exp_precomp (fmpz_mod_poly_frobenius_powers_2exp_t pow, const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv, ulong m, const fmpz_mod_ctx_t ctx)` | |
@@ -384,17 +400,33 @@ Powering title does not render; this page gives [Powering](#powering) its own se
 | ✗ | `void fmpz_mod_poly_frobenius_powers_precomp (fmpz_mod_poly_frobenius_powers_t pow, const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv, ulong m, const fmpz_mod_ctx_t ctx)` | |
 | — | `void fmpz_mod_poly_frobenius_powers_clear (fmpz_mod_poly_frobenius_powers_t pow, const fmpz_mod_ctx_t ctx)` | |
 
+`powmod` raises a polynomial to a power modulo a polynomial $$f$$, which is
+[`ModPowModPolynomial`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/mod_polynomial/traits/trait.ModPowModPolynomial.html),
+with an `Assign` form, and the `_preinv` versions are
+[`ModPowModPolynomialPrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/mod_polynomial/traits/trait.ModPowModPolynomialPrecomputed.html),
+whose data comes from
+[`precompute_mod_div_rem_data`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModDivRemPrecomputed.html#tymethod.precompute_mod_div_rem_data)
+as for division. FLINT reduces a base of any degree first, while Malachite requires it to be
+reduced modulo $$f$$ and panics otherwise; Malachite's exponent is a `u64`, so the `fmpz` exponents
+have no counterpart beyond that range; hence ≈. There is no separate counterpart of `powmod_x`:
+a base of $$x$$ is detected and raised by the same shift-based sliding window, but it must be
+reduced modulo $$f$$, so $$\deg f \ge 2$$. For a modulus that is a power of 2,
+[`ModPowerOf2PowModPolynomial`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/mod_polynomial/traits/trait.ModPowerOf2PowModPolynomial.html)
+and
+[`ModPowerOf2PowModPolynomialPrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/mod_polynomial/traits/trait.ModPowerOf2PowModPolynomialPrecomputed.html)
+do the same modulo $$2^k$$.
+
 The heading links to `#products` because that is where these entries appear in the manual. Both
 `_clear` rows are [`Drop`](https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html). `pow` is
-[`mod_pow`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPow.html#tymethod.mod_pow)
+[`mod_pow`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPow.html#tymethod.mod_pow)
 on
 [`NaturalPolynomial`](https://docs.rs/malachite-nz/latest/malachite_nz/natural_polynomial/struct.NaturalPolynomial.html),
 and `pow_trunc` and its `binexp` algorithm are
-[`mod_pow_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.ModPowTruncated.html#tymethod.mod_pow_truncated);
+[`mod_pow_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.ModPowTruncated.html#tymethod.mod_pow_truncated);
 for a modulus that is a power of 2,
-[`mod_power_of_2_pow`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2Pow.html#tymethod.mod_power_of_2_pow)
+[`mod_power_of_2_pow`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2Pow.html#tymethod.mod_power_of_2_pow)
 and
-[`mod_power_of_2_pow_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.ModPowerOf2PowTruncated.html#tymethod.mod_power_of_2_pow_truncated)
+[`mod_power_of_2_pow_truncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.ModPowerOf2PowTruncated.html#tymethod.mod_power_of_2_pow_truncated)
 do the same. Unlike `fmpz_mod_poly_pow_trunc`, which gives 0 for the zeroth power of the zero
 polynomial, the truncated forms give 1 (reduced), as every other power does.
 
@@ -402,69 +434,116 @@ polynomial, the truncated forms give 1 (reduced), as every other power does.
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✗ | `void fmpz_mod_poly_divrem (fmpz_mod_poly_t Q, fmpz_mod_poly_t R, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)` | |
-| ✗ | `void fmpz_mod_poly_divrem_basecase (fmpz_mod_poly_t Q, fmpz_mod_poly_t R, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)` | |
-| ✗ | `void fmpz_mod_poly_divrem_newton_n_preinv (fmpz_mod_poly_t Q, fmpz_mod_poly_t R, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_poly_t Binv, const fmpz_mod_ctx_t ctx)` | |
+| ✓ | `void fmpz_mod_poly_divrem (fmpz_mod_poly_t Q, fmpz_mod_poly_t R, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)` | [`ModDivRem`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModDivRem.html), [`ModDivAssignRem`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModDivAssignRem.html), [`CheckedModDivRem`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.CheckedModDivRem.html) |
+| ⚙ | `void fmpz_mod_poly_divrem_basecase (fmpz_mod_poly_t Q, fmpz_mod_poly_t R, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)` | [`mod_div_rem`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModDivRem.html#tymethod.mod_div_rem) |
+| ✓ | `void fmpz_mod_poly_divrem_newton_n_preinv (fmpz_mod_poly_t Q, fmpz_mod_poly_t R, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_poly_t Binv, const fmpz_mod_ctx_t ctx)` | [`ModDivRemPrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModDivRemPrecomputed.html), [`ModDivAssignRemPrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModDivAssignRemPrecomputed.html), [`ModRemPrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModRemPrecomputed.html), [`ModRemPrecomputedAssign`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModRemPrecomputedAssign.html) |
 | ✗ | `void fmpz_mod_poly_divrem_f (fmpz_t f, fmpz_mod_poly_t Q, fmpz_mod_poly_t R, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)` | |
-| ✗ | `void fmpz_mod_poly_div (fmpz_mod_poly_t Q, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)` | |
-| ✗ | `void fmpz_mod_poly_div_newton_n_preinv (fmpz_mod_poly_t Q, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_poly_t Binv, const fmpz_mod_ctx_t ctx)` | |
-| ✗ | `void fmpz_mod_poly_rem (fmpz_mod_poly_t R, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)` | |
-| ✗ | `void fmpz_mod_poly_rem_basecase (fmpz_mod_poly_t R, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)` | |
+| ✓ | `void fmpz_mod_poly_div (fmpz_mod_poly_t Q, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)` | [`ModQuotient`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModQuotient.html), [`ModQuotientAssign`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModQuotientAssign.html), [`CheckedModQuotient`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.CheckedModQuotient.html) |
+| ✓ | `void fmpz_mod_poly_div_newton_n_preinv (fmpz_mod_poly_t Q, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_poly_t Binv, const fmpz_mod_ctx_t ctx)` | [`ModQuotientPrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModQuotientPrecomputed.html), [`ModQuotientPrecomputedAssign`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModQuotientPrecomputedAssign.html) |
+| ✓ | `void fmpz_mod_poly_rem (fmpz_mod_poly_t R, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)` | [`ModRem`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModRem.html), [`ModRemAssign`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModRemAssign.html), [`CheckedModRem`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.CheckedModRem.html) |
+| ⚙ | `void fmpz_mod_poly_rem_basecase (fmpz_mod_poly_t R, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)` | [`mod_rem`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModRem.html#tymethod.mod_rem) |
 | ✗ | `void fmpz_mod_poly_rem_f (fmpz_t f, fmpz_mod_poly_t R, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)` | |
-| ✗ | `ulong fmpz_mod_poly_remove (fmpz_mod_poly_t f, const fmpz_mod_poly_t g, const fmpz_mod_ctx_t ctx)` | |
+| ✓ | `ulong fmpz_mod_poly_remove (fmpz_mod_poly_t f, const fmpz_mod_poly_t g, const fmpz_mod_ctx_t ctx)` | [`ModRemovePower`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModRemovePower.html), [`ModRemovePowerAssign`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModRemovePowerAssign.html) |
 
 Every entry gives $$A = BQ + R$$ with $$\deg R < \deg B$$ and requires the leading coefficient of
 $$B$$ to be invertible modulo $$n$$, not that $$n$$ be prime; where it is not, `divrem_f` and
-`rem_f` set `f` to a nontrivial factor of $$n$$ instead. The `_newton_n_preinv` rows also take
+`rem_f` set `f` to a nontrivial factor of $$n$$ instead. `divrem`, `div`, and `rem` are
+[`ModDivRem`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModDivRem.html),
+[`ModQuotient`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModQuotient.html),
+and
+[`ModRem`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModRem.html)
+of two `NaturalPolynomial`s, each with an `Assign` form; Malachite panics where the leading
+coefficient is not invertible or $$B$$ is 0, and the `Checked` forms return `None` instead. The
+`_basecase` rows are algorithm choices, which Malachite makes inside `mod_div_rem`: the quotient is
+the reversed quotient of the reversals of $$A$$ and $$B$$ as power series, and the remainder takes
+one truncated product, except that with a modulus of one or two limbs a quotient of two
+coefficients is found one term at a time and a long $$B$$ with at most six nonzero coefficients is
+divided by term by term, as for `UnsignedPolynomial`. For a modulus that is a power of 2,
+[`ModPowerOf2DivRem`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModPowerOf2DivRem.html),
+[`ModPowerOf2Quotient`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModPowerOf2Quotient.html),
+and
+[`ModPowerOf2Rem`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModPowerOf2Rem.html)
+do the same modulo $$2^k$$. The `_newton_n_preinv` rows also take
 `Binv`, the inverse of the reverse of $$B$$ modulo $$x^{\operatorname{len}(B)}$$, and require
-$$\operatorname{len}(A) \leq 2\operatorname{len}(B) - 2$$; `remove` does not terminate when `g` is
-a unit, including a non-constant unit such as $$1 + 2x$$ modulo 4.
+$$\operatorname{len}(A) \leq 2\operatorname{len}(B) - 2$$. In Malachite that inverse is the data of
+[`ModDivRemPrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModDivRemPrecomputed.html),
+[`ModQuotientPrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModQuotientPrecomputed.html),
+and
+[`ModRemPrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModRemPrecomputed.html),
+computed once by
+[`precompute_mod_div_rem_data`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModDivRemPrecomputed.html#tymethod.precompute_mod_div_rem_data)
+or its siblings and passed to each division, and a dividend of any length is divided, a block at
+a time from the top; the `ModPowerOf2` versions do the same modulo $$2^k$$.
+`remove` does not terminate when `g` is
+a unit, including a non-constant unit such as $$1 + 2x$$ modulo 4; [`ModRemovePower`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModRemovePower.html) and its `Assign`
+form panic instead whenever `g` is zero or constant or its leading coefficient is not invertible.
 
 ## [Divisibility testing](https://flintlib.org/doc/fmpz_mod_poly.html#divisibility-testing) {#divisibility-testing}
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✗ | `int fmpz_mod_poly_divides (fmpz_mod_poly_t Q, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)` | |
-| ✗ | `int fmpz_mod_poly_divides_classical (fmpz_mod_poly_t Q, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)` | |
+| ✓ | `int fmpz_mod_poly_divides (fmpz_mod_poly_t Q, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)` | [`CheckedModDivExact`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.CheckedModDivExact.html), [`ModDivisibleBy`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModDivisibleBy.html) |
+| ⚙ | `int fmpz_mod_poly_divides_classical (fmpz_mod_poly_t Q, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)` | [`checked_mod_div_exact`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.CheckedModDivExact.html#tymethod.checked_mod_div_exact) |
 
-`remove` is under [Division](#division).
+`divides` returns whether $$B$$ divides $$A$$ and sets the quotient, which is
+[`CheckedModDivExact`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.CheckedModDivExact.html)
+of two `NaturalPolynomial`s, returning the quotient when there is one and `None` otherwise;
+[`ModDivisibleBy`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModDivisibleBy.html)
+returns only whether there is one. Both panic when the leading coefficient of $$B$$ is not
+invertible, where FLINT's result is undefined. `_classical` is an algorithm choice, which Malachite
+makes inside `checked_mod_div_exact`. When the division is known to be exact,
+[`ModDivExact`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModDivExact.html)
+skips the check. For a modulus that is a power of 2, the `ModPowerOf2` versions do the same modulo
+$$2^k$$. `remove` is under [Division](#division).
 
 ## [Power series inversion](https://flintlib.org/doc/fmpz_mod_poly.html#power-series-inversion) {#power-series-inversion}
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✗ | `void fmpz_mod_poly_inv_series (fmpz_mod_poly_t Qinv, const fmpz_mod_poly_t Q, slong n, const fmpz_mod_ctx_t ctx)` | |
-| ✗ | `void fmpz_mod_poly_inv_series_f (fmpz_t f, fmpz_mod_poly_t Qinv, const fmpz_mod_poly_t Q, slong n, const fmpz_mod_ctx_t ctx)` | |
+| ✓ | `void fmpz_mod_poly_inv_series (fmpz_mod_poly_t Qinv, const fmpz_mod_poly_t Q, slong n, const fmpz_mod_ctx_t ctx)` | [`ModInverseTruncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.ModInverseTruncated.html) |
+| ≈ | `void fmpz_mod_poly_inv_series_f (fmpz_t f, fmpz_mod_poly_t Qinv, const fmpz_mod_poly_t Q, slong n, const fmpz_mod_ctx_t ctx)` | [`ModInverseTruncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.ModInverseTruncated.html) |
 
 `inv_series` computes the first `n` coefficients of $$1/Q$$ and aborts unless the constant term of
 $$Q$$ is a unit, which over a composite modulus excludes nonzero non-invertible values;
-`inv_series_f` instead sets `f` to a nontrivial factor of the modulus. Whether the constant term
-is a unit can be tested beforehand with
-[`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModInverse.html),
-which returns an [`Option`](https://doc.rust-lang.org/nightly/core/option/enum.Option.html).
+`inv_series_f` instead sets `f` to a nontrivial factor of the modulus. Malachite's
+[`ModInverseTruncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.ModInverseTruncated.html)
+on a `NaturalPolynomial` with a `Natural` modulus returns `None` in both cases, like
+[`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModInverse.html)
+on a single `Natural`, but does not produce the factor, hence ≈ for `inv_series_f`; the factor is
+the gcd of the constant term and the modulus. The result is the zero polynomial when `n` is 0 or
+the modulus is 1. A modulus of one or two limbs is handled in word arithmetic, as by
+`UnsignedPolynomial`, and a larger one by Newton's iteration on truncated products. For a modulus
+that is a power of 2,
+[`ModPowerOf2InverseTruncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.ModPowerOf2InverseTruncated.html)
+does the same modulo $$2^k$$.
 
 ## [Power series division](https://flintlib.org/doc/fmpz_mod_poly.html#power-series-division) {#power-series-division}
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✗ | `void fmpz_mod_poly_div_series (fmpz_mod_poly_t Q, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, slong n, const fmpz_mod_ctx_t ctx)` | |
+| ✓ | `void fmpz_mod_poly_div_series (fmpz_mod_poly_t Q, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, slong n, const fmpz_mod_ctx_t ctx)` | [`ModDivTruncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.ModDivTruncated.html), [`CheckedModDivTruncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.CheckedModDivTruncated.html) |
 
 `div_series` computes the first `n` coefficients of $$A/B$$ and, as in [Power series
 inversion](#power-series-inversion), aborts unless the constant term of $$B$$ is a unit; there is
 no `_f` form that returns a factor of the modulus instead.
+[`ModDivTruncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.ModDivTruncated.html)
+on `NaturalPolynomial`s with a `Natural` modulus panics in that case, and
+[`CheckedModDivTruncated`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/series/traits/trait.CheckedModDivTruncated.html)
+returns `None`. A modulus of one or two limbs is handled in word arithmetic, and a larger one by the
+method of Karp and Markstein on truncated products.
 
 ## [Greatest common divisor](https://flintlib.org/doc/fmpz_mod_poly.html#greatest-common-divisor) {#gcd}
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✓ | `void fmpz_mod_poly_make_monic (fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)` | [`mod_make_monic`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.ModMakeMonic.html#tymethod.mod_make_monic) |
-| ≈ | `void fmpz_mod_poly_make_monic_f (fmpz_t f, fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)` | [`mod_make_monic`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.ModMakeMonic.html#tymethod.mod_make_monic) |
-| ✗ | `void fmpz_mod_poly_gcd (fmpz_mod_poly_t G, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)` | |
-| ✗ | `void fmpz_mod_poly_gcd_f (fmpz_t f, fmpz_mod_poly_t G, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)` | |
-| ✗ | `void fmpz_mod_poly_gcd_euclidean_f (fmpz_t f, fmpz_mod_poly_t G, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)` | |
-| ✗ | `void fmpz_mod_poly_xgcd (fmpz_mod_poly_t G, fmpz_mod_poly_t S, fmpz_mod_poly_t T, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)` | |
-| ✗ | `void fmpz_mod_poly_xgcd_f (fmpz_t f, fmpz_mod_poly_t G, fmpz_mod_poly_t S, fmpz_mod_poly_t T, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)` | |
-| ✗ | `void fmpz_mod_poly_xgcd_euclidean_f (fmpz_t f, fmpz_mod_poly_t G, fmpz_mod_poly_t S, fmpz_mod_poly_t T, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)` | |
+| ✓ | `void fmpz_mod_poly_make_monic (fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)` | [`mod_make_monic`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModMakeMonic.html#tymethod.mod_make_monic) |
+| ≈ | `void fmpz_mod_poly_make_monic_f (fmpz_t f, fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)` | [`mod_make_monic`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModMakeMonic.html#tymethod.mod_make_monic) |
+| ✓ | `void fmpz_mod_poly_gcd (fmpz_mod_poly_t G, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)` | [`ModGcd`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModGcd.html), [`ModGcdAssign`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModGcdAssign.html) |
+| ≈ | `void fmpz_mod_poly_gcd_f (fmpz_t f, fmpz_mod_poly_t G, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)` | [`CheckedModGcd`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.CheckedModGcd.html) |
+| ≈ | `void fmpz_mod_poly_gcd_euclidean_f (fmpz_t f, fmpz_mod_poly_t G, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)` | [`checked_mod_gcd`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.CheckedModGcd.html#tymethod.checked_mod_gcd) |
+| ✓ | `void fmpz_mod_poly_xgcd (fmpz_mod_poly_t G, fmpz_mod_poly_t S, fmpz_mod_poly_t T, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)` | [`ModExtendedGcd`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModExtendedGcd.html) |
+| ≈ | `void fmpz_mod_poly_xgcd_f (fmpz_t f, fmpz_mod_poly_t G, fmpz_mod_poly_t S, fmpz_mod_poly_t T, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)` | [`CheckedModExtendedGcd`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.CheckedModExtendedGcd.html) |
+| ≈ | `void fmpz_mod_poly_xgcd_euclidean_f (fmpz_t f, fmpz_mod_poly_t G, fmpz_mod_poly_t S, fmpz_mod_poly_t T, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)` | [`checked_mod_extended_gcd`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.CheckedModExtendedGcd.html#tymethod.checked_mod_extended_gcd) |
 | ✗ | `void fmpz_mod_poly_gcdinv (fmpz_mod_poly_t G, fmpz_mod_poly_t S, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)` | |
 | ✗ | `void fmpz_mod_poly_gcdinv_f (fmpz_t f, fmpz_mod_poly_t G, fmpz_mod_poly_t S, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)` | |
 | ✗ | `void fmpz_mod_poly_gcdinv_euclidean (fmpz_mod_poly_t G, fmpz_mod_poly_t S, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)` | |
@@ -474,9 +553,20 @@ no `_f` form that returns a factor of the modulus instead.
 
 `make_monic` succeeds exactly when the leading coefficient is invertible, and `make_monic_f`
 otherwise sets `f` to a nontrivial factor of $$p$$;
-[`mod_make_monic`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.ModMakeMonic.html#tymethod.mod_make_monic)
+[`mod_make_monic`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModMakeMonic.html#tymethod.mod_make_monic)
 does both, returning the factor as the error of a
 [`Result`](https://doc.rust-lang.org/nightly/core/result/enum.Result.html).
+
+`gcd` and `xgcd` assume a prime modulus. On `NaturalPolynomial`s with a `Natural` modulus,
+[`ModGcd`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModGcd.html) and [`ModExtendedGcd`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModExtendedGcd.html) panic when a leading coefficient met along the way is not
+invertible, which cannot happen for a prime modulus. The `_f` forms set `f` to a nontrivial factor
+of $$p$$ in that case; [`CheckedModGcd`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.CheckedModGcd.html) and [`CheckedModExtendedGcd`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.CheckedModExtendedGcd.html) return `None`
+instead, without the factor, hence ≈. `_euclidean_f` is also an algorithm choice, which Malachite
+makes inside `checked_mod_gcd` and `checked_mod_extended_gcd`. A modulus of one or two limbs is
+handled in word arithmetic. FLINT has no LCM; [`ModLcm`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModLcm.html), [`ModLcmAssign`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModLcmAssign.html) and
+[`CheckedModLcm`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.CheckedModLcm.html) return the monic LCM, and for a modulus that is a power of 2,
+[`CheckedModPowerOf2Gcd`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.CheckedModPowerOf2Gcd.html), [`CheckedModPowerOf2ExtendedGcd`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.CheckedModPowerOf2ExtendedGcd.html) and
+[`CheckedModPowerOf2Lcm`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.CheckedModPowerOf2Lcm.html) work modulo $$2^k$$.
 
 ## [Minpoly](https://flintlib.org/doc/fmpz_mod_poly.html#minpoly) {#minpoly}
 
@@ -515,51 +605,58 @@ root, which over $$\mathbb{F}_p$$ includes every $$f$$ with $$f' = 0$$.
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✓ | `void fmpz_mod_poly_derivative (fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)` | [`mod_derivative`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.ModDerivative.html#tymethod.mod_derivative) |
+| ✓ | `void fmpz_mod_poly_derivative (fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)` | [`mod_derivative`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/calculus/traits/trait.ModDerivative.html#tymethod.mod_derivative) |
 
 For a modulus that is a power of 2, use
-[`mod_power_of_2_derivative`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.ModPowerOf2Derivative.html#tymethod.mod_power_of_2_derivative).
+[`mod_power_of_2_derivative`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/calculus/traits/trait.ModPowerOf2Derivative.html#tymethod.mod_power_of_2_derivative).
 
 ## [Evaluation](https://flintlib.org/doc/fmpz_mod_poly.html#evaluation) {#evaluation}
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ≈ | `void fmpz_mod_poly_evaluate_fmpz (fmpz_t res, const fmpz_mod_poly_t poly, const fmpz_t a, const fmpz_mod_ctx_t ctx)` | [`mod_evaluate`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.ModEvaluate.html#tymethod.mod_evaluate) |
+| ≈ | `void fmpz_mod_poly_evaluate_fmpz (fmpz_t res, const fmpz_mod_poly_t poly, const fmpz_t a, const fmpz_mod_ctx_t ctx)` | [`mod_evaluate`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModEvaluate.html#tymethod.mod_evaluate) |
 
 FLINT reduces the point on the way in, whereas under [Malachite's rule](#reduced-check) an
 unreduced point panics, hence ≈. The evaluation is
-[`mod_evaluate`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.ModEvaluate.html#tymethod.mod_evaluate),
+[`mod_evaluate`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModEvaluate.html#tymethod.mod_evaluate),
 and for a modulus that is a power of 2,
-[`mod_power_of_2_evaluate`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.ModPowerOf2Evaluate.html#tymethod.mod_power_of_2_evaluate);
+[`mod_power_of_2_evaluate`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModPowerOf2Evaluate.html#tymethod.mod_power_of_2_evaluate);
 both panic unless the coefficients and the point are reduced.
 
 ## [Multipoint evaluation](https://flintlib.org/doc/fmpz_mod_poly.html#multipoint-evaluation) {#multipoint-evaluation}
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✓ | `void fmpz_mod_poly_evaluate_fmpz_vec (fmpz * ys, const fmpz_mod_poly_t poly, const fmpz * xs, slong n, const fmpz_mod_ctx_t ctx)` | [`mod_evaluate_many`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.ModEvaluateMany.html#tymethod.mod_evaluate_many) |
-| ⚙ | `void fmpz_mod_poly_evaluate_fmpz_vec_iter (fmpz * ys, const fmpz_mod_poly_t poly, const fmpz * xs, slong n, const fmpz_mod_ctx_t ctx)` | [`mod_evaluate_many`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.ModEvaluateMany.html#tymethod.mod_evaluate_many) |
-| ⚙ | `void fmpz_mod_poly_evaluate_fmpz_vec_fast (fmpz * ys, const fmpz_mod_poly_t poly, const fmpz * xs, slong n, const fmpz_mod_ctx_t ctx)` | [`mod_evaluate_many`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.ModEvaluateMany.html#tymethod.mod_evaluate_many) |
+| ✓ | `void fmpz_mod_poly_evaluate_fmpz_vec (fmpz * ys, const fmpz_mod_poly_t poly, const fmpz * xs, slong n, const fmpz_mod_ctx_t ctx)` | [`mod_evaluate_many`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModEvaluateMany.html#tymethod.mod_evaluate_many) |
+| ⚙ | `void fmpz_mod_poly_evaluate_fmpz_vec_iter (fmpz * ys, const fmpz_mod_poly_t poly, const fmpz * xs, slong n, const fmpz_mod_ctx_t ctx)` | [`mod_evaluate_many`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModEvaluateMany.html#tymethod.mod_evaluate_many) |
+| ⚙ | `void fmpz_mod_poly_evaluate_fmpz_vec_fast (fmpz * ys, const fmpz_mod_poly_t poly, const fmpz * xs, slong n, const fmpz_mod_ctx_t ctx)` | [`mod_evaluate_many`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModEvaluateMany.html#tymethod.mod_evaluate_many) |
 
 All three compute the same values and require the points to be reduced, so
-[`mod_evaluate_many`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.ModEvaluateMany.html#tymethod.mod_evaluate_many)
+[`mod_evaluate_many`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModEvaluateMany.html#tymethod.mod_evaluate_many)
 gives the result of `evaluate_fmpz_vec` and `evaluate_fmpz_vec_fast` as well; it panics on an
-unreduced point.
+unreduced point. Like `evaluate_fmpz_vec`, it chooses between evaluating at each point and
+reducing modulo a subproduct tree of the points, but its choice depends on the number of points
+and on the modulus as well as on the polynomial's length. To evaluate many polynomials at the
+same points, [`precompute_mod_evaluate_many_data`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModEvaluateManyPrecomputed.html#tymethod.precompute_mod_evaluate_many_data) builds the tree once, with the inverses of its nodes, and
+[`mod_evaluate_many_precomputed`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModEvaluateManyPrecomputed.html#tymethod.mod_evaluate_many_precomputed) evaluates with it.
 
 ## [Composition](https://flintlib.org/doc/fmpz_mod_poly.html#composition) {#composition}
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✗ | `void fmpz_mod_poly_compose (fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, const fmpz_mod_ctx_t ctx)` | |
+| ✓ | `void fmpz_mod_poly_compose (fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, const fmpz_mod_ctx_t ctx)` | [`ModCompose`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModCompose.html), [`ModComposeAssign`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModComposeAssign.html) |
 
 `compose(res, poly1, poly2)` sets `res` to $$g(h(t))$$, where $$g$$ is `poly1` and $$h$$ is
-`poly2`; over a composite modulus its degree can be less than $$\deg g \cdot \deg h$$, and it can
-be zero (modulo 4, $$2x \circ 2x = 0$$). Horner's rule with
-[`mod_mul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModMul.html#tymethod.mod_mul)
-by $$h$$ and
-[`mod_add`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModAdd.html#tymethod.mod_add)
-of each coefficient of $$g$$, as a constant polynomial, computes the same result. [Modular
-composition](#modular-composition) is composition modulo a polynomial, a different operation.
+`poly2`, which is
+[`ModCompose`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModCompose.html)
+of two
+[`NaturalPolynomial`](https://docs.rs/malachite-nz/latest/malachite_nz/natural_polynomial/struct.NaturalPolynomial.html)s
+modulo a `Natural`, or [`ModComposeAssign`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModComposeAssign.html) when `res` is `poly1`. Over a composite modulus
+its degree can be less than $$\deg g \cdot \deg h$$, and it can be zero (modulo 4,
+$$2x \circ 2x = 0$$). When $$h$$ is $$x + c$$,
+[`mod_taylor_shift`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModTaylorShift.html#tymethod.mod_taylor_shift)
+computes it directly. [Modular composition](#modular-composition) is composition modulo a
+polynomial, a different operation.
 
 ## [Square roots](https://flintlib.org/doc/fmpz_mod_poly.html#square-roots) {#square-roots}
 
@@ -578,17 +675,43 @@ $$s$$ to a square root of $$p$$, which is not unique, or 0 if there is none.
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✗ | `void fmpz_mod_poly_compose_mod (fmpz_mod_poly_t res, const fmpz_mod_poly_t f, const fmpz_mod_poly_t g, const fmpz_mod_poly_t h, const fmpz_mod_ctx_t ctx)` | |
-| ✗ | `void fmpz_mod_poly_compose_mod_horner (fmpz_mod_poly_t res, const fmpz_mod_poly_t f, const fmpz_mod_poly_t g, const fmpz_mod_poly_t h, const fmpz_mod_ctx_t ctx)` | |
-| ✗ | `void fmpz_mod_poly_compose_mod_brent_kung (fmpz_mod_poly_t res, const fmpz_mod_poly_t f, const fmpz_mod_poly_t g, const fmpz_mod_poly_t h, const fmpz_mod_ctx_t ctx)` | |
-| ✗ | `void fmpz_mod_poly_compose_mod_brent_kung_preinv (fmpz_mod_poly_t res, const fmpz_mod_poly_t f, const fmpz_mod_poly_t g, const fmpz_mod_poly_t h, const fmpz_mod_poly_t hinv, const fmpz_mod_ctx_t ctx)` | |
-| ✗ | `void fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv (fmpz_mod_poly_t res, const fmpz_mod_poly_t f, const fmpz_mod_mat_t A, const fmpz_mod_poly_t h, const fmpz_mod_poly_t hinv, const fmpz_mod_ctx_t ctx)` | |
-| ✗ | `void fmpz_mod_poly_compose_mod_brent_kung_vec_preinv (fmpz_mod_poly_struct * res, const fmpz_mod_poly_struct * polys, slong len1, slong l, const fmpz_mod_poly_t g, const fmpz_mod_poly_t poly, const fmpz_mod_poly_t polyinv, const fmpz_mod_ctx_t ctx)` | |
+| ≈ | `void fmpz_mod_poly_compose_mod (fmpz_mod_poly_t res, const fmpz_mod_poly_t f, const fmpz_mod_poly_t g, const fmpz_mod_poly_t h, const fmpz_mod_ctx_t ctx)` | [`ModComposeModPolynomial`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/mod_polynomial/traits/trait.ModComposeModPolynomial.html), [`ModComposeModPolynomialAssign`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/mod_polynomial/traits/trait.ModComposeModPolynomialAssign.html) |
+| ⚙ | `void fmpz_mod_poly_compose_mod_horner (fmpz_mod_poly_t res, const fmpz_mod_poly_t f, const fmpz_mod_poly_t g, const fmpz_mod_poly_t h, const fmpz_mod_ctx_t ctx)` | [`ModComposeModPolynomial`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/mod_polynomial/traits/trait.ModComposeModPolynomial.html) |
+| ⚙ | `void fmpz_mod_poly_compose_mod_brent_kung (fmpz_mod_poly_t res, const fmpz_mod_poly_t f, const fmpz_mod_poly_t g, const fmpz_mod_poly_t h, const fmpz_mod_ctx_t ctx)` | [`ModComposeModPolynomial`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/mod_polynomial/traits/trait.ModComposeModPolynomial.html) |
+| ≈ | `void fmpz_mod_poly_compose_mod_brent_kung_preinv (fmpz_mod_poly_t res, const fmpz_mod_poly_t f, const fmpz_mod_poly_t g, const fmpz_mod_poly_t h, const fmpz_mod_poly_t hinv, const fmpz_mod_ctx_t ctx)` | [`ModComposeModPolynomialPrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/mod_polynomial/traits/trait.ModComposeModPolynomialPrecomputed.html), [`ModComposeModPolynomialPrecomputedAssign`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/mod_polynomial/traits/trait.ModComposeModPolynomialPrecomputedAssign.html) |
+| ≈ | `void fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv (fmpz_mod_poly_t res, const fmpz_mod_poly_t f, const fmpz_mod_mat_t A, const fmpz_mod_poly_t h, const fmpz_mod_poly_t hinv, const fmpz_mod_ctx_t ctx)` | [`ModComposeModPolynomialPrecomputedPowers`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/mod_polynomial/traits/trait.ModComposeModPolynomialPrecomputedPowers.html), [`ModComposeModPolynomialPrecomputedPowersAssign`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/mod_polynomial/traits/trait.ModComposeModPolynomialPrecomputedPowersAssign.html) |
+| ≈ | `void fmpz_mod_poly_compose_mod_brent_kung_vec_preinv (fmpz_mod_poly_struct * res, const fmpz_mod_poly_struct * polys, slong len1, slong l, const fmpz_mod_poly_t g, const fmpz_mod_poly_t poly, const fmpz_mod_poly_t polyinv, const fmpz_mod_ctx_t ctx)` | [`ModComposeModPolynomialPrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/mod_polynomial/traits/trait.ModComposeModPolynomialPrecomputed.html) |
 | — | `void fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded (fmpz_mod_poly_struct * res, const fmpz_mod_poly_struct * polys, slong len1, slong n, const fmpz_mod_poly_t g, const fmpz_mod_poly_t poly, const fmpz_mod_poly_t polyinv, const fmpz_mod_ctx_t ctx)` | |
 | — | `void fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool (fmpz_mod_poly_struct * res, const fmpz_mod_poly_struct * polys, slong len1, slong n, const fmpz_mod_poly_t g, const fmpz_mod_poly_t poly, const fmpz_mod_poly_t polyinv, const fmpz_mod_ctx_t ctx, thread_pool_handle * threads, slong num_threads)` | |
-| ✗ | `void fmpz_mod_poly_precompute_matrix (fmpz_mod_mat_t A, const fmpz_mod_poly_t f, const fmpz_mod_poly_t g, const fmpz_mod_poly_t ginv, const fmpz_mod_ctx_t ctx)` | |
+| ≈ | `void fmpz_mod_poly_precompute_matrix (fmpz_mod_mat_t A, const fmpz_mod_poly_t f, const fmpz_mod_poly_t g, const fmpz_mod_poly_t ginv, const fmpz_mod_ctx_t ctx)` | [`precompute_mod_compose_mod_polynomial_powers_data`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/mod_polynomial/traits/trait.ModComposeModPolynomialPrecomputedPowers.html#tymethod.precompute_mod_compose_mod_polynomial_powers_data) |
 
 The threaded rows are — because Malachite is single-threaded.
+
+[`ModComposeModPolynomial`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/mod_polynomial/traits/trait.ModComposeModPolynomial.html) computes
+$$f(g) \bmod h$$ like `compose_mod`, but requires $$g$$ to be reduced modulo $$h$$ already, where
+FLINT reduces a longer $$g$$ first; the outer polynomial $$f$$ may have any degree. A short $$f$$ is
+composed by Horner's rule and a longer one by the Brent–Kung algorithm, so `compose_mod_horner` and
+`compose_mod_brent_kung` are ⚙. Malachite's Brent–Kung algorithm chooses its block size from the
+length of $$f$$, about $$\sqrt{\operatorname{len}(f)}$$, and so also accepts an $$f$$ at least as
+long as $$h$$, which FLINT's Brent–Kung functions reject; the choice between the two algorithms
+depends mostly on the length of $$f$$. Every reduction modulo $$h$$ uses the inverse of the
+reversal of $$h$$, which [`ModComposeModPolynomialPrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/mod_polynomial/traits/trait.ModComposeModPolynomialPrecomputed.html)
+takes precomputed, as `compose_mod_brent_kung_preinv` takes `hinv`; the data comes from
+[`precompute_mod_div_rem_data`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModDivRemPrecomputed.html#tymethod.precompute_mod_div_rem_data),
+as for division. `precompute_matrix` and `compose_mod_brent_kung_precomp_preinv` correspond to
+[`ModComposeModPolynomialPrecomputedPowers`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/mod_polynomial/traits/trait.ModComposeModPolynomialPrecomputedPowers.html),
+whose data holds the powers of $$g$$ together with the inverse of the reversal of $$h$$, so that no
+separate `hinv` is passed. For a modulus that is a power of 2, the counterparts are
+[`ModPowerOf2ComposeModPolynomial`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/mod_polynomial/traits/trait.ModPowerOf2ComposeModPolynomial.html) and its
+`Precomputed` and `PrecomputedPowers` forms. `compose_mod_brent_kung_vec_preinv` composes several polynomials with the same $$g$$ at
+once; its counterpart is [`ModComposeModPolynomialPrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/mod_polynomial/traits/trait.ModComposeModPolynomialPrecomputed.html), or
+[`ModComposeModPolynomial`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/mod_polynomial/traits/trait.ModComposeModPolynomial.html), implemented for a slice of polynomials,
+which returns the results as a `Vec` instead of writing them to `res`, takes the number of
+polynomials from the slice, and, like the single-polynomial functions, accepts outer polynomials
+at least as long as $$h$$, which FLINT rejects. A single polynomial, or a few short ones, are
+composed one at a time; the rest share the powers of $$g$$ and one matrix product, as in FLINT.
+For a modulus that is a power of 2, the counterparts are the `ModPowerOf2` forms of these traits,
+also implemented for slices.
 
 ## [Subproduct trees](https://flintlib.org/doc/fmpz_mod_poly.html#subproduct-trees) {#subproduct-trees}
 
@@ -596,10 +719,12 @@ The threaded rows are — because Malachite is single-threaded.
 | :---: | --- | --- |
 | — | `fmpz_poly_struct ** _fmpz_mod_poly_tree_alloc (slong len)` | |
 | — | `void _fmpz_mod_poly_tree_free (fmpz_poly_struct ** tree, slong len)` | |
-| — | `void _fmpz_mod_poly_tree_build (fmpz_poly_struct ** tree, const fmpz * roots, slong len, const fmpz_mod_ctx_t ctx)` | |
+| ≈ | `void _fmpz_mod_poly_tree_build (fmpz_poly_struct ** tree, const fmpz * roots, slong len, const fmpz_mod_ctx_t ctx)` | [`precompute_mod_evaluate_many_data`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModEvaluateManyPrecomputed.html#tymethod.precompute_mod_evaluate_many_data) |
 
-These allocate, free and fill a tree's buffer; a Rust tree allocates and frees itself, so all
-three are —.
+`tree_alloc` and `tree_free` allocate and free a tree's buffer; a Rust tree allocates and frees
+itself, so both are —. `tree_build` fills the tree;
+[`precompute_mod_evaluate_many_data`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/modular/traits/trait.ModEvaluateManyPrecomputed.html#tymethod.precompute_mod_evaluate_many_data) builds the same tree, along
+with the inverses of its nodes, inside the data it returns, which is opaque.
 
 ## [Radix conversion](https://flintlib.org/doc/fmpz_mod_poly.html#radix-conversion) {#radix-conversion}
 
@@ -636,19 +761,19 @@ alone, hence ≈. The undocumented `get_str_pretty` is
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ≈ | `void fmpz_mod_poly_inflate (fmpz_mod_poly_t result, const fmpz_mod_poly_t input, ulong inflation, const fmpz_mod_ctx_t ctx)` | [`compose_power_of_x`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.ComposePowerOfX.html#tymethod.compose_power_of_x) |
-| ≈ | `void fmpz_mod_poly_deflate (fmpz_mod_poly_t result, const fmpz_mod_poly_t input, ulong deflation, const fmpz_mod_ctx_t ctx)` | [`deflate_power_of_x`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.DeflatePowerOfX.html#tymethod.deflate_power_of_x) |
-| ≈ | `ulong fmpz_mod_poly_deflation (const fmpz_mod_poly_t input, const fmpz_mod_ctx_t ctx)` | [`exponent_gcd`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.ExponentGcd.html#tymethod.exponent_gcd) |
+| ≈ | `void fmpz_mod_poly_inflate (fmpz_mod_poly_t result, const fmpz_mod_poly_t input, ulong inflation, const fmpz_mod_ctx_t ctx)` | [`compose_power_of_x`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.ComposePowerOfX.html#tymethod.compose_power_of_x) |
+| ≈ | `void fmpz_mod_poly_deflate (fmpz_mod_poly_t result, const fmpz_mod_poly_t input, ulong deflation, const fmpz_mod_ctx_t ctx)` | [`deflate_power_of_x`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.DeflatePowerOfX.html#tymethod.deflate_power_of_x) |
+| ≈ | `ulong fmpz_mod_poly_deflation (const fmpz_mod_poly_t input, const fmpz_mod_ctx_t ctx)` | [`exponent_gcd`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.ExponentGcd.html#tymethod.exponent_gcd) |
 
 `deflation` returns the largest $$n$$ by which the polynomial can be deflated, the GCD of its
 exponents, with 0 for the zero polynomial and 1 for a constant.
-[`exponent_gcd`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.ExponentGcd.html#tymethod.exponent_gcd)
+[`exponent_gcd`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.ExponentGcd.html#tymethod.exponent_gcd)
 is the same, except that a nonzero constant gives 0, where FLINT gives 1, hence ≈. `deflate`
 by an $$n$$ that does not divide every exponent silently drops the offending terms (modulo 5,
 `deflate(x^2 + x, 2)` is $$x$$), where
-[`deflate_power_of_x`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.DeflatePowerOfX.html#tymethod.deflate_power_of_x)
+[`deflate_power_of_x`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.DeflatePowerOfX.html#tymethod.deflate_power_of_x)
 panics, hence ≈.
-[`compose_power_of_x`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/trait.ComposePowerOfX.html#tymethod.compose_power_of_x)
+[`compose_power_of_x`](https://docs.rs/malachite-base/latest/malachite_base/polynomial/arithmetic/traits/trait.ComposePowerOfX.html#tymethod.compose_power_of_x)
 needs no modulus and matches `inflate` except at $$n = 0$$, where it gives $$p(1)$$ as an
 unreduced sum rather than modulo $$m$$, hence ≈.
 

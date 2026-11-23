@@ -91,10 +91,9 @@ pub fn vec_delete_left<T: Copy>(xs: &mut Vec<T>, delete_size: usize) {
 ///
 /// # Examples
 /// ```
-/// use malachite_base::nevers::Never;
 /// use malachite_base::vecs::vec_from_str;
 ///
-/// assert_eq!(vec_from_str::<Never>("[]"), Some(vec![]));
+/// assert_eq!(vec_from_str::<bool>("[]"), Some(vec![]));
 /// assert_eq!(vec_from_str("[5, 6, 7]"), Some(vec![5, 6, 7]));
 /// assert_eq!(
 ///     vec_from_str("[false, false, true]"),

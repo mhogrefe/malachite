@@ -6,8 +6,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::eq_expr_value;
 use clippy_utils::diagnostics::span_lint_and_sugg;
-use clippy_utils::eq_expr_value;
 use clippy_utils::source::snippet_opt;
 use clippy_utils::visitors::for_each_expr;
 use core::ops::ControlFlow;
@@ -17,7 +17,7 @@ use rustc_hir::{
     BindingMode, Block, ByRef, Expr, ExprKind, HirId, Mutability, PatKind, Path, QPath, StmtKind,
 };
 use rustc_lint::{LateContext, LateLintPass};
-use rustc_session::{declare_lint, declare_lint_pass};
+use rustc_lint::{declare_lint, declare_lint_pass};
 use rustc_span::{Span, Symbol};
 
 declare_lint! {
@@ -147,10 +147,10 @@ fn uses_after<'tcx>(cx: &LateContext<'tcx>, block: &Block<'tcx>, from: usize, id
         ControlFlow::<()>::Continue(())
     };
     for stmt in &block.stmts[from..] {
-        for_each_expr(cx, stmt, &mut inspect);
+        for_each_expr(cx.tcx, stmt, &mut inspect);
     }
     if let Some(e) = block.expr {
-        for_each_expr(cx, e, &mut inspect);
+        for_each_expr(cx.tcx, e, &mut inspect);
     }
     count
 }
