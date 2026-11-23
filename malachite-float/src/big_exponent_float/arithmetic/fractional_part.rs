@@ -14,10 +14,10 @@ use crate::big_exponent_float::arithmetic::round_to_integer::{
 };
 use alloc::borrow::Cow;
 use core::cmp::Ordering::{self, *};
-use malachite_base::num::arithmetic::traits::ModPowerOf2;
 use malachite_base::num::basic::traits::{NaN as NaNTrait, Zero as ZeroTrait};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::num::modular::traits::ModPowerOf2;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::integer::Integer;
 

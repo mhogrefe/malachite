@@ -13,18 +13,6 @@ use crate::num::modular::traits::DivisibleBy;
 use crate::num::number_theory::traits::{Gcd, GcdAssign};
 use crate::vars::{Var, VarScheme};
 use alloc::string::String;
-
-// Until the next release, the traits and structs that moved to `polynomial::arithmetic`,
-// `polynomial::modular`, `polynomial::series`, `polynomial::mod_polynomial`, and
-// `polynomial::calculus` are also re-exported here, so that paths through this module keep
-// resolving. These re-exports will then be removed.
-pub use self::arithmetic::traits::*;
-pub use self::calculus::traits::*;
-pub use self::mod_polynomial::ModComposeModPolynomialData;
-pub use self::mod_polynomial::traits::*;
-pub use self::modular::ModPolynomialData;
-pub use self::modular::traits::*;
-pub use self::series::traits::*;
 use alloc::vec::Vec;
 
 /// Traits for the ring operations on polynomials, division, composition, and evaluation.

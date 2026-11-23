@@ -263,5 +263,3 @@ pub mod sub_mul;
 /// Implementations of [`SubMulShl`] and [`SubMulShlAssign`], traits for subtracting the product of
 /// two numbers, shifted left, from a number.
 pub mod sub_mul_shl;
-/// Various traits for performing arithmetic operations on numbers.
-pub mod traits;

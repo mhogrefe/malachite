@@ -8,13 +8,14 @@
 
 use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{
-    CanonicalPrimitivePart, Content, DivExact, Gcd, GcdAssign, Pow, PowerOf2,
+    CanonicalPrimitivePart, Content, DivExact, Pow, PowerOf2,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::factorization::traits::IsPrime;
 use malachite_base::num::modular::traits::DivisibleBy;
+use malachite_base::num::number_theory::traits::{Gcd, GcdAssign};
 use malachite_base::polynomial::Polynomial;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer_polynomial::IntegerPolynomial;

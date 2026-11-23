@@ -13,8 +13,8 @@
 use crate::integer_polynomial::IntegerPolynomial;
 use crate::integer_polynomial::arithmetic::div_exact::checked_div_exact_helper;
 use crate::integer_polynomial::arithmetic::gcd::gcd_helper;
-use malachite_base::num::arithmetic::traits::{Lcm, LcmAssign};
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::number_theory::traits::{Lcm, LcmAssign};
 
 // The LCM of `p` and `q`: their product divided by their GCD, with a positive leading coefficient.
 // The LCM of 0 and any polynomial is 0.
@@ -46,7 +46,7 @@ impl Lcm<Self> for IntegerPolynomial {
     /// with the sign chosen to make the leading coefficient positive; the LCM is 0 if either
     /// polynomial is 0. Every common multiple of $a$ and $b$ is a multiple of it.
     ///
-    /// The GCD is found as by [`Gcd`](malachite_base::num::arithmetic::traits::Gcd), and the
+    /// The GCD is found as by [`Gcd`](malachite_base::num::number_theory::traits::Gcd), and the
     /// product is divided by it.
     ///
     /// # Worst-case complexity
@@ -60,7 +60,7 @@ impl Lcm<Self> for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::num::arithmetic::traits::Lcm;
+    /// use malachite_base::num::number_theory::traits::Lcm;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let p = IntegerPolynomial::from_str("6*x+6").unwrap();
@@ -92,7 +92,7 @@ impl Lcm<&Self> for IntegerPolynomial {
     /// with the sign chosen to make the leading coefficient positive; the LCM is 0 if either
     /// polynomial is 0. Every common multiple of $a$ and $b$ is a multiple of it.
     ///
-    /// The GCD is found as by [`Gcd`](malachite_base::num::arithmetic::traits::Gcd), and the
+    /// The GCD is found as by [`Gcd`](malachite_base::num::number_theory::traits::Gcd), and the
     /// product is divided by it.
     ///
     /// # Worst-case complexity
@@ -106,7 +106,7 @@ impl Lcm<&Self> for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::num::arithmetic::traits::Lcm;
+    /// use malachite_base::num::number_theory::traits::Lcm;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let p = IntegerPolynomial::from_str("6*x+6").unwrap();
@@ -138,7 +138,7 @@ impl Lcm<IntegerPolynomial> for &IntegerPolynomial {
     /// with the sign chosen to make the leading coefficient positive; the LCM is 0 if either
     /// polynomial is 0. Every common multiple of $a$ and $b$ is a multiple of it.
     ///
-    /// The GCD is found as by [`Gcd`](malachite_base::num::arithmetic::traits::Gcd), and the
+    /// The GCD is found as by [`Gcd`](malachite_base::num::number_theory::traits::Gcd), and the
     /// product is divided by it.
     ///
     /// # Worst-case complexity
@@ -152,7 +152,7 @@ impl Lcm<IntegerPolynomial> for &IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::num::arithmetic::traits::Lcm;
+    /// use malachite_base::num::number_theory::traits::Lcm;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let p = IntegerPolynomial::from_str("6*x+6").unwrap();
@@ -183,7 +183,7 @@ impl Lcm<&IntegerPolynomial> for &IntegerPolynomial {
     /// with the sign chosen to make the leading coefficient positive; the LCM is 0 if either
     /// polynomial is 0. Every common multiple of $a$ and $b$ is a multiple of it.
     ///
-    /// The GCD is found as by [`Gcd`](malachite_base::num::arithmetic::traits::Gcd), and the
+    /// The GCD is found as by [`Gcd`](malachite_base::num::number_theory::traits::Gcd), and the
     /// product is divided by it.
     ///
     /// # Worst-case complexity
@@ -197,7 +197,7 @@ impl Lcm<&IntegerPolynomial> for &IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::num::arithmetic::traits::Lcm;
+    /// use malachite_base::num::number_theory::traits::Lcm;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let p = IntegerPolynomial::from_str("6*x+6").unwrap();
@@ -227,7 +227,7 @@ impl LcmAssign<Self> for IntegerPolynomial {
     /// with the sign chosen to make the leading coefficient positive; the LCM is 0 if either
     /// polynomial is 0. Every common multiple of $a$ and $b$ is a multiple of it.
     ///
-    /// The GCD is found as by [`Gcd`](malachite_base::num::arithmetic::traits::Gcd), and the
+    /// The GCD is found as by [`Gcd`](malachite_base::num::number_theory::traits::Gcd), and the
     /// product is divided by it.
     ///
     /// # Worst-case complexity
@@ -241,7 +241,7 @@ impl LcmAssign<Self> for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::num::arithmetic::traits::LcmAssign;
+    /// use malachite_base::num::number_theory::traits::LcmAssign;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let mut p = IntegerPolynomial::from_str("6*x+6").unwrap();
@@ -273,7 +273,7 @@ impl LcmAssign<&Self> for IntegerPolynomial {
     /// with the sign chosen to make the leading coefficient positive; the LCM is 0 if either
     /// polynomial is 0. Every common multiple of $a$ and $b$ is a multiple of it.
     ///
-    /// The GCD is found as by [`Gcd`](malachite_base::num::arithmetic::traits::Gcd), and the
+    /// The GCD is found as by [`Gcd`](malachite_base::num::number_theory::traits::Gcd), and the
     /// product is divided by it.
     ///
     /// # Worst-case complexity
@@ -287,7 +287,7 @@ impl LcmAssign<&Self> for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::num::arithmetic::traits::LcmAssign;
+    /// use malachite_base::num::number_theory::traits::LcmAssign;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let mut p = IntegerPolynomial::from_str("6*x+6").unwrap();

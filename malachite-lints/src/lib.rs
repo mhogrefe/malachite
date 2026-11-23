@@ -283,6 +283,9 @@ fn assign_variant(
         "trigonometric",
         "hyperbolic",
         "linear_algebra",
+        "elliptic",
+        "gamma",
+        "factorization",
         "logic",
     ] {
         let path = format!("malachite_base::num::{module}::traits::{trait_name}");
@@ -314,6 +317,9 @@ fn assign_trait_impl<'tcx>(
         "trigonometric",
         "hyperbolic",
         "linear_algebra",
+        "elliptic",
+        "gamma",
+        "factorization",
         "logic",
     ] {
         let path = format!("malachite_base::num::{module}::traits::{trait_name}");

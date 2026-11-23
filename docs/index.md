@@ -17,7 +17,7 @@ function, which independent implementations each Malachite operation is checked 
 ([Azurite](https://github.com/mhogrefe/azurite), FLINT, GMP, MPFR, and num).
 
 ```rust
-use malachite::base::num::arithmetic::traits::Factorial;
+use malachite::base::num::number_theory::traits::Factorial;
 use malachite::Natural;
 
 fn main() {
@@ -41,9 +41,10 @@ that rounds also has a variant that lets you specify one of six rounding modes.
 `Float` support is enabled by the `floats` feature.
 
 ```rust
-use malachite::base::num::arithmetic::traits::{Exp, Sqrt};
+use malachite::base::num::arithmetic::traits::Sqrt;
 use malachite::base::num::conversion::string::options::ToSciOptions;
 use malachite::base::num::conversion::traits::ToSci;
+use malachite::base::num::exponential::traits::Exp;
 use malachite::Float;
 
 fn main() {
@@ -135,7 +136,7 @@ The `malachite` crate re-exports four sub-crates.
   - Traits that wrap functions from the standard library, like
   [`CheckedAdd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CheckedAdd.html);
   - Traits that give extra functionality to primitive types, like
-    [`Gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Gcd.html),
+    [`Gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.Gcd.html),
     [`FloorSqrt`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.FloorSqrt.html),
     and
     [`BitAccess`](https://docs.rs/malachite-base/latest/malachite_base/num/logic/traits/trait.BitAccess.html);
@@ -152,15 +153,15 @@ The `malachite` crate re-exports four sub-crates.
   - Various mathematical functions, like implementations of
     [`FloorSqrt`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.FloorSqrt.html)
     and
-    [`Gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Gcd.html);
+    [`Gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/number_theory/traits/trait.Gcd.html);
   - Modular arithmetic functions, like implementations of
-    [`ModAdd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModAdd.html)
+    [`ModAdd`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModAdd.html)
     and
-    [`ModPow`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPow.html),
+    [`ModPow`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPow.html),
     and of traits for arithmetic modulo a power of 2, like
-    [`ModPowerOf2Add`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2Add.html)
+    [`ModPowerOf2Add`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2Add.html)
     and
-    [`ModPowerOf2Pow`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2Pow.html);
+    [`ModPowerOf2Pow`](https://docs.rs/malachite-base/latest/malachite_base/num/modular/traits/trait.ModPowerOf2Pow.html);
   - Various functions for logic and bit manipulation, like
     [`BitAnd`](https://doc.rust-lang.org/nightly/core/ops/trait.BitAnd.html) and
     [`BitAccess`](https://docs.rs/malachite-base/latest/malachite_base/num/logic/traits/trait.BitAccess.html).

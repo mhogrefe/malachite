@@ -11,9 +11,10 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::Natural;
-use malachite_base::num::arithmetic::traits::{DivisibleBy, Parity};
+use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::factorization::traits::Primes;
+use malachite_base::num::modular::traits::DivisibleBy;
 
 // The largest even index whose denominator is in `BERNOULLI_DENOMINATORS`.
 const BERNOULLI_DENOMINATOR_MAX_SMALL: u64 = 178;

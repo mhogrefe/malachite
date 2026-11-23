@@ -28,13 +28,14 @@ use alloc::vec::Vec;
 use core::cmp::{max, min};
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    DivExact, DivRem, Gcd, GcdAssign, NegAssign, Parity, Pow, SubMulAssign, UnsignedAbs,
+    DivExact, DivRem, NegAssign, Parity, Pow, SubMulAssign, UnsignedAbs,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::num::modular::traits::ModMul;
+use malachite_base::num::number_theory::traits::{Gcd, GcdAssign};
 use malachite_base::polynomial::arithmetic::traits::L2NormSquared;
 use malachite_base::unsigned_polynomial::modular::mod_gcd::checked_monic_gcd;
 use malachite_base::unsigned_polynomial::modular::subproduct_tree::Modulus;
@@ -562,7 +563,7 @@ impl Gcd<Self> for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::num::arithmetic::traits::Gcd;
+    /// use malachite_base::num::number_theory::traits::Gcd;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let p = IntegerPolynomial::from_str("6*x+6").unwrap();
@@ -610,7 +611,7 @@ impl Gcd<&Self> for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::num::arithmetic::traits::Gcd;
+    /// use malachite_base::num::number_theory::traits::Gcd;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let p = IntegerPolynomial::from_str("6*x+6").unwrap();
@@ -658,7 +659,7 @@ impl Gcd<IntegerPolynomial> for &IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::num::arithmetic::traits::Gcd;
+    /// use malachite_base::num::number_theory::traits::Gcd;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let p = IntegerPolynomial::from_str("6*x+6").unwrap();
@@ -705,7 +706,7 @@ impl Gcd<&IntegerPolynomial> for &IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::num::arithmetic::traits::Gcd;
+    /// use malachite_base::num::number_theory::traits::Gcd;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let p = IntegerPolynomial::from_str("6*x+6").unwrap();
@@ -751,7 +752,7 @@ impl GcdAssign<Self> for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::num::arithmetic::traits::GcdAssign;
+    /// use malachite_base::num::number_theory::traits::GcdAssign;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let mut p = IntegerPolynomial::from_str("6*x+6").unwrap();
@@ -799,7 +800,7 @@ impl GcdAssign<&Self> for IntegerPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::num::arithmetic::traits::GcdAssign;
+    /// use malachite_base::num::number_theory::traits::GcdAssign;
     /// use malachite_nz::integer_polynomial::IntegerPolynomial;
     ///
     /// let mut p = IntegerPolynomial::from_str("6*x+6").unwrap();

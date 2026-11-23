@@ -18,12 +18,13 @@ use core::cmp::{
     Ordering::{self, *},
     max,
 };
-use malachite_base::num::arithmetic::traits::{CeilingLogBase2, PowerOf2};
+use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{
     Infinity as InfinityTrait, NaN as NaNTrait, One, Zero as ZeroTrait,
 };
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
+use malachite_base::num::exponential::traits::CeilingLogBase2;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::integer::Integer;

@@ -6,11 +6,12 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::{DivExact, Mod, ModPowerOf2};
+use malachite_base::num::arithmetic::traits::DivExact;
 use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, NegativeOne, One, Zero};
 use malachite_base::num::conversion::string::options::FromSciStringOptions;
 use malachite_base::num::conversion::traits::{FromStringBase, ToStringBase};
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::num::modular::traits::{Mod, ModPowerOf2};
 use malachite_base::strings::{ToLowerHexString, ToUpperHexString};
 use malachite_float::BigExponentFloat;
 use malachite_float::big_exponent_float::ComparableBigExponentFloatRef;

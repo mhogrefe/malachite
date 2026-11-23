@@ -12,8 +12,9 @@
 
 use crate::rational_polynomial::RationalPolynomial;
 use crate::rational_polynomial::arithmetic::make_monic::monic_from_primitive_part;
-use malachite_base::num::arithmetic::traits::{Gcd, GcdAssign, PrimitivePart};
+use malachite_base::num::arithmetic::traits::PrimitivePart;
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::number_theory::traits::{Gcd, GcdAssign};
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::arithmetic::traits::MakeMonic;
 
@@ -63,7 +64,7 @@ impl Gcd<Self> for RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::num::arithmetic::traits::Gcd;
+    /// use malachite_base::num::number_theory::traits::Gcd;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let p = RationalPolynomial::from_str("1/2*x^2-1/2").unwrap();
@@ -104,7 +105,7 @@ impl Gcd<&Self> for RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::num::arithmetic::traits::Gcd;
+    /// use malachite_base::num::number_theory::traits::Gcd;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let p = RationalPolynomial::from_str("1/2*x^2-1/2").unwrap();
@@ -145,7 +146,7 @@ impl Gcd<RationalPolynomial> for &RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::num::arithmetic::traits::Gcd;
+    /// use malachite_base::num::number_theory::traits::Gcd;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let p = RationalPolynomial::from_str("1/2*x^2-1/2").unwrap();
@@ -185,7 +186,7 @@ impl Gcd<&RationalPolynomial> for &RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::num::arithmetic::traits::Gcd;
+    /// use malachite_base::num::number_theory::traits::Gcd;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let p = RationalPolynomial::from_str("1/2*x^2-1/2").unwrap();
@@ -224,7 +225,7 @@ impl GcdAssign<Self> for RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::num::arithmetic::traits::GcdAssign;
+    /// use malachite_base::num::number_theory::traits::GcdAssign;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let mut p = RationalPolynomial::from_str("1/2*x^2-1/2").unwrap();
@@ -264,7 +265,7 @@ impl GcdAssign<&Self> for RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::num::arithmetic::traits::GcdAssign;
+    /// use malachite_base::num::number_theory::traits::GcdAssign;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let mut p = RationalPolynomial::from_str("1/2*x^2-1/2").unwrap();

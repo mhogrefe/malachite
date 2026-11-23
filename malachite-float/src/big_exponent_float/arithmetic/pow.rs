@@ -21,8 +21,7 @@ use alloc::borrow::Cow;
 use core::cmp::Ordering::{self, *};
 use core::cmp::max;
 use malachite_base::num::arithmetic::traits::{
-    Abs, AddMul, CeilingLogBase2, CheckedRoot, CheckedSqrt, DivRem, Parity, Pow, PowAssign,
-    Reciprocal, UnsignedAbs,
+    Abs, AddMul, CheckedRoot, CheckedSqrt, DivRem, Parity, Pow, PowAssign, Reciprocal, UnsignedAbs,
 };
 use malachite_base::num::basic::traits::{
     Infinity as InfinityTrait, NaN as NaNTrait, NegativeInfinity, NegativeOne, One,
@@ -30,6 +29,7 @@ use malachite_base::num::basic::traits::{
 };
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::exponential::traits::CeilingLogBase2;
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::integer::Integer;

@@ -16,9 +16,10 @@ use crate::natural::number_theory::zeta_helpers::{
 };
 use alloc::vec;
 use alloc::vec::Vec;
-use malachite_base::num::arithmetic::traits::{ModInverse, ModMulAssign, ModNegAssign, Parity};
+use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base::num::modular::traits::{ModInverse, ModMulAssign, ModNegAssign};
 use malachite_base::unsigned_polynomial::series::mod_inverse_truncated::mod_inverse_truncated_vec;
 
 // The even indices below which a single Euler number is taken from a table rather than from

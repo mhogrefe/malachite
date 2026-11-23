@@ -14,12 +14,12 @@ use crate::Rational;
 use alloc::vec;
 use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{
-    DivExact, DivExactAssign, ModInverse, ModMul, ModMulAssign, ModNegAssign, NegAssign, Parity,
-    SubMulAssign, UnsignedAbs,
+    DivExact, DivExactAssign, NegAssign, Parity, SubMulAssign, UnsignedAbs,
 };
 use malachite_base::num::basic::traits::{One, OneHalf, Zero};
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::num::modular::traits::{ModInverse, ModMul, ModMulAssign, ModNegAssign};
 use malachite_base::num::number_theory::traits::Primorial;
 use malachite_base::unsigned_polynomial::series::mod_inverse_truncated::mod_inverse_truncated_vec;
 use malachite_nz::integer::Integer;

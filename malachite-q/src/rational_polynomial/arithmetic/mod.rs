@@ -83,7 +83,7 @@ pub mod evaluate_many;
 /// An implementation of [`ExponentGcd`], the greatest common divisor of the exponents at which a
 /// polynomial has nonzero coefficients.
 pub mod exponent_gcd;
-/// Implementations of [`ExtendedGcd`](malachite_base::num::arithmetic::traits::ExtendedGcd), for
+/// Implementations of [`ExtendedGcd`](malachite_base::num::number_theory::traits::ExtendedGcd), for
 /// computing extended GCDs of polynomials.
 pub mod extended_gcd;
 /// An implementation of [`FromRationalRoots`] for
@@ -92,8 +92,8 @@ pub mod extended_gcd;
 pub mod from_rational_roots;
 /// An implementation of [`FromRoots`], which builds the monic polynomial with given roots.
 pub mod from_roots;
-/// Implementations of [`Gcd`](malachite_base::num::arithmetic::traits::Gcd) and
-/// [`GcdAssign`](malachite_base::num::arithmetic::traits::GcdAssign), for computing GCDs of
+/// Implementations of [`Gcd`](malachite_base::num::number_theory::traits::Gcd) and
+/// [`GcdAssign`](malachite_base::num::number_theory::traits::GcdAssign), for computing GCDs of
 /// polynomials.
 pub mod gcd;
 /// An implementation of [`Height`](malachite_base::num::arithmetic::traits::Height), the largest of
@@ -104,8 +104,8 @@ pub mod height;
 pub mod is_unit;
 /// An implementation of [`L2NormSquared`], the sum of the squares of a polynomial's coefficients.
 pub mod l2_norm_squared;
-/// Implementations of [`Lcm`](malachite_base::num::arithmetic::traits::Lcm) and
-/// [`LcmAssign`](malachite_base::num::arithmetic::traits::LcmAssign), for computing LCMs of
+/// Implementations of [`Lcm`](malachite_base::num::number_theory::traits::Lcm) and
+/// [`LcmAssign`](malachite_base::num::number_theory::traits::LcmAssign), for computing LCMs of
 /// polynomials.
 pub mod lcm;
 /// Implementations of [`MakeMonic`] and [`MakeMonicAssign`], which divide a polynomial by its

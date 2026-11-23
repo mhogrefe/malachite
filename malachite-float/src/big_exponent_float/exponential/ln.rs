@@ -20,10 +20,11 @@ use core::cmp::{
     Ordering::{self, *},
     max,
 };
-use malachite_base::num::arithmetic::traits::{CeilingLogBase2, IsPowerOf2, Parity, Pow};
+use malachite_base::num::arithmetic::traits::{IsPowerOf2, Parity, Pow};
 use malachite_base::num::basic::traits::{
     Infinity as InfinityTrait, NaN as NaNTrait, NegativeInfinity, One, Zero as ZeroTrait,
 };
+use malachite_base::num::exponential::traits::CeilingLogBase2;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::integer::Integer;

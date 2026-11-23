@@ -6,9 +6,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::BinomialCoefficient;
 use malachite_base::num::basic::traits::{One, Two, Zero};
-use malachite_base::num::number_theory::traits::{Factorial, RisingFactorial};
+use malachite_base::num::number_theory::traits::{BinomialCoefficient, Factorial, RisingFactorial};
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::arithmetic::traits::Evaluate;
 use malachite_base::polynomial::special::traits::{

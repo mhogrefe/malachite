@@ -25,13 +25,16 @@ use core::cmp::{
     Ordering::{self, *},
     max,
 };
-use malachite_base::num::arithmetic::traits::{CheckedLogBase, DivisibleBy, Gcd, IsPowerOf2, Pow};
+use malachite_base::num::arithmetic::traits::{IsPowerOf2, Pow};
 use malachite_base::num::basic::traits::{
     Infinity as InfinityTrait, NaN as NaNTrait, NegativeInfinity, One, Two, Zero as ZeroTrait,
 };
 use malachite_base::num::comparison::traits::OrdProduct;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::exponential::traits::CheckedLogBase;
 use malachite_base::num::factorization::traits::ExpressAsPower;
+use malachite_base::num::modular::traits::DivisibleBy;
+use malachite_base::num::number_theory::traits::Gcd;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;

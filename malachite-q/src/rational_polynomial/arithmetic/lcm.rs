@@ -12,8 +12,9 @@
 
 use crate::rational_polynomial::RationalPolynomial;
 use crate::rational_polynomial::arithmetic::make_monic::monic_from_primitive_part;
-use malachite_base::num::arithmetic::traits::{Lcm, LcmAssign, PrimitivePart};
+use malachite_base::num::arithmetic::traits::PrimitivePart;
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::number_theory::traits::{Lcm, LcmAssign};
 use malachite_base::polynomial::Polynomial;
 
 // The monic LCM of `p` and `q`, the monic multiple of the LCM of the primitive parts of their
@@ -47,7 +48,7 @@ impl Lcm<Self> for RationalPolynomial {
     /// is a multiple of it.
     ///
     /// The product of the primitive parts of the numerators is divided by their GCD, found as by
-    /// [`Gcd`](malachite_base::num::arithmetic::traits::Gcd) on
+    /// [`Gcd`](malachite_base::num::number_theory::traits::Gcd) on
     /// [`IntegerPolynomial`](malachite_nz::integer_polynomial::IntegerPolynomial)s, and made monic.
     ///
     /// # Worst-case complexity
@@ -61,7 +62,7 @@ impl Lcm<Self> for RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::num::arithmetic::traits::Lcm;
+    /// use malachite_base::num::number_theory::traits::Lcm;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let p = RationalPolynomial::from_str("1/2*x^2-1/2").unwrap();
@@ -90,7 +91,7 @@ impl Lcm<&Self> for RationalPolynomial {
     /// is a multiple of it.
     ///
     /// The product of the primitive parts of the numerators is divided by their GCD, found as by
-    /// [`Gcd`](malachite_base::num::arithmetic::traits::Gcd) on
+    /// [`Gcd`](malachite_base::num::number_theory::traits::Gcd) on
     /// [`IntegerPolynomial`](malachite_nz::integer_polynomial::IntegerPolynomial)s, and made monic.
     ///
     /// # Worst-case complexity
@@ -104,7 +105,7 @@ impl Lcm<&Self> for RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::num::arithmetic::traits::Lcm;
+    /// use malachite_base::num::number_theory::traits::Lcm;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let p = RationalPolynomial::from_str("1/2*x^2-1/2").unwrap();
@@ -133,7 +134,7 @@ impl Lcm<RationalPolynomial> for &RationalPolynomial {
     /// is a multiple of it.
     ///
     /// The product of the primitive parts of the numerators is divided by their GCD, found as by
-    /// [`Gcd`](malachite_base::num::arithmetic::traits::Gcd) on
+    /// [`Gcd`](malachite_base::num::number_theory::traits::Gcd) on
     /// [`IntegerPolynomial`](malachite_nz::integer_polynomial::IntegerPolynomial)s, and made monic.
     ///
     /// # Worst-case complexity
@@ -147,7 +148,7 @@ impl Lcm<RationalPolynomial> for &RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::num::arithmetic::traits::Lcm;
+    /// use malachite_base::num::number_theory::traits::Lcm;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let p = RationalPolynomial::from_str("1/2*x^2-1/2").unwrap();
@@ -175,7 +176,7 @@ impl Lcm<&RationalPolynomial> for &RationalPolynomial {
     /// is a multiple of it.
     ///
     /// The product of the primitive parts of the numerators is divided by their GCD, found as by
-    /// [`Gcd`](malachite_base::num::arithmetic::traits::Gcd) on
+    /// [`Gcd`](malachite_base::num::number_theory::traits::Gcd) on
     /// [`IntegerPolynomial`](malachite_nz::integer_polynomial::IntegerPolynomial)s, and made monic.
     ///
     /// # Worst-case complexity
@@ -189,7 +190,7 @@ impl Lcm<&RationalPolynomial> for &RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::num::arithmetic::traits::Lcm;
+    /// use malachite_base::num::number_theory::traits::Lcm;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let p = RationalPolynomial::from_str("1/2*x^2-1/2").unwrap();
@@ -216,7 +217,7 @@ impl LcmAssign<Self> for RationalPolynomial {
     /// is a multiple of it.
     ///
     /// The product of the primitive parts of the numerators is divided by their GCD, found as by
-    /// [`Gcd`](malachite_base::num::arithmetic::traits::Gcd) on
+    /// [`Gcd`](malachite_base::num::number_theory::traits::Gcd) on
     /// [`IntegerPolynomial`](malachite_nz::integer_polynomial::IntegerPolynomial)s, and made monic.
     ///
     /// # Worst-case complexity
@@ -230,7 +231,7 @@ impl LcmAssign<Self> for RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::num::arithmetic::traits::LcmAssign;
+    /// use malachite_base::num::number_theory::traits::LcmAssign;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let mut p = RationalPolynomial::from_str("1/2*x^2-1/2").unwrap();
@@ -258,7 +259,7 @@ impl LcmAssign<&Self> for RationalPolynomial {
     /// is a multiple of it.
     ///
     /// The product of the primitive parts of the numerators is divided by their GCD, found as by
-    /// [`Gcd`](malachite_base::num::arithmetic::traits::Gcd) on
+    /// [`Gcd`](malachite_base::num::number_theory::traits::Gcd) on
     /// [`IntegerPolynomial`](malachite_nz::integer_polynomial::IntegerPolynomial)s, and made monic.
     ///
     /// # Worst-case complexity
@@ -272,7 +273,7 @@ impl LcmAssign<&Self> for RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::num::arithmetic::traits::LcmAssign;
+    /// use malachite_base::num::number_theory::traits::LcmAssign;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let mut p = RationalPolynomial::from_str("1/2*x^2-1/2").unwrap();

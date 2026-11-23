@@ -7,12 +7,13 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
-use malachite_base::num::arithmetic::traits::{ModInverse, ModMul, ModPow, ModPowerOf2, PowerOf2};
+use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeOne, One, Two, Zero,
 };
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
+use malachite_base::num::modular::traits::{ModInverse, ModMul, ModPow, ModPowerOf2};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_float::big_exponent_float::ComparableBigExponentFloatRef;
 use malachite_float::test_util::big_exponent_float::{

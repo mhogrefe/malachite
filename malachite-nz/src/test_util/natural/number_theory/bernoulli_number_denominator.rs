@@ -7,8 +7,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::Natural;
-use malachite_base::num::arithmetic::traits::{DivisibleBy, Parity};
+use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::basic::traits::One;
+use malachite_base::num::modular::traits::DivisibleBy;
 
 // The denominator of B_n, by the von Staudt–Clausen theorem with every prime found by trial
 // division: the product of the primes p with p - 1 dividing n, for an even n >= 2.

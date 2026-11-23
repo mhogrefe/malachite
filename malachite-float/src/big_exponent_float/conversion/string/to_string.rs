@@ -17,9 +17,10 @@ use alloc::format;
 use alloc::string::String;
 use core::fmt::{Binary, Debug, Display, Formatter, LowerHex, Octal, Result, UpperHex};
 use core::str::FromStr;
-use malachite_base::num::arithmetic::traits::{DivExact, Mod};
+use malachite_base::num::arithmetic::traits::DivExact;
 use malachite_base::num::conversion::string::options::ToSciOptions;
 use malachite_base::num::conversion::traits::{ExactFrom, ToStringBase};
+use malachite_base::num::modular::traits::Mod;
 use malachite_base::strings::{ToBinaryString, ToLowerHexString, ToOctalString, ToUpperHexString};
 use malachite_nz::integer::Integer;
 

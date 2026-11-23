@@ -7,8 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
-use malachite_base::num::arithmetic::traits::{ExtendedGcd, Gcd};
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::number_theory::traits::{ExtendedGcd, Gcd};
 use malachite_base::polynomial::Polynomial;
 use malachite_q::rational_polynomial::RationalPolynomial;
 use malachite_q::test_util::generators::{

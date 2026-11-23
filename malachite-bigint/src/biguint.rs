@@ -20,13 +20,12 @@ use core::{
 };
 use malachite_base::{
     num::{
-        arithmetic::traits::{
-            DivExact, DivMod, DivRem, DivRound, DivisibleBy, FloorRoot, Gcd, Lcm, Mod, ModInverse,
-            ModPow, Parity,
-        },
+        arithmetic::traits::{DivExact, DivMod, DivRem, DivRound, FloorRoot, Parity},
         basic::traits::{One as _, Zero as _},
         conversion::traits::{Digits, FromStringBase, PowerOf2Digits, RoundingInto, ToStringBase},
         logic::traits::{BitAccess, BitIterable, CountOnes, SignificantBits},
+        modular::traits::{DivisibleBy, Mod, ModInverse, ModPow},
+        number_theory::traits::{Gcd, Lcm},
     },
     rounding_modes::RoundingMode,
 };

@@ -7,9 +7,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
-use malachite_base::num::arithmetic::traits::Lcm;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::linear_algebra::traits::AreLinearlyIndependent;
+use malachite_base::num::number_theory::traits::Lcm;
 use malachite_base::vector::Vector;
 use malachite_nz::integer_vector::IntegerVector;
 use malachite_nz::natural::Natural;

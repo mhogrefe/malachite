@@ -16,13 +16,14 @@ use crate::big_exponent_float::exponential::exp::{round_nudged, ziv_loop};
 use alloc::borrow::Cow;
 use core::cmp::Ordering::{self, *};
 use core::cmp::min;
-use malachite_base::num::arithmetic::traits::{DivisibleBy, Mod, ModPow, ModPowerOf2, Parity};
+use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::basic::traits::{
     NaN as NaNTrait, NegativeOne, One, OneHalf, Two, Zero as ZeroTrait,
 };
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::exponential::traits::CeilingLogBase2;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::num::modular::traits::{DivisibleBy, Mod, ModPow, ModPowerOf2};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;

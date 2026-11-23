@@ -7,9 +7,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::str::FromStr;
-use malachite_base::num::arithmetic::traits::{Gcd, Lcm, LcmAssign};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::modular::traits::DivisibleBy;
+use malachite_base::num::number_theory::traits::{Gcd, Lcm, LcmAssign};
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::arithmetic::traits::MakeMonic;
 use malachite_q::Rational;

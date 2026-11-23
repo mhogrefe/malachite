@@ -167,6 +167,9 @@ fn plain_variant_exists(
         "trigonometric",
         "hyperbolic",
         "linear_algebra",
+        "elliptic",
+        "gamma",
+        "factorization",
         "logic",
     ] {
         let path = format!("malachite_base::num::{module}::traits::{trait_name}");

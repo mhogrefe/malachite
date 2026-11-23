@@ -21,13 +21,13 @@ use crate::natural::Natural;
 use alloc::vec::Vec;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    AddMul, Ceiling, DivRound, FloorSqrt, ModPowerOf2, MulAddMul, Parity, Pow, ShrRound,
-    ShrRoundAssign,
+    AddMul, Ceiling, DivRound, FloorSqrt, MulAddMul, Parity, Pow, ShrRound, ShrRoundAssign,
 };
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::factorization::traits::Primes;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::num::modular::traits::ModPowerOf2;
 use malachite_base::num::number_theory::traits::Factorial;
 use malachite_base::rounding_modes::RoundingMode::*;
 

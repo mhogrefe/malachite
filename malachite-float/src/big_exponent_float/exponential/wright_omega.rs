@@ -19,11 +19,11 @@ use core::cmp::Ordering::{self, *};
 use core::cmp::max;
 use core::mem::swap;
 use malachite_base::fail_on_untested_path;
-use malachite_base::num::arithmetic::traits::FloorLogBase2;
 use malachite_base::num::basic::traits::{
     Infinity as InfinityTrait, NaN as NaNTrait, One, OneHalf, Zero as ZeroTrait,
 };
 use malachite_base::num::conversion::traits::RoundingFrom;
+use malachite_base::num::exponential::traits::FloorLogBase2;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::integer::Integer;

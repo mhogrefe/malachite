@@ -6,6 +6,20 @@ Unreleased section as work lands; at release time the section is stamped with th
 date. The 0.10.0 section was reconstructed retroactively; releases before 0.10.0 are only
 documented by git history.
 
+## Unreleased
+
+### Breaking and behavioral changes
+
+- The re-exports that kept the paths from before the 0.15.0 module split resolving are gone, as
+  announced in 0.15.0. Each trait is now reachable only through the module that defines it:
+  `malachite_base::num::arithmetic::traits` no longer re-exports the traits of `num::modular`,
+  `num::number_theory`, `num::exponential`, `num::elliptic`, `num::trigonometric`,
+  `num::hyperbolic`, and `num::linear_algebra`; the `malachite_base::polynomial` root no longer
+  re-exports the traits of `polynomial::arithmetic`, `polynomial::modular`, `polynomial::series`,
+  `polynomial::mod_polynomial`, and `polynomial::calculus`, or `ModPolynomialData` and
+  `ModComposeModPolynomialData`; and malachite-q's `rational::arithmetic::traits` module, which held
+  only the re-exports of `rational::number_theory::traits`, is removed.
+
 ## 0.15.0 — 2026-11-22
 
 ### Breaking and behavioral changes

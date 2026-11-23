@@ -92,8 +92,8 @@ pub mod exponent_gcd;
 pub mod floor_l2_norm;
 /// An implementation of [`FromRoots`], which builds the monic polynomial with given roots.
 pub mod from_roots;
-/// Implementations of [`Gcd`](malachite_base::num::arithmetic::traits::Gcd) and
-/// [`GcdAssign`](malachite_base::num::arithmetic::traits::GcdAssign), for computing GCDs of
+/// Implementations of [`Gcd`](malachite_base::num::number_theory::traits::Gcd) and
+/// [`GcdAssign`](malachite_base::num::number_theory::traits::GcdAssign), for computing GCDs of
 /// polynomials.
 pub mod gcd;
 /// Implementations of [`Height`](malachite_base::num::arithmetic::traits::Height) and
@@ -105,8 +105,8 @@ pub mod height;
 pub mod is_unit;
 /// An implementation of [`L2NormSquared`], the sum of the squares of a polynomial's coefficients.
 pub mod l2_norm_squared;
-/// Implementations of [`Lcm`](malachite_base::num::arithmetic::traits::Lcm) and
-/// [`LcmAssign`](malachite_base::num::arithmetic::traits::LcmAssign), for computing LCMs of
+/// Implementations of [`Lcm`](malachite_base::num::number_theory::traits::Lcm) and
+/// [`LcmAssign`](malachite_base::num::number_theory::traits::LcmAssign), for computing LCMs of
 /// polynomials.
 pub mod lcm;
 /// Implementations of [`Mul`](core::ops::Mul) and [`MulAssign`](core::ops::MulAssign), for

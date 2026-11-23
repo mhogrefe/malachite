@@ -16,9 +16,10 @@ use crate::rational_polynomial::arithmetic::make_monic::monic_from_primitive_par
 use alloc::vec;
 use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{
-    Content, DivExact, ExtendedGcd, Gcd, PrimitivePart, Reciprocal, UnsignedAbs,
+    Content, DivExact, PrimitivePart, Reciprocal, UnsignedAbs,
 };
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::number_theory::traits::{ExtendedGcd, Gcd};
 use malachite_base::polynomial::Polynomial;
 use malachite_base::polynomial::arithmetic::traits::MakeMonic;
 use malachite_nz::integer::Integer;
@@ -128,7 +129,7 @@ impl ExtendedGcd<Self> for RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::num::arithmetic::traits::ExtendedGcd;
+    /// use malachite_base::num::number_theory::traits::ExtendedGcd;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let p = RationalPolynomial::from_str("1/2*x^2-1/2").unwrap();
@@ -177,7 +178,7 @@ impl ExtendedGcd<&Self> for RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::num::arithmetic::traits::ExtendedGcd;
+    /// use malachite_base::num::number_theory::traits::ExtendedGcd;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let p = RationalPolynomial::from_str("1/2*x^2-1/2").unwrap();
@@ -226,7 +227,7 @@ impl ExtendedGcd<RationalPolynomial> for &RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::num::arithmetic::traits::ExtendedGcd;
+    /// use malachite_base::num::number_theory::traits::ExtendedGcd;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let p = RationalPolynomial::from_str("1/2*x^2-1/2").unwrap();
@@ -278,7 +279,7 @@ impl ExtendedGcd<&RationalPolynomial> for &RationalPolynomial {
     /// # Examples
     /// ```
     /// use core::str::FromStr;
-    /// use malachite_base::num::arithmetic::traits::ExtendedGcd;
+    /// use malachite_base::num::number_theory::traits::ExtendedGcd;
     /// use malachite_q::rational_polynomial::RationalPolynomial;
     ///
     /// let p = RationalPolynomial::from_str("1/2*x^2-1/2").unwrap();

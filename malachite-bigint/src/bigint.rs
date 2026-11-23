@@ -22,12 +22,13 @@ use core::{
 use malachite_base::{
     num::{
         arithmetic::traits::{
-            Abs, DivEuclidean, DivExact, DivMod, DivModEuclidean, DivRem, DivRound, DivisibleBy,
-            Mod, ModEuclidean, Parity, Sign as _, UnsignedAbs,
+            Abs, DivEuclidean, DivExact, DivMod, DivModEuclidean, DivRem, DivRound, Parity,
+            Sign as _, UnsignedAbs,
         },
         basic::traits::{One as _, Zero as _},
         conversion::traits::{RoundingInto, ToStringBase},
         logic::traits::{BitAccess, NotAssign},
+        modular::traits::{DivisibleBy, Mod, ModEuclidean},
     },
     rounding_modes::RoundingMode,
 };
