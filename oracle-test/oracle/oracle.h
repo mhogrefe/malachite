@@ -98,6 +98,7 @@ int require_some_lines(const char * name, long checked);
 
 /* primitive_root.c */
 int run_n_primitive_root_prime(const char * arg);
+int run_n_is_prime(const char * arg);
 
 /* sqrtmod.c */
 int run_fmpz_sqrtmod(const char * arg);

@@ -26,6 +26,7 @@ typedef struct
 
 static const oracle_mode modes[] = {
     {"n_primitive_root_prime", run_n_primitive_root_prime},
+    {"n_is_prime", run_n_is_prime},
     {"fmpz_sqrtmod", run_fmpz_sqrtmod},
     {"n_sqrtmod", run_n_sqrtmod},
     {"sqrtmod_stress", run_sqrtmod_stress},

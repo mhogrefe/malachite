@@ -11439,6 +11439,21 @@ fn test_against_azurite(build: bool) {
     ] {
         check_demo_against_azurite(&oracle, "../malachite-base", demo, "az_zmod_pow2_sqrt");
     }
+    // The primitive unsigned is_prime, decided by Azurite's proven primality test.
+    for demo in [
+        "demo_u8_is_prime",
+        "demo_u8_is_prime_primes",
+        "demo_u16_is_prime",
+        "demo_u16_is_prime_primes",
+        "demo_u32_is_prime",
+        "demo_u32_is_prime_primes",
+        "demo_u64_is_prime",
+        "demo_u64_is_prime_primes",
+        "demo_usize_is_prime",
+        "demo_usize_is_prime_primes",
+    ] {
+        check_demo_against_azurite(&oracle, "../malachite-base", demo, "az_nat_is_prime");
+    }
     for (demo, mode) in AZURITE_UNSIGNED_VECTOR_STAGES {
         check_demo_against_azurite(&oracle, "../malachite-base", demo, mode);
     }
@@ -14439,6 +14454,21 @@ fn test_against_flint(build: bool) {
             demo_name,
             "n_primitive_root_prime",
         );
+    }
+
+    for demo_name in [
+        "demo_u8_is_prime",
+        "demo_u8_is_prime_primes",
+        "demo_u16_is_prime",
+        "demo_u16_is_prime_primes",
+        "demo_u32_is_prime",
+        "demo_u32_is_prime_primes",
+        "demo_u64_is_prime",
+        "demo_u64_is_prime_primes",
+        "demo_usize_is_prime",
+        "demo_usize_is_prime_primes",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-base", demo_name, "n_is_prime");
     }
 
     // Every case from test_evaluate in malachite-nz's IntegerPolynomial and NaturalPolynomial

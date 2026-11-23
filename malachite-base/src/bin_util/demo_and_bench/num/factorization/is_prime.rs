@@ -23,6 +23,11 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_u32_is_prime);
     register_demo!(runner, demo_u64_is_prime);
     register_demo!(runner, demo_usize_is_prime);
+    register_demo!(runner, demo_u8_is_prime_primes);
+    register_demo!(runner, demo_u16_is_prime_primes);
+    register_demo!(runner, demo_u32_is_prime_primes);
+    register_demo!(runner, demo_u64_is_prime_primes);
+    register_demo!(runner, demo_usize_is_prime_primes);
 
     register_bench!(runner, benchmark_u8_is_prime_algorithms);
     register_bench!(runner, benchmark_u16_is_prime_algorithms);
@@ -77,6 +82,56 @@ fn demo_u64_is_prime(gm: GenMode, config: &GenConfig, limit: usize) {
 
 fn demo_usize_is_prime(gm: GenMode, config: &GenConfig, limit: usize) {
     for u in unsigned_gen::<usize>().get(gm, config).take(limit) {
+        if u.is_prime() {
+            println!("{u} is prime");
+        } else {
+            println!("{u} is not prime");
+        }
+    }
+}
+
+fn demo_u8_is_prime_primes(gm: GenMode, config: &GenConfig, limit: usize) {
+    for u in unsigned_gen_var_29::<u8>().get(gm, config).take(limit) {
+        if u.is_prime() {
+            println!("{u} is prime");
+        } else {
+            println!("{u} is not prime");
+        }
+    }
+}
+
+fn demo_u16_is_prime_primes(gm: GenMode, config: &GenConfig, limit: usize) {
+    for u in unsigned_gen_var_29::<u16>().get(gm, config).take(limit) {
+        if u.is_prime() {
+            println!("{u} is prime");
+        } else {
+            println!("{u} is not prime");
+        }
+    }
+}
+
+fn demo_u32_is_prime_primes(gm: GenMode, config: &GenConfig, limit: usize) {
+    for u in unsigned_gen_var_29::<u32>().get(gm, config).take(limit) {
+        if u.is_prime() {
+            println!("{u} is prime");
+        } else {
+            println!("{u} is not prime");
+        }
+    }
+}
+
+fn demo_u64_is_prime_primes(gm: GenMode, config: &GenConfig, limit: usize) {
+    for u in unsigned_gen_var_29::<u64>().get(gm, config).take(limit) {
+        if u.is_prime() {
+            println!("{u} is prime");
+        } else {
+            println!("{u} is not prime");
+        }
+    }
+}
+
+fn demo_usize_is_prime_primes(gm: GenMode, config: &GenConfig, limit: usize) {
+    for u in unsigned_gen_var_29::<usize>().get(gm, config).take(limit) {
         if u.is_prime() {
             println!("{u} is prime");
         } else {

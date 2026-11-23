@@ -11,7 +11,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::exhaustive::exhaustive_unsigneds;
 use malachite_base::num::factorization::is_prime::test_is_prime_tables;
-use malachite_base::num::factorization::traits::IsPrime;
+use malachite_base::num::factorization::traits::{IsPrime, Primes};
 use malachite_base::test_util::generators::{unsigned_gen, unsigned_pair_gen_var_50};
 use malachite_base::test_util::num::factorization::is_prime::is_prime_naive;
 use malachite_base::test_util::num::factorization::is_prime_flint_3_1_2::{
@@ -555,6 +555,26 @@ fn test_is_prime_against_flint_3_1_2() {
             }
         }
     }
+}
+
+// The definitive check of the small-input paths: every u32, as a u32 and as a u64, against the
+// sieve. Takes a minute or two in release.
+#[test]
+fn test_is_prime_all_u32() {
+    let mut primes = u32::primes();
+    let mut next_prime = primes.next();
+    let mut count = 0;
+    for n in 0..=u32::MAX {
+        let expected = next_prime == Some(n);
+        if expected {
+            next_prime = primes.next();
+            count += 1;
+        }
+        assert_eq!(n.is_prime(), expected, "{n}");
+        assert_eq!(u64::from(n).is_prime(), expected, "{n}");
+    }
+    assert_eq!(next_prime, None);
+    assert_eq!(count, 203280221);
 }
 
 #[test]
