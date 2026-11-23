@@ -50,8 +50,27 @@ FLINT, the driver compiles the oracle sources in `oracle/` on demand (into `targ
 it builds `lake exe oracle` in the Azurite checkout. It then runs each registered Malachite demo in
 all three generator modes (`exhaustive`, `random`, `special_random`) at 10000 lines each, checking
 every run against the oracle, after the unit-row files described below. Any disagreement fails the
-run with the offending line reported. The demo output lands in `test-out.txt`, which is shared
-state: don't run the driver and a manual demo regeneration concurrently.
+run with the offending line reported.
+
+The driver first collects a backend's checks, then orders them: the unit-row files by path, and
+then the demos by the path of the `demo_and_bench` file that registers each one (which mirrors the
+layout of the crate's sources), keeping the order of the tables in `src/main.rs` within a file. A
+demo name that no `demo_and_bench` file registers fails the run before anything runs. It builds
+each crate's demo binary once (`cargo build --release --features bin_build`) and runs it directly,
+falling back to `cargo run` for a crate whose binary does not load a library. The checks run on
+`MALACHITE_ORACLE_JOBS` workers (4 by default), and each result is printed with a `[done/total]`
+count. After a failure no new check starts; the ones running finish, and the run exits with an
+error that names the failing check and, for a demo, the file holding its output. Each worker
+writes its demos' output to its own file, `target/oracle-out/test-out-<worker>.txt`.
+
+```
+cargo run --release -- plan
+cargo run --release -- plan azurite
+```
+
+print the ordered checks of both backends, or of one, without building or running anything. Set
+`MALACHITE_ORACLE_FILTER` to run (or print) only the checks whose description, as printed, contains
+it: `MALACHITE_ORACLE_FILTER=ln_gamma cargo run --release -- azurite`.
 
 ## Unit rows
 
@@ -326,8 +345,9 @@ identity `s·x + t·y = g` in Azurite arithmetic, and the pair Malachite's docum
    `fmpz_poly_set_str_malachite` from `oracle/util.c`.
 3. Register the demo in `src/main.rs` with `check_demo_against_flint`; the unit file needs no
    registration.
-4. Prove the harness can fail: corrupt one line of `test-out.txt` by hand and check that the
-   oracle catches it.
+4. Prove the harness can fail: corrupt one line of a demo's output (a
+   `target/oracle-out/test-out-<worker>.txt` left by a run, or the output of the demo run by hand)
+   and check that the oracle mode, run on that file, catches it.
 
 For an Azurite oracle, step 2 is a `check*` function in `Azurite/Oracle/AzNat.lean` (or a new
 file for another type) and a row in the `modes` table of `Azurite/Oracle/Main.lean`, written

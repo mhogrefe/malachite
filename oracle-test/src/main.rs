@@ -14,17 +14,26 @@
 // `MALACHITE_MPFR_DIR`, defaulting to Homebrew's `/opt/homebrew/opt/mpfr`. The Azurite oracle is
 // the `oracle` executable of the Azurite repository (formally verified Lean arithmetic), located
 // through `MALACHITE_AZURITE_DIR`, defaulting to `../../../azurite`. `cargo run --release -- flint`
-// or `-- azurite` runs one backend; with no argument both run. See README.md.
+// or `-- azurite` runs one backend; with no argument both run. The checks of a backend are collected
+// first, ordered by the paths of the files that register their demos, and run on
+// `MALACHITE_ORACLE_JOBS` workers (4 by default), with a `[done/total]` count; `-- plan` prints
+// them without running anything. See README.md.
 
+use std::collections::HashMap;
 use std::env;
 use std::fs::{self, File};
 use std::io::{self, Write};
+use std::mem;
 use std::path::{Path, PathBuf};
-use std::process::{Command, Stdio};
+use std::process::{self, Command, Stdio};
+use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
+use std::sync::Mutex;
+use std::thread;
 
 const MODES: [&str; 3] = ["exhaustive", "random", "special_random"];
 const LIMIT: usize = 10000;
-const TEST_OUT: &str = "test-out.txt";
+// Where each worker writes its demos' output, as `test-out-<worker>.txt`.
+const OUT_DIR: &str = "target/oracle-out";
 
 fn flint_dir() -> PathBuf {
     let dir = env::var("MALACHITE_FLINT_DIR").unwrap_or_else(|_| "../../flint-3.6.0".to_string());
@@ -94,60 +103,68 @@ fn build_oracle() -> PathBuf {
     binary
 }
 
-fn run_oracle(oracle: &Path, mode: &str, input: Option<&str>) {
-    let mut command = Command::new(oracle);
-    command.arg(mode);
-    if let Some(input) = input {
-        command.arg(input);
+// What a check hands to an oracle mode: a unit-row file, or the output of one demo run.
+enum CheckInput {
+    Unit(PathBuf),
+    Demo {
+        crate_dir: String,
+        demo: String,
+        gen_mode: &'static str,
+        limit: usize,
+    },
+}
+
+// One oracle check. The test functions only collect checks into `PLAN`; `run_plan` orders them,
+// runs them on several workers, and reports progress.
+struct Check {
+    backend: &'static str,
+    oracle: PathBuf,
+    oracle_mode: String,
+    input: CheckInput,
+}
+
+static PLAN: Mutex<Vec<Check>> = Mutex::new(Vec::new());
+
+fn plan_check(backend: &'static str, oracle: &Path, oracle_mode: &str, input: CheckInput) {
+    PLAN.lock().unwrap().push(Check {
+        backend,
+        oracle: oracle.to_path_buf(),
+        oracle_mode: oracle_mode.to_string(),
+        input,
+    });
+}
+
+// Plans one check per generator mode: the demo's output, at most `limit` lines, read by the oracle
+// mode `oracle_mode`.
+fn plan_demo(
+    backend: &'static str,
+    oracle: &Path,
+    crate_dir: &str,
+    demo_name: &str,
+    oracle_mode: &str,
+    modes: &[&'static str],
+    limit: usize,
+) {
+    for &gen_mode in modes {
+        plan_check(
+            backend,
+            oracle,
+            oracle_mode,
+            CheckInput::Demo {
+                crate_dir: crate_dir.to_string(),
+                demo: demo_name.to_string(),
+                gen_mode,
+                limit,
+            },
+        );
     }
-    let output = command.output().expect("failed to run the FLINT oracle");
-    io::stdout().write_all(&output.stdout).unwrap();
-    io::stderr().write_all(&output.stderr).unwrap();
-    assert!(
-        output.status.success(),
-        "FLINT oracle failed in mode {mode}: {:?}",
-        output.status
-    );
 }
 
-// Runs a Malachite demo in the given generator mode, capturing its output to `TEST_OUT`.
-fn run_demo(crate_dir: &str, demo_name: &str, mode: &str) {
-    run_demo_with_limit(crate_dir, demo_name, mode, LIMIT);
-}
-
-// Like `run_demo`, but with a line limit other than `LIMIT`, for demos whose lines are long.
-fn run_demo_with_limit(crate_dir: &str, demo_name: &str, mode: &str, limit: usize) {
-    let output_file = File::create(TEST_OUT).unwrap();
-    let mut command = Command::new("cargo");
-    command
-        .arg("run")
-        .arg("--release")
-        .arg("-j")
-        .arg("4")
-        .arg("--features")
-        .arg("bin_build")
-        .arg("--")
-        .arg("-l")
-        .arg(format!("{limit}"))
-        .arg("-m")
-        .arg(mode)
-        .arg("-d")
-        .arg(demo_name);
-    command.current_dir(crate_dir);
-    command.stdout(Stdio::from(output_file));
-    let output = command.output().expect("failed to run Malachite demo");
-    io::stdout().write_all(&output.stdout).unwrap();
-    io::stderr().write_all(&output.stderr).unwrap();
-    assert!(output.status.success(), "demo {demo_name} failed");
-}
-
-// Runs a Malachite demo in every generator mode, diffing each run's output against FLINT.
+// Plans a Malachite demo in every generator mode, diffing each run's output against FLINT.
 fn check_demo_against_flint(oracle: &Path, crate_dir: &str, demo_name: &str, flint_mode: &str) {
-    for mode in MODES {
-        println!("testing {demo_name} in mode {mode}");
-        run_demo(crate_dir, demo_name, mode);
-        run_oracle(oracle, flint_mode, Some(TEST_OUT));
-    }
+    plan_demo(
+        "FLINT", oracle, crate_dir, demo_name, flint_mode, &MODES, LIMIT,
+    );
 }
 
 // Like `check_demo_against_flint`, but with a line limit other than `LIMIT`, for demos whose lines
@@ -159,11 +176,9 @@ fn check_demo_against_flint_with_limit(
     flint_mode: &str,
     limit: usize,
 ) {
-    for mode in MODES {
-        println!("testing {demo_name} in mode {mode}");
-        run_demo_with_limit(crate_dir, demo_name, mode, limit);
-        run_oracle(oracle, flint_mode, Some(TEST_OUT));
-    }
+    plan_demo(
+        "FLINT", oracle, crate_dir, demo_name, flint_mode, &MODES, limit,
+    );
 }
 
 // Like `check_demo_against_flint_with_limit`, but only in the random modes, for demos that enlarge
@@ -175,11 +190,15 @@ fn check_demo_against_flint_random_modes_with_limit(
     flint_mode: &str,
     limit: usize,
 ) {
-    for mode in &MODES[1..] {
-        println!("testing {demo_name} in mode {mode}");
-        run_demo_with_limit(crate_dir, demo_name, mode, limit);
-        run_oracle(oracle, flint_mode, Some(TEST_OUT));
-    }
+    plan_demo(
+        "FLINT",
+        oracle,
+        crate_dir,
+        demo_name,
+        flint_mode,
+        &MODES[1..],
+        limit,
+    );
 }
 
 // Like `check_demo_against_flint_no_special`, but with a line limit other than `LIMIT`, for demos
@@ -191,11 +210,15 @@ fn check_demo_against_flint_no_special_with_limit(
     flint_mode: &str,
     limit: usize,
 ) {
-    for mode in &MODES[..2] {
-        println!("testing {demo_name} in mode {mode}");
-        run_demo_with_limit(crate_dir, demo_name, mode, limit);
-        run_oracle(oracle, flint_mode, Some(TEST_OUT));
-    }
+    plan_demo(
+        "FLINT",
+        oracle,
+        crate_dir,
+        demo_name,
+        flint_mode,
+        &MODES[..2],
+        limit,
+    );
 }
 
 // For demos whose generators do not support the special_random mode, such as those built on
@@ -206,36 +229,388 @@ fn check_demo_against_flint_no_special(
     demo_name: &str,
     flint_mode: &str,
 ) {
-    for mode in &MODES[..2] {
-        println!("testing {demo_name} in mode {mode}");
-        run_demo(crate_dir, demo_name, mode);
-        run_oracle(oracle, flint_mode, Some(TEST_OUT));
+    plan_demo(
+        "FLINT",
+        oracle,
+        crate_dir,
+        demo_name,
+        flint_mode,
+        &MODES[..2],
+        LIMIT,
+    );
+}
+
+// Plans every unit-row file under `unit/<dir>/`: each `<mode>/<name>.txt` holds lines in the
+// format the demos print, mostly the rows of a `test_*` function in Malachite's own tests, and is
+// handed to the oracle's mode `<mode>` as it is.
+fn plan_unit_files(backend: &'static str, dir: &str, oracle: &Path) {
+    let root = Path::new("unit").join(dir);
+    let mode_dirs = fs::read_dir(&root)
+        .unwrap_or_else(|_| panic!("no unit-row directory {}", root.display()))
+        .map(|entry| entry.unwrap().path())
+        .filter(|path| path.is_dir());
+    for mode_dir in mode_dirs {
+        let mode = mode_dir.file_name().unwrap().to_str().unwrap().to_string();
+        let files = fs::read_dir(&mode_dir)
+            .unwrap()
+            .map(|entry| entry.unwrap().path())
+            .filter(|path| path.extension().and_then(|e| e.to_str()) == Some("txt"));
+        for file in files {
+            plan_check(backend, oracle, &mode, CheckInput::Unit(file));
+        }
     }
 }
 
-// Checks every unit-row file under `unit/<backend>/`: each `<mode>/<name>.txt` holds lines in the
-// format the demos print, mostly the rows of a `test_*` function in Malachite's own tests, and is
-// handed to the oracle's mode `<mode>` as it is. Directories and files are visited in sorted order.
-fn run_unit_files(backend: &str, mut run: impl FnMut(&str, &str)) {
-    let root = Path::new("unit").join(backend);
-    let mut mode_dirs: Vec<PathBuf> = fs::read_dir(&root)
-        .unwrap_or_else(|_| panic!("no unit-row directory {}", root.display()))
-        .map(|entry| entry.unwrap().path())
-        .filter(|path| path.is_dir())
-        .collect();
-    mode_dirs.sort();
-    for mode_dir in mode_dirs {
-        let mode = mode_dir.file_name().unwrap().to_str().unwrap().to_string();
-        let mut files: Vec<PathBuf> = fs::read_dir(&mode_dir)
-            .unwrap()
-            .map(|entry| entry.unwrap().path())
-            .filter(|path| path.extension().and_then(|e| e.to_str()) == Some("txt"))
-            .collect();
-        files.sort();
-        for file in files {
-            println!("testing unit rows {} in mode {mode}", file.display());
-            run(&mode, file.to_str().unwrap());
+// The demo-and-bench file that registers each of a crate's demos. Those files mirror the layout of
+// the crate's sources, so ordering the checks by them orders them by the implementations' paths. A
+// demo registered through a generic macro (`register_unsigned_demos!` and the like) is named
+// `<function>_<type>`, so those registrations are kept as prefixes.
+struct DemoSources {
+    exact: HashMap<String, String>,
+    generic: Vec<(String, String)>,
+}
+
+impl DemoSources {
+    fn read(crate_dir: &str) -> DemoSources {
+        let mut sources = DemoSources {
+            exact: HashMap::new(),
+            generic: Vec::new(),
+        };
+        let mut dirs = vec![Path::new(crate_dir).join("src/bin_util/demo_and_bench")];
+        while let Some(dir) = dirs.pop() {
+            for entry in fs::read_dir(&dir).unwrap() {
+                let path = entry.unwrap().path();
+                if path.is_dir() {
+                    dirs.push(path);
+                } else if path.extension().and_then(|e| e.to_str()) == Some("rs") {
+                    sources.read_file(&path);
+                }
+            }
         }
+        sources
+    }
+
+    // Records the demos that one file registers: `register_demo!(runner, name)` and
+    // `register_<kind>_demos!(runner, name, ...)`.
+    fn read_file(&mut self, path: &Path) {
+        let file = path.to_str().unwrap().to_string();
+        let text = fs::read_to_string(path).unwrap();
+        let mut rest = text.as_str();
+        while let Some(start) = rest.find("register_") {
+            rest = &rest[start + "register_".len()..];
+            let Some(bang) = rest.find("!(") else {
+                break;
+            };
+            let kind = &rest[..bang];
+            if !kind.bytes().all(|b| b.is_ascii_alphanumeric() || b == b'_') {
+                continue;
+            }
+            let Some(close) = rest[bang..].find(')') else {
+                break;
+            };
+            let args: Vec<&str> = rest[bang + 2..bang + close]
+                .split(',')
+                .map(str::trim)
+                .collect();
+            if args.len() >= 2 {
+                if kind == "demo" {
+                    self.exact.insert(args[1].to_string(), file.clone());
+                } else if kind.ends_with("_demos") {
+                    self.generic.push((args[1].to_string(), file.clone()));
+                }
+            }
+            rest = &rest[bang + close..];
+        }
+    }
+
+    fn file_of(&self, demo: &str) -> Option<&str> {
+        if let Some(file) = self.exact.get(demo) {
+            return Some(file);
+        }
+        self.generic
+            .iter()
+            .filter(|(prefix, _)| {
+                demo.len() > prefix.len()
+                    && demo.starts_with(prefix.as_str())
+                    && demo.as_bytes()[prefix.len()] == b'_'
+            })
+            .max_by_key(|(prefix, _)| prefix.len())
+            .map(|(_, file)| file.as_str())
+    }
+}
+
+// Takes the planned checks and orders them: the unit-row files first, by path, and then the demos,
+// by the path of the file that registers each one, keeping the planned order within a file. Panics,
+// before anything runs, if a planned demo is not registered, even one that the filter drops.
+fn take_ordered_plan() -> Vec<Check> {
+    let checks = mem::take(&mut *PLAN.lock().unwrap());
+    let mut sources: HashMap<String, DemoSources> = HashMap::new();
+    let mut unregistered = Vec::new();
+    let mut keyed = Vec::new();
+    for (index, check) in checks.into_iter().enumerate() {
+        let key = match &check.input {
+            CheckInput::Unit(file) => (0, file.to_str().unwrap().to_string()),
+            CheckInput::Demo {
+                crate_dir, demo, ..
+            } => {
+                let crate_sources = sources
+                    .entry(crate_dir.clone())
+                    .or_insert_with(|| DemoSources::read(crate_dir));
+                match crate_sources.file_of(demo) {
+                    Some(file) => (1, file.to_string()),
+                    None => {
+                        unregistered.push(format!("{demo} ({crate_dir})"));
+                        (2, String::new())
+                    }
+                }
+            }
+        };
+        keyed.push((key, index, check));
+    }
+    unregistered.sort();
+    unregistered.dedup();
+    assert!(
+        unregistered.is_empty(),
+        "planned demos that no demo-and-bench file registers: {unregistered:?}"
+    );
+    keyed.sort_by(|a, b| (&a.0, a.1).cmp(&(&b.0, b.1)));
+    // `MALACHITE_ORACLE_FILTER` keeps only the checks whose description contains it, for a quick
+    // run while working on one function.
+    let filter = env::var("MALACHITE_ORACLE_FILTER").unwrap_or_default();
+    keyed
+        .into_iter()
+        .map(|(_, _, check)| check)
+        .filter(|check| describe(check).contains(&filter))
+        .collect()
+}
+
+fn describe(check: &Check) -> String {
+    match &check.input {
+        CheckInput::Unit(file) => {
+            format!("unit rows {} in mode {}", file.display(), check.oracle_mode)
+        }
+        CheckInput::Demo { demo, gen_mode, .. } => {
+            format!("{demo} in mode {gen_mode} against {}", check.backend)
+        }
+    }
+}
+
+// Prints the ordered checks without running anything.
+fn print_plan() {
+    let checks = take_ordered_plan();
+    let total = checks.len();
+    for (i, check) in checks.iter().enumerate() {
+        println!("[{}/{total}] {}", i + 1, describe(check));
+    }
+}
+
+// How a crate's demos are run: its demo binary directly, built once before the checks start, or,
+// if running the binary directly failed to load a library (a binary that links a library through
+// `@rpath` needs the library path that `cargo run` sets), through `cargo run`.
+struct DemoRunner {
+    crate_dir: String,
+    binary: PathBuf,
+    through_cargo: AtomicBool,
+}
+
+const CARGO_BUILD_ARGS: [&str; 6] = ["--release", "-j", "4", "--features", "bin_build", "-q"];
+
+// Builds a crate's demo binary (a no-op when it is up to date), returning its path, which Cargo
+// reports as the `executable` of the bin target's `compiler-artifact` message.
+fn build_demo_binary(crate_dir: &str) -> PathBuf {
+    let output = Command::new("cargo")
+        .arg("build")
+        .args(CARGO_BUILD_ARGS)
+        .arg("--message-format=json-render-diagnostics")
+        .current_dir(crate_dir)
+        .stderr(Stdio::inherit())
+        .output()
+        .expect("failed to run cargo");
+    assert!(
+        output.status.success(),
+        "failed to build the demo binary of {crate_dir}"
+    );
+    let messages = String::from_utf8(output.stdout).unwrap();
+    for line in messages.lines() {
+        if line.contains("\"reason\":\"compiler-artifact\"") && line.contains("\"kind\":[\"bin\"]")
+        {
+            if let Some(start) = line.find("\"executable\":\"") {
+                let rest = &line[start + "\"executable\":\"".len()..];
+                return PathBuf::from(&rest[..rest.find('"').unwrap()]);
+            }
+        }
+    }
+    panic!("cargo built no demo binary in {crate_dir}");
+}
+
+// Runs a demo, writing its output to `out` and returning what it wrote to stderr.
+fn run_demo(
+    runner: &DemoRunner,
+    demo: &str,
+    gen_mode: &str,
+    limit: usize,
+    out: &Path,
+) -> Result<Vec<u8>, String> {
+    let limit = limit.to_string();
+    let args = ["-l", &limit, "-m", gen_mode, "-d", demo];
+    let create = || File::create(out).unwrap_or_else(|e| panic!("cannot create {out:?}: {e}"));
+    if !runner.through_cargo.load(Ordering::Relaxed) {
+        let output = Command::new(&runner.binary)
+            .args(args)
+            .current_dir(&runner.crate_dir)
+            .stdout(create())
+            .output()
+            .map_err(|e| format!("failed to run {:?}: {e}", runner.binary))?;
+        if output.status.success() {
+            return Ok(output.stderr);
+        }
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        if !stderr.contains("dyld") {
+            return Err(format!("the demo failed ({}):\n{stderr}", output.status));
+        }
+        if !runner.through_cargo.swap(true, Ordering::Relaxed) {
+            eprintln!(
+                "the demo binary of {} did not load a library; running its demos through \
+                `cargo run`:\n{stderr}",
+                runner.crate_dir
+            );
+        }
+    }
+    let output = Command::new("cargo")
+        .arg("run")
+        .args(CARGO_BUILD_ARGS)
+        .arg("--")
+        .args(args)
+        .current_dir(&runner.crate_dir)
+        .stdout(create())
+        .output()
+        .map_err(|e| format!("failed to run cargo: {e}"))?;
+    if output.status.success() {
+        Ok(output.stderr)
+    } else {
+        Err(format!(
+            "the demo failed ({}):\n{}",
+            output.status,
+            String::from_utf8_lossy(&output.stderr)
+        ))
+    }
+}
+
+// Runs one check, using `out` for a demo's output, and returns everything the demo and the oracle
+// printed besides the demo's output.
+fn run_check(
+    check: &Check,
+    runners: &HashMap<String, DemoRunner>,
+    out: &Path,
+) -> Result<Vec<u8>, String> {
+    let mut printed = Vec::new();
+    let input = match &check.input {
+        CheckInput::Unit(file) => file.as_path(),
+        CheckInput::Demo {
+            crate_dir,
+            demo,
+            gen_mode,
+            limit,
+        } => {
+            printed = run_demo(&runners[crate_dir], demo, gen_mode, *limit, out)?;
+            out
+        }
+    };
+    let output = Command::new(&check.oracle)
+        .arg(&check.oracle_mode)
+        .arg(input)
+        .output()
+        .map_err(|e| format!("failed to run the {} oracle: {e}", check.backend))?;
+    printed.extend_from_slice(&output.stdout);
+    printed.extend_from_slice(&output.stderr);
+    if output.status.success() {
+        Ok(printed)
+    } else {
+        Err(format!(
+            "the {} oracle failed in mode {} ({}) on {}:\n{}",
+            check.backend,
+            check.oracle_mode,
+            output.status,
+            input.display(),
+            String::from_utf8_lossy(&printed)
+        ))
+    }
+}
+
+// The number of checks run at once: `MALACHITE_ORACLE_JOBS`, or 4.
+fn jobs() -> usize {
+    env::var("MALACHITE_ORACLE_JOBS").map_or(4, |jobs| match jobs.parse() {
+        Ok(jobs) if jobs > 0 => jobs,
+        _ => panic!("MALACHITE_ORACLE_JOBS must be a positive integer, not {jobs:?}"),
+    })
+}
+
+// Runs the planned checks in order on `jobs()` workers, each writing its demos' output to its own
+// file in `OUT_DIR`, and prints `[done/total]` with each result. After the first failure no new
+// check starts; the checks already running finish, and then the run exits with an error.
+fn run_plan() {
+    let checks = take_ordered_plan();
+    let total = checks.len();
+    let mut runners = HashMap::new();
+    for check in &checks {
+        if let CheckInput::Demo { crate_dir, .. } = &check.input {
+            if !runners.contains_key(crate_dir) {
+                let runner = DemoRunner {
+                    crate_dir: crate_dir.clone(),
+                    binary: build_demo_binary(crate_dir),
+                    through_cargo: AtomicBool::new(false),
+                };
+                runners.insert(crate_dir.clone(), runner);
+            }
+        }
+    }
+    fs::create_dir_all(OUT_DIR).unwrap();
+    let next = AtomicUsize::new(0);
+    let done = AtomicUsize::new(0);
+    let failure: Mutex<Option<String>> = Mutex::new(None);
+    thread::scope(|scope| {
+        for worker in 0..jobs() {
+            let (checks, runners, next, done, failure) =
+                (&checks, &runners, &next, &done, &failure);
+            scope.spawn(move || {
+                let out = Path::new(OUT_DIR).join(format!("test-out-{worker}.txt"));
+                while failure.lock().unwrap().is_none() {
+                    let i = next.fetch_add(1, Ordering::Relaxed);
+                    if i >= total {
+                        break;
+                    }
+                    let check = &checks[i];
+                    let result = run_check(check, runners, &out);
+                    let n = done.fetch_add(1, Ordering::Relaxed) + 1;
+                    match result {
+                        Ok(printed) => {
+                            let mut stdout = io::stdout().lock();
+                            writeln!(stdout, "[{n}/{total}] testing {}", describe(check)).unwrap();
+                            stdout.write_all(&printed).unwrap();
+                        }
+                        Err(message) => {
+                            let mut failure = failure.lock().unwrap();
+                            if failure.is_none() {
+                                let demo_output = match check.input {
+                                    CheckInput::Unit(_) => String::new(),
+                                    CheckInput::Demo { .. } => {
+                                        format!(" (the demo's output is in {})", out.display())
+                                    }
+                                };
+                                *failure = Some(format!(
+                                    "[{n}/{total}] {} failed{demo_output}: {message}",
+                                    describe(check)
+                                ));
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    });
+    if let Some(message) = failure.into_inner().unwrap() {
+        eprintln!("{message}");
+        process::exit(1);
     }
 }
 
@@ -270,28 +645,13 @@ fn build_azurite_oracle() -> PathBuf {
     binary
 }
 
-fn run_azurite_oracle(oracle: &Path, mode: &str, input: &str) {
-    let output = Command::new(oracle)
-        .arg(mode)
-        .arg(input)
-        .output()
-        .expect("failed to run the Azurite oracle");
-    io::stdout().write_all(&output.stdout).unwrap();
-    io::stderr().write_all(&output.stderr).unwrap();
-    assert!(
-        output.status.success(),
-        "Azurite oracle failed in mode {mode}: {:?}",
-        output.status
-    );
-}
-
-// Runs a Malachite demo in the given generator modes, checking each run's output against Azurite.
+// Plans a Malachite demo in the given generator modes, checking each run's output against Azurite.
 fn check_demo_against_azurite_in_modes(
     oracle: &Path,
     crate_dir: &str,
     demo_name: &str,
     azurite_mode: &str,
-    modes: &[&str],
+    modes: &[&'static str],
 ) {
     check_demo_against_azurite_with_limit(oracle, crate_dir, demo_name, azurite_mode, modes, LIMIT);
 }
@@ -303,17 +663,21 @@ fn check_demo_against_azurite_with_limit(
     crate_dir: &str,
     demo_name: &str,
     azurite_mode: &str,
-    modes: &[&str],
+    modes: &[&'static str],
     limit: usize,
 ) {
-    for mode in modes {
-        println!("testing {demo_name} in mode {mode} against Azurite");
-        run_demo_with_limit(crate_dir, demo_name, mode, limit);
-        run_azurite_oracle(oracle, azurite_mode, TEST_OUT);
-    }
+    plan_demo(
+        "Azurite",
+        oracle,
+        crate_dir,
+        demo_name,
+        azurite_mode,
+        modes,
+        limit,
+    );
 }
 
-// Runs a Malachite demo in every generator mode, checking each run's output against Azurite.
+// Plans a Malachite demo in every generator mode, checking each run's output against Azurite.
 fn check_demo_against_azurite(oracle: &Path, crate_dir: &str, demo_name: &str, azurite_mode: &str) {
     check_demo_against_azurite_in_modes(oracle, crate_dir, demo_name, azurite_mode, &MODES);
 }
@@ -9494,13 +9858,17 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES_NO_SPECIAL: &[(&str, &str)] = &[
 ];
 
 fn test_azurite_units(oracle: &Path) {
-    run_unit_files("azurite", |mode, file| {
-        run_azurite_oracle(oracle, mode, file)
-    });
+    plan_unit_files("Azurite", "azurite", oracle);
 }
 
-fn test_against_azurite() {
-    let oracle = build_azurite_oracle();
+// Plans every Azurite check. Unless `build` is false (for `-- plan`, which runs nothing), first
+// builds the oracle.
+fn test_against_azurite(build: bool) {
+    let oracle = if build {
+        build_azurite_oracle()
+    } else {
+        PathBuf::from("oracle")
+    };
     test_azurite_units(&oracle);
     for (demo, mode) in AZURITE_NATURAL_STAGES {
         check_demo_against_azurite(&oracle, "../malachite-nz", demo, mode);
@@ -9569,32 +9937,59 @@ fn test_against_azurite() {
 
 fn main() {
     let args: Vec<String> = env::args().skip(1).collect();
-    let (flint, azurite) = match args.iter().map(String::as_str).collect::<Vec<_>>()[..] {
-        [] => (true, true),
-        ["flint"] => (true, false),
-        ["azurite"] => (false, true),
-        // The unit-row files alone, for both backends: a quick check while adding rows.
-        ["units"] => {
-            test_flint_units(&build_oracle());
-            test_azurite_units(&build_azurite_oracle());
-            return;
-        }
-        _ => panic!("usage: cargo run --release [-- flint | azurite | units]"),
+    let args: Vec<&str> = args.iter().map(String::as_str).collect();
+    // `plan` prints the ordered checks without building or running anything.
+    let (plan, backends) = match args.split_first() {
+        Some((&"plan", rest)) => (true, rest),
+        _ => (false, &args[..]),
     };
+    let (flint, azurite, units) = match backends {
+        [] => (true, true, false),
+        ["flint"] => (true, false, false),
+        ["azurite"] => (false, true, false),
+        // The unit-row files alone, for both backends: a quick check while adding rows.
+        ["units"] => (true, true, true),
+        _ => panic!("usage: cargo run --release -- [plan] [flint | azurite | units]"),
+    };
+    let finish = || if plan { print_plan() } else { run_plan() };
     if flint {
-        test_against_flint();
+        if units {
+            test_flint_units(&if plan {
+                PathBuf::from("flint-oracle")
+            } else {
+                build_oracle()
+            });
+        } else {
+            test_against_flint(!plan);
+        }
+        finish();
     }
     if azurite {
-        test_against_azurite();
+        if units {
+            test_azurite_units(&if plan {
+                PathBuf::from("oracle")
+            } else {
+                build_azurite_oracle()
+            });
+        } else {
+            test_against_azurite(!plan);
+        }
+        finish();
     }
 }
 
 fn test_flint_units(oracle: &Path) {
-    run_unit_files("flint", |mode, file| run_oracle(oracle, mode, Some(file)));
+    plan_unit_files("FLINT", "flint", oracle);
 }
 
-fn test_against_flint() {
-    let oracle = build_oracle();
+// Plans every FLINT check. Unless `build` is false (for `-- plan`, which runs nothing), first
+// builds the oracle.
+fn test_against_flint(build: bool) {
+    let oracle = if build {
+        build_oracle()
+    } else {
+        PathBuf::from("flint-oracle")
+    };
     test_flint_units(&oracle);
 
     check_demo_against_flint(
