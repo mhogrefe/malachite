@@ -24,6 +24,11 @@ pub(crate) fn register(runner: &mut Runner) {
         demo_big_exponent_float_log_base_power_of_2_prec_round_debug
     );
     register_demo!(runner, demo_big_exponent_float_log_base_power_of_2_prec);
+    register_demo!(runner, demo_big_exponent_float_log_base_power_of_2_prec_ref);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_log_base_power_of_2_prec_assign
+    );
     register_demo!(
         runner,
         demo_big_exponent_float_log_base_power_of_2_prec_debug
@@ -180,6 +185,38 @@ fn demo_big_exponent_float_log_base_power_of_2_rational_prec_debug(
         println!(
             "BigExponentFloat::log_base_power_of_2_rational_prec({x}, {k}, {prec}) = ({z:#x}, {o:?})"
         );
+    }
+}
+
+fn demo_big_exponent_float_log_base_power_of_2_prec_ref(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, pow, prec, _) in big_exponent_float_signed_unsigned_rounding_mode_quadruple_gen_var_3()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "(&{x}).log_base_power_of_2_prec_ref({pow}, {prec}) = {:?}",
+            x.log_base_power_of_2_prec_ref(pow, prec)
+        );
+    }
+}
+
+fn demo_big_exponent_float_log_base_power_of_2_prec_assign(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (mut x, pow, prec, _) in
+        big_exponent_float_signed_unsigned_rounding_mode_quadruple_gen_var_3()
+            .get(gm, config)
+            .take(limit)
+    {
+        let x_old = x.clone();
+        x.log_base_power_of_2_prec_assign(pow, prec);
+        println!("x := {x_old}; x.log_base_power_of_2_prec_assign({pow}, {prec}); x = {x}");
     }
 }
 

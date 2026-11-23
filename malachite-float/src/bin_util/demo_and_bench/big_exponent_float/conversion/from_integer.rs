@@ -21,12 +21,15 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_from_integer);
     register_demo!(runner, demo_big_exponent_float_from_integer_debug);
     register_demo!(runner, demo_big_exponent_float_from_integer_prec_round);
+    register_demo!(runner, demo_big_exponent_float_from_integer_prec_round_ref);
     register_demo!(
         runner,
         demo_big_exponent_float_from_integer_prec_round_debug
     );
     register_demo!(runner, demo_big_exponent_float_from_integer_prec);
+    register_demo!(runner, demo_big_exponent_float_from_integer_prec_ref);
     register_demo!(runner, demo_big_exponent_float_from_integer_prec_debug);
+    register_demo!(runner, demo_big_exponent_float_from_integer_prec_ref_debug);
 
     register_bench!(
         runner,
@@ -102,6 +105,48 @@ fn demo_big_exponent_float_from_integer_prec_debug(gm: GenMode, config: &GenConf
     {
         let (x, o) = BigExponentFloat::from_integer_prec_ref(&n, prec);
         println!("BigExponentFloat::from_integer_prec({n}, {prec}) = ({x:#x}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_from_integer_prec_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, p) in integer_unsigned_pair_gen_var_6()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "BigExponentFloat::from_integer_prec_ref(&{n}, {p}) = {:?}",
+            BigExponentFloat::from_integer_prec_ref(&n, p)
+        );
+    }
+}
+
+fn demo_big_exponent_float_from_integer_prec_ref_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (n, p) in integer_unsigned_pair_gen_var_6()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (f, o) = BigExponentFloat::from_integer_prec_ref(&n, p);
+        println!("BigExponentFloat::from_integer_prec_ref(&{n}, {p}) = ({f:#x}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_from_integer_prec_round_ref(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (n, p, rm) in integer_unsigned_rounding_mode_triple_gen_var_3()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "BigExponentFloat::from_integer_prec_round_ref(&{n}, {p}, {rm:?}) = {:?}",
+            BigExponentFloat::from_integer_prec_round_ref(&n, p, rm)
+        );
     }
 }
 

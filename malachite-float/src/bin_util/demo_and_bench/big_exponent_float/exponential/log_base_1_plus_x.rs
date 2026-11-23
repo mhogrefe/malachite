@@ -19,6 +19,11 @@ pub(crate) fn register(runner: &mut Runner) {
         demo_big_exponent_float_log_base_1_plus_x_prec_round_debug
     );
     register_demo!(runner, demo_big_exponent_float_log_base_1_plus_x_prec);
+    register_demo!(runner, demo_big_exponent_float_log_base_1_plus_x_prec_ref);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_log_base_1_plus_x_prec_assign
+    );
     register_demo!(runner, demo_big_exponent_float_log_base_1_plus_x_prec_debug);
     register_demo!(
         runner,
@@ -120,6 +125,39 @@ fn demo_big_exponent_float_log_base_1_plus_x_prec_round_in_domain_debug(
     {
         let (z, o) = x.log_base_1_plus_x_prec_round_ref(b, prec, rm);
         println!("({x:#x}).log_base_1_plus_x_prec_round({b}, {prec}, {rm}) = ({z:#x}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_log_base_1_plus_x_prec_ref(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, base, prec, _) in
+        big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_5()
+            .get(gm, config)
+            .take(limit)
+    {
+        println!(
+            "(&{x}).log_base_1_plus_x_prec_ref({base}, {prec}) = {:?}",
+            x.log_base_1_plus_x_prec_ref(base, prec)
+        );
+    }
+}
+
+fn demo_big_exponent_float_log_base_1_plus_x_prec_assign(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (mut x, base, prec, _) in
+        big_exponent_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_5()
+            .get(gm, config)
+            .take(limit)
+    {
+        let x_old = x.clone();
+        x.log_base_1_plus_x_prec_assign(base, prec);
+        println!("x := {x_old}; x.log_base_1_plus_x_prec_assign({base}, {prec}); x = {x}");
     }
 }
 

@@ -343,17 +343,17 @@ fn demo_float_sub_ref_ref_debug(gm: GenMode, config: &GenConfig, limit: usize) {
 fn demo_float_sub_assign(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut x, y) in float_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
-        x += y.clone();
-        println!("x := {x_old}; x += {y}; x = {x}");
+        x -= y.clone();
+        println!("x := {x_old}; x -= {y}; x = {x}");
     }
 }
 
 fn demo_float_sub_assign_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut x, y) in float_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
-        x += y.clone();
+        x -= y.clone();
         println!(
-            "x := {:#x}; x += {:#x}; x = {:#x}",
+            "x := {:#x}; x -= {:#x}; x = {:#x}",
             ComparableFloat(x_old),
             ComparableFloat(y),
             ComparableFloat(x)
@@ -364,17 +364,17 @@ fn demo_float_sub_assign_debug(gm: GenMode, config: &GenConfig, limit: usize) {
 fn demo_float_sub_assign_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut x, y) in float_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
-        x += &y;
-        println!("x := {x_old}; x += &{y}; x = {x}");
+        x -= &y;
+        println!("x := {x_old}; x -= &{y}; x = {x}");
     }
 }
 
 fn demo_float_sub_assign_ref_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut x, y) in float_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
-        x += &y;
+        x -= &y;
         println!(
-            "x := {:#x}; x += &{:#x}; x = {:#x}",
+            "x := {:#x}; x -= &{:#x}; x = {:#x}",
             ComparableFloat(x_old),
             ComparableFloat(y),
             ComparableFloat(x)
@@ -1190,17 +1190,17 @@ fn demo_float_sub_rational_ref_ref_debug(gm: GenMode, config: &GenConfig, limit:
 fn demo_float_sub_rational_assign(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut x, y) in float_rational_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
-        x += y.clone();
-        println!("x := {x_old}; x += {y}; x = {x}");
+        x -= y.clone();
+        println!("x := {x_old}; x -= {y}; x = {x}");
     }
 }
 
 fn demo_float_sub_rational_assign_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut x, y) in float_rational_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
-        x += y.clone();
+        x -= y.clone();
         println!(
-            "x := {:#x}; x += {}; x = {:#x}",
+            "x := {:#x}; x -= {}; x = {:#x}",
             ComparableFloat(x_old),
             y,
             ComparableFloat(x)
@@ -1211,17 +1211,17 @@ fn demo_float_sub_rational_assign_debug(gm: GenMode, config: &GenConfig, limit: 
 fn demo_float_sub_rational_assign_ref(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut x, y) in float_rational_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
-        x += &y;
-        println!("x := {x_old}; x += &{y}; x = {x}");
+        x -= &y;
+        println!("x := {x_old}; x -= &{y}; x = {x}");
     }
 }
 
 fn demo_float_sub_rational_assign_ref_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for (mut x, y) in float_rational_pair_gen().get(gm, config).take(limit) {
         let x_old = x.clone();
-        x += &y;
+        x -= &y;
         println!(
-            "x := {:#x}; x += &{}; x = {:#x}",
+            "x := {:#x}; x -= &{}; x = {:#x}",
             ComparableFloat(x_old),
             y,
             ComparableFloat(x)

@@ -25,11 +25,26 @@ use malachite_float::test_util::generators::{
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_min);
+    register_demo!(runner, demo_big_exponent_float_min_val_ref);
+    register_demo!(runner, demo_big_exponent_float_min_ref_val);
+    register_demo!(runner, demo_big_exponent_float_min_ref_ref);
     register_demo!(runner, demo_big_exponent_float_min_debug);
     register_demo!(runner, demo_big_exponent_float_min_prec_round);
+    register_demo!(runner, demo_big_exponent_float_min_prec_round_val_ref);
+    register_demo!(runner, demo_big_exponent_float_min_prec_round_ref_val);
+    register_demo!(runner, demo_big_exponent_float_min_prec_round_ref_ref);
     register_demo!(runner, demo_big_exponent_float_min_prec_round_debug);
+    register_demo!(runner, demo_big_exponent_float_min_prec_round_val_ref_debug);
+    register_demo!(runner, demo_big_exponent_float_min_prec_round_ref_val_debug);
+    register_demo!(runner, demo_big_exponent_float_min_prec_round_ref_ref_debug);
     register_demo!(runner, demo_big_exponent_float_min_prec);
+    register_demo!(runner, demo_big_exponent_float_min_prec_val_ref);
+    register_demo!(runner, demo_big_exponent_float_min_prec_ref_val);
+    register_demo!(runner, demo_big_exponent_float_min_prec_ref_ref);
     register_demo!(runner, demo_big_exponent_float_min_prec_debug);
+    register_demo!(runner, demo_big_exponent_float_min_prec_val_ref_debug);
+    register_demo!(runner, demo_big_exponent_float_min_prec_ref_val_debug);
+    register_demo!(runner, demo_big_exponent_float_min_prec_ref_ref_debug);
     register_demo!(runner, demo_big_exponent_float_min_rational_prec_round);
     register_demo!(
         runner,
@@ -38,11 +53,26 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_min_rational_prec);
     register_demo!(runner, demo_big_exponent_float_min_rational_prec_debug);
     register_demo!(runner, demo_big_exponent_float_max);
+    register_demo!(runner, demo_big_exponent_float_max_val_ref);
+    register_demo!(runner, demo_big_exponent_float_max_ref_val);
+    register_demo!(runner, demo_big_exponent_float_max_ref_ref);
     register_demo!(runner, demo_big_exponent_float_max_debug);
     register_demo!(runner, demo_big_exponent_float_max_prec_round);
+    register_demo!(runner, demo_big_exponent_float_max_prec_round_val_ref);
+    register_demo!(runner, demo_big_exponent_float_max_prec_round_ref_val);
+    register_demo!(runner, demo_big_exponent_float_max_prec_round_ref_ref);
     register_demo!(runner, demo_big_exponent_float_max_prec_round_debug);
+    register_demo!(runner, demo_big_exponent_float_max_prec_round_val_ref_debug);
+    register_demo!(runner, demo_big_exponent_float_max_prec_round_ref_val_debug);
+    register_demo!(runner, demo_big_exponent_float_max_prec_round_ref_ref_debug);
     register_demo!(runner, demo_big_exponent_float_max_prec);
+    register_demo!(runner, demo_big_exponent_float_max_prec_val_ref);
+    register_demo!(runner, demo_big_exponent_float_max_prec_ref_val);
+    register_demo!(runner, demo_big_exponent_float_max_prec_ref_ref);
     register_demo!(runner, demo_big_exponent_float_max_prec_debug);
+    register_demo!(runner, demo_big_exponent_float_max_prec_val_ref_debug);
+    register_demo!(runner, demo_big_exponent_float_max_prec_ref_val_debug);
+    register_demo!(runner, demo_big_exponent_float_max_prec_ref_ref_debug);
     register_demo!(runner, demo_big_exponent_float_max_rational_prec_round);
     register_demo!(
         runner,
@@ -182,6 +212,420 @@ fn demo_big_exponent_float_min_rational_prec_debug(gm: GenMode, config: &GenConf
     {
         let (z, o) = x.min_rational_prec_ref_ref(&y, prec);
         println!("({x:#x}).min_rational_prec({y}, {prec}) = ({z:#x}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_min_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in big_exponent_float_pair_gen().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        println!("({x_old}).min_val_ref({y_old}) = {:?}", x.min_val_ref(&y));
+    }
+}
+
+
+fn demo_big_exponent_float_min_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in big_exponent_float_pair_gen().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        println!("({x_old}).min_ref_val({y_old}) = {:?}", x.min_ref_val(y));
+    }
+}
+
+
+fn demo_big_exponent_float_min_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in big_exponent_float_pair_gen().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        println!("({x_old}).min_ref_ref({y_old}) = {:?}", x.min_ref_ref(&y));
+    }
+}
+
+
+fn demo_big_exponent_float_min_prec_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in big_exponent_float_big_exponent_float_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        println!(
+            "({x_old}).min_prec_val_ref({y_old}, {prec}) = {:?}",
+            x.min_prec_val_ref(&y, prec)
+        );
+    }
+}
+
+fn demo_big_exponent_float_min_prec_val_ref_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in big_exponent_float_big_exponent_float_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        let (result, o) = x.min_prec_val_ref(&y, prec);
+        println!("({x_old:#x}).min_prec_val_ref({y_old:#x}, {prec}) = ({result:#x}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_min_prec_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in big_exponent_float_big_exponent_float_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        println!(
+            "({x_old}).min_prec_ref_val({y_old}, {prec}) = {:?}",
+            x.min_prec_ref_val(y, prec)
+        );
+    }
+}
+
+fn demo_big_exponent_float_min_prec_ref_val_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in big_exponent_float_big_exponent_float_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        let (result, o) = x.min_prec_ref_val(y, prec);
+        println!("({x_old:#x}).min_prec_ref_val({y_old:#x}, {prec}) = ({result:#x}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_min_prec_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in big_exponent_float_big_exponent_float_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        println!(
+            "({x_old}).min_prec_ref_ref({y_old}, {prec}) = {:?}",
+            x.min_prec_ref_ref(&y, prec)
+        );
+    }
+}
+
+fn demo_big_exponent_float_min_prec_ref_ref_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in big_exponent_float_big_exponent_float_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        let (result, o) = x.min_prec_ref_ref(&y, prec);
+        println!("({x_old:#x}).min_prec_ref_ref({y_old:#x}, {prec}) = ({result:#x}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_min_prec_round_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec, rm) in
+        big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_1()
+            .get(gm, config)
+            .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        println!(
+            "({x_old}).min_prec_round_val_ref({y_old}, {prec}, {rm}) = {:?}",
+            x.min_prec_round_val_ref(&y, prec, rm)
+        );
+    }
+}
+
+fn demo_big_exponent_float_min_prec_round_val_ref_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, prec, rm) in
+        big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_1()
+            .get(gm, config)
+            .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        let (result, o) = x.min_prec_round_val_ref(&y, prec, rm);
+        println!(
+            "({x_old:#x}).min_prec_round_val_ref({y_old:#x}, {prec}, {rm}) = ({result:#x}, {o:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_min_prec_round_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec, rm) in
+        big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_1()
+            .get(gm, config)
+            .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        println!(
+            "({x_old}).min_prec_round_ref_val({y_old}, {prec}, {rm}) = {:?}",
+            x.min_prec_round_ref_val(y, prec, rm)
+        );
+    }
+}
+
+fn demo_big_exponent_float_min_prec_round_ref_val_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, prec, rm) in
+        big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_1()
+            .get(gm, config)
+            .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        let (result, o) = x.min_prec_round_ref_val(y, prec, rm);
+        println!(
+            "({x_old:#x}).min_prec_round_ref_val({y_old:#x}, {prec}, {rm}) = ({result:#x}, {o:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_min_prec_round_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec, rm) in
+        big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_1()
+            .get(gm, config)
+            .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        println!(
+            "({x_old}).min_prec_round_ref_ref({y_old}, {prec}, {rm}) = {:?}",
+            x.min_prec_round_ref_ref(&y, prec, rm)
+        );
+    }
+}
+
+fn demo_big_exponent_float_min_prec_round_ref_ref_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, prec, rm) in
+        big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_1()
+            .get(gm, config)
+            .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        let (result, o) = x.min_prec_round_ref_ref(&y, prec, rm);
+        println!(
+            "({x_old:#x}).min_prec_round_ref_ref({y_old:#x}, {prec}, {rm}) = ({result:#x}, {o:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_max_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in big_exponent_float_pair_gen().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        println!("({x_old}).max_val_ref({y_old}) = {:?}", x.max_val_ref(&y));
+    }
+}
+
+
+fn demo_big_exponent_float_max_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in big_exponent_float_pair_gen().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        println!("({x_old}).max_ref_val({y_old}) = {:?}", x.max_ref_val(y));
+    }
+}
+
+
+fn demo_big_exponent_float_max_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in big_exponent_float_pair_gen().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        println!("({x_old}).max_ref_ref({y_old}) = {:?}", x.max_ref_ref(&y));
+    }
+}
+
+
+fn demo_big_exponent_float_max_prec_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in big_exponent_float_big_exponent_float_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        println!(
+            "({x_old}).max_prec_val_ref({y_old}, {prec}) = {:?}",
+            x.max_prec_val_ref(&y, prec)
+        );
+    }
+}
+
+fn demo_big_exponent_float_max_prec_val_ref_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in big_exponent_float_big_exponent_float_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        let (result, o) = x.max_prec_val_ref(&y, prec);
+        println!("({x_old:#x}).max_prec_val_ref({y_old:#x}, {prec}) = ({result:#x}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_max_prec_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in big_exponent_float_big_exponent_float_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        println!(
+            "({x_old}).max_prec_ref_val({y_old}, {prec}) = {:?}",
+            x.max_prec_ref_val(y, prec)
+        );
+    }
+}
+
+fn demo_big_exponent_float_max_prec_ref_val_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in big_exponent_float_big_exponent_float_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        let (result, o) = x.max_prec_ref_val(y, prec);
+        println!("({x_old:#x}).max_prec_ref_val({y_old:#x}, {prec}) = ({result:#x}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_max_prec_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in big_exponent_float_big_exponent_float_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        println!(
+            "({x_old}).max_prec_ref_ref({y_old}, {prec}) = {:?}",
+            x.max_prec_ref_ref(&y, prec)
+        );
+    }
+}
+
+fn demo_big_exponent_float_max_prec_ref_ref_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in big_exponent_float_big_exponent_float_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        let (result, o) = x.max_prec_ref_ref(&y, prec);
+        println!("({x_old:#x}).max_prec_ref_ref({y_old:#x}, {prec}) = ({result:#x}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_max_prec_round_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec, rm) in
+        big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_1()
+            .get(gm, config)
+            .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        println!(
+            "({x_old}).max_prec_round_val_ref({y_old}, {prec}, {rm}) = {:?}",
+            x.max_prec_round_val_ref(&y, prec, rm)
+        );
+    }
+}
+
+fn demo_big_exponent_float_max_prec_round_val_ref_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, prec, rm) in
+        big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_1()
+            .get(gm, config)
+            .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        let (result, o) = x.max_prec_round_val_ref(&y, prec, rm);
+        println!(
+            "({x_old:#x}).max_prec_round_val_ref({y_old:#x}, {prec}, {rm}) = ({result:#x}, {o:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_max_prec_round_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec, rm) in
+        big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_1()
+            .get(gm, config)
+            .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        println!(
+            "({x_old}).max_prec_round_ref_val({y_old}, {prec}, {rm}) = {:?}",
+            x.max_prec_round_ref_val(y, prec, rm)
+        );
+    }
+}
+
+fn demo_big_exponent_float_max_prec_round_ref_val_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, prec, rm) in
+        big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_1()
+            .get(gm, config)
+            .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        let (result, o) = x.max_prec_round_ref_val(y, prec, rm);
+        println!(
+            "({x_old:#x}).max_prec_round_ref_val({y_old:#x}, {prec}, {rm}) = ({result:#x}, {o:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_max_prec_round_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec, rm) in
+        big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_1()
+            .get(gm, config)
+            .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        println!(
+            "({x_old}).max_prec_round_ref_ref({y_old}, {prec}, {rm}) = {:?}",
+            x.max_prec_round_ref_ref(&y, prec, rm)
+        );
+    }
+}
+
+fn demo_big_exponent_float_max_prec_round_ref_ref_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, prec, rm) in
+        big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_1()
+            .get(gm, config)
+            .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        let (result, o) = x.max_prec_round_ref_ref(&y, prec, rm);
+        println!(
+            "({x_old:#x}).max_prec_round_ref_ref({y_old:#x}, {prec}, {rm}) = ({result:#x}, {o:?})"
+        );
     }
 }
 

@@ -21,6 +21,8 @@ pub(crate) fn register(runner: &mut Runner) {
         demo_big_exponent_float_tree_t_minus_1_prec_round_debug
     );
     register_demo!(runner, demo_big_exponent_float_tree_t_minus_1_prec);
+    register_demo!(runner, demo_big_exponent_float_tree_t_minus_1_prec_ref);
+    register_demo!(runner, demo_big_exponent_float_tree_t_minus_1_prec_assign);
     register_demo!(runner, demo_big_exponent_float_tree_t_minus_1_prec_debug);
     register_demo!(
         runner,
@@ -167,6 +169,33 @@ fn demo_big_exponent_float_tree_t_minus_1_rational_prec_debug(
     {
         let (z, o) = BigExponentFloat::tree_t_minus_1_rational_prec_ref(&x, prec);
         println!("BigExponentFloat::tree_t_minus_1_rational_prec({x}, {prec}) = ({z:#x}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_tree_t_minus_1_prec_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec, _) in big_exponent_float_unsigned_rounding_mode_triple_gen_var_24()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "(&{x}).tree_t_minus_1_prec_ref({prec}) = {:?}",
+            x.tree_t_minus_1_prec_ref(prec)
+        );
+    }
+}
+
+fn demo_big_exponent_float_tree_t_minus_1_prec_assign(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (mut x, prec, _) in big_exponent_float_unsigned_rounding_mode_triple_gen_var_24()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let o = x.tree_t_minus_1_prec_assign(prec);
+        println!("x := {x_old}; x.tree_t_minus_1_prec_assign({prec}) = {o:?}; x = {x}");
     }
 }
 

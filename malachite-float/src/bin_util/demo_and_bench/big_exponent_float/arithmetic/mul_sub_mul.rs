@@ -29,9 +29,18 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_mul_sub_mul);
     register_demo!(runner, demo_big_exponent_float_mul_sub_mul_debug);
     register_demo!(runner, demo_big_exponent_float_mul_sub_mul_prec_round);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_mul_sub_mul_prec_round_assign
+    );
     register_demo!(runner, demo_big_exponent_float_mul_sub_mul_prec_round_debug);
     register_demo!(runner, demo_big_exponent_float_mul_sub_mul_prec);
+    register_demo!(runner, demo_big_exponent_float_mul_sub_mul_prec_assign);
     register_demo!(runner, demo_big_exponent_float_mul_sub_mul_prec_debug);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_mul_sub_mul_prec_assign_debug
+    );
 
     register_bench!(
         runner,
@@ -135,6 +144,50 @@ fn demo_big_exponent_float_mul_sub_mul_prec_debug(gm: GenMode, config: &GenConfi
     for (x, y, z, w, prec) in quintuple_gen_var_1().get(gm, config).take(limit) {
         let (r, o) = x.mul_sub_mul_prec_ref_ref_ref_ref(&y, &z, &w, prec);
         println!("({x:#x}).mul_sub_mul_prec({y:#x}, {z:#x}, {w:#x}, {prec}) = ({r:#x}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_mul_sub_mul_prec_round_assign(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (a, b, c, d, prec, rm) in sextuple_gen_var_2().get(gm, config).take(limit) {
+        let mut a = a;
+        let a_old = a.clone();
+        a.mul_sub_mul_prec_round_assign(b.clone(), c.clone(), d.clone(), prec, rm);
+        println!(
+            "a := {a_old}; \
+             a.mul_sub_mul_prec_round_assign({b}, {c}, {d}, {prec}, {rm}); a = {a}"
+        );
+    }
+}
+
+fn demo_big_exponent_float_mul_sub_mul_prec_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (a, b, c, d, prec) in quintuple_gen_var_1().get(gm, config).take(limit) {
+        let mut a = a;
+        let a_old = a.clone();
+        a.mul_sub_mul_prec_assign(b.clone(), c.clone(), d.clone(), prec);
+        println!(
+            "a := {a_old}; \
+             a.mul_sub_mul_prec_assign({b}, {c}, {d}, {prec}); a = {a}"
+        );
+    }
+}
+
+fn demo_big_exponent_float_mul_sub_mul_prec_assign_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (a, b, c, d, prec) in quintuple_gen_var_1().get(gm, config).take(limit) {
+        let mut a = a;
+        let a_old = a.clone();
+        a.mul_sub_mul_prec_assign(b.clone(), c.clone(), d.clone(), prec);
+        println!(
+            "a := {a_old:#x}; \
+             a.mul_sub_mul_prec_assign({b:#x}, {c:#x}, {d:#x}, {prec}); a = {a:#x}"
+        );
     }
 }
 

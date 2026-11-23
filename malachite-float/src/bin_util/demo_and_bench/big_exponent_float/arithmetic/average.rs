@@ -15,6 +15,7 @@ use malachite_float::test_util::generators::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_average_prec_round);
+    register_demo!(runner, demo_big_exponent_float_average_prec_round_assign);
     register_demo!(runner, demo_big_exponent_float_average_prec_round_debug);
     register_demo!(runner, demo_big_exponent_float_average_prec);
     register_demo!(runner, demo_big_exponent_float_average_prec_debug);
@@ -74,6 +75,23 @@ fn demo_big_exponent_float_average_prec_debug(gm: GenMode, config: &GenConfig, l
     {
         let (z, o) = x.average_prec_ref_ref(&y, prec);
         println!("({x:#x}).average_prec({y:#x}, {prec}) = ({z:#x}, {o:?})");
+    }
+}
+
+
+fn demo_big_exponent_float_average_prec_round_assign(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (mut x, y, prec, rm) in
+        big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_7()
+            .get(gm, config)
+            .take(limit)
+    {
+        let x_old = x.clone();
+        let o = x.average_prec_round_assign(y.clone(), prec, rm);
+        println!("x := {x_old}; x.average_prec_round_assign({y}, {prec}, {rm}) = {o:?}; x = {x}");
     }
 }
 

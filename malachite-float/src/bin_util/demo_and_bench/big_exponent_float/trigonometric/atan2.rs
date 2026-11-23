@@ -17,6 +17,7 @@ use malachite_q::test_util::bench::bucketers::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_atan2_prec_round);
+    register_demo!(runner, demo_big_exponent_float_atan2_prec_round_assign);
     register_demo!(runner, demo_big_exponent_float_atan2_prec_round_debug);
     register_demo!(runner, demo_big_exponent_float_atan2_rational_prec_round);
     register_demo!(
@@ -425,6 +426,20 @@ fn demo_big_exponent_float_atan2_pi_rational_prec_debug(
         println!("BigExponentFloat::atan2_pi_rational_prec({y}, {x}, {prec}) = ({z:#x}, {o:?})");
     }
 }
+
+fn demo_big_exponent_float_atan2_prec_round_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y, prec, rm) in
+        big_exponent_float_big_exponent_float_unsigned_rounding_mode_quadruple_gen_var_17()
+            .get(gm, config)
+            .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        let o = x.atan2_prec_round_assign(y, prec, rm);
+        println!("x := {x_old}; x.atan2_prec_round_assign({y_old}, {prec}, {rm}) = {o:?}; x = {x}");
+    }
+}
+
 
 fn benchmark_big_exponent_float_atan2_prec_round_evaluation_strategy(
     gm: GenMode,

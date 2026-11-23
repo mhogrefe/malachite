@@ -49,7 +49,7 @@ and integers, ℕ and ℤ.
   for large numbers. For example, multiplication uses the naive quadratic algorithm, or one of
   13 variants of
   [Toom-Cook multiplication](https://en.wikipedia.org/wiki/Toom%E2%80%93Cook_multiplication),
-  or an [FFT over small primes](https://flintlib.org/doc/fft_small.html) (a port of FLINT's
+  or an [FFT over small primes](https://flintlib.org/doc/fft_small/index.html) (a port of FLINT's
   `fft_small`, which carries out number-theoretic transforms modulo 50-bit primes in
   double-precision floating point), depending on the input size. On x86 and x86_64, the FFT
   detects AVX2 and FMA at run time and uses them when the CPU has them, so a default build is as

@@ -40,6 +40,7 @@ pub(crate) fn register(runner: &mut Runner) {
         demo_big_exponent_float_power_of_2_rational_prec_round_debug
     );
     register_demo!(runner, demo_big_exponent_float_power_of_2_rational_prec);
+    register_demo!(runner, demo_big_exponent_float_power_of_2_rational_prec_ref);
     register_demo!(
         runner,
         demo_big_exponent_float_power_of_2_rational_prec_debug
@@ -183,6 +184,22 @@ fn demo_big_exponent_float_power_of_2_rational_prec_debug(
     {
         let (z, o) = BigExponentFloat::power_of_2_rational_prec_ref(&x, prec);
         println!("BigExponentFloat::power_of_2_rational_prec({x}, {prec}) = ({z:#x}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_power_of_2_rational_prec_ref(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (n, p, _) in rational_unsigned_rounding_mode_triple_gen_var_21()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "BigExponentFloat::power_of_2_rational_prec_ref(&{n}, {p}) = {:?}",
+            BigExponentFloat::power_of_2_rational_prec_ref(&n, p)
+        );
     }
 }
 

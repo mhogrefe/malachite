@@ -20,14 +20,19 @@ use malachite_q::test_util::generators::{rational_gen, rational_unsigned_pair_ge
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_from_rational_prec_round);
+    register_demo!(runner, demo_big_exponent_float_from_rational_prec_round_ref);
     register_demo!(
         runner,
         demo_big_exponent_float_from_rational_prec_round_debug
     );
     register_demo!(runner, demo_big_exponent_float_from_rational_prec);
+    register_demo!(runner, demo_big_exponent_float_from_rational_prec_ref);
     register_demo!(runner, demo_big_exponent_float_from_rational_prec_debug);
+    register_demo!(runner, demo_big_exponent_float_from_rational_prec_ref_debug);
     register_demo!(runner, demo_big_exponent_float_try_from_rational);
+    register_demo!(runner, demo_big_exponent_float_try_from_rational_ref);
     register_demo!(runner, demo_big_exponent_float_try_from_rational_debug);
+    register_demo!(runner, demo_big_exponent_float_try_from_rational_ref_debug);
     register_demo!(runner, demo_big_exponent_float_convertible_from_rational);
 
     register_bench!(
@@ -120,6 +125,70 @@ fn demo_big_exponent_float_convertible_from_rational(
         println!(
             "BigExponentFloat::convertible_from({q}) = {}",
             BigExponentFloat::convertible_from(&q)
+        );
+    }
+}
+
+fn demo_big_exponent_float_from_rational_prec_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, p) in rational_unsigned_pair_gen_var_3()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "BigExponentFloat::from_rational_prec_ref(&{n}, {p}) = {:?}",
+            BigExponentFloat::from_rational_prec_ref(&n, p)
+        );
+    }
+}
+
+fn demo_big_exponent_float_from_rational_prec_ref_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (n, p) in rational_unsigned_pair_gen_var_3()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (f, o) = BigExponentFloat::from_rational_prec_ref(&n, p);
+        println!("BigExponentFloat::from_rational_prec_ref(&{n}, {p}) = ({f:#x}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_from_rational_prec_round_ref(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (n, p, rm) in rational_unsigned_rounding_mode_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "BigExponentFloat::from_rational_prec_round_ref(&{n}, {p}, {rm:?}) = {:?}",
+            BigExponentFloat::from_rational_prec_round_ref(&n, p, rm)
+        );
+    }
+}
+
+fn demo_big_exponent_float_try_from_rational_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in rational_gen().get(gm, config).take(limit) {
+        println!(
+            "BigExponentFloat::try_from(&{x}) = {:?}",
+            BigExponentFloat::try_from(&x)
+        );
+    }
+}
+
+fn demo_big_exponent_float_try_from_rational_ref_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for x in rational_gen().get(gm, config).take(limit) {
+        println!(
+            "BigExponentFloat::try_from(&{x}) = {:?}",
+            BigExponentFloat::try_from(&x).map(|f| format!("{f:#x}"))
         );
     }
 }

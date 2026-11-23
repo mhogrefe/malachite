@@ -23,6 +23,8 @@ pub(crate) fn register(runner: &mut Runner) {
         demo_big_exponent_float_reciprocal_sqrt_prec_round_debug
     );
     register_demo!(runner, demo_big_exponent_float_reciprocal_sqrt_prec);
+    register_demo!(runner, demo_big_exponent_float_reciprocal_sqrt_prec_ref);
+    register_demo!(runner, demo_big_exponent_float_reciprocal_sqrt_prec_assign);
     register_demo!(runner, demo_big_exponent_float_reciprocal_sqrt_prec_debug);
 
     register_bench!(
@@ -116,6 +118,33 @@ fn demo_big_exponent_float_reciprocal_sqrt_prec_debug(
     {
         let (z, o) = x.reciprocal_sqrt_prec_ref(prec);
         println!("({x:#x}).reciprocal_sqrt_prec({prec}) = ({z:#x}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_reciprocal_sqrt_prec_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec) in big_exponent_float_unsigned_pair_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "(&{x}).reciprocal_sqrt_prec_ref({prec}) = {:?}",
+            x.reciprocal_sqrt_prec_ref(prec)
+        );
+    }
+}
+
+fn demo_big_exponent_float_reciprocal_sqrt_prec_assign(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (mut x, prec) in big_exponent_float_unsigned_pair_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        x.reciprocal_sqrt_prec_assign(prec);
+        println!("x := {x_old}; x.reciprocal_sqrt_prec_assign({prec}); x = {x}");
     }
 }
 

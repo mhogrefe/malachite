@@ -16,8 +16,12 @@ use malachite_q::test_util::bench::bucketers::triple_1_2_rational_bit_u64_max_bu
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_lambert_w0_prec_round);
+    register_demo!(runner, demo_big_exponent_float_lambert_w0_prec_round_ref);
+    register_demo!(runner, demo_big_exponent_float_lambert_w0_prec_round_assign);
     register_demo!(runner, demo_big_exponent_float_lambert_w0_prec_round_debug);
     register_demo!(runner, demo_big_exponent_float_lambert_w0_prec);
+    register_demo!(runner, demo_big_exponent_float_lambert_w0_prec_ref);
+    register_demo!(runner, demo_big_exponent_float_lambert_w0_prec_assign);
     register_demo!(runner, demo_big_exponent_float_lambert_w0_prec_debug);
     register_demo!(
         runner,
@@ -28,6 +32,7 @@ pub(crate) fn register(runner: &mut Runner) {
         demo_big_exponent_float_lambert_w0_rational_prec_round_debug
     );
     register_demo!(runner, demo_big_exponent_float_lambert_w0_rational_prec);
+    register_demo!(runner, demo_big_exponent_float_lambert_w0_rational_prec_ref);
     register_demo!(
         runner,
         demo_big_exponent_float_lambert_w0_rational_prec_debug
@@ -152,6 +157,76 @@ fn demo_big_exponent_float_lambert_w0_rational_prec_debug(
     {
         let (z, o) = BigExponentFloat::lambert_w0_rational_prec_ref(&x, prec);
         println!("BigExponentFloat::lambert_w0_rational_prec({x}, {prec}) = ({z:#x}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_lambert_w0_rational_prec_ref(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (n, p, _) in rational_unsigned_rounding_mode_triple_gen_var_10()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "BigExponentFloat::lambert_w0_rational_prec_ref(&{n}, {p}) = {:?}",
+            BigExponentFloat::lambert_w0_rational_prec_ref(&n, p)
+        );
+    }
+}
+
+fn demo_big_exponent_float_lambert_w0_prec_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec, _) in big_exponent_float_unsigned_rounding_mode_triple_gen_var_24()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "(&{x}).lambert_w0_prec_ref({prec}) = {:?}",
+            x.lambert_w0_prec_ref(prec)
+        );
+    }
+}
+
+fn demo_big_exponent_float_lambert_w0_prec_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, prec, _) in big_exponent_float_unsigned_rounding_mode_triple_gen_var_24()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let o = x.lambert_w0_prec_assign(prec);
+        println!("x := {x_old}; x.lambert_w0_prec_assign({prec}) = {o:?}; x = {x}");
+    }
+}
+
+fn demo_big_exponent_float_lambert_w0_prec_round_ref(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, prec, rm) in big_exponent_float_unsigned_rounding_mode_triple_gen_var_24()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "(&{x}).lambert_w0_prec_round_ref({prec}, {rm}) = {:?}",
+            x.lambert_w0_prec_round_ref(prec, rm)
+        );
+    }
+}
+
+fn demo_big_exponent_float_lambert_w0_prec_round_assign(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (mut x, prec, rm) in big_exponent_float_unsigned_rounding_mode_triple_gen_var_24()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let o = x.lambert_w0_prec_round_assign(prec, rm);
+        println!("x := {x_old}; x.lambert_w0_prec_round_assign({prec}, {rm}) = {o:?}; x = {x}");
     }
 }
 

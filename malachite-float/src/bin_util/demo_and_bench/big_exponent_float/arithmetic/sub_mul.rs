@@ -28,11 +28,93 @@ use malachite_float::test_util::generators::{
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_sub_mul);
+    register_demo!(runner, demo_big_exponent_float_sub_mul_val_val_ref);
+    register_demo!(runner, demo_big_exponent_float_sub_mul_val_ref_val);
+    register_demo!(runner, demo_big_exponent_float_sub_mul_val_ref_ref);
+    register_demo!(runner, demo_big_exponent_float_sub_mul_ref_val_val);
+    register_demo!(runner, demo_big_exponent_float_sub_mul_ref_val_ref);
+    register_demo!(runner, demo_big_exponent_float_sub_mul_ref_ref_val);
+    register_demo!(runner, demo_big_exponent_float_sub_mul_ref_ref_ref);
+    register_demo!(runner, demo_big_exponent_float_sub_mul_assign);
+    register_demo!(runner, demo_big_exponent_float_sub_mul_assign_val_ref);
+    register_demo!(runner, demo_big_exponent_float_sub_mul_assign_ref_val);
+    register_demo!(runner, demo_big_exponent_float_sub_mul_assign_ref_ref);
     register_demo!(runner, demo_big_exponent_float_sub_mul_debug);
+    register_demo!(runner, demo_big_exponent_float_sub_mul_val_val_ref_debug);
+    register_demo!(runner, demo_big_exponent_float_sub_mul_val_ref_val_debug);
+    register_demo!(runner, demo_big_exponent_float_sub_mul_val_ref_ref_debug);
+    register_demo!(runner, demo_big_exponent_float_sub_mul_ref_val_val_debug);
+    register_demo!(runner, demo_big_exponent_float_sub_mul_ref_val_ref_debug);
+    register_demo!(runner, demo_big_exponent_float_sub_mul_ref_ref_val_debug);
+    register_demo!(runner, demo_big_exponent_float_sub_mul_ref_ref_ref_debug);
+    register_demo!(runner, demo_big_exponent_float_sub_mul_assign_debug);
+    register_demo!(runner, demo_big_exponent_float_sub_mul_assign_val_ref_debug);
+    register_demo!(runner, demo_big_exponent_float_sub_mul_assign_ref_val_debug);
+    register_demo!(runner, demo_big_exponent_float_sub_mul_assign_ref_ref_debug);
     register_demo!(runner, demo_big_exponent_float_sub_mul_prec_round);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_sub_mul_prec_round_ref_ref_ref
+    );
     register_demo!(runner, demo_big_exponent_float_sub_mul_prec_round_debug);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_sub_mul_prec_round_ref_ref_ref_debug
+    );
     register_demo!(runner, demo_big_exponent_float_sub_mul_prec);
+    register_demo!(runner, demo_big_exponent_float_sub_mul_prec_val_val_ref);
+    register_demo!(runner, demo_big_exponent_float_sub_mul_prec_val_ref_val);
+    register_demo!(runner, demo_big_exponent_float_sub_mul_prec_val_ref_ref);
+    register_demo!(runner, demo_big_exponent_float_sub_mul_prec_ref_val_val);
+    register_demo!(runner, demo_big_exponent_float_sub_mul_prec_ref_val_ref);
+    register_demo!(runner, demo_big_exponent_float_sub_mul_prec_ref_ref_val);
+    register_demo!(runner, demo_big_exponent_float_sub_mul_prec_ref_ref_ref);
+    register_demo!(runner, demo_big_exponent_float_sub_mul_prec_assign);
+    register_demo!(runner, demo_big_exponent_float_sub_mul_prec_assign_val_ref);
+    register_demo!(runner, demo_big_exponent_float_sub_mul_prec_assign_ref_val);
+    register_demo!(runner, demo_big_exponent_float_sub_mul_prec_assign_ref_ref);
     register_demo!(runner, demo_big_exponent_float_sub_mul_prec_debug);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_sub_mul_prec_val_val_ref_debug
+    );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_sub_mul_prec_val_ref_val_debug
+    );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_sub_mul_prec_val_ref_ref_debug
+    );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_sub_mul_prec_ref_val_val_debug
+    );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_sub_mul_prec_ref_val_ref_debug
+    );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_sub_mul_prec_ref_ref_val_debug
+    );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_sub_mul_prec_ref_ref_ref_debug
+    );
+    register_demo!(runner, demo_big_exponent_float_sub_mul_prec_assign_debug);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_sub_mul_prec_assign_val_ref_debug
+    );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_sub_mul_prec_assign_ref_val_debug
+    );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_sub_mul_prec_assign_ref_ref_debug
+    );
 
     register_bench!(
         runner,
@@ -56,6 +138,47 @@ pub(crate) fn register(runner: &mut Runner) {
         demo_big_exponent_float_sub_mul_rational_prec_round_debug
     );
     register_demo!(runner, demo_big_exponent_float_sub_mul_rational_prec);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_sub_mul_rational_prec_val_val_ref
+    );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_sub_mul_rational_prec_val_ref_val
+    );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_sub_mul_rational_prec_val_ref_ref
+    );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_sub_mul_rational_prec_ref_val_val
+    );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_sub_mul_rational_prec_ref_val_ref
+    );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_sub_mul_rational_prec_ref_ref_val
+    );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_sub_mul_rational_prec_ref_ref_ref
+    );
+    register_demo!(runner, demo_big_exponent_float_sub_mul_rational_prec_assign);
+    register_demo!(
+        runner,
+        demo_big_exponent_float_sub_mul_rational_prec_assign_val_ref
+    );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_sub_mul_rational_prec_assign_ref_val
+    );
+    register_demo!(
+        runner,
+        demo_big_exponent_float_sub_mul_rational_prec_assign_ref_ref
+    );
     register_demo!(runner, demo_big_exponent_float_sub_mul_rational_prec_debug);
     register_bench!(
         runner,
@@ -121,6 +244,729 @@ fn demo_big_exponent_float_sub_mul_prec_debug(gm: GenMode, config: &GenConfig, l
     for (x, y, z, prec) in quadruple_gen_var_1().get(gm, config).take(limit) {
         let (r, o) = x.sub_mul_prec_ref_ref_ref(&y, &z, prec);
         println!("({x:#x}).sub_mul_prec({y:#x}, {z:#x}, {prec}) = ({r:#x}, {o:?})");
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_prec_round_ref_ref_ref(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec, rm) in quintuple_gen_var_2().get(gm, config).take(limit) {
+        println!(
+            "(&{x}).sub_mul_prec_round_ref_ref_ref(&{y}, &{z}, {prec}, {rm}) = {:?}",
+            x.sub_mul_prec_round_ref_ref_ref(&y, &z, prec, rm)
+        );
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_prec_round_ref_ref_ref_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec, rm) in quintuple_gen_var_2().get(gm, config).take(limit) {
+        let (diff, o) = x.sub_mul_prec_round_ref_ref_ref(&y, &z, prec, rm);
+        println!(
+            "(&{x:#x}).sub_mul_prec_round_ref_ref_ref(&{y:#x}, &{z:#x}, {prec}, {rm}) = \
+             ({diff:#x}, {o:?})"
+        );
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_val_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z) in big_exponent_float_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "({x}).sub_mul({y}, {z}) = {:?}",
+            x.clone().sub_mul(y.clone(), &z)
+        );
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_val_val_ref_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z) in big_exponent_float_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let res = x.clone().sub_mul(y.clone(), &z);
+        println!("({x:#x}).sub_mul({y:#x}, {z:#x}) = {res:#x}");
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_val_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z) in big_exponent_float_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "({x}).sub_mul({y}, {z}) = {:?}",
+            x.clone().sub_mul(&y, z.clone())
+        );
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_val_ref_val_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z) in big_exponent_float_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let res = x.clone().sub_mul(&y, z.clone());
+        println!("({x:#x}).sub_mul({y:#x}, {z:#x}) = {res:#x}");
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_val_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z) in big_exponent_float_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!("({x}).sub_mul({y}, {z}) = {:?}", x.clone().sub_mul(&y, &z));
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_val_ref_ref_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z) in big_exponent_float_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let res = x.clone().sub_mul(&y, &z);
+        println!("({x:#x}).sub_mul({y:#x}, {z:#x}) = {res:#x}");
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_ref_val_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z) in big_exponent_float_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "(&{x}).sub_mul({y}, {z}) = {:?}",
+            (&x).sub_mul(y.clone(), z.clone())
+        );
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_ref_val_val_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z) in big_exponent_float_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let res = (&x).sub_mul(y.clone(), z.clone());
+        println!("(&{x:#x}).sub_mul({y:#x}, {z:#x}) = {res:#x}");
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_ref_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z) in big_exponent_float_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "(&{x}).sub_mul({y}, {z}) = {:?}",
+            (&x).sub_mul(y.clone(), &z)
+        );
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_ref_val_ref_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z) in big_exponent_float_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let res = (&x).sub_mul(y.clone(), &z);
+        println!("(&{x:#x}).sub_mul({y:#x}, {z:#x}) = {res:#x}");
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_ref_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z) in big_exponent_float_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "(&{x}).sub_mul({y}, {z}) = {:?}",
+            (&x).sub_mul(&y, z.clone())
+        );
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_ref_ref_val_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z) in big_exponent_float_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let res = (&x).sub_mul(&y, z.clone());
+        println!("(&{x:#x}).sub_mul({y:#x}, {z:#x}) = {res:#x}");
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_ref_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z) in big_exponent_float_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!("(&{x}).sub_mul({y}, {z}) = {:?}", (&x).sub_mul(&y, &z));
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_ref_ref_ref_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z) in big_exponent_float_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let res = (&x).sub_mul(&y, &z);
+        println!("(&{x:#x}).sub_mul({y:#x}, {z:#x}) = {res:#x}");
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z) in big_exponent_float_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let mut x = x;
+        let x_old = x.clone();
+        x.sub_mul_assign(y.clone(), z.clone());
+        println!("x := {x_old}; x.sub_mul_assign({y}, {z}); x = {x}");
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_assign_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z) in big_exponent_float_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let mut x = x;
+        let x_old = x.clone();
+        x.sub_mul_assign(y.clone(), z.clone());
+        println!("x := {x_old:#x}; x.sub_mul_assign({y:#x}, {z:#x}); x = {x:#x}");
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_assign_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z) in big_exponent_float_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let mut x = x;
+        let x_old = x.clone();
+        x.sub_mul_assign(y.clone(), &z);
+        println!("x := {x_old}; x.sub_mul_assign({y}, {z}); x = {x}");
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_assign_val_ref_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z) in big_exponent_float_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let mut x = x;
+        let x_old = x.clone();
+        x.sub_mul_assign(y.clone(), &z);
+        println!("x := {x_old:#x}; x.sub_mul_assign({y:#x}, {z:#x}); x = {x:#x}");
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_assign_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z) in big_exponent_float_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let mut x = x;
+        let x_old = x.clone();
+        x.sub_mul_assign(&y, z.clone());
+        println!("x := {x_old}; x.sub_mul_assign({y}, {z}); x = {x}");
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_assign_ref_val_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z) in big_exponent_float_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let mut x = x;
+        let x_old = x.clone();
+        x.sub_mul_assign(&y, z.clone());
+        println!("x := {x_old:#x}; x.sub_mul_assign({y:#x}, {z:#x}); x = {x:#x}");
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_assign_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z) in big_exponent_float_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let mut x = x;
+        let x_old = x.clone();
+        x.sub_mul_assign(&y, &z);
+        println!("x := {x_old}; x.sub_mul_assign({y}, {z}); x = {x}");
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_assign_ref_ref_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z) in big_exponent_float_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let mut x = x;
+        let x_old = x.clone();
+        x.sub_mul_assign(&y, &z);
+        println!("x := {x_old:#x}; x.sub_mul_assign({y:#x}, {z:#x}); x = {x:#x}");
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_prec_val_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z, prec) in quadruple_gen_var_1().get(gm, config).take(limit) {
+        println!(
+            "({x}).sub_mul_prec_val_val_ref({y}, {z}, {prec}) = {:?}",
+            x.clone().sub_mul_prec_val_val_ref(y.clone(), &z, prec)
+        );
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_prec_val_val_ref_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec) in quadruple_gen_var_1().get(gm, config).take(limit) {
+        let res = x.clone().sub_mul_prec_val_val_ref(y.clone(), &z, prec);
+        println!(
+            "({x:#x}).sub_mul_prec_val_val_ref({y:#x}, {z:#x}, {prec}) = ({:#x}, {:?})",
+            res.0, res.1
+        );
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_prec_val_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z, prec) in quadruple_gen_var_1().get(gm, config).take(limit) {
+        println!(
+            "({x}).sub_mul_prec_val_ref_val({y}, {z}, {prec}) = {:?}",
+            x.clone().sub_mul_prec_val_ref_val(&y, z.clone(), prec)
+        );
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_prec_val_ref_val_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec) in quadruple_gen_var_1().get(gm, config).take(limit) {
+        let res = x.clone().sub_mul_prec_val_ref_val(&y, z.clone(), prec);
+        println!(
+            "({x:#x}).sub_mul_prec_val_ref_val({y:#x}, {z:#x}, {prec}) = ({:#x}, {:?})",
+            res.0, res.1
+        );
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_prec_val_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z, prec) in quadruple_gen_var_1().get(gm, config).take(limit) {
+        println!(
+            "({x}).sub_mul_prec_val_ref_ref({y}, {z}, {prec}) = {:?}",
+            x.clone().sub_mul_prec_val_ref_ref(&y, &z, prec)
+        );
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_prec_val_ref_ref_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec) in quadruple_gen_var_1().get(gm, config).take(limit) {
+        let res = x.clone().sub_mul_prec_val_ref_ref(&y, &z, prec);
+        println!(
+            "({x:#x}).sub_mul_prec_val_ref_ref({y:#x}, {z:#x}, {prec}) = ({:#x}, {:?})",
+            res.0, res.1
+        );
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_prec_ref_val_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z, prec) in quadruple_gen_var_1().get(gm, config).take(limit) {
+        println!(
+            "(&{x}).sub_mul_prec_ref_val_val({y}, {z}, {prec}) = {:?}",
+            x.sub_mul_prec_ref_val_val(y.clone(), z.clone(), prec)
+        );
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_prec_ref_val_val_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec) in quadruple_gen_var_1().get(gm, config).take(limit) {
+        let res = x.sub_mul_prec_ref_val_val(y.clone(), z.clone(), prec);
+        println!(
+            "(&{x:#x}).sub_mul_prec_ref_val_val({y:#x}, {z:#x}, {prec}) = ({:#x}, {:?})",
+            res.0, res.1
+        );
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_prec_ref_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z, prec) in quadruple_gen_var_1().get(gm, config).take(limit) {
+        println!(
+            "(&{x}).sub_mul_prec_ref_val_ref({y}, {z}, {prec}) = {:?}",
+            x.sub_mul_prec_ref_val_ref(y.clone(), &z, prec)
+        );
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_prec_ref_val_ref_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec) in quadruple_gen_var_1().get(gm, config).take(limit) {
+        let res = x.sub_mul_prec_ref_val_ref(y.clone(), &z, prec);
+        println!(
+            "(&{x:#x}).sub_mul_prec_ref_val_ref({y:#x}, {z:#x}, {prec}) = ({:#x}, {:?})",
+            res.0, res.1
+        );
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_prec_ref_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z, prec) in quadruple_gen_var_1().get(gm, config).take(limit) {
+        println!(
+            "(&{x}).sub_mul_prec_ref_ref_val({y}, {z}, {prec}) = {:?}",
+            x.sub_mul_prec_ref_ref_val(&y, z.clone(), prec)
+        );
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_prec_ref_ref_val_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec) in quadruple_gen_var_1().get(gm, config).take(limit) {
+        let res = x.sub_mul_prec_ref_ref_val(&y, z.clone(), prec);
+        println!(
+            "(&{x:#x}).sub_mul_prec_ref_ref_val({y:#x}, {z:#x}, {prec}) = ({:#x}, {:?})",
+            res.0, res.1
+        );
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_prec_ref_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z, prec) in quadruple_gen_var_1().get(gm, config).take(limit) {
+        println!(
+            "(&{x}).sub_mul_prec_ref_ref_ref({y}, {z}, {prec}) = {:?}",
+            x.sub_mul_prec_ref_ref_ref(&y, &z, prec)
+        );
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_prec_ref_ref_ref_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec) in quadruple_gen_var_1().get(gm, config).take(limit) {
+        let res = x.sub_mul_prec_ref_ref_ref(&y, &z, prec);
+        println!(
+            "(&{x:#x}).sub_mul_prec_ref_ref_ref({y:#x}, {z:#x}, {prec}) = ({:#x}, {:?})",
+            res.0, res.1
+        );
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_prec_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z, prec) in quadruple_gen_var_1().get(gm, config).take(limit) {
+        let mut x = x;
+        let x_old = x.clone();
+        x.sub_mul_prec_assign(y.clone(), z.clone(), prec);
+        println!("x := {x_old}; x.sub_mul_prec_assign({y}, {z}, {prec}); x = {x}");
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_prec_assign_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec) in quadruple_gen_var_1().get(gm, config).take(limit) {
+        let mut x = x;
+        let x_old = x.clone();
+        x.sub_mul_prec_assign(y.clone(), z.clone(), prec);
+        println!("x := {x_old:#x}; x.sub_mul_prec_assign({y:#x}, {z:#x}, {prec}); x = {x:#x}");
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_prec_assign_val_ref(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec) in quadruple_gen_var_1().get(gm, config).take(limit) {
+        let mut x = x;
+        let x_old = x.clone();
+        x.sub_mul_prec_assign_val_ref(y.clone(), &z, prec);
+        println!("x := {x_old}; x.sub_mul_prec_assign_val_ref({y}, {z}, {prec}); x = {x}");
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_prec_assign_val_ref_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec) in quadruple_gen_var_1().get(gm, config).take(limit) {
+        let mut x = x;
+        let x_old = x.clone();
+        x.sub_mul_prec_assign_val_ref(y.clone(), &z, prec);
+        println!(
+            "x := {x_old:#x}; x.sub_mul_prec_assign_val_ref({y:#x}, {z:#x}, {prec}); x = {x:#x}"
+        );
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_prec_assign_ref_val(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec) in quadruple_gen_var_1().get(gm, config).take(limit) {
+        let mut x = x;
+        let x_old = x.clone();
+        x.sub_mul_prec_assign_ref_val(&y, z.clone(), prec);
+        println!("x := {x_old}; x.sub_mul_prec_assign_ref_val({y}, {z}, {prec}); x = {x}");
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_prec_assign_ref_val_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec) in quadruple_gen_var_1().get(gm, config).take(limit) {
+        let mut x = x;
+        let x_old = x.clone();
+        x.sub_mul_prec_assign_ref_val(&y, z.clone(), prec);
+        println!(
+            "x := {x_old:#x}; x.sub_mul_prec_assign_ref_val({y:#x}, {z:#x}, {prec}); x = {x:#x}"
+        );
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_prec_assign_ref_ref(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec) in quadruple_gen_var_1().get(gm, config).take(limit) {
+        let mut x = x;
+        let x_old = x.clone();
+        x.sub_mul_prec_assign_ref_ref(&y, &z, prec);
+        println!("x := {x_old}; x.sub_mul_prec_assign_ref_ref({y}, {z}, {prec}); x = {x}");
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_prec_assign_ref_ref_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec) in quadruple_gen_var_1().get(gm, config).take(limit) {
+        let mut x = x;
+        let x_old = x.clone();
+        x.sub_mul_prec_assign_ref_ref(&y, &z, prec);
+        println!(
+            "x := {x_old:#x}; x.sub_mul_prec_assign_ref_ref({y:#x}, {z:#x}, {prec}); x = {x:#x}"
+        );
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_rational_prec_val_val_ref(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec, _) in rational_quintuple_gen().get(gm, config).take(limit) {
+        println!(
+            "({x}).sub_mul_rational_prec_val_val_ref({y}, {z}, {prec}) = {:?}",
+            x.clone()
+                .sub_mul_rational_prec_val_val_ref(y.clone(), &z, prec)
+        );
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_rational_prec_val_ref_val(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec, _) in rational_quintuple_gen().get(gm, config).take(limit) {
+        println!(
+            "({x}).sub_mul_rational_prec_val_ref_val({y}, {z}, {prec}) = {:?}",
+            x.clone()
+                .sub_mul_rational_prec_val_ref_val(&y, z.clone(), prec)
+        );
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_rational_prec_val_ref_ref(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec, _) in rational_quintuple_gen().get(gm, config).take(limit) {
+        println!(
+            "({x}).sub_mul_rational_prec_val_ref_ref({y}, {z}, {prec}) = {:?}",
+            x.clone().sub_mul_rational_prec_val_ref_ref(&y, &z, prec)
+        );
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_rational_prec_ref_val_val(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec, _) in rational_quintuple_gen().get(gm, config).take(limit) {
+        println!(
+            "(&{x}).sub_mul_rational_prec_ref_val_val({y}, {z}, {prec}) = {:?}",
+            x.sub_mul_rational_prec_ref_val_val(y.clone(), z.clone(), prec)
+        );
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_rational_prec_ref_val_ref(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec, _) in rational_quintuple_gen().get(gm, config).take(limit) {
+        println!(
+            "(&{x}).sub_mul_rational_prec_ref_val_ref({y}, {z}, {prec}) = {:?}",
+            x.sub_mul_rational_prec_ref_val_ref(y.clone(), &z, prec)
+        );
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_rational_prec_ref_ref_val(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec, _) in rational_quintuple_gen().get(gm, config).take(limit) {
+        println!(
+            "(&{x}).sub_mul_rational_prec_ref_ref_val({y}, {z}, {prec}) = {:?}",
+            x.sub_mul_rational_prec_ref_ref_val(&y, z.clone(), prec)
+        );
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_rational_prec_ref_ref_ref(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec, _) in rational_quintuple_gen().get(gm, config).take(limit) {
+        println!(
+            "(&{x}).sub_mul_rational_prec_ref_ref_ref({y}, {z}, {prec}) = {:?}",
+            x.sub_mul_rational_prec_ref_ref_ref(&y, &z, prec)
+        );
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_rational_prec_assign(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec, _) in rational_quintuple_gen().get(gm, config).take(limit) {
+        let mut x = x;
+        let x_old = x.clone();
+        x.sub_mul_rational_prec_assign(y.clone(), z.clone(), prec);
+        println!("x := {x_old}; x.sub_mul_rational_prec_assign({y}, {z}, {prec}); x = {x}");
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_rational_prec_assign_val_ref(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec, _) in rational_quintuple_gen().get(gm, config).take(limit) {
+        let mut x = x;
+        let x_old = x.clone();
+        x.sub_mul_rational_prec_assign_val_ref(y.clone(), &z, prec);
+        println!("x := {x_old}; x.sub_mul_rational_prec_assign_val_ref({y}, {z}, {prec}); x = {x}");
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_rational_prec_assign_ref_val(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec, _) in rational_quintuple_gen().get(gm, config).take(limit) {
+        let mut x = x;
+        let x_old = x.clone();
+        x.sub_mul_rational_prec_assign_ref_val(&y, z.clone(), prec);
+        println!("x := {x_old}; x.sub_mul_rational_prec_assign_ref_val({y}, {z}, {prec}); x = {x}");
+    }
+}
+
+fn demo_big_exponent_float_sub_mul_rational_prec_assign_ref_ref(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec, _) in rational_quintuple_gen().get(gm, config).take(limit) {
+        let mut x = x;
+        let x_old = x.clone();
+        x.sub_mul_rational_prec_assign_ref_ref(&y, &z, prec);
+        println!("x := {x_old}; x.sub_mul_rational_prec_assign_ref_ref({y}, {z}, {prec}); x = {x}");
     }
 }
 

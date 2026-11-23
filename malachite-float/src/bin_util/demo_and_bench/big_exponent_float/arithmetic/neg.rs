@@ -15,7 +15,11 @@ use malachite_float::test_util::generators::big_exponent_float_gen;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_big_exponent_float_neg);
+    register_demo!(runner, demo_big_exponent_float_neg_ref);
+    register_demo!(runner, demo_big_exponent_float_neg_assign);
     register_demo!(runner, demo_big_exponent_float_neg_debug);
+    register_demo!(runner, demo_big_exponent_float_neg_ref_debug);
+    register_demo!(runner, demo_big_exponent_float_neg_assign_debug);
     register_bench!(runner, benchmark_big_exponent_float_neg_evaluation_strategy);
 }
 
@@ -28,6 +32,34 @@ fn demo_big_exponent_float_neg(gm: GenMode, config: &GenConfig, limit: usize) {
 fn demo_big_exponent_float_neg_debug(gm: GenMode, config: &GenConfig, limit: usize) {
     for x in big_exponent_float_gen().get(gm, config).take(limit) {
         println!("-{x:#x} = {:#x}", -&x);
+    }
+}
+
+fn demo_big_exponent_float_neg_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in big_exponent_float_gen().get(gm, config).take(limit) {
+        println!("-(&{n}) = {}", -&n);
+    }
+}
+
+fn demo_big_exponent_float_neg_ref_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for n in big_exponent_float_gen().get(gm, config).take(limit) {
+        println!("-(&{:#x}) = {:#x}", &n, -&n);
+    }
+}
+
+fn demo_big_exponent_float_neg_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut n in big_exponent_float_gen().get(gm, config).take(limit) {
+        let n_old = n.clone();
+        n.neg_assign();
+        println!("n := {n_old}; n.neg_assign(); n = {n}");
+    }
+}
+
+fn demo_big_exponent_float_neg_assign_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut n in big_exponent_float_gen().get(gm, config).take(limit) {
+        let n_old = n.clone();
+        n.neg_assign();
+        println!("n := {n_old:#x}; n.neg_assign(); n = {n:#x}");
     }
 }
 

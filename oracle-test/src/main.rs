@@ -26,8 +26,8 @@ use std::io::{self, Write};
 use std::mem;
 use std::path::{Path, PathBuf};
 use std::process::{self, Command, Stdio};
-use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use std::sync::Mutex;
+use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use std::thread;
 
 const MODES: [&str; 3] = ["exhaustive", "random", "special_random"];
@@ -339,11 +339,7 @@ fn tests_reaching<'a>(fns: &[TopLevelFn<'a>], position: usize) -> Option<BTreeSe
             }
         }
     }
-    if tests.is_empty() {
-        None
-    } else {
-        Some(tests)
-    }
+    if tests.is_empty() { None } else { Some(tests) }
 }
 
 // Plans one check per oracle mode of `backend` (`FLINT` or `Azurite`) that a crate's unit tests
@@ -620,9 +616,7 @@ fn take_ordered_plan() -> Vec<Check> {
     let mut keyed = Vec::new();
     for (index, check) in checks.into_iter().enumerate() {
         let key = match &check.input {
-            CheckInput::TestRows { rows: file, .. } => {
-                (0, file.to_str().unwrap().to_string())
-            }
+            CheckInput::TestRows { rows: file, .. } => (0, file.to_str().unwrap().to_string()),
             CheckInput::Demo {
                 crate_dir, demo, ..
             } => {
@@ -2915,24 +2909,104 @@ const AZURITE_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_float_product",
     ),
     ("demo_float_add_debug", "az_float_add"),
+    ("demo_float_add_assign_debug", "az_float_add"),
+    ("demo_float_add_assign_ref_debug", "az_float_add"),
+    ("demo_float_add_ref_ref_debug", "az_float_add"),
+    ("demo_float_add_ref_val_debug", "az_float_add"),
+    ("demo_float_add_val_ref_debug", "az_float_add"),
     ("demo_float_add_extreme_debug", "az_float_add"),
     ("demo_float_add_prec_debug", "az_float_add"),
+    ("demo_float_add_prec_assign_debug", "az_float_add"),
+    ("demo_float_add_prec_assign_ref_debug", "az_float_add"),
+    ("demo_float_add_prec_ref_ref_debug", "az_float_add"),
+    ("demo_float_add_prec_ref_val_debug", "az_float_add"),
+    ("demo_float_add_prec_val_ref_debug", "az_float_add"),
     ("demo_float_add_prec_extreme_debug", "az_float_add"),
     ("demo_float_add_round_debug", "az_float_add"),
+    ("demo_float_add_round_assign_debug", "az_float_add"),
+    ("demo_float_add_round_assign_ref_debug", "az_float_add"),
+    ("demo_float_add_round_ref_ref_debug", "az_float_add"),
+    ("demo_float_add_round_ref_val_debug", "az_float_add"),
+    ("demo_float_add_round_val_ref_debug", "az_float_add"),
     ("demo_float_add_round_extreme_debug", "az_float_add"),
     ("demo_float_add_prec_round_debug", "az_float_add"),
+    ("demo_float_add_prec_round_assign_debug", "az_float_add"),
+    ("demo_float_add_prec_round_assign_ref_debug", "az_float_add"),
+    ("demo_float_add_prec_round_ref_ref_debug", "az_float_add"),
+    ("demo_float_add_prec_round_ref_val_debug", "az_float_add"),
+    ("demo_float_add_prec_round_val_ref_debug", "az_float_add"),
     ("demo_float_add_prec_round_extreme_debug", "az_float_add"),
     ("demo_float_sub_debug", "az_float_sub"),
+    ("demo_float_sub_assign_debug", "az_float_sub"),
+    ("demo_float_sub_assign_ref_debug", "az_float_sub"),
+    ("demo_float_sub_ref_ref_debug", "az_float_sub"),
+    ("demo_float_sub_ref_val_debug", "az_float_sub"),
+    ("demo_float_sub_val_ref_debug", "az_float_sub"),
     ("demo_float_sub_extreme_debug", "az_float_sub"),
     ("demo_float_sub_prec_debug", "az_float_sub"),
+    ("demo_float_sub_prec_assign_debug", "az_float_sub"),
+    ("demo_float_sub_prec_assign_ref_debug", "az_float_sub"),
+    ("demo_float_sub_prec_ref_ref_debug", "az_float_sub"),
+    ("demo_float_sub_prec_ref_val_debug", "az_float_sub"),
+    ("demo_float_sub_prec_val_ref_debug", "az_float_sub"),
     ("demo_float_sub_prec_extreme_debug", "az_float_sub"),
     ("demo_float_sub_round_debug", "az_float_sub"),
+    ("demo_float_sub_round_assign_debug", "az_float_sub"),
+    ("demo_float_sub_round_assign_ref_debug", "az_float_sub"),
+    ("demo_float_sub_round_ref_ref_debug", "az_float_sub"),
+    ("demo_float_sub_round_ref_val_debug", "az_float_sub"),
+    ("demo_float_sub_round_val_ref_debug", "az_float_sub"),
     ("demo_float_sub_round_extreme_debug", "az_float_sub"),
     ("demo_float_sub_prec_round_debug", "az_float_sub"),
+    ("demo_float_sub_prec_round_assign_debug", "az_float_sub"),
+    ("demo_float_sub_prec_round_assign_ref_debug", "az_float_sub"),
+    ("demo_float_sub_prec_round_ref_ref_debug", "az_float_sub"),
+    ("demo_float_sub_prec_round_ref_val_debug", "az_float_sub"),
+    ("demo_float_sub_prec_round_val_ref_debug", "az_float_sub"),
     ("demo_float_sub_prec_round_extreme_debug", "az_float_sub"),
     ("demo_float_add_rational_debug", "az_float_add_rational"),
     (
+        "demo_float_add_rational_assign_debug",
+        "az_float_add_rational",
+    ),
+    (
+        "demo_float_add_rational_assign_ref_debug",
+        "az_float_add_rational",
+    ),
+    (
+        "demo_float_add_rational_ref_ref_debug",
+        "az_float_add_rational",
+    ),
+    (
+        "demo_float_add_rational_ref_val_debug",
+        "az_float_add_rational",
+    ),
+    (
+        "demo_float_add_rational_val_ref_debug",
+        "az_float_add_rational",
+    ),
+    (
         "demo_float_add_rational_prec_debug",
+        "az_float_add_rational",
+    ),
+    (
+        "demo_float_add_rational_prec_assign_debug",
+        "az_float_add_rational",
+    ),
+    (
+        "demo_float_add_rational_prec_assign_ref_debug",
+        "az_float_add_rational",
+    ),
+    (
+        "demo_float_add_rational_prec_ref_ref_debug",
+        "az_float_add_rational",
+    ),
+    (
+        "demo_float_add_rational_prec_ref_val_debug",
+        "az_float_add_rational",
+    ),
+    (
+        "demo_float_add_rational_prec_val_ref_debug",
         "az_float_add_rational",
     ),
     (
@@ -2940,13 +3014,93 @@ const AZURITE_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_float_add_rational",
     ),
     (
+        "demo_float_add_rational_round_assign_debug",
+        "az_float_add_rational",
+    ),
+    (
+        "demo_float_add_rational_round_assign_ref_debug",
+        "az_float_add_rational",
+    ),
+    (
+        "demo_float_add_rational_round_ref_ref_debug",
+        "az_float_add_rational",
+    ),
+    (
+        "demo_float_add_rational_round_ref_val_debug",
+        "az_float_add_rational",
+    ),
+    (
+        "demo_float_add_rational_round_val_ref_debug",
+        "az_float_add_rational",
+    ),
+    (
         "demo_float_add_rational_prec_round_debug",
+        "az_float_add_rational",
+    ),
+    (
+        "demo_float_add_rational_prec_round_assign_debug",
+        "az_float_add_rational",
+    ),
+    (
+        "demo_float_add_rational_prec_round_assign_ref_debug",
+        "az_float_add_rational",
+    ),
+    (
+        "demo_float_add_rational_prec_round_ref_ref_debug",
+        "az_float_add_rational",
+    ),
+    (
+        "demo_float_add_rational_prec_round_ref_val_debug",
+        "az_float_add_rational",
+    ),
+    (
+        "demo_float_add_rational_prec_round_val_ref_debug",
         "az_float_add_rational",
     ),
     ("demo_rational_add_float_debug", "az_float_add_rational"),
     ("demo_float_sub_rational_debug", "az_float_sub_rational"),
     (
+        "demo_float_sub_rational_assign_debug",
+        "az_float_sub_rational",
+    ),
+    (
+        "demo_float_sub_rational_assign_ref_debug",
+        "az_float_sub_rational",
+    ),
+    (
+        "demo_float_sub_rational_ref_ref_debug",
+        "az_float_sub_rational",
+    ),
+    (
+        "demo_float_sub_rational_ref_val_debug",
+        "az_float_sub_rational",
+    ),
+    (
+        "demo_float_sub_rational_val_ref_debug",
+        "az_float_sub_rational",
+    ),
+    (
         "demo_float_sub_rational_prec_debug",
+        "az_float_sub_rational",
+    ),
+    (
+        "demo_float_sub_rational_prec_assign_debug",
+        "az_float_sub_rational",
+    ),
+    (
+        "demo_float_sub_rational_prec_assign_ref_debug",
+        "az_float_sub_rational",
+    ),
+    (
+        "demo_float_sub_rational_prec_ref_ref_debug",
+        "az_float_sub_rational",
+    ),
+    (
+        "demo_float_sub_rational_prec_ref_val_debug",
+        "az_float_sub_rational",
+    ),
+    (
+        "demo_float_sub_rational_prec_val_ref_debug",
         "az_float_sub_rational",
     ),
     (
@@ -2954,17 +3108,97 @@ const AZURITE_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_float_sub_rational",
     ),
     (
+        "demo_float_sub_rational_round_assign_debug",
+        "az_float_sub_rational",
+    ),
+    (
+        "demo_float_sub_rational_round_assign_ref_debug",
+        "az_float_sub_rational",
+    ),
+    (
+        "demo_float_sub_rational_round_ref_ref_debug",
+        "az_float_sub_rational",
+    ),
+    (
+        "demo_float_sub_rational_round_ref_val_debug",
+        "az_float_sub_rational",
+    ),
+    (
+        "demo_float_sub_rational_round_val_ref_debug",
+        "az_float_sub_rational",
+    ),
+    (
         "demo_float_sub_rational_prec_round_debug",
+        "az_float_sub_rational",
+    ),
+    (
+        "demo_float_sub_rational_prec_round_assign_debug",
+        "az_float_sub_rational",
+    ),
+    (
+        "demo_float_sub_rational_prec_round_assign_ref_debug",
+        "az_float_sub_rational",
+    ),
+    (
+        "demo_float_sub_rational_prec_round_ref_ref_debug",
+        "az_float_sub_rational",
+    ),
+    (
+        "demo_float_sub_rational_prec_round_ref_val_debug",
+        "az_float_sub_rational",
+    ),
+    (
+        "demo_float_sub_rational_prec_round_val_ref_debug",
         "az_float_sub_rational",
     ),
     ("demo_rational_sub_float_debug", "az_float_sub_rational"),
     ("demo_float_mul_rational_debug", "az_float_mul_rational"),
+    (
+        "demo_float_mul_rational_assign_debug",
+        "az_float_mul_rational",
+    ),
+    (
+        "demo_float_mul_rational_assign_ref_debug",
+        "az_float_mul_rational",
+    ),
+    (
+        "demo_float_mul_rational_ref_ref_debug",
+        "az_float_mul_rational",
+    ),
+    (
+        "demo_float_mul_rational_ref_val_debug",
+        "az_float_mul_rational",
+    ),
+    (
+        "demo_float_mul_rational_val_ref_debug",
+        "az_float_mul_rational",
+    ),
     (
         "demo_float_mul_rational_extreme_debug",
         "az_float_mul_rational",
     ),
     (
         "demo_float_mul_rational_prec_debug",
+        "az_float_mul_rational",
+    ),
+    (
+        "demo_float_mul_rational_prec_assign_debug",
+        "az_float_mul_rational",
+    ),
+    (
+        "demo_float_mul_rational_prec_assign_ref_debug",
+        "az_float_mul_rational",
+    ),
+    (
+        "demo_float_mul_rational_prec_ref_ref_debug",
+        "az_float_mul_rational",
+    ),
+    (
+        "demo_float_mul_rational_prec_ref_val_debug",
+        "az_float_mul_rational",
+    ),
+    (
+        "demo_float_mul_rational_prec_val_ref_debug",
         "az_float_mul_rational",
     ),
     (
@@ -2976,7 +3210,47 @@ const AZURITE_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_float_mul_rational",
     ),
     (
+        "demo_float_mul_rational_round_assign_debug",
+        "az_float_mul_rational",
+    ),
+    (
+        "demo_float_mul_rational_round_assign_ref_debug",
+        "az_float_mul_rational",
+    ),
+    (
+        "demo_float_mul_rational_round_ref_ref_debug",
+        "az_float_mul_rational",
+    ),
+    (
+        "demo_float_mul_rational_round_ref_val_debug",
+        "az_float_mul_rational",
+    ),
+    (
+        "demo_float_mul_rational_round_val_ref_debug",
+        "az_float_mul_rational",
+    ),
+    (
         "demo_float_mul_rational_prec_round_debug",
+        "az_float_mul_rational",
+    ),
+    (
+        "demo_float_mul_rational_prec_round_assign_debug",
+        "az_float_mul_rational",
+    ),
+    (
+        "demo_float_mul_rational_prec_round_assign_ref_debug",
+        "az_float_mul_rational",
+    ),
+    (
+        "demo_float_mul_rational_prec_round_ref_ref_debug",
+        "az_float_mul_rational",
+    ),
+    (
+        "demo_float_mul_rational_prec_round_ref_val_debug",
+        "az_float_mul_rational",
+    ),
+    (
+        "demo_float_mul_rational_prec_round_val_ref_debug",
         "az_float_mul_rational",
     ),
     ("demo_rational_mul_float_debug", "az_float_mul_rational"),
@@ -2986,11 +3260,51 @@ const AZURITE_FLOAT_STAGES: &[(&str, &str)] = &[
     ),
     ("demo_float_div_rational_debug", "az_float_div_rational"),
     (
+        "demo_float_div_rational_assign_debug",
+        "az_float_div_rational",
+    ),
+    (
+        "demo_float_div_rational_assign_ref_debug",
+        "az_float_div_rational",
+    ),
+    (
+        "demo_float_div_rational_ref_ref_debug",
+        "az_float_div_rational",
+    ),
+    (
+        "demo_float_div_rational_ref_val_debug",
+        "az_float_div_rational",
+    ),
+    (
+        "demo_float_div_rational_val_ref_debug",
+        "az_float_div_rational",
+    ),
+    (
         "demo_float_div_rational_extreme_debug",
         "az_float_div_rational",
     ),
     (
         "demo_float_div_rational_prec_debug",
+        "az_float_div_rational",
+    ),
+    (
+        "demo_float_div_rational_prec_assign_debug",
+        "az_float_div_rational",
+    ),
+    (
+        "demo_float_div_rational_prec_assign_ref_debug",
+        "az_float_div_rational",
+    ),
+    (
+        "demo_float_div_rational_prec_ref_ref_debug",
+        "az_float_div_rational",
+    ),
+    (
+        "demo_float_div_rational_prec_ref_val_debug",
+        "az_float_div_rational",
+    ),
+    (
+        "demo_float_div_rational_prec_val_ref_debug",
         "az_float_div_rational",
     ),
     (
@@ -3002,7 +3316,47 @@ const AZURITE_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_float_div_rational",
     ),
     (
+        "demo_float_div_rational_round_assign_debug",
+        "az_float_div_rational",
+    ),
+    (
+        "demo_float_div_rational_round_assign_ref_debug",
+        "az_float_div_rational",
+    ),
+    (
+        "demo_float_div_rational_round_ref_ref_debug",
+        "az_float_div_rational",
+    ),
+    (
+        "demo_float_div_rational_round_ref_val_debug",
+        "az_float_div_rational",
+    ),
+    (
+        "demo_float_div_rational_round_val_ref_debug",
+        "az_float_div_rational",
+    ),
+    (
         "demo_float_div_rational_prec_round_debug",
+        "az_float_div_rational",
+    ),
+    (
+        "demo_float_div_rational_prec_round_assign_debug",
+        "az_float_div_rational",
+    ),
+    (
+        "demo_float_div_rational_prec_round_assign_ref_debug",
+        "az_float_div_rational",
+    ),
+    (
+        "demo_float_div_rational_prec_round_ref_ref_debug",
+        "az_float_div_rational",
+    ),
+    (
+        "demo_float_div_rational_prec_round_ref_val_debug",
+        "az_float_div_rational",
+    ),
+    (
+        "demo_float_div_rational_prec_round_val_ref_debug",
         "az_float_div_rational",
     ),
     ("demo_rational_div_float_debug", "az_float_div_rational"),
@@ -3027,28 +3381,79 @@ const AZURITE_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_float_div_rational",
     ),
     ("demo_float_mul_debug", "az_float_mul"),
+    ("demo_float_mul_assign_debug", "az_float_mul"),
+    ("demo_float_mul_assign_ref_debug", "az_float_mul"),
+    ("demo_float_mul_ref_ref_debug", "az_float_mul"),
+    ("demo_float_mul_ref_val_debug", "az_float_mul"),
+    ("demo_float_mul_val_ref_debug", "az_float_mul"),
     ("demo_float_mul_extreme_debug", "az_float_mul"),
     ("demo_float_mul_prec_debug", "az_float_mul"),
+    ("demo_float_mul_prec_assign_debug", "az_float_mul"),
+    ("demo_float_mul_prec_assign_ref_debug", "az_float_mul"),
+    ("demo_float_mul_prec_ref_ref_debug", "az_float_mul"),
+    ("demo_float_mul_prec_ref_val_debug", "az_float_mul"),
+    ("demo_float_mul_prec_val_ref_debug", "az_float_mul"),
     ("demo_float_mul_prec_extreme_debug", "az_float_mul"),
     ("demo_float_mul_round_debug", "az_float_mul"),
+    ("demo_float_mul_round_assign_debug", "az_float_mul"),
+    ("demo_float_mul_round_assign_ref_debug", "az_float_mul"),
+    ("demo_float_mul_round_ref_ref_debug", "az_float_mul"),
+    ("demo_float_mul_round_ref_val_debug", "az_float_mul"),
+    ("demo_float_mul_round_val_ref_debug", "az_float_mul"),
     ("demo_float_mul_round_extreme_debug", "az_float_mul"),
     ("demo_float_mul_prec_round_debug", "az_float_mul"),
+    ("demo_float_mul_prec_round_assign_debug", "az_float_mul"),
+    ("demo_float_mul_prec_round_assign_ref_debug", "az_float_mul"),
+    ("demo_float_mul_prec_round_ref_ref_debug", "az_float_mul"),
+    ("demo_float_mul_prec_round_ref_val_debug", "az_float_mul"),
+    ("demo_float_mul_prec_round_val_ref_debug", "az_float_mul"),
     ("demo_float_mul_prec_round_extreme_debug", "az_float_mul"),
     ("demo_float_div_debug", "az_float_div"),
+    ("demo_float_div_assign_debug", "az_float_div"),
+    ("demo_float_div_assign_ref_debug", "az_float_div"),
+    ("demo_float_div_ref_ref_debug", "az_float_div"),
+    ("demo_float_div_ref_val_debug", "az_float_div"),
+    ("demo_float_div_val_ref_debug", "az_float_div"),
     ("demo_float_div_extreme_debug", "az_float_div"),
     ("demo_float_div_prec_debug", "az_float_div"),
+    ("demo_float_div_prec_assign_debug", "az_float_div"),
+    ("demo_float_div_prec_assign_ref_debug", "az_float_div"),
+    ("demo_float_div_prec_ref_ref_debug", "az_float_div"),
+    ("demo_float_div_prec_ref_val_debug", "az_float_div"),
+    ("demo_float_div_prec_val_ref_debug", "az_float_div"),
     ("demo_float_div_prec_extreme_debug", "az_float_div"),
     ("demo_float_div_round_debug", "az_float_div"),
+    ("demo_float_div_round_assign_debug", "az_float_div"),
+    ("demo_float_div_round_assign_ref_debug", "az_float_div"),
+    ("demo_float_div_round_ref_ref_debug", "az_float_div"),
+    ("demo_float_div_round_ref_val_debug", "az_float_div"),
+    ("demo_float_div_round_val_ref_debug", "az_float_div"),
     ("demo_float_div_round_extreme_debug", "az_float_div"),
     ("demo_float_div_prec_round_debug", "az_float_div"),
+    ("demo_float_div_prec_round_assign_debug", "az_float_div"),
+    ("demo_float_div_prec_round_assign_ref_debug", "az_float_div"),
+    ("demo_float_div_prec_round_ref_ref_debug", "az_float_div"),
+    ("demo_float_div_prec_round_ref_val_debug", "az_float_div"),
+    ("demo_float_div_prec_round_val_ref_debug", "az_float_div"),
     ("demo_float_div_prec_round_extreme_debug", "az_float_div"),
     ("demo_float_square_debug", "az_float_square"),
+    ("demo_float_square_assign_debug", "az_float_square"),
+    ("demo_float_square_ref_debug", "az_float_square"),
     ("demo_float_square_extreme_debug", "az_float_square"),
     ("demo_float_square_prec_debug", "az_float_square"),
+    ("demo_float_square_prec_assign_debug", "az_float_square"),
+    ("demo_float_square_prec_ref_debug", "az_float_square"),
     ("demo_float_square_prec_extreme_debug", "az_float_square"),
     ("demo_float_square_round_debug", "az_float_square"),
+    ("demo_float_square_round_assign_debug", "az_float_square"),
+    ("demo_float_square_round_ref_debug", "az_float_square"),
     ("demo_float_square_round_extreme_debug", "az_float_square"),
     ("demo_float_square_prec_round_debug", "az_float_square"),
+    (
+        "demo_float_square_prec_round_assign_debug",
+        "az_float_square",
+    ),
+    ("demo_float_square_prec_round_ref_debug", "az_float_square"),
     (
         "demo_float_square_prec_round_extreme_debug",
         "az_float_square",
@@ -4676,19 +5081,45 @@ const AZURITE_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_float_log_base_10_1_plus_x",
     ),
     ("demo_float_reciprocal_debug", "az_float_reciprocal"),
+    ("demo_float_reciprocal_assign_debug", "az_float_reciprocal"),
+    ("demo_float_reciprocal_ref_debug", "az_float_reciprocal"),
     ("demo_float_reciprocal_extreme_debug", "az_float_reciprocal"),
     ("demo_float_reciprocal_prec_debug", "az_float_reciprocal"),
+    (
+        "demo_float_reciprocal_prec_assign_debug",
+        "az_float_reciprocal",
+    ),
+    (
+        "demo_float_reciprocal_prec_ref_debug",
+        "az_float_reciprocal",
+    ),
     (
         "demo_float_reciprocal_prec_extreme_debug",
         "az_float_reciprocal",
     ),
     ("demo_float_reciprocal_round_debug", "az_float_reciprocal"),
     (
+        "demo_float_reciprocal_round_assign_debug",
+        "az_float_reciprocal",
+    ),
+    (
+        "demo_float_reciprocal_round_ref_debug",
+        "az_float_reciprocal",
+    ),
+    (
         "demo_float_reciprocal_round_extreme_debug",
         "az_float_reciprocal",
     ),
     (
         "demo_float_reciprocal_prec_round_debug",
+        "az_float_reciprocal",
+    ),
+    (
+        "demo_float_reciprocal_prec_round_assign_debug",
+        "az_float_reciprocal",
+    ),
+    (
+        "demo_float_reciprocal_prec_round_ref_debug",
         "az_float_reciprocal",
     ),
     (
@@ -6267,8 +6698,12 @@ const AZURITE_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_float_round_to_integer_then",
     ),
     ("demo_float_neg_debug", "az_float_neg"),
+    ("demo_float_neg_assign_debug", "az_float_neg"),
+    ("demo_float_neg_ref_debug", "az_float_neg"),
     ("demo_float_neg_extreme_debug", "az_float_neg"),
     ("demo_float_abs_debug", "az_float_abs"),
+    ("demo_float_abs_assign_debug", "az_float_abs"),
+    ("demo_float_abs_ref_debug", "az_float_abs"),
     ("demo_float_abs_extreme_debug", "az_float_abs"),
     ("demo_float_shl_unsigned_debug_u8", "az_float_shl"),
     ("demo_float_shr_unsigned_debug_u8", "az_float_shr"),
@@ -6362,20 +6797,44 @@ const AZURITE_FLOAT_STAGES: &[(&str, &str)] = &[
     ),
     ("demo_float_try_from_natural_debug", "az_float_from_natural"),
     (
+        "demo_float_try_from_natural_ref_debug",
+        "az_float_from_natural",
+    ),
+    (
         "demo_float_from_natural_prec_debug",
+        "az_float_from_natural",
+    ),
+    (
+        "demo_float_from_natural_prec_ref_debug",
         "az_float_from_natural",
     ),
     (
         "demo_float_from_natural_prec_round_debug",
         "az_float_from_natural",
     ),
+    (
+        "demo_float_from_natural_prec_round_ref_debug",
+        "az_float_from_natural",
+    ),
     ("demo_float_try_from_integer_debug", "az_float_from_integer"),
+    (
+        "demo_float_try_from_integer_ref_debug",
+        "az_float_from_integer",
+    ),
     (
         "demo_float_from_integer_prec_debug",
         "az_float_from_integer",
     ),
     (
+        "demo_float_from_integer_prec_ref_debug",
+        "az_float_from_integer",
+    ),
+    (
         "demo_float_from_integer_prec_round_debug",
+        "az_float_from_integer",
+    ),
+    (
+        "demo_float_from_integer_prec_round_ref_debug",
         "az_float_from_integer",
     ),
     (
@@ -6391,7 +6850,15 @@ const AZURITE_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_float_from_rational",
     ),
     (
+        "demo_float_from_rational_prec_ref_debug",
+        "az_float_from_rational",
+    ),
+    (
         "demo_float_from_rational_prec_round_debug",
+        "az_float_from_rational",
+    ),
+    (
+        "demo_float_from_rational_prec_round_ref_debug",
         "az_float_from_rational",
     ),
     (
@@ -7929,7 +8396,47 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_big_exponent_float_add",
     ),
     (
+        "demo_big_exponent_float_add_assign_debug",
+        "az_big_exponent_float_add",
+    ),
+    (
+        "demo_big_exponent_float_add_assign_ref_debug",
+        "az_big_exponent_float_add",
+    ),
+    (
+        "demo_big_exponent_float_add_val_ref_debug",
+        "az_big_exponent_float_add",
+    ),
+    (
+        "demo_big_exponent_float_add_ref_val_debug",
+        "az_big_exponent_float_add",
+    ),
+    (
+        "demo_big_exponent_float_add_ref_ref_debug",
+        "az_big_exponent_float_add",
+    ),
+    (
         "demo_big_exponent_float_add_prec_debug",
+        "az_big_exponent_float_add",
+    ),
+    (
+        "demo_big_exponent_float_add_prec_assign_debug",
+        "az_big_exponent_float_add",
+    ),
+    (
+        "demo_big_exponent_float_add_prec_assign_ref_debug",
+        "az_big_exponent_float_add",
+    ),
+    (
+        "demo_big_exponent_float_add_prec_ref_ref_debug",
+        "az_big_exponent_float_add",
+    ),
+    (
+        "demo_big_exponent_float_add_prec_ref_val_debug",
+        "az_big_exponent_float_add",
+    ),
+    (
+        "demo_big_exponent_float_add_prec_val_ref_debug",
         "az_big_exponent_float_add",
     ),
     (
@@ -7937,7 +8444,47 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_big_exponent_float_add",
     ),
     (
+        "demo_big_exponent_float_add_prec_round_assign_debug",
+        "az_big_exponent_float_add",
+    ),
+    (
+        "demo_big_exponent_float_add_prec_round_assign_ref_debug",
+        "az_big_exponent_float_add",
+    ),
+    (
+        "demo_big_exponent_float_add_prec_round_ref_ref_debug",
+        "az_big_exponent_float_add",
+    ),
+    (
+        "demo_big_exponent_float_add_prec_round_ref_val_debug",
+        "az_big_exponent_float_add",
+    ),
+    (
+        "demo_big_exponent_float_add_prec_round_val_ref_debug",
+        "az_big_exponent_float_add",
+    ),
+    (
         "demo_big_exponent_float_sub_debug",
+        "az_big_exponent_float_sub",
+    ),
+    (
+        "demo_big_exponent_float_sub_assign_debug",
+        "az_big_exponent_float_sub",
+    ),
+    (
+        "demo_big_exponent_float_sub_assign_ref_debug",
+        "az_big_exponent_float_sub",
+    ),
+    (
+        "demo_big_exponent_float_sub_val_ref_debug",
+        "az_big_exponent_float_sub",
+    ),
+    (
+        "demo_big_exponent_float_sub_ref_val_debug",
+        "az_big_exponent_float_sub",
+    ),
+    (
+        "demo_big_exponent_float_sub_ref_ref_debug",
         "az_big_exponent_float_sub",
     ),
     (
@@ -7945,11 +8492,71 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_big_exponent_float_sub",
     ),
     (
+        "demo_big_exponent_float_sub_prec_assign_debug",
+        "az_big_exponent_float_sub",
+    ),
+    (
+        "demo_big_exponent_float_sub_prec_assign_ref_debug",
+        "az_big_exponent_float_sub",
+    ),
+    (
+        "demo_big_exponent_float_sub_prec_ref_ref_debug",
+        "az_big_exponent_float_sub",
+    ),
+    (
+        "demo_big_exponent_float_sub_prec_ref_val_debug",
+        "az_big_exponent_float_sub",
+    ),
+    (
+        "demo_big_exponent_float_sub_prec_val_ref_debug",
+        "az_big_exponent_float_sub",
+    ),
+    (
         "demo_big_exponent_float_sub_prec_round_debug",
         "az_big_exponent_float_sub",
     ),
     (
+        "demo_big_exponent_float_sub_prec_round_assign_debug",
+        "az_big_exponent_float_sub",
+    ),
+    (
+        "demo_big_exponent_float_sub_prec_round_assign_ref_debug",
+        "az_big_exponent_float_sub",
+    ),
+    (
+        "demo_big_exponent_float_sub_prec_round_ref_ref_debug",
+        "az_big_exponent_float_sub",
+    ),
+    (
+        "demo_big_exponent_float_sub_prec_round_ref_val_debug",
+        "az_big_exponent_float_sub",
+    ),
+    (
+        "demo_big_exponent_float_sub_prec_round_val_ref_debug",
+        "az_big_exponent_float_sub",
+    ),
+    (
         "demo_big_exponent_float_add_rational_prec_debug",
+        "az_big_exponent_float_add_rational",
+    ),
+    (
+        "demo_big_exponent_float_add_rational_prec_assign_debug",
+        "az_big_exponent_float_add_rational",
+    ),
+    (
+        "demo_big_exponent_float_add_rational_prec_assign_ref_debug",
+        "az_big_exponent_float_add_rational",
+    ),
+    (
+        "demo_big_exponent_float_add_rational_prec_ref_ref_debug",
+        "az_big_exponent_float_add_rational",
+    ),
+    (
+        "demo_big_exponent_float_add_rational_prec_ref_val_debug",
+        "az_big_exponent_float_add_rational",
+    ),
+    (
+        "demo_big_exponent_float_add_rational_prec_val_ref_debug",
         "az_big_exponent_float_add_rational",
     ),
     (
@@ -7961,11 +8568,51 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_big_exponent_float_sub_rational",
     ),
     (
+        "demo_big_exponent_float_sub_rational_prec_assign_debug",
+        "az_big_exponent_float_sub_rational",
+    ),
+    (
+        "demo_big_exponent_float_sub_rational_prec_assign_ref_debug",
+        "az_big_exponent_float_sub_rational",
+    ),
+    (
+        "demo_big_exponent_float_sub_rational_prec_ref_ref_debug",
+        "az_big_exponent_float_sub_rational",
+    ),
+    (
+        "demo_big_exponent_float_sub_rational_prec_ref_val_debug",
+        "az_big_exponent_float_sub_rational",
+    ),
+    (
+        "demo_big_exponent_float_sub_rational_prec_val_ref_debug",
+        "az_big_exponent_float_sub_rational",
+    ),
+    (
         "demo_big_exponent_float_sub_rational_prec_round_debug",
         "az_big_exponent_float_sub_rational",
     ),
     (
         "demo_big_exponent_float_mul_rational_prec_debug",
+        "az_big_exponent_float_mul_rational",
+    ),
+    (
+        "demo_big_exponent_float_mul_rational_prec_assign_debug",
+        "az_big_exponent_float_mul_rational",
+    ),
+    (
+        "demo_big_exponent_float_mul_rational_prec_assign_ref_debug",
+        "az_big_exponent_float_mul_rational",
+    ),
+    (
+        "demo_big_exponent_float_mul_rational_prec_ref_ref_debug",
+        "az_big_exponent_float_mul_rational",
+    ),
+    (
+        "demo_big_exponent_float_mul_rational_prec_ref_val_debug",
+        "az_big_exponent_float_mul_rational",
+    ),
+    (
+        "demo_big_exponent_float_mul_rational_prec_val_ref_debug",
         "az_big_exponent_float_mul_rational",
     ),
     (
@@ -7977,6 +8624,26 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_big_exponent_float_div_rational",
     ),
     (
+        "demo_big_exponent_float_div_rational_prec_assign_debug",
+        "az_big_exponent_float_div_rational",
+    ),
+    (
+        "demo_big_exponent_float_div_rational_prec_assign_ref_debug",
+        "az_big_exponent_float_div_rational",
+    ),
+    (
+        "demo_big_exponent_float_div_rational_prec_ref_ref_debug",
+        "az_big_exponent_float_div_rational",
+    ),
+    (
+        "demo_big_exponent_float_div_rational_prec_ref_val_debug",
+        "az_big_exponent_float_div_rational",
+    ),
+    (
+        "demo_big_exponent_float_div_rational_prec_val_ref_debug",
+        "az_big_exponent_float_div_rational",
+    ),
+    (
         "demo_big_exponent_float_div_rational_prec_round_debug",
         "az_big_exponent_float_div_rational",
     ),
@@ -7985,7 +8652,47 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_big_exponent_float_mul",
     ),
     (
+        "demo_big_exponent_float_mul_assign_debug",
+        "az_big_exponent_float_mul",
+    ),
+    (
+        "demo_big_exponent_float_mul_assign_ref_debug",
+        "az_big_exponent_float_mul",
+    ),
+    (
+        "demo_big_exponent_float_mul_val_ref_debug",
+        "az_big_exponent_float_mul",
+    ),
+    (
+        "demo_big_exponent_float_mul_ref_val_debug",
+        "az_big_exponent_float_mul",
+    ),
+    (
+        "demo_big_exponent_float_mul_ref_ref_debug",
+        "az_big_exponent_float_mul",
+    ),
+    (
         "demo_big_exponent_float_mul_prec_debug",
+        "az_big_exponent_float_mul",
+    ),
+    (
+        "demo_big_exponent_float_mul_prec_assign_debug",
+        "az_big_exponent_float_mul",
+    ),
+    (
+        "demo_big_exponent_float_mul_prec_assign_ref_debug",
+        "az_big_exponent_float_mul",
+    ),
+    (
+        "demo_big_exponent_float_mul_prec_ref_ref_debug",
+        "az_big_exponent_float_mul",
+    ),
+    (
+        "demo_big_exponent_float_mul_prec_ref_val_debug",
+        "az_big_exponent_float_mul",
+    ),
+    (
+        "demo_big_exponent_float_mul_prec_val_ref_debug",
         "az_big_exponent_float_mul",
     ),
     (
@@ -7993,7 +8700,47 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_big_exponent_float_mul",
     ),
     (
+        "demo_big_exponent_float_mul_prec_round_assign_debug",
+        "az_big_exponent_float_mul",
+    ),
+    (
+        "demo_big_exponent_float_mul_prec_round_assign_ref_debug",
+        "az_big_exponent_float_mul",
+    ),
+    (
+        "demo_big_exponent_float_mul_prec_round_ref_ref_debug",
+        "az_big_exponent_float_mul",
+    ),
+    (
+        "demo_big_exponent_float_mul_prec_round_ref_val_debug",
+        "az_big_exponent_float_mul",
+    ),
+    (
+        "demo_big_exponent_float_mul_prec_round_val_ref_debug",
+        "az_big_exponent_float_mul",
+    ),
+    (
         "demo_big_exponent_float_div_prec_debug",
+        "az_big_exponent_float_div",
+    ),
+    (
+        "demo_big_exponent_float_div_prec_assign_debug",
+        "az_big_exponent_float_div",
+    ),
+    (
+        "demo_big_exponent_float_div_prec_assign_ref_debug",
+        "az_big_exponent_float_div",
+    ),
+    (
+        "demo_big_exponent_float_div_prec_ref_ref_debug",
+        "az_big_exponent_float_div",
+    ),
+    (
+        "demo_big_exponent_float_div_prec_ref_val_debug",
+        "az_big_exponent_float_div",
+    ),
+    (
+        "demo_big_exponent_float_div_prec_val_ref_debug",
         "az_big_exponent_float_div",
     ),
     (
@@ -8001,7 +8748,35 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_big_exponent_float_div",
     ),
     (
+        "demo_big_exponent_float_div_prec_round_assign_debug",
+        "az_big_exponent_float_div",
+    ),
+    (
+        "demo_big_exponent_float_div_prec_round_assign_ref_debug",
+        "az_big_exponent_float_div",
+    ),
+    (
+        "demo_big_exponent_float_div_prec_round_ref_ref_debug",
+        "az_big_exponent_float_div",
+    ),
+    (
+        "demo_big_exponent_float_div_prec_round_ref_val_debug",
+        "az_big_exponent_float_div",
+    ),
+    (
+        "demo_big_exponent_float_div_prec_round_val_ref_debug",
+        "az_big_exponent_float_div",
+    ),
+    (
         "demo_big_exponent_float_square_debug",
+        "az_big_exponent_float_square",
+    ),
+    (
+        "demo_big_exponent_float_square_assign_debug",
+        "az_big_exponent_float_square",
+    ),
+    (
+        "demo_big_exponent_float_square_ref_debug",
         "az_big_exponent_float_square",
     ),
     (
@@ -8009,7 +8784,23 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_big_exponent_float_square",
     ),
     (
+        "demo_big_exponent_float_square_prec_assign_debug",
+        "az_big_exponent_float_square",
+    ),
+    (
+        "demo_big_exponent_float_square_prec_ref_debug",
+        "az_big_exponent_float_square",
+    ),
+    (
         "demo_big_exponent_float_square_prec_round_debug",
+        "az_big_exponent_float_square",
+    ),
+    (
+        "demo_big_exponent_float_square_prec_round_assign_debug",
+        "az_big_exponent_float_square",
+    ),
+    (
+        "demo_big_exponent_float_square_prec_round_ref_debug",
         "az_big_exponent_float_square",
     ),
     (
@@ -8017,7 +8808,23 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_big_exponent_float_sqrt",
     ),
     (
+        "demo_big_exponent_float_sqrt_prec_assign_debug",
+        "az_big_exponent_float_sqrt",
+    ),
+    (
+        "demo_big_exponent_float_sqrt_prec_ref_debug",
+        "az_big_exponent_float_sqrt",
+    ),
+    (
         "demo_big_exponent_float_sqrt_prec_round_debug",
+        "az_big_exponent_float_sqrt",
+    ),
+    (
+        "demo_big_exponent_float_sqrt_prec_round_assign_debug",
+        "az_big_exponent_float_sqrt",
+    ),
+    (
+        "demo_big_exponent_float_sqrt_prec_round_ref_debug",
         "az_big_exponent_float_sqrt",
     ),
     (
@@ -8030,6 +8837,10 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
     ),
     (
         "demo_big_exponent_float_sqrt_rational_prec_debug",
+        "az_big_exponent_float_sqrt_rational",
+    ),
+    (
+        "demo_big_exponent_float_sqrt_rational_prec_ref_debug",
         "az_big_exponent_float_sqrt_rational",
     ),
     (
@@ -8049,7 +8860,47 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_big_exponent_float_agm",
     ),
     (
+        "demo_big_exponent_float_agm_prec_val_ref_debug",
+        "az_big_exponent_float_agm",
+    ),
+    (
+        "demo_big_exponent_float_agm_prec_ref_val_debug",
+        "az_big_exponent_float_agm",
+    ),
+    (
+        "demo_big_exponent_float_agm_prec_ref_ref_debug",
+        "az_big_exponent_float_agm",
+    ),
+    (
+        "demo_big_exponent_float_agm_prec_assign_debug",
+        "az_big_exponent_float_agm",
+    ),
+    (
+        "demo_big_exponent_float_agm_prec_assign_ref_debug",
+        "az_big_exponent_float_agm",
+    ),
+    (
         "demo_big_exponent_float_agm_prec_round_debug",
+        "az_big_exponent_float_agm",
+    ),
+    (
+        "demo_big_exponent_float_agm_prec_round_val_ref_debug",
+        "az_big_exponent_float_agm",
+    ),
+    (
+        "demo_big_exponent_float_agm_prec_round_ref_val_debug",
+        "az_big_exponent_float_agm",
+    ),
+    (
+        "demo_big_exponent_float_agm_prec_round_ref_ref_debug",
+        "az_big_exponent_float_agm",
+    ),
+    (
+        "demo_big_exponent_float_agm_prec_round_assign_debug",
+        "az_big_exponent_float_agm",
+    ),
+    (
+        "demo_big_exponent_float_agm_prec_round_assign_ref_debug",
         "az_big_exponent_float_agm",
     ),
     (
@@ -8188,11 +9039,31 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_big_exponent_float_ln",
     ),
     (
+        "demo_big_exponent_float_ln_prec_ref_debug",
+        "az_big_exponent_float_ln",
+    ),
+    (
+        "demo_big_exponent_float_ln_prec_assign_debug",
+        "az_big_exponent_float_ln",
+    ),
+    (
         "demo_big_exponent_float_ln_prec_round_debug",
         "az_big_exponent_float_ln",
     ),
     (
+        "demo_big_exponent_float_ln_prec_round_ref_debug",
+        "az_big_exponent_float_ln",
+    ),
+    (
+        "demo_big_exponent_float_ln_prec_round_assign_debug",
+        "az_big_exponent_float_ln",
+    ),
+    (
         "demo_big_exponent_float_ln_rational_prec_debug",
+        "az_big_exponent_float_ln_rational",
+    ),
+    (
+        "demo_big_exponent_float_ln_rational_prec_ref_debug",
         "az_big_exponent_float_ln_rational",
     ),
     (
@@ -8212,11 +9083,27 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_big_exponent_float_ln_1_plus_x",
     ),
     (
+        "demo_big_exponent_float_ln_1_plus_x_prec_ref_debug",
+        "az_big_exponent_float_ln_1_plus_x",
+    ),
+    (
+        "demo_big_exponent_float_ln_1_plus_x_prec_assign_debug",
+        "az_big_exponent_float_ln_1_plus_x",
+    ),
+    (
         "demo_big_exponent_float_ln_1_plus_x_prec_round_debug",
         "az_big_exponent_float_ln_1_plus_x",
     ),
     (
         "demo_big_exponent_float_log_base_2_prec_debug",
+        "az_big_exponent_float_log_base_2",
+    ),
+    (
+        "demo_big_exponent_float_log_base_2_prec_ref_debug",
+        "az_big_exponent_float_log_base_2",
+    ),
+    (
+        "demo_big_exponent_float_log_base_2_prec_assign_debug",
         "az_big_exponent_float_log_base_2",
     ),
     (
@@ -8265,6 +9152,14 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
     ),
     (
         "demo_big_exponent_float_log_base_prec_debug",
+        "az_big_exponent_float_log_base",
+    ),
+    (
+        "demo_big_exponent_float_log_base_prec_ref_debug",
+        "az_big_exponent_float_log_base",
+    ),
+    (
+        "demo_big_exponent_float_log_base_prec_assign_debug",
         "az_big_exponent_float_log_base",
     ),
     (
@@ -8345,6 +9240,10 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
     ),
     (
         "demo_big_exponent_float_exp_rational_prec_debug",
+        "az_big_exponent_float_exp_rational",
+    ),
+    (
+        "demo_big_exponent_float_exp_rational_prec_ref_debug",
         "az_big_exponent_float_exp_rational",
     ),
     (
@@ -8508,6 +9407,14 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_big_exponent_float_log_base_10",
     ),
     (
+        "demo_big_exponent_float_log_base_10_prec_ref_debug",
+        "az_big_exponent_float_log_base_10",
+    ),
+    (
+        "demo_big_exponent_float_log_base_10_prec_assign_debug",
+        "az_big_exponent_float_log_base_10",
+    ),
+    (
         "demo_big_exponent_float_log_base_10_prec_round_debug",
         "az_big_exponent_float_log_base_10",
     ),
@@ -8532,6 +9439,14 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_big_exponent_float_reciprocal",
     ),
     (
+        "demo_big_exponent_float_reciprocal_prec_assign_debug",
+        "az_big_exponent_float_reciprocal",
+    ),
+    (
+        "demo_big_exponent_float_reciprocal_prec_ref_debug",
+        "az_big_exponent_float_reciprocal",
+    ),
+    (
         "demo_big_exponent_float_reciprocal_prec_round_debug",
         "az_big_exponent_float_reciprocal",
     ),
@@ -8540,7 +9455,95 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_big_exponent_float_add_mul",
     ),
     (
+        "demo_big_exponent_float_add_mul_val_val_ref_debug",
+        "az_big_exponent_float_add_mul",
+    ),
+    (
+        "demo_big_exponent_float_add_mul_val_ref_val_debug",
+        "az_big_exponent_float_add_mul",
+    ),
+    (
+        "demo_big_exponent_float_add_mul_val_ref_ref_debug",
+        "az_big_exponent_float_add_mul",
+    ),
+    (
+        "demo_big_exponent_float_add_mul_ref_val_val_debug",
+        "az_big_exponent_float_add_mul",
+    ),
+    (
+        "demo_big_exponent_float_add_mul_ref_val_ref_debug",
+        "az_big_exponent_float_add_mul",
+    ),
+    (
+        "demo_big_exponent_float_add_mul_ref_ref_val_debug",
+        "az_big_exponent_float_add_mul",
+    ),
+    (
+        "demo_big_exponent_float_add_mul_ref_ref_ref_debug",
+        "az_big_exponent_float_add_mul",
+    ),
+    (
+        "demo_big_exponent_float_add_mul_assign_debug",
+        "az_big_exponent_float_add_mul",
+    ),
+    (
+        "demo_big_exponent_float_add_mul_assign_val_ref_debug",
+        "az_big_exponent_float_add_mul",
+    ),
+    (
+        "demo_big_exponent_float_add_mul_assign_ref_val_debug",
+        "az_big_exponent_float_add_mul",
+    ),
+    (
+        "demo_big_exponent_float_add_mul_assign_ref_ref_debug",
+        "az_big_exponent_float_add_mul",
+    ),
+    (
         "demo_big_exponent_float_add_mul_prec_debug",
+        "az_big_exponent_float_add_mul",
+    ),
+    (
+        "demo_big_exponent_float_add_mul_prec_val_val_ref_debug",
+        "az_big_exponent_float_add_mul",
+    ),
+    (
+        "demo_big_exponent_float_add_mul_prec_val_ref_val_debug",
+        "az_big_exponent_float_add_mul",
+    ),
+    (
+        "demo_big_exponent_float_add_mul_prec_val_ref_ref_debug",
+        "az_big_exponent_float_add_mul",
+    ),
+    (
+        "demo_big_exponent_float_add_mul_prec_ref_val_val_debug",
+        "az_big_exponent_float_add_mul",
+    ),
+    (
+        "demo_big_exponent_float_add_mul_prec_ref_val_ref_debug",
+        "az_big_exponent_float_add_mul",
+    ),
+    (
+        "demo_big_exponent_float_add_mul_prec_ref_ref_val_debug",
+        "az_big_exponent_float_add_mul",
+    ),
+    (
+        "demo_big_exponent_float_add_mul_prec_ref_ref_ref_debug",
+        "az_big_exponent_float_add_mul",
+    ),
+    (
+        "demo_big_exponent_float_add_mul_prec_assign_debug",
+        "az_big_exponent_float_add_mul",
+    ),
+    (
+        "demo_big_exponent_float_add_mul_prec_assign_val_ref_debug",
+        "az_big_exponent_float_add_mul",
+    ),
+    (
+        "demo_big_exponent_float_add_mul_prec_assign_ref_val_debug",
+        "az_big_exponent_float_add_mul",
+    ),
+    (
+        "demo_big_exponent_float_add_mul_prec_assign_ref_ref_debug",
         "az_big_exponent_float_add_mul",
     ),
     (
@@ -8548,7 +9551,55 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_big_exponent_float_add_mul",
     ),
     (
+        "demo_big_exponent_float_add_mul_prec_round_ref_ref_ref_debug",
+        "az_big_exponent_float_add_mul",
+    ),
+    (
         "demo_big_exponent_float_sub_mul_debug",
+        "az_big_exponent_float_sub_mul",
+    ),
+    (
+        "demo_big_exponent_float_sub_mul_val_val_ref_debug",
+        "az_big_exponent_float_sub_mul",
+    ),
+    (
+        "demo_big_exponent_float_sub_mul_val_ref_val_debug",
+        "az_big_exponent_float_sub_mul",
+    ),
+    (
+        "demo_big_exponent_float_sub_mul_val_ref_ref_debug",
+        "az_big_exponent_float_sub_mul",
+    ),
+    (
+        "demo_big_exponent_float_sub_mul_ref_val_val_debug",
+        "az_big_exponent_float_sub_mul",
+    ),
+    (
+        "demo_big_exponent_float_sub_mul_ref_val_ref_debug",
+        "az_big_exponent_float_sub_mul",
+    ),
+    (
+        "demo_big_exponent_float_sub_mul_ref_ref_val_debug",
+        "az_big_exponent_float_sub_mul",
+    ),
+    (
+        "demo_big_exponent_float_sub_mul_ref_ref_ref_debug",
+        "az_big_exponent_float_sub_mul",
+    ),
+    (
+        "demo_big_exponent_float_sub_mul_assign_debug",
+        "az_big_exponent_float_sub_mul",
+    ),
+    (
+        "demo_big_exponent_float_sub_mul_assign_val_ref_debug",
+        "az_big_exponent_float_sub_mul",
+    ),
+    (
+        "demo_big_exponent_float_sub_mul_assign_ref_val_debug",
+        "az_big_exponent_float_sub_mul",
+    ),
+    (
+        "demo_big_exponent_float_sub_mul_assign_ref_ref_debug",
         "az_big_exponent_float_sub_mul",
     ),
     (
@@ -8556,7 +9607,55 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_big_exponent_float_sub_mul",
     ),
     (
+        "demo_big_exponent_float_sub_mul_prec_val_val_ref_debug",
+        "az_big_exponent_float_sub_mul",
+    ),
+    (
+        "demo_big_exponent_float_sub_mul_prec_val_ref_val_debug",
+        "az_big_exponent_float_sub_mul",
+    ),
+    (
+        "demo_big_exponent_float_sub_mul_prec_val_ref_ref_debug",
+        "az_big_exponent_float_sub_mul",
+    ),
+    (
+        "demo_big_exponent_float_sub_mul_prec_ref_val_val_debug",
+        "az_big_exponent_float_sub_mul",
+    ),
+    (
+        "demo_big_exponent_float_sub_mul_prec_ref_val_ref_debug",
+        "az_big_exponent_float_sub_mul",
+    ),
+    (
+        "demo_big_exponent_float_sub_mul_prec_ref_ref_val_debug",
+        "az_big_exponent_float_sub_mul",
+    ),
+    (
+        "demo_big_exponent_float_sub_mul_prec_ref_ref_ref_debug",
+        "az_big_exponent_float_sub_mul",
+    ),
+    (
+        "demo_big_exponent_float_sub_mul_prec_assign_debug",
+        "az_big_exponent_float_sub_mul",
+    ),
+    (
+        "demo_big_exponent_float_sub_mul_prec_assign_val_ref_debug",
+        "az_big_exponent_float_sub_mul",
+    ),
+    (
+        "demo_big_exponent_float_sub_mul_prec_assign_ref_val_debug",
+        "az_big_exponent_float_sub_mul",
+    ),
+    (
+        "demo_big_exponent_float_sub_mul_prec_assign_ref_ref_debug",
+        "az_big_exponent_float_sub_mul",
+    ),
+    (
         "demo_big_exponent_float_sub_mul_prec_round_debug",
+        "az_big_exponent_float_sub_mul",
+    ),
+    (
+        "demo_big_exponent_float_sub_mul_prec_round_ref_ref_ref_debug",
         "az_big_exponent_float_sub_mul",
     ),
     (
@@ -8584,6 +9683,10 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_big_exponent_float_mul_add_mul",
     ),
     (
+        "demo_big_exponent_float_mul_add_mul_prec_assign_debug",
+        "az_big_exponent_float_mul_add_mul",
+    ),
+    (
         "demo_big_exponent_float_mul_add_mul_prec_round_debug",
         "az_big_exponent_float_mul_add_mul",
     ),
@@ -8593,6 +9696,10 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
     ),
     (
         "demo_big_exponent_float_mul_sub_mul_prec_debug",
+        "az_big_exponent_float_mul_sub_mul",
+    ),
+    (
+        "demo_big_exponent_float_mul_sub_mul_prec_assign_debug",
         "az_big_exponent_float_mul_sub_mul",
     ),
     (
@@ -8652,7 +9759,23 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_big_exponent_float_neg",
     ),
     (
+        "demo_big_exponent_float_neg_assign_debug",
+        "az_big_exponent_float_neg",
+    ),
+    (
+        "demo_big_exponent_float_neg_ref_debug",
+        "az_big_exponent_float_neg",
+    ),
+    (
         "demo_big_exponent_float_abs_debug",
+        "az_big_exponent_float_abs",
+    ),
+    (
+        "demo_big_exponent_float_abs_assign_debug",
+        "az_big_exponent_float_abs",
+    ),
+    (
+        "demo_big_exponent_float_abs_ref_debug",
         "az_big_exponent_float_abs",
     ),
     (
@@ -8820,6 +9943,10 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_big_exponent_float_from_natural",
     ),
     (
+        "demo_big_exponent_float_from_natural_prec_ref_debug",
+        "az_big_exponent_float_from_natural",
+    ),
+    (
         "demo_big_exponent_float_from_natural_prec_round_debug",
         "az_big_exponent_float_from_natural",
     ),
@@ -8832,6 +9959,10 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_big_exponent_float_from_integer",
     ),
     (
+        "demo_big_exponent_float_from_integer_prec_ref_debug",
+        "az_big_exponent_float_from_integer",
+    ),
+    (
         "demo_big_exponent_float_from_integer_prec_round_debug",
         "az_big_exponent_float_from_integer",
     ),
@@ -8841,6 +9972,10 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
     ),
     (
         "demo_big_exponent_float_from_rational_prec_debug",
+        "az_big_exponent_float_from_rational",
+    ),
+    (
+        "demo_big_exponent_float_from_rational_prec_ref_debug",
         "az_big_exponent_float_from_rational",
     ),
     (
@@ -8876,11 +10011,31 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_big_exponent_float_cbrt",
     ),
     (
+        "demo_big_exponent_float_cbrt_prec_ref_debug",
+        "az_big_exponent_float_cbrt",
+    ),
+    (
+        "demo_big_exponent_float_cbrt_prec_assign_debug",
+        "az_big_exponent_float_cbrt",
+    ),
+    (
         "demo_big_exponent_float_cbrt_prec_round_debug",
         "az_big_exponent_float_cbrt",
     ),
     (
+        "demo_big_exponent_float_cbrt_prec_round_ref_debug",
+        "az_big_exponent_float_cbrt",
+    ),
+    (
+        "demo_big_exponent_float_cbrt_prec_round_assign_debug",
+        "az_big_exponent_float_cbrt",
+    ),
+    (
         "demo_big_exponent_float_cbrt_rational_prec_debug",
+        "az_big_exponent_float_cbrt_rational",
+    ),
+    (
+        "demo_big_exponent_float_cbrt_rational_prec_ref_debug",
         "az_big_exponent_float_cbrt_rational",
     ),
     (
@@ -8896,7 +10051,47 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_big_exponent_float_pow",
     ),
     (
+        "demo_big_exponent_float_pow_prec_val_ref_debug",
+        "az_big_exponent_float_pow",
+    ),
+    (
+        "demo_big_exponent_float_pow_prec_ref_val_debug",
+        "az_big_exponent_float_pow",
+    ),
+    (
+        "demo_big_exponent_float_pow_prec_ref_ref_debug",
+        "az_big_exponent_float_pow",
+    ),
+    (
+        "demo_big_exponent_float_pow_prec_assign_debug",
+        "az_big_exponent_float_pow",
+    ),
+    (
+        "demo_big_exponent_float_pow_prec_assign_ref_debug",
+        "az_big_exponent_float_pow",
+    ),
+    (
         "demo_big_exponent_float_pow_prec_round_debug",
+        "az_big_exponent_float_pow",
+    ),
+    (
+        "demo_big_exponent_float_pow_prec_round_val_ref_debug",
+        "az_big_exponent_float_pow",
+    ),
+    (
+        "demo_big_exponent_float_pow_prec_round_ref_val_debug",
+        "az_big_exponent_float_pow",
+    ),
+    (
+        "demo_big_exponent_float_pow_prec_round_ref_ref_debug",
+        "az_big_exponent_float_pow",
+    ),
+    (
+        "demo_big_exponent_float_pow_prec_round_assign_debug",
+        "az_big_exponent_float_pow",
+    ),
+    (
+        "demo_big_exponent_float_pow_prec_round_assign_ref_debug",
         "az_big_exponent_float_pow",
     ),
     (
@@ -8933,6 +10128,10 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
     ),
     (
         "demo_big_exponent_float_cos_rational_prec_debug",
+        "az_big_exponent_float_cos_rational",
+    ),
+    (
+        "demo_big_exponent_float_cos_rational_prec_ref_debug",
         "az_big_exponent_float_cos_rational",
     ),
     (
@@ -8981,6 +10180,10 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
     ),
     (
         "demo_big_exponent_float_sin_rational_prec_debug",
+        "az_big_exponent_float_sin_rational",
+    ),
+    (
+        "demo_big_exponent_float_sin_rational_prec_ref_debug",
         "az_big_exponent_float_sin_rational",
     ),
     (
@@ -9080,6 +10283,10 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_big_exponent_float_tan_rational",
     ),
     (
+        "demo_big_exponent_float_tan_rational_prec_ref_debug",
+        "az_big_exponent_float_tan_rational",
+    ),
+    (
         "demo_big_exponent_float_tan_rational_prec_round_debug",
         "az_big_exponent_float_tan_rational",
     ),
@@ -9125,6 +10332,10 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
     ),
     (
         "demo_big_exponent_float_sec_rational_prec_debug",
+        "az_big_exponent_float_sec_rational",
+    ),
+    (
+        "demo_big_exponent_float_sec_rational_prec_ref_debug",
         "az_big_exponent_float_sec_rational",
     ),
     (
@@ -9176,6 +10387,10 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_big_exponent_float_csc_rational",
     ),
     (
+        "demo_big_exponent_float_csc_rational_prec_ref_debug",
+        "az_big_exponent_float_csc_rational",
+    ),
+    (
         "demo_big_exponent_float_csc_rational_prec_round_debug",
         "az_big_exponent_float_csc_rational",
     ),
@@ -9224,6 +10439,10 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_big_exponent_float_cot_rational",
     ),
     (
+        "demo_big_exponent_float_cot_rational_prec_ref_debug",
+        "az_big_exponent_float_cot_rational",
+    ),
+    (
         "demo_big_exponent_float_cot_rational_prec_round_debug",
         "az_big_exponent_float_cot_rational",
     ),
@@ -9269,6 +10488,10 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
     ),
     (
         "demo_big_exponent_float_atan_rational_prec_debug",
+        "az_big_exponent_float_atan_rational",
+    ),
+    (
+        "demo_big_exponent_float_atan_rational_prec_ref_debug",
         "az_big_exponent_float_atan_rational",
     ),
     (
@@ -9612,6 +10835,10 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_big_exponent_float_sinh_rational",
     ),
     (
+        "demo_big_exponent_float_sinh_rational_prec_ref_debug",
+        "az_big_exponent_float_sinh_rational",
+    ),
+    (
         "demo_big_exponent_float_cosh_prec_round_debug",
         "az_big_exponent_float_cosh",
     ),
@@ -9625,6 +10852,10 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
     ),
     (
         "demo_big_exponent_float_cosh_rational_prec_debug",
+        "az_big_exponent_float_cosh_rational",
+    ),
+    (
+        "demo_big_exponent_float_cosh_rational_prec_ref_debug",
         "az_big_exponent_float_cosh_rational",
     ),
     (
@@ -9660,6 +10891,10 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_big_exponent_float_tanh_rational",
     ),
     (
+        "demo_big_exponent_float_tanh_rational_prec_ref_debug",
+        "az_big_exponent_float_tanh_rational",
+    ),
+    (
         "demo_big_exponent_float_sech_prec_round_debug",
         "az_big_exponent_float_sech",
     ),
@@ -9673,6 +10908,10 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
     ),
     (
         "demo_big_exponent_float_sech_rational_prec_debug",
+        "az_big_exponent_float_sech_rational",
+    ),
+    (
+        "demo_big_exponent_float_sech_rational_prec_ref_debug",
         "az_big_exponent_float_sech_rational",
     ),
     (
@@ -9692,6 +10931,10 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
         "az_big_exponent_float_csch_rational",
     ),
     (
+        "demo_big_exponent_float_csch_rational_prec_ref_debug",
+        "az_big_exponent_float_csch_rational",
+    ),
+    (
         "demo_big_exponent_float_coth_prec_round_debug",
         "az_big_exponent_float_coth",
     ),
@@ -9705,6 +10948,10 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
     ),
     (
         "demo_big_exponent_float_coth_rational_prec_debug",
+        "az_big_exponent_float_coth_rational",
+    ),
+    (
+        "demo_big_exponent_float_coth_rational_prec_ref_debug",
         "az_big_exponent_float_coth_rational",
     ),
     (
