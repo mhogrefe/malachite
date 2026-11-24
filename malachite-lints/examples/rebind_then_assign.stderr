@@ -1,0 +1,30 @@
+error: `t` is rebound as mutable only to call `abs_assign` on it
+  --> $DIR/rebind_then_assign.rs:16:5
+   |
+LL | /     let mut t = t;
+LL | |     t.abs_assign();
+   | |___________________^
+   |
+   = help: bind the result of the by-value variant instead (`let mut t = t.abs(..);`), or declare the original binding `mut` and drop the rebind
+   = note: `#[deny(rebind_then_assign)]` on by default
+
+error: `u` is rebound as mutable only to call `atan_prec_assign` on it
+  --> $DIR/rebind_then_assign.rs:24:5
+   |
+LL | /     let mut u = u;
+LL | |     u.atan_prec_assign(10);
+   | |___________________________^
+   |
+   = help: bind the result of the by-value variant instead (`let mut u = u.atan_prec(..).0;`), or declare the original binding `mut` and drop the rebind
+
+error: `n` is rebound as mutable only to call `wrapping_add_assign` on it
+  --> $DIR/rebind_then_assign.rs:32:5
+   |
+LL | /     let mut n = n;
+LL | |     n.wrapping_add_assign(3);
+   | |_____________________________^
+   |
+   = help: bind the result of the by-value variant instead (`let mut n = n.wrapping_add(..);`), or declare the original binding `mut` and drop the rebind
+
+error: aborting due to 3 previous errors
+

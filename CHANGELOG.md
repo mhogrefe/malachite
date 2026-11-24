@@ -20,6 +20,26 @@ documented by git history.
   `ModComposeModPolynomialData`; and malachite-q's `rational::arithmetic::traits` module, which held
   only the re-exports of `rational::number_theory::traits`, is removed.
 
+### malachite-base
+
+- The `IsProbablePrime`, `IsStrongProbablePrime`, and `IsLucasProbablePrime` traits, in
+  `num::factorization::traits`, for the Baillie–PSW probable prime test, the strong probable prime
+  (Miller–Rabin) test to a given base, and the Lucas probable prime test with Selfridge's
+  parameters. They are implemented for the primitive unsigned types; for those up to 64 bits wide,
+  `is_probable_prime` decides primality exactly, as does the `u128` implementation below
+  $3317044064679887385961981 \approx 2^{81.5}$.
+- `is_prime` on the primitive unsigned types follows FLINT 3.7's `n_is_prime`. It is about 1.5 to 3
+  times faster than before on random inputs, and 2 to 5.5 times faster on primes.
+- The prime iterators of the `Primes` trait read the primes below $2^{20}$ from a precomputed
+  table instead of sieving for them, and `primes()` no longer re-sieves from the start each time it
+  passes a power of 2 below $2^{20}$. Generating the first 4,160 primes is about 4.5 times faster,
+  and `primes().jump_after` to a point below $2^{20}$ no longer sieves at all.
+
+### malachite-nz
+
+- `IsProbablePrime`, `IsStrongProbablePrime`, and `IsLucasProbablePrime` for `Natural`, following
+  FLINT's `fmpz_is_probabprime`, `fmpz_is_strong_probabprime`, and `fmpz_is_probabprime_lucas`.
+
 ## 0.15.0 — 2026-11-22
 
 ### Breaking and behavioral changes

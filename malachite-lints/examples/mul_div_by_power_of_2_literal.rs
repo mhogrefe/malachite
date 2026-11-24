@@ -16,7 +16,7 @@ fn f(a: u32, b: i32) -> (u32, u32, u32, i32, u32, u32, u32, u32) {
     let mut ma = a;
     ma *= 2;
     // `/=` by a power of two: flagged, use `>>=`.
-    let mut da = a;
+    let mut da = a + 1;
     da /= 32;
     // not a power of two: fine.
     let n1 = a * 3;
@@ -46,7 +46,7 @@ fn h(a: u32, b: i64, x: u64) -> (u32, i64, u32, u64, u32) {
     // signed integers round the exact quotient the same way under both: flagged, no `Down` caveat.
     let d2 = b.div_round(8, Nearest).0;
     // `div_round_assign`: flagged, use `shr_round_assign`.
-    let mut da = a;
+    let mut da = a + 1;
     da.div_round_assign(4, Floor);
     // by a width: flagged, use `shr_round(Limb::LOG_WIDTH, ..)`.
     let d3 = x.div_round(Limb::WIDTH, Up).0;

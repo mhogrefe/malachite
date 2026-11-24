@@ -18,8 +18,10 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::num::arithmetic::traits::DivMod;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::{ExactFrom, WrappingFrom};
+use crate::num::factorization::is_prime_tables::MOD_30_PRIME_LOOKUP;
 use crate::num::factorization::prime_sieve::{
     id_to_n, limbs_prime_sieve_size, limbs_prime_sieve_u64, n_to_bit,
 };
@@ -32,9 +34,63 @@ const NUM_SMALL_PRIMES: usize = 172;
 // The same count as a `u64`, for comparing against the `u64` index of a prime iterator.
 const NUM_SMALL_PRIMES_U64: u64 = NUM_SMALL_PRIMES as u64;
 
-// The sieve bit index of the first prime past the small-prime table (1031 is the next prime after
-// 1021, the largest prime below 2^10).
-const NEXT_INDEX: u64 = n_to_bit(1031) - 1;
+// Primes from 1031 (the next prime after 1021, the last entry of `SMALL_PRIMES`) up to
+// `TABLE_LIMIT` are read from `MOD_30_PRIME_LOOKUP`, and only larger ones are sieved.
+const TABLE_LIMIT: u64 = 1 << 20;
+// 1048573 is the largest prime below `TABLE_LIMIT`.
+const LARGEST_TABLE_PRIME: u64 = 1048573;
+
+// The residues mod 30 that the eight bits of each byte of `MOD_30_PRIME_LOOKUP` stand for.
+const WHEEL_RESIDUES: [u64; 8] = [1, 7, 11, 13, 17, 19, 23, 29];
+
+// The table state for the first prime greater than n, for n < `LARGEST_TABLE_PRIME`: the byte of
+// `MOD_30_PRIME_LOOKUP` to read, and that byte's bits for the numbers greater than n.
+fn table_state_after(n: u64) -> (u64, u8) {
+    let (byte, r) = n.div_mod(30);
+    // the number of wheel residues at most r, which are the bits to clear
+    let mut count = 0;
+    while count < 8 && WHEEL_RESIDUES[count] <= r {
+        count += 1;
+    }
+    if count == 8 {
+        (byte + 1, MOD_30_PRIME_LOOKUP[byte as usize + 1])
+    } else {
+        (
+            byte,
+            MOD_30_PRIME_LOOKUP[byte as usize] & (u8::MAX << count),
+        )
+    }
+}
+
+// The sieve bit index to search from for the first prime past the table.
+const SIEVE_START: u64 = n_to_bit(LARGEST_TABLE_PRIME) + 1;
+
+// The next prime in `MOD_30_PRIME_LOOKUP` from the table state (`byte`, `bits`), with the table
+// state after it, if that prime is less than `TABLE_LIMIT`.
+#[inline]
+fn table_next(mut byte: u64, mut bits: u8) -> Option<(u64, u8, u64)> {
+    while bits == 0 {
+        byte += 1;
+        bits = *MOD_30_PRIME_LOOKUP.get(usize::exact_from(byte))?;
+    }
+    let p = byte * 30 + WHEEL_RESIDUES[bits.trailing_zeros() as usize];
+    if p < TABLE_LIMIT {
+        Some((byte, bits & (bits - 1), p))
+    } else {
+        None
+    }
+}
+
+// Where a `PrimesLessThanIterator` is reading its primes from.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+enum Source {
+    // `SMALL_PRIMES`; the index is into the array.
+    Small,
+    // `MOD_30_PRIME_LOOKUP`; the index and `bits` are the table state.
+    Table,
+    // The sieve; the index is the sieve bit to search from.
+    Sieve,
+}
 
 // This is flint_primes_small from ulong_extras/compute_primes.c, FLINT 3.1.2.
 pub(crate) const SMALL_PRIMES: [u16; NUM_SMALL_PRIMES] = [
@@ -86,8 +142,9 @@ fn limbs_index_of_next_false_bit<T: PrimitiveUnsigned>(xs: &[T], start: u64) -> 
 /// [`Primes::primes_less_than_or_equal_to`]; see their documentation for more.
 #[derive(Clone, Debug)]
 pub struct PrimesLessThanIterator<T: PrimitiveUnsigned> {
-    small: bool,
+    source: Source,
     i: u64,
+    bits: u8,
     limit: T,
     sieve: Vec<u64>,
     phantom: PhantomData<*const T>,
@@ -98,16 +155,16 @@ impl<T: PrimitiveUnsigned> PrimesLessThanIterator<T> {
         let limit = n;
         let n: u64 = n.saturating_into();
         let mut sieve;
-        // 1031 is the smallest prime greater than 2^10.
-        if n < 1031 {
+        if n < TABLE_LIMIT {
             sieve = Vec::with_capacity(0);
         } else {
             sieve = alloc::vec![0; limbs_prime_sieve_size::<u64>(n)];
             limbs_prime_sieve_u64(&mut sieve, n);
         }
         Self {
-            small: true,
+            source: Source::Small,
             i: 0,
+            bits: 0,
             limit,
             sieve,
             phantom: PhantomData,
@@ -137,75 +194,85 @@ impl<T: PrimitiveUnsigned> PrimesLessThanIterator<T> {
     /// assert_eq!(primes.next(), None);
     /// ```
     pub fn jump_after(&mut self, n: T) -> bool {
+        let n: u64 = if let Ok(n) = n.try_into() {
+            n
+        } else {
+            return false;
+        };
         // 1021 is the greatest prime smaller than 2^10.
-        if n < T::saturating_from(1021) {
-            self.small = true;
-            self.i = u64::wrapping_from(match SMALL_PRIMES.binary_search(&n.wrapping_into()) {
+        if n < 1021 {
+            self.source = Source::Small;
+            self.i = u64::wrapping_from(match SMALL_PRIMES.binary_search(&u16::wrapping_from(n)) {
                 Ok(i) => i + 1,
                 Err(i) => i,
             });
-            if self.i == NUM_SMALL_PRIMES_U64 {
-                if self.sieve.is_empty() {
-                    false
-                } else {
-                    self.small = false;
-                    self.i = NEXT_INDEX;
-                    let next_i =
-                        if let Some(next_i) = limbs_index_of_next_false_bit(&self.sieve, self.i) {
-                            next_i
-                        } else {
-                            return false;
-                        };
-                    let next_p = T::exact_from(id_to_n(next_i + 1));
-                    next_p <= self.limit
-                }
-            } else if let Ok(next_p) = T::try_from(SMALL_PRIMES[self.i as usize]) {
-                next_p <= self.limit
-            } else {
-                false
-            }
+        } else if n < LARGEST_TABLE_PRIME {
+            self.source = Source::Table;
+            (self.i, self.bits) = table_state_after(n);
         } else {
-            self.small = false;
-            self.i = if let Ok(n) = n.try_into() {
-                n_to_bit(n) + 1
-            } else {
-                return false;
-            };
-            let next_i = if let Some(next_i) = limbs_index_of_next_false_bit(&self.sieve, self.i) {
-                next_i
-            } else {
-                return false;
-            };
-            let next_p = T::exact_from(id_to_n(next_i + 1));
-            next_p <= self.limit
+            self.source = Source::Sieve;
+            self.i = n_to_bit(n) + 1;
         }
+        self.peek().is_some()
+    }
+
+    // The next prime, without advancing.
+    fn peek(&self) -> Option<T> {
+        let p = match self.source {
+            Source::Small => u64::from(SMALL_PRIMES[self.i as usize]),
+            Source::Table => {
+                if let Some((_, _, p)) = table_next(self.i, self.bits) {
+                    p
+                } else {
+                    id_to_n(limbs_index_of_next_false_bit(&self.sieve, SIEVE_START)? + 1)
+                }
+            }
+            Source::Sieve => id_to_n(limbs_index_of_next_false_bit(&self.sieve, self.i)? + 1),
+        };
+        T::try_from(p).ok().filter(|&p| p <= self.limit)
+    }
+
+    // `next` for primes past `SMALL_PRIMES`.
+    #[inline]
+    fn next_large(&mut self) -> Option<T> {
+        if self.source == Source::Table {
+            if let Some((byte, bits, p)) = table_next(self.i, self.bits) {
+                let p = T::try_from(p).ok()?;
+                if p > self.limit {
+                    return None;
+                }
+                self.i = byte;
+                self.bits = bits;
+                return Some(p);
+            }
+            self.source = Source::Sieve;
+            self.i = SIEVE_START;
+        }
+        self.i = limbs_index_of_next_false_bit(&self.sieve, self.i)? + 1;
+        let p = T::exact_from(id_to_n(self.i));
+        if p > self.limit { None } else { Some(p) }
     }
 }
 
 impl<T: PrimitiveUnsigned> Iterator for PrimesLessThanIterator<T> {
     type Item = T;
 
+    #[inline]
     fn next(&mut self) -> Option<T> {
-        if self.small {
-            let p = if let Ok(p) = T::try_from(SMALL_PRIMES[self.i as usize]) {
-                p
-            } else {
-                return None;
-            };
-            if p > self.limit {
-                return None;
-            }
-            self.i += 1;
-            if self.i == NUM_SMALL_PRIMES_U64 {
-                self.small = false;
-                self.i = NEXT_INDEX;
-            }
-            Some(p)
-        } else {
-            self.i = limbs_index_of_next_false_bit(&self.sieve, self.i)? + 1;
-            let p = T::exact_from(id_to_n(self.i));
-            if p > self.limit { None } else { Some(p) }
+        if self.source != Source::Small {
+            return self.next_large();
         }
+        let p = T::try_from(SMALL_PRIMES[self.i as usize]).ok()?;
+        if p > self.limit {
+            return None;
+        }
+        self.i += 1;
+        if self.i == NUM_SMALL_PRIMES_U64 {
+            self.source = Source::Table;
+            // continue from 1031, the first prime past `SMALL_PRIMES`
+            (self.i, self.bits) = table_state_after(1021);
+        }
+        Some(p)
     }
 }
 
@@ -220,7 +287,7 @@ pub struct PrimesIterator<T: PrimitiveUnsigned> {
 
 impl<T: PrimitiveUnsigned> PrimesIterator<T> {
     fn new() -> Self {
-        let limit = T::saturating_from(1024u16);
+        let limit = T::saturating_from(const { TABLE_LIMIT - 1 });
         Self {
             limit,
             xs: PrimesLessThanIterator::new(limit),
@@ -271,24 +338,36 @@ impl<T: PrimitiveUnsigned> PrimesIterator<T> {
 impl<T: PrimitiveUnsigned> Iterator for PrimesIterator<T> {
     type Item = T;
 
+    #[inline]
     fn next(&mut self) -> Option<T> {
         loop {
             let p = self.xs.next();
-            if p.is_some() {
+            if p.is_some() || !self.extend() {
                 return p;
-            } else if self.limit == T::MAX {
-                return None;
             }
-            self.limit.saturating_mul_assign(T::TWO);
-            let i = if self.xs.small {
-                n_to_bit(1031)
-            } else {
-                self.xs.i
-            };
-            self.xs = T::primes_less_than_or_equal_to(&self.limit);
-            self.xs.small = false;
-            self.xs.i = i;
         }
+    }
+}
+
+impl<T: PrimitiveUnsigned> PrimesIterator<T> {
+    // Doubles the limit and re-sieves, continuing after the last prime generated. Returns `false`
+    // if the limit is already `T::MAX`.
+    #[cold]
+    #[inline(never)]
+    fn extend(&mut self) -> bool {
+        if self.limit == T::MAX {
+            return false;
+        }
+        self.limit.saturating_mul_assign(T::TWO);
+        let i = if self.xs.source == Source::Sieve {
+            self.xs.i
+        } else {
+            SIEVE_START
+        };
+        self.xs = T::primes_less_than_or_equal_to(&self.limit);
+        self.xs.source = Source::Sieve;
+        self.xs.i = i;
+        true
     }
 }
 

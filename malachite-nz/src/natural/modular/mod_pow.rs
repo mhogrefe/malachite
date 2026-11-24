@@ -321,6 +321,83 @@ fn select_fns(
     }
 }
 
+type MulFn = &'static dyn Fn(&mut [Limb], &[Limb], &[Limb]);
+type SquareFn = &'static dyn Fn(&mut [Limb], &[Limb]);
+type ReduceFn = &'static dyn Fn(&mut [Limb], &mut [Limb], &[Limb], &[Limb]);
+
+// Montgomery (REDC) arithmetic modulo an odd m with n = `ms.len()` limbs and R = B^n, set up the
+// way `limbs_mod_pow_odd` sets it up. A value in Montgomery form is an n-limb slice less than B^n,
+// which is not necessarily reduced mod m: the product of two such values is less than B^(2n), and
+// its REDC is again less than B^n.
+pub(crate) struct LimbsRedc<'a> {
+    pub(crate) ms: &'a [Limb],
+    is: Vec<Limb>,
+    mul_fn: MulFn,
+    square_fn: SquareFn,
+    reduce_fn: ReduceFn,
+    product: Vec<Limb>,
+}
+
+impl<'a> LimbsRedc<'a> {
+    pub(crate) fn new(ms: &'a [Limb]) -> Self {
+        let n = ms.len();
+        assert!(ms[0].odd());
+        let is = if n < REDC_1_TO_REDC_N_THRESHOLD {
+            vec![limbs_modular_invert_limb(ms[0]).wrapping_neg()]
+        } else {
+            let mut is = vec![0; n + limbs_mod_pow_odd_scratch_len(n)];
+            let (is_lo, scratch) = is.split_at_mut(n);
+            limbs_modular_invert(is_lo, ms, scratch);
+            is.truncate(n);
+            is.shrink_to_fit();
+            is
+        };
+        let (mul_fn, square_fn, reduce_fn) = select_fns(n);
+        Self {
+            ms,
+            is,
+            mul_fn,
+            square_fn,
+            reduce_fn,
+            product: vec![0; n << 1],
+        }
+    }
+
+    // Converts x < m, with at most n limbs, to Montgomery form.
+    pub(crate) fn to_redc(&self, xs: &[Limb]) -> Vec<Limb> {
+        let mut out = vec![0; self.ms.len()];
+        to_redc(&mut out, xs, self.ms);
+        out
+    }
+
+    // out = REDC(xs * ys).
+    pub(crate) fn mul(&mut self, out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
+        (self.mul_fn)(&mut self.product, xs, ys);
+        (self.reduce_fn)(out, &mut self.product, self.ms, &self.is);
+    }
+
+    // out = REDC(xs^2).
+    pub(crate) fn square(&mut self, out: &mut [Limb], xs: &[Limb]) {
+        (self.square_fn)(&mut self.product, xs);
+        (self.reduce_fn)(out, &mut self.product, self.ms, &self.is);
+    }
+
+    // Converts xs out of Montgomery form, reducing the result mod m.
+    pub(crate) fn redc_to_reduced(&mut self, xs: &[Limb]) -> Vec<Limb> {
+        let n = self.ms.len();
+        let (lo, hi) = self.product.split_at_mut(n);
+        lo.copy_from_slice(xs);
+        slice_set_zero(hi);
+        let mut out = vec![0; n];
+        (self.reduce_fn)(&mut out, &mut self.product, self.ms, &self.is);
+        // REDC of a number less than B^n is at most m.
+        if limbs_cmp_same_length(&out, self.ms) != Less {
+            limbs_sub_same_length_in_place_left(&mut out, self.ms);
+        }
+        out
+    }
+}
+
 // Given the limbs of $x$, $E$, and odd $m$, writes the limbs of $x^E \mod m$ to an output slice.
 //
 // `xs`, `es`, and `ms` must be nonempty and their last elements must be nonzero. $m$ must be odd,

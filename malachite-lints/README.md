@@ -239,6 +239,8 @@ Flags reassigning a bignum the result of a method on itself — `x = x.add_prec(
 `{name}_assign`/`_assign_ref`, or a `{Name}Assign` trait in `malachite-base`). The in-place form
 avoids a needless move or clone of a potentially huge value. Operator forms (`x = &x * &y`) are
 clippy's `assign_op_pattern` territory. The assign variants' own defining delegations are exempt.
+A mutable binding that shadows an immutable one (`let mut t = t.abs();`) is exempt: the in-place
+form would need a `let mut t = t;` rebind, which `rebind_then_assign` flags.
 
 ### `clone_with_ref_variant`
 
@@ -357,6 +359,14 @@ Flags binding a `(value, Ordering)` result and then asserting the ordering is `E
 `f_round(.., Exact)` and take `.0` instead. The `Exact` rounding mode *is* the assertion — it
 panics if the result is not exactly representable — and it is also usually faster, since the
 default `Nearest` does more work than the other modes.
+
+### `rebind_then_assign`
+
+Flags rebinding a local as mutable only to mutate it in place on the next line (`let mut t = t;
+t.abs_assign();`) when the `*_assign*` method has a by-value companion: bind the by-value result
+instead (`let mut t = t.abs();`), or declare the original binding `mut` and drop the rebind. Tests
+and demos, which call the in-place variants they exercise, are exempt, as is the by-value variant's
+own defining delegation.
 
 ### `assign_then_consumed_once`
 

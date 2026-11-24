@@ -19,7 +19,7 @@ use crate::float::trigonometric::sin::{SCALE, SCALED_INPUT_EXPONENT, scaled_unde
 use crate::{Float, emulate_float_float_to_float_fn, emulate_rational_rational_to_float_fn};
 use core::cmp::Ordering::{self, Equal, Greater, Less};
 use core::cmp::{max, min};
-use malachite_base::num::arithmetic::traits::{Abs, AbsAssign, IsPowerOf2};
+use malachite_base::num::arithmetic::traits::{Abs, IsPowerOf2};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{
@@ -156,7 +156,7 @@ fn atan2_prec_round_normal_ref(
     if x_positive {
         // atan2(y, x) = atan(y/x)
         loop {
-            let (t, div_o) = y.div_prec_ref_ref(x, w);
+            let (mut t, div_o) = y.div_prec_ref_ref(x, w);
             if div_o == Equal {
                 // the quotient is exact, so its arctangent is the whole answer
                 return t.atan_prec_round(prec, rm);
@@ -171,7 +171,6 @@ fn atan2_prec_round_normal_ref(
                 return underflow(!y_negative, prec, rm);
             }
             // error <= 2 ulps, since |atan'| <= 1
-            let mut t = t;
             t.atan_prec_assign(w);
             if float_can_round(t.significand_ref().unwrap(), w - 2, prec, rm) {
                 return Float::from_float_prec_round(t, prec, rm);
@@ -436,8 +435,7 @@ fn atan2_with_period_prec_round_normal_ref(
         if !t.is_finite() {
             return atan2u_aux4(u, x_positive, y_positive, prec, rm);
         }
-        let mut t = t;
-        t.abs_assign();
+        let mut t = t.abs();
         let exp_t = i64::from(t.get_exponent().unwrap());
         // |t - |y/x|| <= e1 := 1/2 ulp(t) = 2^(exp_t - w - 1)
         t.atan_with_period_prec_assign(u, w);

@@ -227,6 +227,55 @@ fn primes_less_than_or_equal_to_properties() {
 }
 
 // TODO replace with real version once available
+fn test_primes_boundaries_helper<T: IsPrime + PrimitiveUnsigned>() {
+    // Primes up to 1021 come from a small table, primes from 1031 up to 2^20 from a bitmap, and
+    // larger ones from a sieve; check limits and jumps on both sides of each handoff.
+    let expected = primes_naive::<T>()
+        .take_while(|&p| p < T::exact_from(1200000u32))
+        .collect_vec();
+    for limit in [
+        1020u32, 1021, 1022, 1030, 1031, 1032, 1048572, 1048573, 1048574, 1048575, 1048576,
+        1048577, 1048583, 1048584, 1099999,
+    ] {
+        let limit = T::exact_from(limit);
+        let less_than = expected
+            .iter()
+            .copied()
+            .take_while(|&p| p < limit)
+            .collect_vec();
+        assert_eq!(T::primes_less_than(&limit).collect_vec(), less_than);
+        assert_eq!(
+            T::primes().take_while(|&p| p < limit).collect_vec(),
+            less_than
+        );
+        let at_most = expected
+            .iter()
+            .copied()
+            .take_while(|&p| p <= limit)
+            .collect_vec();
+        assert_eq!(
+            T::primes_less_than_or_equal_to(&limit).collect_vec(),
+            at_most
+        );
+        let next = expected.iter().copied().find(|&p| p > limit).unwrap();
+        let mut ps = T::primes();
+        assert!(ps.jump_after(limit));
+        assert_eq!(ps.next(), Some(next));
+        let mut ps = T::primes_less_than(&T::exact_from(1200000u32));
+        assert!(ps.jump_after(limit));
+        assert_eq!(ps.next(), Some(next));
+        let mut ps = T::primes_less_than_or_equal_to(&limit);
+        assert!(!ps.jump_after(limit));
+        assert_eq!(ps.next(), None);
+    }
+}
+
+#[test]
+fn test_primes_boundaries() {
+    test_primes_boundaries_helper::<u32>();
+    test_primes_boundaries_helper::<u64>();
+}
+
 fn next_prime_after<T: IsPrime + PrimitiveUnsigned>(mut n: T) -> T {
     loop {
         n += T::ONE;

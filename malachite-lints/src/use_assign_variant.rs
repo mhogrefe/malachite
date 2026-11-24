@@ -8,7 +8,8 @@
 
 use crate::eq_expr_value;
 use clippy_utils::diagnostics::span_lint;
-use rustc_hir::{Expr, ExprKind, LetStmt, PatKind, QPath};
+use rustc_hir::def::Res;
+use rustc_hir::{BindingMode, Expr, ExprKind, LetStmt, Mutability, Node, PatKind, QPath};
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_lint::{declare_lint, declare_lint_pass};
 
@@ -124,13 +125,13 @@ impl<'tcx> LateLintPass<'tcx> for UseAssignVariant {
         };
         // The rebound name: either the whole pattern (`let x = ...`) or the first element of a
         // tuple pattern (`let (x, o) = ...`, the house `(value, Ordering)` shape).
-        let (bound, tuple) = match local.pat.kind {
-            PatKind::Binding(_, _, ident, None) => (ident, false),
+        let (bound, bound_mut, tuple) = match local.pat.kind {
+            PatKind::Binding(BindingMode(_, m), _, ident, None) => (ident, m, false),
             PatKind::Tuple([first, ..], _) => {
-                let PatKind::Binding(_, _, ident, None) = first.kind else {
+                let PatKind::Binding(BindingMode(_, m), _, ident, None) = first.kind else {
                     return;
                 };
-                (ident, true)
+                (ident, m, true)
             }
             _ => return,
         };
@@ -157,6 +158,16 @@ impl<'tcx> LateLintPass<'tcx> for UseAssignVariant {
             return;
         };
         if segment.ident.name != bound.name {
+            return;
+        }
+        // A mutable binding that shadows an immutable one (`let mut t = t.abs();`) is what
+        // `rebind_then_assign` asks for: the in-place form would need a `let mut t = t;` rebind
+        // first.
+        if bound_mut == Mutability::Mut
+            && let Res::Local(id) = path.res
+            && let Node::Pat(pat) = cx.tcx.hir_node(id)
+            && matches!(pat.kind, PatKind::Binding(BindingMode(_, Mutability::Not), ..))
+        {
             return;
         }
         // A reference-typed receiver (e.g. a `&Rational` parameter shadowed by an owned result) has

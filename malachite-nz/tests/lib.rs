@@ -811,8 +811,11 @@ pub mod natural {
         pub mod log_base_power_of_2;
     }
     pub mod factorization {
+        pub mod is_lucas_probable_prime;
         pub mod is_power;
+        pub mod is_probable_prime;
         pub mod is_square;
+        pub mod is_strong_probable_prime;
         pub mod primes;
     }
     pub mod logic {

@@ -31,8 +31,9 @@ use crate::num::number_theory::traits::JacobiSymbol;
 // unless n divides that D, which means n = p. But n = p can't divide Q either: that needs |D| >= 4p
 // - 1, while the p - 1 candidates 5, 9, ..., 4p - 3 are distinct mod p, so one of them is a
 // nonresidue and the search stops sooner.
-fn selfridge_q<T: PartialEq + Copy, R: Fn(i64) -> T, J: Fn(T) -> i8>(
-    zero: T,
+#[doc(hidden)]
+pub fn selfridge_q<T: PartialEq, R: Fn(i64) -> T, J: Fn(&T) -> i8>(
+    zero: &T,
     d_mod_n: &R,
     jacobi: &J,
 ) -> Option<i64> {
@@ -41,10 +42,10 @@ fn selfridge_q<T: PartialEq + Copy, R: Fn(i64) -> T, J: Fn(T) -> i8>(
     loop {
         d = if d > 0 { -(d + 2) } else { -(d - 2) };
         let r = d_mod_n(d);
-        match jacobi(r) {
+        match jacobi(&r) {
             // D = 1 mod 4, so the shift is exact.
             -1 => return Some((1 - d) >> 2),
-            0 if r != zero => return None,
+            0 if r != *zero => return None,
             _ => {}
         }
     }
@@ -81,7 +82,7 @@ fn is_lucas_probable_prime_redc<
         let r = T::from(d.unsigned_abs()) % n;
         if d < 0 && r != T::ZERO { n - r } else { r }
     };
-    let Some(q) = selfridge_q(T::ZERO, &d_mod_n, &|d: T| d.jacobi_symbol(n)) else {
+    let Some(q) = selfridge_q(&T::ZERO, &d_mod_n, &|d: &T| d.jacobi_symbol(n)) else {
         return false;
     };
     // A = P^2 / Q - 2 mod n, where P = 1; Q is invertible, as selfridge_q explains.

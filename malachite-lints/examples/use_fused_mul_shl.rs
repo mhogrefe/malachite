@@ -75,7 +75,7 @@ fn main() {
     let _ = x.mod_add(x.mod_mul(y, m).mod_shl(2u64, m), m);
     let _ = x.mod_sub(x.mod_mul(x.mod_shl(2u64, m), m), m);
     let _ = x.mod_add_mul(x, x.mod_shl(2u64, m), m);
-    let mut d = x;
+    let mut d = x + 1;
     d.mod_add_assign(x.mod_mul(y, m).mod_shl(2u64, m), m);
     let _ = (&X).mod_add((&Y).mod_mul(&Z, &M).mod_shl(2u64, &M), &M);
     // Different moduli: not flagged.

@@ -46,6 +46,7 @@ mod manual_rational_significant_bits;
 mod missing_inline_on_delegator;
 mod mul_div_by_power_of_2;
 mod mul_div_by_power_of_2_literal;
+mod rebind_then_assign;
 mod redundant_cmp_reverse;
 mod redundant_crate_prefix;
 mod redundant_from_in_comparison;
@@ -687,6 +688,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         use_to_string_variant::USE_TO_STRING_VARIANT,
         use_trailing_zeros::USE_TRAILING_ZEROS,
         use_unary_assign::USE_UNARY_ASSIGN,
+        rebind_then_assign::REBIND_THEN_ASSIGN,
         use_abs_comparison::USE_ABS_COMPARISON,
         use_width_mask::USE_WIDTH_MASK,
         widened_half::WIDENED_HALF,
@@ -837,6 +839,8 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
     lint_store
         .register_late_lint_pass(Box::new(|_| Box::new(use_trailing_zeros::UseTrailingZeros)));
     lint_store.register_late_lint_pass(Box::new(|_| Box::new(use_unary_assign::UseUnaryAssign)));
+    lint_store
+        .register_late_lint_pass(Box::new(|_| Box::new(rebind_then_assign::RebindThenAssign)));
     lint_store
         .register_late_lint_pass(Box::new(|_| Box::new(use_abs_comparison::UseAbsComparison)));
     lint_store.register_late_lint_pass(Box::new(|_| Box::new(use_width_mask::UseWidthMask)));

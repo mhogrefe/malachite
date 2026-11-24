@@ -2551,6 +2551,14 @@ pub fn natural_gen_var_8() -> Generator<Natural> {
     )
 }
 
+pub fn natural_gen_var_8_rm() -> Generator<(rug::Integer, Natural)> {
+    Generator::new(
+        &|| natural_rm(exhaustive_natural_gen_var_8()),
+        &|config| natural_rm(random_natural_gen_var_8(config)),
+        &|config| natural_rm(special_random_natural_gen_var_8(config)),
+    )
+}
+
 // All small `Natural`s.
 pub fn natural_gen_var_9() -> Generator<Natural> {
     Generator::new_no_special(&exhaustive_natural_gen, &random_natural_gen_var_9)

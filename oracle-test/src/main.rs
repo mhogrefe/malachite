@@ -11470,6 +11470,12 @@ fn test_against_azurite(build: bool) {
             "az_nat_is_probable_prime",
         );
     }
+    for demo in [
+        "demo_natural_is_probable_prime",
+        "demo_natural_is_probable_prime_odd",
+    ] {
+        check_demo_against_azurite(&oracle, "../malachite-nz", demo, "az_nat_is_probable_prime");
+    }
     for (demo, mode) in AZURITE_UNSIGNED_VECTOR_STAGES {
         check_demo_against_azurite(&oracle, "../malachite-base", demo, mode);
     }
@@ -14514,6 +14520,24 @@ fn test_against_flint(build: bool) {
         check_demo_against_flint(
             &oracle,
             "../malachite-base",
+            demo_name,
+            "fmpz_is_strong_probabprime",
+        );
+    }
+    for demo_name in [
+        "demo_natural_is_probable_prime",
+        "demo_natural_is_probable_prime_odd",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "fmpz_is_probabprime");
+    }
+    for demo_name in [
+        "demo_natural_is_strong_probable_prime",
+        "demo_natural_is_strong_probable_prime_ref",
+        "demo_natural_is_strong_probable_prime_odd_base_2",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-nz",
             demo_name,
             "fmpz_is_strong_probabprime",
         );
