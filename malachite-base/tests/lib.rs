@@ -446,9 +446,12 @@ pub mod num {
     }
     pub mod factorization {
         pub mod factor;
+        pub mod is_lucas_probable_prime;
         pub mod is_power;
         pub mod is_prime;
+        pub mod is_probable_prime;
         pub mod is_square;
+        pub mod is_strong_probable_prime;
         pub mod latex;
         pub mod prime_indicator_sequence;
         pub mod prime_indicator_sequence_less_than;

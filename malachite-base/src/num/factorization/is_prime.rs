@@ -8,7 +8,7 @@
 //
 //      Copyright © 2009 Tom Boothby
 //
-//      Copyright © 2010, 2021, 2025 Fredrik Johansson
+//      Copyright © 2010, 2021, 2025, 2026 Fredrik Johansson
 //
 //      Copyright © 2014, 2015 Dana Jacobsen
 //
@@ -27,16 +27,19 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::num::arithmetic::traits::{
-    Parity, PowerOf2, WrappingAddAssign, WrappingMulAssign, WrappingSubMul, XMulYToZZ,
+    OverflowingAddAssign, Parity, PowerOf2, WrappingAddAssign, WrappingMulAssign, WrappingSubMul,
+    XMulYToZZ,
 };
-use crate::num::basic::integers::USIZE_IS_U32;
-use crate::num::conversion::traits::WrappingFrom;
+use crate::num::basic::integers::{PrimitiveInt, USIZE_IS_U32};
+use crate::num::conversion::half::{wide_join_halves, wide_split_in_half, wide_upper_half};
+use crate::num::conversion::traits::{ExactFrom, JoinHalves, SplitInHalf, WrappingFrom};
 use crate::num::factorization::is_prime_tables::{
     BASE_2_PSEUDOPRIMES, BASE_2_PSEUDOPRIMES_HASH_KEYS, MOD_30_PRIME_LOOKUP, ODD_PRIME_LOOKUP,
     WITNESS_BASES,
 };
 use crate::num::factorization::traits::IsPrime;
-use crate::num::modular::traits::{ModAdd, ModMulPrecomputed, ModPowerOf2};
+use crate::num::logic::traits::{BitAccess, SignificantBits};
+use crate::num::modular::traits::{ModAdd, ModAddAssign, ModMulPrecomputed, ModPowerOf2};
 
 // This is SMALL_ODDPRIME_LIMIT from ulong_extras/is_prime.c, FLINT 3.7.0-dev.
 const SMALL_ODD_PRIME_LIMIT: u64 = 32768;
@@ -253,8 +256,8 @@ fn get_witness_base(n: u64) -> u64 {
 // Data for Montgomery arithmetic modulo an odd n, with R = 2^64.
 //
 // This is nmod_redc_ctx_struct from nmod.h, FLINT 3.7.0-dev.
-struct RedcContext {
-    n: u64,
+pub(crate) struct RedcContext {
+    pub(crate) n: u64,
     // the inverse of n as computed by `precompute_mod_mul_data`
     n_preinverse: u64,
     norm: u32,
@@ -277,7 +280,7 @@ fn binvert(a: u64) -> u64 {
 }
 
 // This is nmod_redc_ctx_init_ui from nmod.h, FLINT 3.7.0-dev.
-fn redc_context(n: u64) -> RedcContext {
+pub(crate) fn redc_context(n: u64) -> RedcContext {
     RedcContext {
         n,
         n_preinverse: u64::precompute_mod_mul_data(&n),
@@ -289,7 +292,7 @@ fn redc_context(n: u64) -> RedcContext {
 // Converts a to Montgomery form. Assumes a is already reduced mod n.
 //
 // This is n_to_redc_preinv from nmod.h, FLINT 3.7.0-dev.
-fn to_redc(a: u64, ctx: &RedcContext) -> u64 {
+pub(crate) fn to_redc(a: u64, ctx: &RedcContext) -> u64 {
     let n = ctx.n << ctx.norm;
     let a = a << ctx.norm;
     let (mut q1, q0) = u64::x_mul_y_to_zz(ctx.n_preinverse, a);
@@ -303,7 +306,7 @@ fn to_redc(a: u64, ctx: &RedcContext) -> u64 {
 
 // This is nmod_redc_set_ui from nmod.h, FLINT 3.7.0-dev.
 #[inline]
-fn to_redc_unreduced(x: u64, ctx: &RedcContext) -> u64 {
+pub(crate) fn to_redc_unreduced(x: u64, ctx: &RedcContext) -> u64 {
     to_redc(x % ctx.n, ctx)
 }
 
@@ -311,7 +314,7 @@ fn to_redc_unreduced(x: u64, ctx: &RedcContext) -> u64 {
 //
 // This is nmod_redc_mul from nmod.h, FLINT 3.7.0-dev.
 #[inline]
-fn redc_mul(a: u64, b: u64, ctx: &RedcContext) -> u64 {
+pub(crate) fn redc_mul(a: u64, b: u64, ctx: &RedcContext) -> u64 {
     let (hi, lo) = u64::x_mul_y_to_zz(a, b);
     let lo = u64::x_mul_y_to_zz(lo.wrapping_mul(ctx.n_redc.wrapping_neg()), ctx.n).0;
     let diff = hi.wrapping_sub(lo);
@@ -401,7 +404,12 @@ fn redc_two_pow<M: Fn(u64, u64) -> u64, D: Fn(u64) -> u64>(
 // used for n > 2^32.
 //
 // This is _n_is_strong_probabprime_redc from ulong_extras/is_prime.c, FLINT 3.7.0-dev.
-fn is_strong_probable_prime_redc(a: u64, d: u64, one_redc: u64, ctx: &RedcContext) -> bool {
+pub(crate) fn is_strong_probable_prime_redc(
+    a: u64,
+    d: u64,
+    one_redc: u64,
+    ctx: &RedcContext,
+) -> bool {
     let n = ctx.n;
     let mut t = d;
     let minus_one_redc = n - one_redc;
@@ -587,7 +595,7 @@ const fn trial_64(n: u64, i: usize) -> bool {
 }
 
 // This is n_is_prime from ulong_extras/is_prime.c, FLINT 3.7.0-dev, where FLINT_BITS is 64.
-fn u64_is_prime(n: u64) -> bool {
+pub(crate) fn u64_is_prime(n: u64) -> bool {
     if n < SMALL_ODD_PRIME_LIMIT {
         return if n.odd() {
             is_odd_prime_small(n)
@@ -622,6 +630,751 @@ fn u64_is_prime(n: u64) -> bool {
     is_prime_odd_no_trial(n)
 }
 
+// Divides the three-limb value [n2, n1, n0] by a normalized (top bit set) two-limb d, returning the
+// one-limb quotient and the remainder. Requires [n2, n1] < d.
+//
+// FLINT does this with flint_mpn_tdiv_qr; this is Knuth's Algorithm D specialized to one quotient
+// limb, for which the two-limb correction test makes the estimate exact.
+fn div_3_by_2_normalized(n2: u64, n1: u64, n0: u64, d: u128) -> (u64, u128) {
+    let (d1, d0) = wide_split_in_half(d);
+    let top = u128::join_halves(n2, n1);
+    let mut q = if u128::from(n2) >= d1 {
+        u128::MAX >> u64::WIDTH
+    } else {
+        top / d1
+    };
+    let mut r = top - q * d1;
+    while r.upper_half() == 0 && q * d0 > u128::join_halves(r.lower_half(), n0) {
+        q -= 1;
+        r += d1;
+    }
+    let q = q.lower_half();
+    (
+        q,
+        u128::join_halves(n1, n0).wrapping_sub_mul(d, u128::from(q)),
+    )
+}
+
+// Computes floor(2^192 / m) for 2^64 < m < 2^128. The result fits in two limbs.
+//
+// This is n_ll_small_preinv from ulong_extras/ll_is_prime.c, FLINT 3.7.0-dev.
+fn ll_small_preinv(m: u128) -> u128 {
+    let s = m.leading_zeros();
+    let d = m << s;
+    // 2^(192 + s) / d, one quotient limb at a time
+    let (q1, r) = div_3_by_2_normalized(u64::power_of_2(s.into()), 0, 0, d);
+    let (r1, r0) = r.split_in_half();
+    let q0 = div_3_by_2_normalized(r1, r0, 0, d).0;
+    u128::join_halves(q1, q0)
+}
+
+// Returns the low three limbs of a^2, as the top limb and the bottom two.
+//
+// This is sqrlo_3x2x2 from ulong_extras/ll_is_prime.c, FLINT 3.7.0-dev.
+#[inline]
+fn sqrlo_3x2x2(a: u128) -> (u64, u128) {
+    let (a1, a0) = wide_split_in_half(a);
+    let s = a0 * a0;
+    let t = a0 * a1;
+    let high = wide_join_halves(a1 * a1, wide_upper_half(s))
+        .wrapping_add(t)
+        .wrapping_add(t);
+    let (high_1, high_0) = high.split_in_half();
+    (high_1, u128::join_halves(high_0, s.lower_half()))
+}
+
+// An approximation, at most a few units too small, of floor(ab / 2^128).
+//
+// This is mulhi_2x2_sloppy from ulong_extras/ll_is_prime.c, FLINT 3.7.0-dev.
+#[inline]
+fn mulhi_2x2_sloppy(a: u128, b: u128) -> u128 {
+    let (a1, a0) = wide_split_in_half(a);
+    let (b1, b0) = wide_split_in_half(b);
+    let s2 = wide_upper_half(a0 * b1);
+    let u2 = wide_upper_half(a1 * b0);
+    (s2 + u2).wrapping_add(a1 * b1)
+}
+
+// Reduces a two-limb x to a noncanonical residue mod m, typically in [0, 2m).
+//
+// This is n_ll_small_reduce2_sloppy from ulong_extras/ll_is_prime.c, FLINT 3.7.0-dev.
+#[inline]
+fn ll_small_reduce2_sloppy(x: u128, m: u128, minv: u128) -> u128 {
+    let q0 = wide_upper_half(wide_upper_half(x) * wide_upper_half(minv));
+    x.wrapping_sub_mul(m, q0)
+}
+
+// Reduces a two-limb x to [0, m).
+//
+// This is n_ll_small_reduce2_precise from ulong_extras/ll_is_prime.c, FLINT 3.7.0-dev.
+#[inline]
+fn ll_small_reduce2_precise(x: u128, m: u128, minv: u128) -> u128 {
+    let mut x = ll_small_reduce2_sloppy(x, m, minv);
+    while x >= m {
+        x -= m;
+    }
+    x
+}
+
+// Squares a noncanonical residue mod m, returning a noncanonical residue in [0, 6m).
+//
+// This is n_ll_small_sqrmod_sloppy from ulong_extras/ll_is_prime.c, FLINT 3.7.0-dev.
+#[inline]
+fn ll_small_sqrmod_sloppy(a: u128, m: u128, minv: u128) -> u128 {
+    let (t2, t10) = sqrlo_3x2x2(a);
+    let q = mulhi_2x2_sloppy(u128::join_halves(t2, t10.upper_half()), minv);
+    t10.wrapping_sub_mul(q, m)
+}
+
+// Squares a residue mod m, reducing to [0, m).
+//
+// This is n_ll_small_sqrmod from ulong_extras/ll_is_prime.c, FLINT 3.7.0-dev.
+#[inline]
+fn ll_small_sqrmod(a: u128, m: u128, minv: u128) -> u128 {
+    let mut t = ll_small_sqrmod_sloppy(a, m, minv);
+    while t >= m {
+        t -= m;
+    }
+    t
+}
+
+// The largest b for which b^7 fits in a limb.
+const MAX_7TH_ROOT: u64 = 565;
+
+// Computes b1^exp, b2^exp, and b3^exp mod m simultaneously, for b1 <= b2 <= b3 <= 41 and m < 2^82,
+// to benefit from instruction-level parallelism.
+//
+// This is n_ll_small_powmod_triple from ulong_extras/ll_is_prime.c, FLINT 3.7.0-dev, with the
+// exponent's bits indexed within a u128 rather than limb by limb.
+fn ll_small_powmod_triple(
+    b1: u64,
+    b2: u64,
+    b3: u64,
+    exp: u128,
+    m: u128,
+    minv: u128,
+) -> (u128, u128, u128) {
+    let mut x = 1;
+    let mut y = 1;
+    let mut z = 1;
+    let mut ebits = exp.significant_bits();
+    // Do the first two rounds without modular reduction, since b^7 fits in a limb.
+    if ebits >= 3 && b3 <= MAX_7TH_ROOT {
+        let mut x0 = b1 * b1;
+        let mut y0 = b2 * b2;
+        let mut z0 = b3 * b3;
+        if exp.get_bit(ebits - 2) {
+            x0 *= b1;
+            y0 *= b2;
+            z0 *= b3;
+        }
+        x0 *= x0;
+        y0 *= y0;
+        z0 *= z0;
+        if exp.get_bit(ebits - 3) {
+            x0 *= b1;
+            y0 *= b2;
+            z0 *= b3;
+        }
+        x = u128::from(x0);
+        y = u128::from(y0);
+        z = u128::from(z0);
+        ebits -= 3;
+    }
+    for bit in (0..ebits).rev() {
+        x = ll_small_sqrmod_sloppy(x, m, minv);
+        y = ll_small_sqrmod_sloppy(y, m, minv);
+        z = ll_small_sqrmod_sloppy(z, m, minv);
+        if exp.get_bit(bit) {
+            x.wrapping_mul_assign(u128::from(b1));
+            y.wrapping_mul_assign(u128::from(b2));
+            z.wrapping_mul_assign(u128::from(b3));
+        }
+    }
+    (
+        ll_small_reduce2_precise(x, m, minv),
+        ll_small_reduce2_precise(y, m, minv),
+        ll_small_reduce2_precise(z, m, minv),
+    )
+}
+
+// Computes 2^exp mod m, for m < 2^82.
+//
+// This is n_ll_small_2_powmod from ulong_extras/ll_is_prime.c, FLINT 3.7.0-dev, where FLINT_BITS is
+// 64, with the exponent's bits indexed within a u128 rather than limb by limb.
+fn ll_small_2_powmod(exp: u128, m: u128, minv: u128) -> u128 {
+    let mut x = 1;
+    let mut ebits = exp.significant_bits();
+    // The top six bits of the exponent give a power of 2 that fits in a limb.
+    if ebits >= 6 {
+        ebits -= 6;
+        x = u128::power_of_2(u64::wrapping_from(exp >> ebits));
+    }
+    for bit in (0..ebits).rev() {
+        x = ll_small_sqrmod_sloppy(x, m, minv);
+        if exp.get_bit(bit) {
+            x.wrapping_add_assign(x);
+        }
+    }
+    ll_small_reduce2_precise(x, m, minv)
+}
+
+// The second stage of a strong probable prime test: y = a^d mod n, where n - 1 = d * 2^s.
+//
+// This is n_ll_small_sprp_stage2 from ulong_extras/ll_is_prime.c, FLINT 3.7.0-dev.
+fn ll_small_sprp_stage2(mut y: u128, s: u32, nm1: u128, n: u128, ninv: u128) -> bool {
+    if y == 1 || y == nm1 {
+        return true;
+    }
+    for _ in 1..s {
+        y = ll_small_sqrmod(y, n, ninv);
+        if y == nm1 {
+            return true;
+        }
+    }
+    false
+}
+
+// Bases for the Sorenson–Webster test; together with 2, they prove primality below
+// SORENSON_WEBSTER_BOUND.
+const LL_ODD_BASES: [u64; 12] = [3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41];
+
+// Miller–Rabin for odd 2^64 < n < 2^128 with n < 357913941 * 2^64, so that the noncanonical
+// residues never overflow. Returns `Some(false)` for a composite, `Some(true)` for a proven prime
+// (valid when n < SORENSON_WEBSTER_BOUND), and `None` when `base_2_only` is set and n is a base-2
+// strong probable prime.
+//
+// This is n_ll_small_is_prime_mr from ulong_extras/ll_is_prime.c, FLINT 3.7.0-dev.
+fn ll_small_is_prime_mr(n: u128, base_2_only: bool) -> Option<bool> {
+    let nm1 = n - 1;
+    let s = nm1.trailing_zeros();
+    let t = nm1 >> s;
+    let ninv = ll_small_preinv(n);
+    if !ll_small_sprp_stage2(ll_small_2_powmod(t, n, ninv), s, nm1, n, ninv) {
+        return Some(false);
+    }
+    if base_2_only {
+        return None;
+    }
+    for &[b1, b2, b3] in LL_ODD_BASES.as_chunks::<3>().0 {
+        let (y1, y2, y3) = ll_small_powmod_triple(b1, b2, b3, t, n, ninv);
+        if !ll_small_sprp_stage2(y1, s, nm1, n, ninv)
+            || !ll_small_sprp_stage2(y2, s, nm1, n, ninv)
+            || !ll_small_sprp_stage2(y3, s, nm1, n, ninv)
+        {
+            return Some(false);
+        }
+    }
+    Some(true)
+}
+
+// The Sorenson–Webster bound, 3317044064679887385961981: an odd n below it that is a strong
+// probable prime to the bases 2, 3, 5, ..., 41 is prime.
+const SORENSON_WEBSTER_BOUND: u128 = 0x2be69_51adc5b22410a5fd;
+
+// For n of at least this high limb, the noncanonical residues of the small-modulus arithmetic could
+// overflow three limbs: 6 * 2 * (357913941 * 2^64) < 2^192.
+const LL_SMALL_LIMIT_HIGH: u64 = 357913941;
+
+const LL_NUM_TRIAL_PRIMES: usize = 64;
+
+// For each odd prime p from 3 to 313: the inverse of p mod 2^128, and floor((2^128 - 1) / p). p
+// divides n exactly when n times the inverse, mod 2^128, is at most the second value.
+//
+// This is ll_trial_primes from ulong_extras/ll_is_prime.c, FLINT 3.7.0-dev, with each pair of limbs
+// joined into a u128.
+const LL_TRIAL_INVERSES: [(u128, u128); LL_NUM_TRIAL_PRIMES] = [
+    // 3
+    (
+        0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab,
+        0x55555555555555555555555555555555,
+    ),
+    // 5
+    (
+        0xcccccccccccccccccccccccccccccccd,
+        0x33333333333333333333333333333333,
+    ),
+    // 7
+    (
+        0xb6db6db6db6db6db6db6db6db6db6db7,
+        0x24924924924924924924924924924924,
+    ),
+    // 11
+    (
+        0xa2e8ba2e8ba2e8ba2e8ba2e8ba2e8ba3,
+        0x1745d1745d1745d1745d1745d1745d17,
+    ),
+    // 13
+    (
+        0xc4ec4ec4ec4ec4ec4ec4ec4ec4ec4ec5,
+        0x13b13b13b13b13b13b13b13b13b13b13,
+    ),
+    // 17
+    (
+        0xf0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f1,
+        0x0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f,
+    ),
+    // 19
+    (
+        0xbca1af286bca1af286bca1af286bca1b,
+        0x0d79435e50d79435e50d79435e50d794,
+    ),
+    // 23
+    (
+        0x4de9bd37a6f4de9bd37a6f4de9bd37a7,
+        0x0b21642c8590b21642c8590b21642c85,
+    ),
+    // 29
+    (
+        0xc234f72c234f72c234f72c234f72c235,
+        0x08d3dcb08d3dcb08d3dcb08d3dcb08d3,
+    ),
+    // 31
+    (
+        0xdef7bdef7bdef7bdef7bdef7bdef7bdf,
+        0x08421084210842108421084210842108,
+    ),
+    // 37
+    (
+        0xc1bacf914c1bacf914c1bacf914c1bad,
+        0x06eb3e45306eb3e45306eb3e45306eb3,
+    ),
+    // 41
+    (
+        0x18f9c18f9c18f9c18f9c18f9c18f9c19,
+        0x063e7063e7063e7063e7063e7063e706,
+    ),
+    // 43
+    (
+        0xbe82fa0be82fa0be82fa0be82fa0be83,
+        0x05f417d05f417d05f417d05f417d05f4,
+    ),
+    // 47
+    (
+        0x3677d46cefa8d9df51b3bea3677d46cf,
+        0x0572620ae4c415c9882b9310572620ae,
+    ),
+    // 53
+    (
+        0x13521cfb2b78c13521cfb2b78c13521d,
+        0x04d4873ecade304d4873ecade304d487,
+    ),
+    // 59
+    (
+        0x8f2fba9386822b63cbeea4e1a08ad8f3,
+        0x0456c797dd49c34115b1e5f75270d045,
+    ),
+    // 61
+    (
+        0x14fbcda3ac10c9714fbcda3ac10c9715,
+        0x04325c53ef368eb04325c53ef368eb04,
+    ),
+    // 67
+    (
+        0xc2dd9ca81e9131abf0b7672a07a44c6b,
+        0x03d226357e16ece540f4898d5f85bb39,
+    ),
+    // 71
+    (
+        0x4f52edf8c9ea5dbf193d4bb7e327a977,
+        0x039b0ad12073615a240e6c2b4481cd85,
+    ),
+    // 73
+    (
+        0x3f1f8fc7e3f1f8fc7e3f1f8fc7e3f1f9,
+        0x0381c0e070381c0e070381c0e070381c,
+    ),
+    // 79
+    (
+        0xd5df984dc5abbf309b8b577e613716af,
+        0x033d91d2a2067b23a5440cf6474a8819,
+    ),
+    // 83
+    (
+        0x2818acb90f6bf3a9a3784a062b2e43db,
+        0x03159721ed7e75346f0940c565c87b5f,
+    ),
+    // 89
+    (
+        0xd1fa3f47e8fd1fa3f47e8fd1fa3f47e9,
+        0x02e05c0b81702e05c0b81702e05c0b81,
+    ),
+    // 97
+    (
+        0x5f02a3a0fd5c5f02a3a0fd5c5f02a3a1,
+        0x02a3a0fd5c5f02a3a0fd5c5f02a3a0fd,
+    ),
+    // 101
+    (
+        0xc32b16cfd7720f353a4c0a237c32b16d,
+        0x0288df0cac5b3f5dc83cd4e930288df0,
+    ),
+    // 103
+    (
+        0xd0c6d5bf60ee9a18dab7ec1dd3431b57,
+        0x027c45979c95204f88b2f392a409f116,
+    ),
+    // 107
+    (
+        0xa2b10bf66e0e5aea77a04c8f8d28ac43,
+        0x02647c69456217ecdc1cb5d4ef40991f,
+    ),
+    // 109
+    (
+        0xc0964fda6c0964fda6c0964fda6c0965,
+        0x02593f69b02593f69b02593f69b02593,
+    ),
+    // 113
+    (
+        0xc090fdbc090fdbc090fdbc090fdbc091,
+        0x0243f6f0243f6f0243f6f0243f6f0243,
+    ),
+    // 127
+    (
+        0xbf7efdfbf7efdfbf7efdfbf7efdfbf7f,
+        0x02040810204081020408102040810204,
+    ),
+    // 131
+    (
+        0xf82ee6986d6f63aa03e88cb3c9484e2b,
+        0x01f44659e4a427157f05dcd30dadec75,
+    ),
+    // 137
+    (
+        0x21a291c077975b8fe21a291c077975b9,
+        0x01de5d6e3f8868a4701de5d6e3f8868a,
+    ),
+    // 139
+    (
+        0xa2126ad1f4f31ba03aef6ca970586723,
+        0x01d77b654b82c33917f14424d5a3e9e6,
+    ),
+    // 149
+    (
+        0x93c225cc74d50c06df5b0f768ce2cabd,
+        0x01b7d6c3dda338b2af3f920a4f089731,
+    ),
+    // 151
+    (
+        0x26fe4dfc9bf937f26fe4dfc9bf937f27,
+        0x01b2036406c80d901b2036406c80d901,
+    ),
+    // 157
+    (
+        0x0685b4fe5e92c0685b4fe5e92c0685b5,
+        0x01a16d3f97a4b01a16d3f97a4b01a16d,
+    ),
+    // 163
+    (
+        0x8bc775ca99ea03241f693a1c451ab30b,
+        0x01920fb49d0e228d59857f36f825b178,
+    ),
+    // 167
+    (
+        0x513ed9ad38b7f3bc8d07aa27db35a717,
+        0x01886e5f0abb04994b1d20310dcbe157,
+    ),
+    // 173
+    (
+        0x133caba736c05eb4882383b30d516325,
+        0x017ad2208e0ecc35458c93fa14b77dc7,
+    ),
+    // 179
+    (
+        0x0e4d3aa30a02dc3eed6866f8d962ae7b,
+        0x016e1f76b4337c6cb1573d7f48f044a5,
+    ),
+    // 181
+    (
+        0x6fbc1c498c05a84f3454dca410f8ed9d,
+        0x016a13cd153729043e3b673fa57b0cba,
+    ),
+    // 191
+    (
+        0x7749b79f7f5470961d7ca632ee936f3f,
+        0x01571ed3c506b39a22d9218202ae3da7,
+    ),
+    // 193
+    (
+        0x90948f40feac6f6b70bf015390948f41,
+        0x015390948f40feac6f6b70bf01539094,
+    ),
+    // 197
+    (
+        0x0bb207cc0532ae21c96bdb9d3d137e0d,
+        0x014cab88725af6e74f44df833facd51d,
+    ),
+    // 199
+    (
+        0x7a3607b7f5b5630e2697cc8aef46c0f7,
+        0x0149539e3b2d066ea21727e120292a73,
+    ),
+    // 211
+    (
+        0x2f514a026d31be7bc0e8f2a76e68575b,
+        0x013698df3de0747953b7342bad7f64b3,
+    ),
+    // 223
+    (
+        0xdd8f7f6d0eec7bfb687763dfdb43bb1f,
+        0x0125e22708092f113840497889c2024b,
+    ),
+    // 227
+    (
+        0x766a024168e18cf81b10ea929ba144cb,
+        0x0120b470c67c0d8875494dd0a2657f6f,
+    ),
+    // 229
+    (
+        0x0c4c0478bbcecfee1d10c4c0478bbced,
+        0x011e2ef3b3fb8744313011e2ef3b3fb8,
+    ),
+    // 233
+    (
+        0x758fee6bac7f735d63fb9aeb1fdcd759,
+        0x0119453808ca29c046514e02328a7011,
+    ),
+    // 239
+    (
+        0x077f76e538c5167e64afaa4f437b2e0f,
+        0x0112358e75d30336a0ab617909a3e202,
+    ),
+    // 241
+    (
+        0x10fef010fef010fef010fef010fef011,
+        0x010fef010fef010fef010fef010fef01,
+    ),
+    // 251
+    (
+        0xa020a32fefae680828cbfbeb9a020a33,
+        0x0105197f7d734041465fdf5cd0105197,
+    ),
+    // 257
+    (
+        0xff00ff00ff00ff00ff00ff00ff00ff01,
+        0x00ff00ff00ff00ff00ff00ff00ff00ff,
+    ),
+    // 263
+    (
+        0xf836826ef73d52bcd624fd1470e99cb7,
+        0x00f92fb2211855a8653b605d71e2cc69,
+    ),
+    // 269
+    (
+        0x3ce8354b2ea1c8cd8fb3ddbd6205b5c5,
+        0x00f3a0d52cba8723363ecf76f58816d7,
+    ),
+    // 271
+    (
+        0x8715ba188f963302d57da36ca27acdef,
+        0x00f1d48bcee0d399fa5504b926bb0a64,
+    ),
+    // 277
+    (
+        0xb25e4463cff13686ee70c03b25e4463d,
+        0x00ec979118f3fc4da1bb9c300ec97911,
+    ),
+    // 281
+    (
+        0x6c69ae01d272ca3fc5b1a6b80749cb29,
+        0x00e939651fe2d8d35c03a4e5947f8b63,
+    ),
+    // 283
+    (
+        0xf26e5c44bfc61b2347768073c9b97113,
+        0x00e79372e225fe30d91a3bb4039e4dcb,
+    ),
+    // 293
+    (
+        0xb07dd0d1b15d7cf12591e94884ce32ad,
+        0x00dfac1f74346c575f3c49647a522133,
+    ),
+    // 307
+    (
+        0xd2f87ebfcaa1c5a0f02806abc74be1fb,
+        0x00d578e97c3f5fe550e2d078140355e3,
+    ),
+    // 311
+    (
+        0xbe25dd6d7aa646ca7ec3e8f3a7198487,
+        0x00d2ba083b445250ab3726b02782e18b,
+    ),
+    // 313
+    (
+        0xbc1d71afd8bdc03458550f8a39409d09,
+        0x00d161543e28e5027423fcba7aaf075c,
+    ),
+];
+
+// FLINT compares only the high limbs below a bound on n, and both limbs above it; comparing the
+// whole u128 is exact everywhere.
+#[inline]
+const fn ll_trial(n: u128, i: usize) -> bool {
+    n.wrapping_mul(LL_TRIAL_INVERSES[i].0) <= LL_TRIAL_INVERSES[i].1
+}
+
+// Tests an n >= 2^64 for primality. Returns `Some(false)` for a composite, `Some(true)` for a
+// proven prime, and `None` when n >= SORENSON_WEBSTER_BOUND has no small factor and is a base-2
+// strong probable prime.
+//
+// This is n_ll_is_prime from ulong_extras/ll_is_prime.c, FLINT 3.7.0-dev, where FLINT_BITS is 64,
+// except that FLINT runs the base-2 test for the largest n with fmpz arithmetic, and Malachite with
+// two-limb Montgomery arithmetic.
+crate_test_fn! {ll_is_prime(n: u128) -> Option<bool> {
+    assert!(n.upper_half() != 0);
+    if n.even() || (0..LL_NUM_TRIAL_PRIMES >> 1).any(|i| ll_trial(n, i)) {
+        return Some(false);
+    }
+    if n < SORENSON_WEBSTER_BOUND {
+        return ll_small_is_prime_mr(n, false);
+    }
+    if n.upper_half() < LL_SMALL_LIMIT_HIGH {
+        return ll_small_is_prime_mr(n, true);
+    }
+    // The base-2 test is slower now, so do some extra trial division.
+    if (LL_NUM_TRIAL_PRIMES >> 1..LL_NUM_TRIAL_PRIMES).any(|i| ll_trial(n, i)) {
+        return Some(false);
+    }
+    if u128_is_strong_probable_prime_odd(n, 2) {
+        None
+    } else {
+        Some(false)
+    }
+}}
+
+// Data for Montgomery arithmetic modulo an odd n > 1, with R = 2^128.
+pub(crate) struct RedcContext128 {
+    pub(crate) n: u128,
+    // -1 / n mod R
+    n_redc: u128,
+    // R mod n: 1 in Montgomery form
+    pub(crate) one: u128,
+    // R^2 mod n
+    r_squared: u128,
+}
+
+// Computes the inverse of an odd a modulo 2^128, by Newton's iteration from 5 correct bits.
+fn binvert_128(a: u128) -> u128 {
+    // correct to 5 bits
+    let mut r = a.wrapping_mul(3) ^ 2;
+    // 10, 20, 40, 80, and 160 bits
+    for _ in 0..5 {
+        r.wrapping_mul_assign(2u128.wrapping_sub_mul(a, r));
+    }
+    r
+}
+
+// Computes [hi, lo] mod n, for hi < n.
+fn rem_256_by_128(hi: u128, lo: u128, n: u128) -> u128 {
+    let s = n.leading_zeros();
+    let d = n << s;
+    // Since hi < n, the top two limbs of the shifted value are less than d.
+    let (h, l) = if s == 0 {
+        (hi, lo)
+    } else {
+        ((hi << s) | (lo >> (u128::WIDTH - u64::from(s))), lo << s)
+    };
+    let (h1, h0) = h.split_in_half();
+    let (l1, l0) = l.split_in_half();
+    let (r1, r0) = div_3_by_2_normalized(h1, h0, l1, d).1.split_in_half();
+    div_3_by_2_normalized(r1, r0, l0, d).1 >> s
+}
+
+pub(crate) fn redc_context_128(n: u128) -> RedcContext128 {
+    // R mod n = (R - 1) mod n + 1, which is already reduced: (R - 1) mod n = n - 1 would mean that
+    // n divides R, but n is odd and greater than 1.
+    let one = u128::MAX % n + 1;
+    let (hi, lo) = u128::x_mul_y_to_zz(one, one);
+    RedcContext128 {
+        n,
+        n_redc: binvert_128(n).wrapping_neg(),
+        one,
+        r_squared: rem_256_by_128(hi, lo, n),
+    }
+}
+
+// Computes ab / R mod n, for a, b < n, reducing to [0, n).
+#[inline]
+pub(crate) fn redc_mul_128(a: u128, b: u128, ctx: &RedcContext128) -> u128 {
+    let (hi, lo) = u128::x_mul_y_to_zz(a, b);
+    let m = lo.wrapping_mul(ctx.n_redc);
+    let mn_hi = u128::x_mul_y_to_zz(m, ctx.n).0;
+    // lo + the low half of mn is 0 mod R, and carries exactly when lo is nonzero.
+    let mut t = hi;
+    let overflow_1 = t.overflowing_add_assign(mn_hi);
+    let overflow_2 = t.overflowing_add_assign(u128::from(lo != 0));
+    if overflow_1 || overflow_2 || t >= ctx.n {
+        t.wrapping_sub(ctx.n)
+    } else {
+        t
+    }
+}
+
+// Converts a < n to Montgomery form.
+#[inline]
+pub(crate) fn to_redc_128(a: u128, ctx: &RedcContext128) -> u128 {
+    redc_mul_128(a, ctx.r_squared, ctx)
+}
+
+// Computes x^exp in Montgomery form, left to right.
+pub(crate) fn redc_pow_128(x: u128, exp: u128, ctx: &RedcContext128) -> u128 {
+    let mut y = ctx.one;
+    for bit in (0..exp.significant_bits()).rev() {
+        y = redc_mul_128(y, y, ctx);
+        if exp.get_bit(bit) {
+            y = redc_mul_128(y, x, ctx);
+        }
+    }
+    y
+}
+
+// Computes 2^exp in Montgomery form, left to right. The top 7 bits of exp give a power of 2 that
+// fits in a u128, and each remaining bit costs a squaring and at most a doubling, rather than a
+// multiplication.
+fn redc_two_pow_128(exp: u128, ctx: &RedcContext128) -> u128 {
+    let n = ctx.n;
+    if exp < 128 {
+        return to_redc_128(u128::power_of_2(u64::exact_from(exp)) % n, ctx);
+    }
+    let bits = exp.significant_bits();
+    let mut y = to_redc_128(
+        u128::power_of_2(u64::exact_from(exp >> (bits - 7))) % n,
+        ctx,
+    );
+    for bit in (0..bits - 7).rev() {
+        y = redc_mul_128(y, y, ctx);
+        if exp.get_bit(bit) {
+            y.mod_add_assign(y, n);
+        }
+    }
+    y
+}
+
+// A strong probable prime test to base a, for odd n > 1 and a reduced mod n, with a not in {0, 1, n
+// - 1}.
+crate_test_fn! {u128_is_strong_probable_prime_odd(n: u128, a: u128) -> bool {
+    let ctx = redc_context_128(n);
+    let nm1 = n - 1;
+    let s = nm1.trailing_zeros();
+    let minus_one = n - ctx.one;
+    let d = nm1 >> s;
+    let mut y = if a == 2 {
+        redc_two_pow_128(d, &ctx)
+    } else {
+        redc_pow_128(to_redc_128(a, &ctx), d, &ctx)
+    };
+    if y == ctx.one || y == minus_one {
+        return true;
+    }
+    for _ in 1..s {
+        y = redc_mul_128(y, y, &ctx);
+        if y == minus_one {
+            return true;
+        }
+    }
+    false
+}}
+
 impl IsPrime for u8 {
     /// Tests whether a `u8` is prime.
     ///
@@ -655,8 +1408,8 @@ impl IsPrime for u8 {
 impl IsPrime for u16 {
     /// Tests whether a `u16` is prime.
     ///
-    /// This implementation looks the answer up in a table, after checking for divisibility by 2,
-    /// 3, and 5 when the input is at least $2^{15}$.
+    /// This implementation looks the answer up in a table, after checking for divisibility by 2, 3,
+    /// and 5 when the input is at least $2^{15}$.
     ///
     /// If you want to generate many small primes, try using
     /// [`u16::primes`][crate::num::factorization::traits::Primes::primes] instead.

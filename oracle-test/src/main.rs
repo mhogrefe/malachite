@@ -11454,6 +11454,22 @@ fn test_against_azurite(build: bool) {
     ] {
         check_demo_against_azurite(&oracle, "../malachite-base", demo, "az_nat_is_prime");
     }
+    // The primitive unsigned is_probable_prime, checked against Azurite's proven primality test.
+    for demo in [
+        "demo_u8_is_probable_prime",
+        "demo_u16_is_probable_prime",
+        "demo_u32_is_probable_prime",
+        "demo_u64_is_probable_prime",
+        "demo_u128_is_probable_prime",
+        "demo_usize_is_probable_prime",
+    ] {
+        check_demo_against_azurite(
+            &oracle,
+            "../malachite-base",
+            demo,
+            "az_nat_is_probable_prime",
+        );
+    }
     for (demo, mode) in AZURITE_UNSIGNED_VECTOR_STAGES {
         check_demo_against_azurite(&oracle, "../malachite-base", demo, mode);
     }
@@ -14469,6 +14485,38 @@ fn test_against_flint(build: bool) {
         "demo_usize_is_prime_primes",
     ] {
         check_demo_against_flint(&oracle, "../malachite-base", demo_name, "n_is_prime");
+    }
+
+    for demo_name in [
+        "demo_u8_is_probable_prime",
+        "demo_u16_is_probable_prime",
+        "demo_u32_is_probable_prime",
+        "demo_u64_is_probable_prime",
+        "demo_u128_is_probable_prime",
+        "demo_usize_is_probable_prime",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-base",
+            demo_name,
+            "fmpz_is_probabprime",
+        );
+    }
+
+    for demo_name in [
+        "demo_u8_is_strong_probable_prime",
+        "demo_u16_is_strong_probable_prime",
+        "demo_u32_is_strong_probable_prime",
+        "demo_u64_is_strong_probable_prime",
+        "demo_u128_is_strong_probable_prime",
+        "demo_usize_is_strong_probable_prime",
+    ] {
+        check_demo_against_flint(
+            &oracle,
+            "../malachite-base",
+            demo_name,
+            "fmpz_is_strong_probabprime",
+        );
     }
 
     // Every case from test_evaluate in malachite-nz's IntegerPolynomial and NaturalPolynomial

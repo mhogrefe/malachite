@@ -91,6 +91,7 @@ mod use_to_string_variant;
 mod use_trailing_zeros;
 mod use_unary_assign;
 mod use_width_mask;
+mod widened_half;
 
 dylint_linting::dylint_library!();
 
@@ -688,6 +689,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         use_unary_assign::USE_UNARY_ASSIGN,
         use_abs_comparison::USE_ABS_COMPARISON,
         use_width_mask::USE_WIDTH_MASK,
+        widened_half::WIDENED_HALF,
     ]);
     lint_store.register_late_lint_pass(Box::new(|_| {
         Box::new(assert_ordering_equal_prefer_exact::AssertOrderingEqualPreferExact)
@@ -838,6 +840,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
     lint_store
         .register_late_lint_pass(Box::new(|_| Box::new(use_abs_comparison::UseAbsComparison)));
     lint_store.register_late_lint_pass(Box::new(|_| Box::new(use_width_mask::UseWidthMask)));
+    lint_store.register_late_lint_pass(Box::new(|_| Box::new(widened_half::WidenedHalf)));
     lint_store.register_late_lint_pass(Box::new(|_| {
         Box::new(fully_qualified_path::FullyQualifiedPath)
     }));

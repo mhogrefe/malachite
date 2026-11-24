@@ -14,6 +14,21 @@ pub(crate) const TWICE_U64_WIDTH: u64 = u64::WIDTH << 1;
 
 /// [`Factor`](traits::Factor), a trait for computing the prime factorization of a number.
 pub mod factor;
+/// [`IsLucasProbablePrime`](traits::IsLucasProbablePrime), a trait for testing whether a number is
+/// a Lucas probable prime.
+///
+/// # is_lucas_probable_prime
+/// ```
+/// use malachite_base::num::factorization::traits::IsLucasProbablePrime;
+///
+/// assert!(97u32.is_lucas_probable_prime());
+/// // 323 = 17 * 19 is the smallest Lucas pseudoprime.
+/// assert!(323u32.is_lucas_probable_prime());
+/// assert!(!15u32.is_lucas_probable_prime());
+/// assert!(170141183460469231731687303715884105727u128.is_lucas_probable_prime());
+/// assert!(!3317044064679887385961981u128.is_lucas_probable_prime());
+/// ```
+pub mod is_lucas_probable_prime;
 /// [`IsPower`](traits::IsPower) and [`ExpressAsPower`](traits::ExpressAsPower), traits for testing
 /// if a number is a perfect power and, if it is, expressing it as such.
 ///
@@ -54,6 +69,19 @@ pub mod is_power;
 /// [`IsPrime`](traits::IsPrime), a trait for testing a number for primality.
 pub mod is_prime;
 pub(crate) mod is_prime_tables;
+/// [`IsProbablePrime`](traits::IsProbablePrime), a trait for testing whether a number is a probable
+/// prime.
+///
+/// # is_probable_prime
+/// ```
+/// use malachite_base::num::factorization::traits::IsProbablePrime;
+///
+/// assert!(5u64.is_probable_prime());
+/// assert!(!6u64.is_probable_prime());
+/// assert!(170141183460469231731687303715884105727u128.is_probable_prime());
+/// assert!(!3317044064679887385961981u128.is_probable_prime());
+/// ```
+pub mod is_probable_prime;
 /// [`IsSquare`](traits::IsSquare), a trait for testing if a number if a perfect square.
 ///
 /// # is_square
@@ -71,6 +99,21 @@ pub(crate) mod is_prime_tables;
 /// assert!(!128u64.is_square());
 /// ```
 pub mod is_square;
+/// [`IsStrongProbablePrime`](traits::IsStrongProbablePrime), a trait for testing whether a number
+/// is a strong probable prime to a given base.
+///
+/// # is_strong_probable_prime
+/// ```
+/// use malachite_base::num::factorization::traits::IsStrongProbablePrime;
+///
+/// assert!(97u8.is_strong_probable_prime(5));
+/// // 2047 = 23 * 89 is the smallest strong pseudoprime to base 2.
+/// assert!(2047u64.is_strong_probable_prime(2));
+/// assert!(!2047u64.is_strong_probable_prime(3));
+/// // A strong pseudoprime to each of the first 13 prime bases
+/// assert!(3317044064679887385961981u128.is_strong_probable_prime(41));
+/// ```
+pub mod is_strong_probable_prime;
 /// The implementation of [`ToLatex`](crate::strings::latex::ToLatex) for a prime factorization.
 pub mod latex;
 /// An efficient prime sieve.

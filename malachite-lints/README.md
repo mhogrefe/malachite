@@ -276,6 +276,18 @@ change between the two calls, and it verifies that the methods resolve to malach
 `SplitInHalf` trait. Calls inside macro expansions are ignored, which also spares macros that take
 one half or the other per invocation.
 
+### `widened_half`
+
+Flags taking a half of a concrete unsigned value with `upper_half()`, `lower_half()`, or
+`split_in_half()` only to convert it straight back to the value's own type: directly, as in
+`u128::from(x.upper_half())` or `x.lower_half().into()`, or through a `let` whose bindings are
+used only in such conversions (`let (a1, a0) = a.split_in_half();` followed only by
+`u128::from(a1)` and `u128::from(a0)`). The narrowing and widening cancel out, so the half should
+stay in the wide type: in malachite-base, `wide_upper_half`, `wide_lower_half`, and
+`wide_split_in_half` return it there; elsewhere, a shift or `mod_power_of_2` by half the width
+does. A binding with any other use (a narrow `wrapping_mul`, say) is left alone, as are
+conversions to a different type and test code.
+
 ### `use_square`
 
 Flags multiplying a bignum by itself (`&x * &x`) and raising one to the power of 2 (`x.pow(2)`,

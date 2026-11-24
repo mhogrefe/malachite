@@ -85,7 +85,7 @@ impl_half_traits!(u64, u32);
 impl_half_traits!(u128, u64);
 
 #[inline]
-fn wide_lower_half<T: PrimitiveUnsigned>(x: T) -> T {
+pub(crate) fn wide_lower_half<T: PrimitiveUnsigned>(x: T) -> T {
     x.mod_power_of_2(T::WIDTH >> 1)
 }
 

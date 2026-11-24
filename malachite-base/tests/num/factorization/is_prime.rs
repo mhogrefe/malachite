@@ -10,13 +10,17 @@ use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::exhaustive::exhaustive_unsigneds;
-use malachite_base::num::factorization::is_prime::test_is_prime_tables;
+use malachite_base::num::factorization::is_prime::{ll_is_prime, test_is_prime_tables};
 use malachite_base::num::factorization::traits::{IsPrime, Primes};
-use malachite_base::test_util::generators::{unsigned_gen, unsigned_pair_gen_var_50};
+use malachite_base::test_util::generators::{
+    unsigned_gen, unsigned_gen_var_29, unsigned_pair_gen_var_50,
+};
+use malachite_base::test_util::num::factorization::is_lucas_probable_prime::*;
 use malachite_base::test_util::num::factorization::is_prime::is_prime_naive;
 use malachite_base::test_util::num::factorization::is_prime_flint_3_1_2::{
     u32_is_prime_flint_3_1_2, u64_is_prime_flint_3_1_2,
 };
+use malachite_base::test_util::num::factorization::is_strong_probable_prime::*;
 
 fn is_prime_helper<T: IsPrime + PrimitiveUnsigned>() {
     let test = |n: u64, out| {
@@ -636,4 +640,109 @@ fn is_prime_properties() {
 
     is_prime_properties_helper_2::<u16, u32>();
     is_prime_properties_helper_2::<u32, u64>();
+}
+
+// The Sorenson–Webster bound, below which n_ll_is_prime's 13-base test proves primality
+const SORENSON_WEBSTER_BOUND: u128 = 3317044064679887385961981;
+
+fn ll_is_prime_check(n: u128) {
+    let bpsw = is_strong_probable_prime_naive(n, 2) && is_lucas_probable_prime_naive(n);
+    match ll_is_prime(n) {
+        Some(true) => assert!(n < SORENSON_WEBSTER_BOUND && bpsw, "{n}"),
+        Some(false) => assert!(!bpsw, "{n}"),
+        None => assert!(
+            n >= SORENSON_WEBSTER_BOUND && is_strong_probable_prime_naive(n, 2),
+            "{n}"
+        ),
+    }
+}
+
+#[test]
+fn test_ll_is_prime() {
+    let test = |n: u128, out| {
+        assert_eq!(ll_is_prime(n), out);
+        ll_is_prime_check(n);
+    };
+    // - n.even()
+    test(18446744073709551616, Some(false));
+    // - a trial prime from 3 to 137 divides n
+    test(18446744073709551621, Some(false));
+    // - n < SORENSON_WEBSTER_BOUND
+    // - u128::from(n2) >= d1 in div_3_by_2_normalized
+    // - the correction loop runs in div_3_by_2_normalized
+    // - ll_small_sqrmod subtracts m
+    // - !(ebits >= 3 && b3 <= MAX_7TH_ROOT) in ll_small_powmod_triple
+    // - exp.get_bit(bit) in ll_small_powmod_triple
+    // - ebits < 6 in ll_small_2_powmod
+    // - exp.get_bit(bit) in ll_small_2_powmod
+    // - ll_small_sprp_stage2 breaks early
+    // - all squarings fail in ll_small_sprp_stage2
+    // - an odd base fails in ll_small_is_prime_mr
+    test(18446744073709551617, Some(false));
+    // - ebits >= 6 in ll_small_2_powmod
+    // - ll_small_reduce2_precise subtracts m
+    // - base 2 fails in ll_small_is_prime_mr
+    test(18446744073709551619, Some(false));
+    // the smallest prime above 2^64
+    // - ebits >= 3 && b3 <= MAX_7TH_ROOT in ll_small_powmod_triple
+    // - !exp.get_bit(ebits - 2) in ll_small_powmod_triple
+    // - !exp.get_bit(ebits - 3) in ll_small_powmod_triple
+    // - y == 1 in ll_small_sprp_stage2
+    // - all bases pass in ll_small_is_prime_mr
+    test(18446744073709551629, Some(true));
+    // - exp.get_bit(ebits - 2) in ll_small_powmod_triple
+    // - exp.get_bit(ebits - 3) in ll_small_powmod_triple
+    test(9149585060559937601537, Some(true));
+    // - n >= SORENSON_WEBSTER_BOUND && n.upper_half() < LL_SMALL_LIMIT_HIGH
+    // - base_2_only in ll_small_is_prime_mr
+    test(4533471823554859405148161, None);
+    // - n.upper_half() >= LL_SMALL_LIMIT_HIGH
+    // - the slow base-2 test fails
+    test(8665580274997661924293869569, Some(false));
+    // - a trial prime from 139 to 313 divides n
+    test(673439381371246869545123577857, Some(false));
+    // - the slow base-2 test passes
+    test(34662321099990647697175478273, None);
+    // a multiple of 313, the largest trial prime
+    test(313 * 58935284580541696407, Some(false));
+    // psi_12 is caught by base 41; psi_13 is the bound itself, so only the base-2 test applies
+    test(318665857834031151167461, Some(false));
+    test(3317044064679887385961981, None);
+    test(3317044064679887385961979, Some(false));
+    test(618970019642690137449562111, None);
+    test(170141183460469231731687303715884105727, None);
+    test(340282366920938463463374607431768211297, None);
+    test(340282366920938463463374607431768211455, Some(false));
+    // The windows above 2^64, around the bound, around the start of the slow base-2 path, and below
+    // 2^128
+    for n in (1u128 << 64)..(1u128 << 64) + 100000 {
+        ll_is_prime_check(n);
+    }
+    for n in SORENSON_WEBSTER_BOUND - 50000..SORENSON_WEBSTER_BOUND + 50000 {
+        ll_is_prime_check(n);
+    }
+    let slow = 357913941u128 << 64;
+    for n in slow - 50000..slow + 50000 {
+        ll_is_prime_check(n);
+    }
+    for n in u128::MAX - 100000..=u128::MAX {
+        ll_is_prime_check(n);
+    }
+}
+
+#[test]
+fn ll_is_prime_properties() {
+    unsigned_gen::<u128>().test_properties(|n| {
+        if n >> 64 != 0 {
+            ll_is_prime_check(n);
+        }
+    });
+    unsigned_gen_var_29::<u64>().test_properties(|p| {
+        for q in [18446744073709551557u64, 4294967291, 2305843009213693951] {
+            let n = u128::from(p) * u128::from(q);
+            if n >> 64 != 0 {
+                assert_ne!(ll_is_prime(n), Some(true));
+            }
+        }
+    });
 }

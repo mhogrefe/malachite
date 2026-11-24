@@ -121,7 +121,11 @@ impl<'tcx> LateLintPass<'tcx> for LongLines {
             }
             owners.push((span.lo(), span.hi(), hir_id));
         }
-        for file in cx.sess().source_map().files().iter() {
+        // Copy the file list rather than iterating under the source map's lock: emitting a lint
+        // takes that lock again, and since the lock is fair, a write request from another thread in
+        // between (loading a source file, say) deadlocks the two.
+        let files: Vec<_> = cx.sess().source_map().files().iter().cloned().collect();
+        for file in &files {
             if file.is_imported() {
                 continue;
             }

@@ -1,0 +1,35 @@
+error: `upper_half()` is converted straight back to `u128`
+  --> $DIR/widened_half.rs:8:13
+   |
+LL |     let _ = u128::from(a.upper_half()) * 3;
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: keep the half in the wide type: in malachite-base, use `wide_upper_half`, `wide_lower_half`, or `wide_split_in_half`; elsewhere, shift right by, or reduce mod 2 to the power of, half the width
+   = note: `#[deny(widened_half)]` on by default
+
+error: `lower_half()` is converted straight back to `u128`
+  --> $DIR/widened_half.rs:9:19
+   |
+LL |     let _: u128 = e.lower_half().into();
+   |                   ^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: keep the half in the wide type: in malachite-base, use `wide_upper_half`, `wide_lower_half`, or `wide_split_in_half`; elsewhere, shift right by, or reduce mod 2 to the power of, half the width
+
+error: every half taken by `split_in_half()` is converted straight back to `u128`
+  --> $DIR/widened_half.rs:11:5
+   |
+LL |     let (a1, a0) = a.split_in_half();
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: keep the half in the wide type: in malachite-base, use `wide_upper_half`, `wide_lower_half`, or `wide_split_in_half`; elsewhere, shift right by, or reduce mod 2 to the power of, half the width
+
+error: every half taken by `upper_half()` is converted straight back to `u128`
+  --> $DIR/widened_half.rs:14:5
+   |
+LL |     let b1 = b.upper_half();
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: keep the half in the wide type: in malachite-base, use `wide_upper_half`, `wide_lower_half`, or `wide_split_in_half`; elsewhere, shift right by, or reduce mod 2 to the power of, half the width
+
+error: aborting due to 4 previous errors
+

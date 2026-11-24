@@ -11,6 +11,26 @@ pub trait IsPrime {
     fn is_prime(&self) -> bool;
 }
 
+/// A trait for testing whether a number is a probable prime, by the Baillie–PSW test: a strong
+/// probable prime test to base 2 followed by a Lucas probable prime test. No composite number is
+/// known to pass it. Where a proof of primality is cheap, as it is for primitive integers up to 64
+/// bits wide, implementations may decide primality exactly instead.
+pub trait IsProbablePrime {
+    fn is_probable_prime(&self) -> bool;
+}
+
+/// A trait for testing whether a number is a strong probable prime (one that passes the
+/// Miller–Rabin test) to a given base.
+pub trait IsStrongProbablePrime<B = Self> {
+    fn is_strong_probable_prime(&self, base: B) -> bool;
+}
+
+/// A trait for testing whether a number is a Lucas probable prime, with Selfridge's choice of
+/// parameters.
+pub trait IsLucasProbablePrime {
+    fn is_lucas_probable_prime(&self) -> bool;
+}
+
 /// A trait for testing whether a number is a square.
 pub trait IsSquare {
     fn is_square(&self) -> bool;

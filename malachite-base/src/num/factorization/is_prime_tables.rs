@@ -14,8 +14,8 @@
 
 // This file is generated from FLINT's table header; do not edit it by hand.
 
-// A bit table of the odd primes less than $2^{15}$: bit $i$ of the table is set when $2i + 1$
-// is prime.
+// A bit table of the odd primes less than $2^{15}$: bit $i$ of the table is set when $2i + 1$ is
+// prime.
 //
 // This is `flint_odd_prime_lookup` from `ulong_extras/is_prime_tables.h`, FLINT 3.7.0-dev.
 pub(crate) static ODD_PRIME_LOOKUP: [u64; 256] = [
@@ -277,8 +277,8 @@ pub(crate) static ODD_PRIME_LOOKUP: [u64; 256] = [
     0x004000d204800048,
 ];
 
-// A bit table of the primes less than $2^{20}$ that are coprime to 30. Byte $i$ covers the
-// eight residues 1, 7, 11, 13, 17, 19, 23, and 29 modulo 30 of the numbers $30i + r$.
+// A bit table of the primes less than $2^{20}$ that are coprime to 30. Byte $i$ covers the eight
+// residues 1, 7, 11, 13, 17, 19, 23, and 29 modulo 30 of the numbers $30i + r$.
 //
 // This is `flint_mod30_prime_lookup` from `ulong_extras/is_prime_tables.h`, FLINT 3.7.0-dev.
 pub(crate) static MOD_30_PRIME_LOOKUP: [u8; 34953] = [
@@ -1814,8 +1814,8 @@ pub(crate) static MOD_30_PRIME_LOOKUP: [u8; 34953] = [
     28, 192, 4, 165, 114, 194, 9, 0, 184, 0, 96, 56, 0, 9, 33, 64, 22, 6, 72, 2, 0, 18, 160, 204,
 ];
 
-// Constants of a nearly perfect hash function for [`BASE_2_PSEUDOPRIMES`], indexed by the
-// seven most significant bits of the number being looked up.
+// Constants of a nearly perfect hash function for [`BASE_2_PSEUDOPRIMES`], indexed by the seven
+// most significant bits of the number being looked up.
 //
 // This is `base2_32bit_pseudoprimes_hash_keys` from `ulong_extras/is_prime_tables.h`, FLINT
 // 3.7.0-dev.
@@ -1838,8 +1838,8 @@ pub(crate) static BASE_2_PSEUDOPRIMES_HASH_KEYS: [u32; 128] = [
     4290083574, 2958376854, 3517221420, 2071108422, 2275002646, 2044063934, 3412713754, 4154686645,
 ];
 
-// The 2314 strong pseudoprimes to base 2 that are less than $2^{32}$, in a hash table of
-// length 2560, with one more entry so that a lookup can probe one position past its hash.
+// The 2314 strong pseudoprimes to base 2 that are less than $2^{32}$, in a hash table of length
+// 2560, with one more entry so that a lookup can probe one position past its hash.
 //
 // This is `base2_32bit_pseudoprimes` from `ulong_extras/is_prime_tables.h`, FLINT 3.7.0-dev.
 pub(crate) static BASE_2_PSEUDOPRIMES: [u32; 2561] = [
@@ -2137,10 +2137,10 @@ pub(crate) static BASE_2_PSEUDOPRIMES: [u32; 2561] = [
     1469960377, 189714193, 0,
 ];
 
-// A hash table of bases for a second strong probable prime test: built from the strong
-// pseudoprimes to base 2 below $2^{64}$, other than the semiprimes $pq$ with
-// $q = k(p - 1) + 1$ for $k \in \{2, 3, 4, 5, 6, 7, 8, 9, 12\}$, so that each of them fails
-// the test to the base that its hash selects.
+// A hash table of bases for a second strong probable prime test: built from the strong pseudoprimes
+// to base 2 below $2^{64}$, other than the semiprimes $pq$ with $q = k(p - 1) + 1$ for $k \in \{2,
+// 3, 4, 5, 6, 7, 8, 9, 12\}$, so that each of them fails the test to the base that its hash
+// selects.
 //
 // This is `witness_base_tab` from `ulong_extras/is_prime_tables.h`, FLINT 3.7.0-dev.
 pub(crate) static WITNESS_BASES: [u16; 32768] = [
