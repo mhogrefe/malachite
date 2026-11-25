@@ -29,6 +29,8 @@ static const oracle_mode modes[] = {
     {"n_is_prime", run_n_is_prime},
     {"fmpz_is_probabprime", run_fmpz_is_probabprime},
     {"fmpz_is_strong_probabprime", run_fmpz_is_strong_probabprime},
+    {"fmpz_is_prime", run_fmpz_is_prime},
+    {"fmpz_divisor_in_residue_class_lenstra", run_fmpz_divisor_in_residue_class_lenstra},
     {"fmpz_sqrtmod", run_fmpz_sqrtmod},
     {"n_sqrtmod", run_n_sqrtmod},
     {"sqrtmod_stress", run_sqrtmod_stress},

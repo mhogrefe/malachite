@@ -39,6 +39,11 @@ documented by git history.
 
 - `IsProbablePrime`, `IsStrongProbablePrime`, and `IsLucasProbablePrime` for `Natural`, following
   FLINT's `fmpz_is_probabprime`, `fmpz_is_strong_probabprime`, and `fmpz_is_probabprime_lucas`.
+- Dividing by a one-limb number is faster for short dividends: the reciprocal of the divisor is now
+  computed with a table lookup and Newton iteration rather than a two-limb division. On aarch64,
+  the remainder of a 2- to 8-limb `Natural` modulo a one-limb `Natural` is about 1.5 to 2 times
+  faster, and `Float` division and reciprocal at precisions up to 64 bits are about 1.3 to 2 times
+  faster.
 
 ## 0.15.0 — 2026-11-22
 

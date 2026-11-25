@@ -101,6 +101,8 @@ int run_n_primitive_root_prime(const char * arg);
 int run_n_is_prime(const char * arg);
 int run_fmpz_is_probabprime(const char * arg);
 int run_fmpz_is_strong_probabprime(const char * arg);
+int run_fmpz_is_prime(const char * arg);
+int run_fmpz_divisor_in_residue_class_lenstra(const char * arg);
 
 /* sqrtmod.c */
 int run_fmpz_sqrtmod(const char * arg);

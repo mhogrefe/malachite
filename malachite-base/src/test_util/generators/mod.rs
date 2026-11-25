@@ -1898,6 +1898,16 @@ pub fn unsigned_gen_var_36() -> Generator<u64> {
     Generator::new_no_special(&exhaustive_unsigned_gen_var_34, &random_unsigned_gen_var_35)
 }
 
+// All `u128`s that are probable primes and at least $2^{64}$: the inputs that reach the two-limb
+// primality tests.
+pub fn unsigned_gen_var_37() -> Generator<u128> {
+    Generator::new(
+        &exhaustive_unsigned_gen_var_35,
+        &random_unsigned_gen_var_36,
+        &special_random_unsigned_gen_var_31,
+    )
+}
+
 // -- (PrimitiveUnsigned, PrimitiveSigned) --
 
 pub fn unsigned_signed_pair_gen<T: PrimitiveUnsigned, U: PrimitiveSigned>() -> Generator<(T, U)> {

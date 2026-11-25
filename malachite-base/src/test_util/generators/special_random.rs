@@ -32,7 +32,7 @@ use crate::num::conversion::traits::{
     ConvertibleFrom, ExactFrom, HasHalf, JoinHalves, RoundingFrom, SaturatingFrom, SplitInHalf,
     WrappingFrom, WrappingInto,
 };
-use crate::num::factorization::traits::IsPrime;
+use crate::num::factorization::traits::{IsPrime, IsProbablePrime};
 use crate::num::float::NiceFloat;
 use crate::num::logic::traits::{BitAccess, BitBlockAccess, LeadingZeros};
 use crate::num::modular::traits::{Mod, ModMul, ModPowerOf2, ModPowerOf2Mul};
@@ -3177,6 +3177,19 @@ pub fn special_random_unsigned_gen_var_29<T: PrimitiveUnsigned>(config: &GenConf
         config.get_or("mean_stripe_n", 4),
         config.get_or("mean_stripe_d", 1),
     ))
+}
+
+pub fn special_random_unsigned_gen_var_31(config: &GenConfig) -> It<u128> {
+    Box::new(
+        striped_random_unsigned_inclusive_range(
+            EXAMPLE_SEED,
+            1 << 64,
+            u128::MAX,
+            config.get_or("mean_stripe_n", 64),
+            config.get_or("mean_stripe_d", 1),
+        )
+        .filter(u128::is_probable_prime),
+    )
 }
 
 // -- (PrimitiveUnsigned, PrimitiveSigned) --

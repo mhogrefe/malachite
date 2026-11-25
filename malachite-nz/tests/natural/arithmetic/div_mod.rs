@@ -27,6 +27,7 @@ use malachite_base::test_util::generators::{
     unsigned_vec_triple_gen_var_53, unsigned_vec_unsigned_pair_gen_var_22,
     unsigned_vec_unsigned_vec_unsigned_triple_gen_var_13,
 };
+use malachite_base::test_util::num::modular::mod_mul::limbs_invert_limb_naive;
 use malachite_nz::natural::arithmetic::div_mod::{
     limbs_div_limb_in_place_mod, limbs_div_limb_mod, limbs_div_limb_to_out_mod, limbs_div_mod,
     limbs_div_mod_barrett, limbs_div_mod_barrett_scratch_len, limbs_div_mod_by_two_limb_normalized,
@@ -23744,7 +23745,10 @@ fn ceiling_div_neg_mod_ref_ref_fail() {
 #[test]
 fn limbs_invert_limb_properties() {
     unsigned_gen_var_12().test_properties(|x| {
-        limbs_invert_limb::<DoubleLimb, Limb>(x);
+        assert_eq!(
+            limbs_invert_limb::<DoubleLimb, Limb>(x),
+            limbs_invert_limb_naive::<Limb, DoubleLimb>(x)
+        );
     });
 }
 

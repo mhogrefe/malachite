@@ -136,7 +136,8 @@ use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 use malachite_base::iterators::iter_windows;
 use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::{
-    AddMul, ArithmeticCheckedShl, DivRound, Height, HeightRef, Parity, PowerOf2, Square,
+    AddMul, ArithmeticCheckedShl, DivRound, FloorRoot, FloorSqrt, Height, HeightRef, Parity,
+    PowerOf2, Square,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -156,6 +157,7 @@ use malachite_base::num::exhaustive::{
     primitive_int_increasing_inclusive_range, primitive_int_increasing_range,
 };
 use malachite_base::num::factorization::prime_sieve::n_to_bit;
+use malachite_base::num::factorization::traits::IsProbablePrime;
 use malachite_base::num::iterators::{bit_distributor_sequence, ruler_sequence};
 use malachite_base::num::logic::traits::{
     BitAccess, BitConvertible, LeadingZeros, SignificantBits,
@@ -2459,6 +2461,10 @@ pub fn exhaustive_natural_gen_var_8() -> It<Natural> {
     Box::new(exhaustive_naturals().map(|n| (n << 1u32) | Natural::ONE))
 }
 
+pub fn exhaustive_natural_gen_var_9() -> It<Natural> {
+    Box::new(exhaustive_naturals().filter(Natural::is_probable_prime))
+}
+
 // -- (Natural, bool) --
 
 pub fn exhaustive_natural_bool_pair_gen() -> It<(Natural, bool)> {
@@ -2673,6 +2679,26 @@ pub fn exhaustive_natural_triple_gen_var_9() -> It<(Natural, Natural, Natural)> 
         exhaustive_triples_from_single(exhaustive_naturals())
             .map(|(a, m, n)| (a, (m << 1u32) | Natural::ONE, (n << 1u32) | Natural::ONE)),
     )
+}
+
+pub fn exhaustive_natural_triple_gen_var_11() -> It<(Natural, Natural, Natural)> {
+    Box::new(exhaustive_naturals().flat_map(|n| {
+        let lo = (&n).floor_root(3) + Natural::ONE;
+        let hi = (&n).floor_sqrt();
+        let mut triples = Vec::new();
+        let mut s = lo;
+        while s <= hi {
+            let mut r = Natural::ONE;
+            while r < s {
+                if (&r).coprime_with(&s) {
+                    triples.push((n.clone(), r.clone(), s.clone()));
+                }
+                r += Natural::ONE;
+            }
+            s += Natural::ONE;
+        }
+        triples
+    }))
 }
 
 // -- (Natural, Natural, Natural, Natural) --

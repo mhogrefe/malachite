@@ -126,8 +126,8 @@ use malachite_base::foer_sequences::FoerSequence;
 use malachite_base::iterators::with_special_value;
 use malachite_base::matrix::Matrix;
 use malachite_base::num::arithmetic::traits::{
-    AddMul, ArithmeticCheckedShl, DivRound, Height, HeightRef, Parity, Pow, PowerOf2,
-    RoundToMultipleOfPowerOf2Assign, Square,
+    AddMul, ArithmeticCheckedShl, DivRound, FloorRoot, FloorSqrt, Height, HeightRef, Parity, Pow,
+    PowerOf2, RoundToMultipleOfPowerOf2Assign, Square,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -142,7 +142,7 @@ use malachite_base::num::conversion::traits::{
 };
 use malachite_base::num::exponential::traits::CeilingLogBase2;
 use malachite_base::num::factorization::prime_sieve::n_to_bit;
-use malachite_base::num::factorization::traits::IsPrime;
+use malachite_base::num::factorization::traits::{IsPrime, IsProbablePrime};
 use malachite_base::num::logic::traits::{
     BitAccess, BitConvertible, LeadingZeros, SignificantBits,
 };
@@ -4942,6 +4942,17 @@ pub fn random_natural_gen_var_9(config: &GenConfig) -> It<Natural> {
     )
 }
 
+pub fn random_natural_gen_var_10(config: &GenConfig) -> It<Natural> {
+    Box::new(
+        random_naturals(
+            EXAMPLE_SEED,
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        )
+        .filter(Natural::is_probable_prime),
+    )
+}
+
 // -- (Natural, bool) --
 
 pub fn random_natural_bool_pair_gen(config: &GenConfig) -> It<(Natural, bool)> {
@@ -5405,6 +5416,30 @@ pub fn random_natural_triple_gen_var_9(config: &GenConfig) -> It<(Natural, Natur
             config.get_or("mean_bits_d", 1),
         ))
         .map(|(a, m, n)| (a, (m << 1u32) | Natural::ONE, (n << 1u32) | Natural::ONE)),
+    )
+}
+
+pub fn random_natural_triple_gen_var_11(config: &GenConfig) -> It<(Natural, Natural, Natural)> {
+    Box::new(
+        random_triples_from_single(random_naturals(
+            EXAMPLE_SEED,
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        ))
+        .filter_map(|(a, b, t)| {
+            let n = &a * b;
+            let lo = (&n).floor_root(3) + Natural::ONE;
+            let hi = (&n).floor_sqrt();
+            if lo > hi {
+                return None;
+            }
+            let s = t % (&hi - &lo + Natural::ONE) + lo;
+            let r = a % &s;
+            if r == 0u32 || !(&r).coprime_with(&s) {
+                return None;
+            }
+            Some((n, r, s))
+        }),
     )
 }
 

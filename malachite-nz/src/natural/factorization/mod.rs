@@ -14,6 +14,11 @@ pub mod is_lucas_probable_prime;
 /// [`ExpressAsPower`](malachite_base::num::factorization::traits::ExpressAsPower), traits for
 /// testing if a number is a perfect power and, if it is, expressing it as such.
 pub mod is_power;
+// Nothing outside the tests uses these primality proofs until `IsPrime` is implemented for
+// `Natural`.
+#[cfg_attr(not(feature = "test_build"), allow(dead_code))]
+#[doc(hidden)]
+pub mod is_prime_n_pm_1;
 /// An implementation of
 /// [`IsProbablePrime`](malachite_base::num::factorization::traits::IsProbablePrime), a trait for
 /// testing whether a number is a probable prime.

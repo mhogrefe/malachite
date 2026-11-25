@@ -68,6 +68,7 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{HasHalf, JoinHalves, SplitInHalf};
 use malachite_base::num::logic::traits::LeadingZeros;
+use malachite_base::num::modular::mod_mul::{limbs_invert_limb_u32, limbs_invert_limb_u64};
 use malachite_base::slices::{slice_move_left, slice_set_zero};
 
 // The highest bit of the input must be set.
@@ -78,13 +79,23 @@ use malachite_base::slices::{slice_move_left, slice_set_zero};
 // # Panics
 // Panics if `d` is zero.
 //
-// This is equivalent to `mpn_invert_limb`, or `invert_limb`, from `gmp-impl.h`, GMP 6.2.1.
+// This is equivalent to `mpn_invert_limb`, or `invert_limb`, from `gmp-impl.h`, GMP 6.2.1. For 32-
+// and 64-bit limbs with the highest bit set, it uses the table lookup and Newton iteration of
+// `invert_limb` from `longlong.h`, FLINT 2.7.1, which computes the same value without a double-limb
+// division.
 crate_test_fn! {limbs_invert_limb<
     DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + JoinHalves<Half = T> + SplitInHalf,
     T: PrimitiveUnsigned,
 >(
     d: T,
 ) -> T {
+    if d.get_highest_bit() {
+        if T::WIDTH == u64::WIDTH {
+            return T::wrapping_from(limbs_invert_limb_u64(d.wrapping_into()));
+        } else if T::WIDTH == u32::WIDTH {
+            return T::wrapping_from(limbs_invert_limb_u32(d.wrapping_into()));
+        }
+    }
     (DT::join_halves(!d, T::MAX) / DT::from(d)).lower_half()
 }}
 

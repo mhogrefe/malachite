@@ -2564,6 +2564,15 @@ pub fn natural_gen_var_9() -> Generator<Natural> {
     Generator::new_no_special(&exhaustive_natural_gen, &random_natural_gen_var_9)
 }
 
+// All `Natural`s that are probable primes.
+pub fn natural_gen_var_10() -> Generator<Natural> {
+    Generator::new(
+        &exhaustive_natural_gen_var_9,
+        &random_natural_gen_var_10,
+        &special_random_natural_gen_var_9,
+    )
+}
+
 // -- (Natural, bool) --
 
 pub fn natural_bool_pair_gen() -> Generator<(Natural, bool)> {
@@ -2938,6 +2947,16 @@ pub fn natural_triple_gen_var_10() -> Generator<(Natural, Natural, Natural)> {
         &exhaustive_natural_triple_gen_var_10,
         &random_natural_triple_gen_var_10,
         &special_random_natural_triple_gen_var_10,
+    )
+}
+
+// All triples of `Natural`s (n, r, s) with n^(1/3) < s <= n^(1/2), 0 < r < s, and gcd(r, s) = 1:
+// inputs to Lenstra's search for a divisor of n congruent to r mod s. In random mode, n is a
+// product ab and r is a mod s, so that n usually has such a divisor.
+pub fn natural_triple_gen_var_11() -> Generator<(Natural, Natural, Natural)> {
+    Generator::new_no_special(
+        &exhaustive_natural_triple_gen_var_11,
+        &random_natural_triple_gen_var_11,
     )
 }
 

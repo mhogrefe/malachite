@@ -145,7 +145,7 @@ use malachite_base::num::conversion::traits::{
     ConvertibleFrom, ExactFrom, SaturatingFrom, ToSci, WrappingFrom,
 };
 use malachite_base::num::exponential::traits::CeilingLogBase2;
-use malachite_base::num::factorization::traits::IsPrime;
+use malachite_base::num::factorization::traits::{IsPrime, IsProbablePrime};
 use malachite_base::num::logic::traits::{
     BitAccess, BitConvertible, LeadingZeros, SignificantBits,
 };
@@ -5679,6 +5679,19 @@ pub fn special_random_natural_gen_var_8(config: &GenConfig) -> It<Natural> {
             config.get_or("mean_bits_d", 1),
         )
         .map(|n| (n << 1u32) | Natural::ONE),
+    )
+}
+
+pub fn special_random_natural_gen_var_9(config: &GenConfig) -> It<Natural> {
+    Box::new(
+        striped_random_naturals(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", 32),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        )
+        .filter(Natural::is_probable_prime),
     )
 }
 

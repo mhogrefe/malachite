@@ -40,7 +40,7 @@ use crate::num::exhaustive::{
     exhaustive_signed_inclusive_range, exhaustive_signed_range, exhaustive_signeds,
     exhaustive_unsigneds, primitive_int_increasing_inclusive_range, primitive_int_increasing_range,
 };
-use crate::num::factorization::traits::IsPrime;
+use crate::num::factorization::traits::{IsPrime, IsProbablePrime};
 use crate::num::float::NiceFloat;
 use crate::num::iterators::{bit_distributor_sequence, ruler_sequence};
 use crate::num::logic::traits::{BitBlockAccess, LeadingZeros, LowMask};
@@ -2080,6 +2080,13 @@ pub fn exhaustive_unsigned_primitive_int_unsigned_triple_gen_var_3<
         primitive_int_increasing_inclusive_range(1, U::WIDTH),
         exhaustive_unsigneds(),
     ))
+}
+
+pub fn exhaustive_unsigned_gen_var_35() -> It<u128> {
+    Box::new(
+        primitive_int_increasing_inclusive_range(1 << 64, u128::MAX)
+            .filter(u128::is_probable_prime),
+    )
 }
 
 // -- (PrimitiveUnsigned, PrimitiveSigned) --

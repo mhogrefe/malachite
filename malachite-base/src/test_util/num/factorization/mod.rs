@@ -10,6 +10,7 @@ pub mod factor;
 pub mod is_lucas_probable_prime;
 pub mod is_prime;
 pub mod is_prime_flint_3_1_2;
+pub mod is_prime_pseudosquare;
 pub mod is_strong_probable_prime;
 pub mod prime_sieve;
 pub mod primes;

@@ -107,7 +107,8 @@ pub fn test_invert_u32_table() {
 // Constant time and additional memory.
 //
 // This is equivalent to `invert_limb` from `longlong.h`, FLINT 2.7.1, when `GMP_LIMB_BITS == 32`.
-crate_test_fn! {limbs_invert_limb_u32(x: u32) -> u32 {
+#[doc(hidden)]
+pub fn limbs_invert_limb_u32(x: u32) -> u32 {
     assert!(x.get_highest_bit());
     let a = INVERT_U32_TABLE[usize::exact_from(x << 1 >> 23)];
     let b = (a << 4)
@@ -124,7 +125,7 @@ crate_test_fn! {limbs_invert_limb_u32(x: u32) -> u32 {
             .upper_half()
             .wrapping_add(x),
     )
-}}
+}
 
 const INVERT_U64_TABLE_LOG_SIZE: u64 = 8;
 
@@ -175,13 +176,14 @@ pub fn test_invert_u64_table() {
 // Constant time and additional memory.
 //
 // This is equivalent to `invert_limb` from `longlong.h`, FLINT 2.7.1, when `GMP_LIMB_BITS == 64`.
-crate_test_fn! {limbs_invert_limb_u64(x: u64) -> u64 {
+#[doc(hidden)]
+pub fn limbs_invert_limb_u64(x: u64) -> u64 {
     assert!(x.get_highest_bit());
     let a = (x >> 24) + 1;
     let b = INVERT_U64_TABLE[usize::exact_from(x << 1 >> 56)];
     let c = (b << 11).wrapping_sub(((b * b).wrapping_mul(a) >> 40) + 1);
-    let d = (c.wrapping_mul(u64::power_of_2(60).wrapping_sub_mul(c, a)) >> 47)
-        .wrapping_add(c << 13);
+    let d =
+        (c.wrapping_mul(u64::power_of_2(60).wrapping_sub_mul(c, a)) >> 47).wrapping_add(c << 13);
     let mut e = d.wrapping_mul(x >> 1).wrapping_neg();
     if x.odd() {
         e.wrapping_sub_assign(d.wrapping_sub(d >> 1));
@@ -193,7 +195,7 @@ crate_test_fn! {limbs_invert_limb_u64(x: u64) -> u64 {
             .upper_half()
             .wrapping_add(x),
     )
-}}
+}
 
 // This is equivalent to `n_ll_mod_preinv` from `ulong_extras/ll_mod_preinv.c`, FLINT 2.7.1.
 crate_test_fn! {mod_preinverted_double<

@@ -68,6 +68,8 @@ pub mod is_lucas_probable_prime;
 pub mod is_power;
 /// [`IsPrime`](traits::IsPrime), a trait for testing a number for primality.
 pub mod is_prime;
+#[doc(hidden)]
+pub mod is_prime_n_pm_1;
 pub(crate) mod is_prime_tables;
 /// [`IsProbablePrime`](traits::IsProbablePrime), a trait for testing whether a number is a probable
 /// prime.

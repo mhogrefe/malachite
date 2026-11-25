@@ -14542,6 +14542,23 @@ fn test_against_flint(build: bool) {
             "fmpz_is_strong_probabprime",
         );
     }
+    // The n - 1 and n + 1 primality tests: every input they settle is checked against
+    // fmpz_is_prime, which settles the rest with a full primality proof.
+    check_demo_against_flint(
+        &oracle,
+        "../malachite-base",
+        "demo_u128_prove_prime",
+        "fmpz_is_prime",
+    );
+    for demo_name in ["demo_natural_prove_prime", "demo_natural_prove_prime_odd"] {
+        check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "fmpz_is_prime");
+    }
+    check_demo_against_flint_no_special(
+        &oracle,
+        "../malachite-nz",
+        "demo_natural_divisor_in_residue_class_lenstra",
+        "fmpz_divisor_in_residue_class_lenstra",
+    );
 
     // Every case from test_evaluate in malachite-nz's IntegerPolynomial and NaturalPolynomial
     // tests, checked against FLINT's evaluation and against each of the two algorithms it chooses
