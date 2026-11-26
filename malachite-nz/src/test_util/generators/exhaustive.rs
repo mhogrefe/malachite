@@ -2461,6 +2461,14 @@ pub fn exhaustive_natural_gen_var_8() -> It<Natural> {
     Box::new(exhaustive_naturals().map(|n| (n << 1u32) | Natural::ONE))
 }
 
+pub fn exhaustive_natural_gen_var_10() -> It<Natural> {
+    Box::new(exhaustive_naturals().map(|n| (n << 1u32) + Natural::power_of_2(128) + Natural::ONE))
+}
+
+pub fn exhaustive_natural_gen_var_11() -> It<Natural> {
+    Box::new(exhaustive_natural_gen_var_10().filter(Natural::is_probable_prime))
+}
+
 pub fn exhaustive_natural_gen_var_9() -> It<Natural> {
     Box::new(exhaustive_naturals().filter(Natural::is_probable_prime))
 }

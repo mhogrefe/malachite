@@ -3179,6 +3179,19 @@ pub fn special_random_unsigned_gen_var_29<T: PrimitiveUnsigned>(config: &GenConf
     ))
 }
 
+pub fn special_random_unsigned_gen_var_32(config: &GenConfig) -> It<u128> {
+    Box::new(
+        striped_random_unsigned_inclusive_range(
+            EXAMPLE_SEED,
+            1 << 64,
+            u128::MAX,
+            config.get_or("mean_stripe_n", 64),
+            config.get_or("mean_stripe_d", 1),
+        )
+        .map(|x| x | 1),
+    )
+}
+
 pub fn special_random_unsigned_gen_var_31(config: &GenConfig) -> It<u128> {
     Box::new(
         striped_random_unsigned_inclusive_range(

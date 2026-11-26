@@ -39,60 +39,6 @@ fn carmichael_pseudoprimes(start: u64) -> impl Iterator<Item = u128> {
 }
 
 #[test]
-fn test_u128_prove_prime() {
-    for n in 0..100000u32 {
-        assert_eq!(u128_prove_prime(u128::from(n)), Some(n.is_prime()));
-    }
-    let test = |n: u128, out: Option<bool>| {
-        assert_eq!(u128_prove_prime(n), out);
-    };
-    // n < 2^64
-    test(2, Some(true));
-    // n >= 2^64, and ll_is_prime settles n
-    test(18446744073709551629, Some(true));
-    test(4533471823554859405148161, Some(true));
-    test(340282366920938463463374607431768211455, Some(false));
-    // - the n ± 1 tests leave n unsettled: the largest prime below 2^128
-    // - q | n - 1
-    // - q | n + 1
-    // - the cofactor is a probable prime
-    // - a base fails for some q in the Pocklington test, so the next base is tried
-    // - m.get_bit(i) and !m.get_bit(i) in chain_full
-    // - !k.get_bit(i) for the trailing bits in chain_mul, and later bits, some set
-    // - t even and t odd in v_to_u
-    // - D < 0
-    // - (D / n) != -1 for a = 3
-    // - B fails for some q in the Morrison test, so the next B is tried
-    // - a cofactor of n ∓ 1 is a base-2 strong probable prime
-    // - Fc / 2 is tested for feasibility, and the tests are infeasible
-    // - F1 and F2 are both even in the combined test
-    // - n needs a full primality proof
-    test(340282366920938463463374607431768211297, None);
-    // - the cofactor of n - 1 is proven prime
-    // - F1^2 overflows, so F1^2 >= n
-    test(618970019642690137449562111, Some(true));
-    // - a cofactor of n ∓ 1 is 1
-    // - F1^3 >= n: the Brillhart, Lehmer, Selfridge test
-    test(170141183460469231731687303715884105727, Some(true));
-    // - rem >= t and rem < t in Wide::sqrt_rem
-    // - all sign combinations in Wide::cmp_signed
-    // - Lenstra's search: i even and i odd, q < c1, s1 in range, d a square, a1 == 0, the chain
-    //   ending, and no divisor found
-    // - lcm(F1, F2)^3 > n: Lenstra's divisors in residue classes
-    test(72535549176877750482370559, Some(true));
-    // - i even && a0 == 0 in Lenstra's search
-    test(167329879230126280997564823109631, Some(true));
-    // - (F2 - 1)^3 > n: the improved n + 1 test
-    test(110985345351181940559839359037079551, Some(true));
-    // - lcm(F1, F2)^2 > n
-    test(15820279490848302930678856003092479, Some(true));
-    // Carmichael base-2 strong pseudoprimes above the Sorenson-Webster bound. Every base coprime to
-    // the first fails the Pocklington test.
-    test(3557725523452902604315321, None);
-    test(3560180573160531764146441, Some(false));
-}
-
-#[test]
 fn test_u128_is_prime_n_pm_1() {
     let test = |n: u128, out: Option<bool>| {
         assert_eq!(u128_is_prime_n_pm_1(n, bpsw), out);
@@ -131,9 +77,9 @@ fn test_u128_is_prime_morrison() {
 }
 
 #[test]
-fn u128_prove_prime_properties() {
+fn u128_is_prime_n_pm_1_properties() {
     unsigned_gen_var_37().test_properties(|n| {
-        assert_ne!(u128_prove_prime(n), Some(false));
+        assert!(n.is_prime());
         assert_ne!(u128_is_prime_n_pm_1(n, bpsw), Some(false));
         if let Some(p) = u128_is_prime_pseudosquare(n) {
             assert!(p);
@@ -141,11 +87,11 @@ fn u128_prove_prime_properties() {
     });
 
     for n in carmichael_pseudoprimes(1_400_000).take(100) {
-        assert_ne!(u128_prove_prime(n), Some(true));
+        assert!(!n.is_prime());
         assert_ne!(u128_is_prime_n_pm_1(n, bpsw), Some(true));
     }
     for n in carmichael_pseudoprimes(14_000_000).take(100) {
-        assert_ne!(u128_prove_prime(n), Some(true));
+        assert!(!n.is_prime());
         assert_ne!(u128_is_prime_n_pm_1(n, bpsw), Some(true));
     }
 }

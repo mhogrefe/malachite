@@ -7982,6 +7982,9 @@ const AZURITE_FLOAT_STAGES: &[(&str, &str)] = &[
     ),
 ];
 
+// The line limit for the Natural APR-CL demo on primes, whose lines are slow for Azurite to check.
+const AZURITE_APRCL_PRIMES_LIMIT: usize = 1000;
+
 // Float demos whose extreme inputs make each line slow on Malachite's side (about a tenth of a
 // second per line for the sums and differences, a fiftieth for the `_round` products and
 // quotients), checked on fewer lines.
@@ -11451,9 +11454,40 @@ fn test_against_azurite(build: bool) {
         "demo_u64_is_prime_primes",
         "demo_usize_is_prime",
         "demo_usize_is_prime_primes",
+        "demo_u128_is_prime",
+        "demo_u128_is_prime_primes",
     ] {
         check_demo_against_azurite(&oracle, "../malachite-base", demo, "az_nat_is_prime");
     }
+    for demo in [
+        "demo_natural_is_prime",
+        "demo_natural_is_prime_odd",
+        "demo_natural_is_prime_primes",
+    ] {
+        check_demo_against_azurite(&oracle, "../malachite-nz", demo, "az_nat_is_prime");
+    }
+    // The APR-CL test, which settles every input.
+    for demo in [
+        "demo_u128_is_prime_aprcl",
+        "demo_u128_is_prime_aprcl_primes",
+    ] {
+        check_demo_against_azurite(&oracle, "../malachite-base", demo, "az_nat_is_prime_proven");
+    }
+    check_demo_against_azurite(
+        &oracle,
+        "../malachite-nz",
+        "demo_natural_is_prime_aprcl",
+        "az_nat_is_prime_proven",
+    );
+    // Its primes run to about 1500 bits, which Azurite proves at about 0.3 s per line.
+    check_demo_against_azurite_with_limit(
+        &oracle,
+        "../malachite-nz",
+        "demo_natural_is_prime_aprcl_primes",
+        "az_nat_is_prime_proven",
+        &MODES,
+        AZURITE_APRCL_PRIMES_LIMIT,
+    );
     // The primitive unsigned is_probable_prime, checked against Azurite's proven primality test.
     for demo in [
         "demo_u8_is_probable_prime",
@@ -14542,15 +14576,29 @@ fn test_against_flint(build: bool) {
             "fmpz_is_strong_probabprime",
         );
     }
-    // The n - 1 and n + 1 primality tests: every input they settle is checked against
-    // fmpz_is_prime, which settles the rest with a full primality proof.
-    check_demo_against_flint(
-        &oracle,
-        "../malachite-base",
-        "demo_u128_prove_prime",
-        "fmpz_is_prime",
-    );
-    for demo_name in ["demo_natural_prove_prime", "demo_natural_prove_prime_odd"] {
+    // The primality tests, which prove primality with the n - 1 and n + 1 tests, falling back to
+    // APR-CL.
+    for demo_name in ["demo_u128_is_prime", "demo_u128_is_prime_primes"] {
+        check_demo_against_flint(&oracle, "../malachite-base", demo_name, "fmpz_is_prime");
+    }
+    for demo_name in [
+        "demo_natural_is_prime",
+        "demo_natural_is_prime_odd",
+        "demo_natural_is_prime_primes",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "fmpz_is_prime");
+    }
+    // The APR-CL test, which settles every input.
+    for demo_name in [
+        "demo_u128_is_prime_aprcl",
+        "demo_u128_is_prime_aprcl_primes",
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-base", demo_name, "fmpz_is_prime");
+    }
+    for demo_name in [
+        "demo_natural_is_prime_aprcl",
+        "demo_natural_is_prime_aprcl_primes",
+    ] {
         check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "fmpz_is_prime");
     }
     check_demo_against_flint_no_special(

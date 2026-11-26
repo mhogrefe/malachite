@@ -17,10 +17,10 @@ use crate::num::arithmetic::traits::{DivMod, OverflowingAddAssign, Parity, Power
 use crate::num::basic::integers::PrimitiveInt;
 use crate::num::conversion::traits::{ExactFrom, JoinHalves, RoundingFrom, SplitInHalf};
 use crate::num::factorization::is_prime::{
-    RedcContext128, ll_is_prime, redc_context_128, redc_mul_128, redc_pow_128, to_redc_128,
+    RedcContext128, redc_context_128, redc_mul_128, redc_pow_128, to_redc_128,
 };
 use crate::num::factorization::traits::{
-    IsPrime, IsProbablePrime, IsSquare, IsStrongProbablePrime, Primes, RemovePowerAssign,
+    IsProbablePrime, IsSquare, IsStrongProbablePrime, Primes, RemovePowerAssign,
 };
 use crate::num::logic::traits::{BitAccess, NotAssign, SignificantBits};
 use crate::num::modular::traits::{
@@ -795,13 +795,3 @@ crate_test_fn! {u128_is_prime_n_pm_1(n: u128, prove: fn(u128) -> Option<bool>) -
     }
     None
 }}
-
-// Proves an n prime or composite, or returns `None` if the available tests cannot settle it.
-#[doc(hidden)]
-pub fn u128_prove_prime(n: u128) -> Option<bool> {
-    if let Ok(n) = u64::try_from(n) {
-        Some(n.is_prime())
-    } else {
-        ll_is_prime(n).or_else(|| u128_is_prime_n_pm_1(n, u128_prove_prime))
-    }
-}

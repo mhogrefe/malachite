@@ -1908,6 +1908,15 @@ pub fn unsigned_gen_var_37() -> Generator<u128> {
     )
 }
 
+// All odd `u128`s that are at least $2^{64}$.
+pub fn unsigned_gen_var_38() -> Generator<u128> {
+    Generator::new(
+        &exhaustive_unsigned_gen_var_36,
+        &random_unsigned_gen_var_37,
+        &special_random_unsigned_gen_var_32,
+    )
+}
+
 // -- (PrimitiveUnsigned, PrimitiveSigned) --
 
 pub fn unsigned_signed_pair_gen<T: PrimitiveUnsigned, U: PrimitiveSigned>() -> Generator<(T, U)> {

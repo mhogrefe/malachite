@@ -813,6 +813,8 @@ pub mod natural {
     pub mod factorization {
         pub mod is_lucas_probable_prime;
         pub mod is_power;
+        pub mod is_prime;
+        pub mod is_prime_aprcl;
         pub mod is_prime_n_pm_1;
         pub mod is_probable_prime;
         pub mod is_square;

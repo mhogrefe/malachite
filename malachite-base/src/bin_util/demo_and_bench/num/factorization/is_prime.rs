@@ -6,15 +6,20 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::factorization::traits::IsPrime;
-use malachite_base::test_util::bench::bucketers::primitive_int_direct_bucketer;
+use malachite_base::num::factorization::traits::{IsPrime, IsProbablePrime};
+use malachite_base::test_util::bench::bucketers::{
+    primitive_int_direct_bucketer, unsigned_bit_bucketer,
+};
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
-use malachite_base::test_util::generators::{unsigned_gen, unsigned_gen_var_29};
+use malachite_base::test_util::generators::{
+    unsigned_gen, unsigned_gen_var_29, unsigned_gen_var_37,
+};
 use malachite_base::test_util::num::factorization::is_prime::is_prime_naive;
 use malachite_base::test_util::num::factorization::is_prime_flint_3_1_2::{
     u32_is_prime_flint_3_1_2, u64_is_prime_flint_3_1_2,
 };
+use malachite_base::test_util::num::factorization::is_prime_pseudosquare::*;
 use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
@@ -23,11 +28,13 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_u32_is_prime);
     register_demo!(runner, demo_u64_is_prime);
     register_demo!(runner, demo_usize_is_prime);
+    register_demo!(runner, demo_u128_is_prime);
     register_demo!(runner, demo_u8_is_prime_primes);
     register_demo!(runner, demo_u16_is_prime_primes);
     register_demo!(runner, demo_u32_is_prime_primes);
     register_demo!(runner, demo_u64_is_prime_primes);
     register_demo!(runner, demo_usize_is_prime_primes);
+    register_demo!(runner, demo_u128_is_prime_primes);
 
     register_bench!(runner, benchmark_u8_is_prime_algorithms);
     register_bench!(runner, benchmark_u16_is_prime_algorithms);
@@ -38,6 +45,7 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_u32_is_prime_algorithms_primes);
     register_bench!(runner, benchmark_u64_is_prime_algorithms_primes);
     register_bench!(runner, benchmark_usize_is_prime_algorithms);
+    register_bench!(runner, benchmark_u128_is_prime_algorithms);
 }
 
 fn demo_u8_is_prime(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -90,6 +98,16 @@ fn demo_usize_is_prime(gm: GenMode, config: &GenConfig, limit: usize) {
     }
 }
 
+fn demo_u128_is_prime(gm: GenMode, config: &GenConfig, limit: usize) {
+    for u in unsigned_gen::<u128>().get(gm, config).take(limit) {
+        if u.is_prime() {
+            println!("{u} is prime");
+        } else {
+            println!("{u} is not prime");
+        }
+    }
+}
+
 fn demo_u8_is_prime_primes(gm: GenMode, config: &GenConfig, limit: usize) {
     for u in unsigned_gen_var_29::<u8>().get(gm, config).take(limit) {
         if u.is_prime() {
@@ -132,6 +150,16 @@ fn demo_u64_is_prime_primes(gm: GenMode, config: &GenConfig, limit: usize) {
 
 fn demo_usize_is_prime_primes(gm: GenMode, config: &GenConfig, limit: usize) {
     for u in unsigned_gen_var_29::<usize>().get(gm, config).take(limit) {
+        if u.is_prime() {
+            println!("{u} is prime");
+        } else {
+            println!("{u} is not prime");
+        }
+    }
+}
+
+fn demo_u128_is_prime_primes(gm: GenMode, config: &GenConfig, limit: usize) {
+    for u in unsigned_gen_var_37().get(gm, config).take(limit) {
         if u.is_prime() {
             println!("{u} is prime");
         } else {
@@ -334,6 +362,34 @@ fn benchmark_u64_is_prime_algorithms_primes(
             }),
             ("FLINT 3.1.2", &mut |u| {
                 std::hint::black_box(u64_is_prime_flint_3_1_2(u));
+            }),
+        ],
+    );
+}
+
+fn benchmark_u128_is_prime_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "u128.is_prime()",
+        BenchmarkType::Algorithms,
+        unsigned_gen_var_37().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &unsigned_bit_bucketer(),
+        &mut [
+            ("default", &mut |u| {
+                std::hint::black_box(u.is_prime());
+            }),
+            ("pseudosquare", &mut |u| {
+                std::hint::black_box(u128_is_prime_pseudosquare(u));
+            }),
+            ("Baillie-PSW", &mut |u| {
+                std::hint::black_box(u.is_probable_prime());
             }),
         ],
     );

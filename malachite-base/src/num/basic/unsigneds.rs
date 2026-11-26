@@ -24,7 +24,7 @@ use crate::num::exponential::traits::{
     CheckedLogBasePowerOf2, FloorLogBase, FloorLogBase2, FloorLogBasePowerOf2,
 };
 use crate::num::factorization::primes::{PrimesIterator, PrimesLessThanIterator};
-use crate::num::factorization::traits::Primes;
+use crate::num::factorization::traits::{IsPrime, Primes};
 use crate::num::logic::traits::{BitBlockAccess, HammingDistance};
 use crate::num::modular::traits::{
     BalancedMod, BalancedModPowerOf2, ModAbsSquared, ModAbsSquaredAssign, ModAdd, ModAddAssign,
@@ -104,6 +104,7 @@ pub trait PrimitiveUnsigned:
     + GcdAssign<Self>
     + HammingDistance
     + IntegerMantissaAndExponent<Self, u64>
+    + IsPrime
     + Lcm<Self, Output = Self>
     + LcmAssign<Self>
     + LucasNumber

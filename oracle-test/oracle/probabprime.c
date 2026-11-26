@@ -8,15 +8,14 @@
     version 3 of the License, or (at your option) any later version. See
     <https://www.gnu.org/licenses/>.
 
-    Diffs `n is a probable prime` and `n is not a probable prime` lines against
-    fmpz_is_probabprime, and `n is a strong probable prime to base a` and `n is not a strong
-    probable prime to base a` lines against fmpz_is_strong_probabprime. The fmpz_is_prime mode diffs
-    `n is proven prime` and `n is proven composite` lines against fmpz_is_prime, and skips `n is not
-    settled` lines, which Malachite's n - 1 and n + 1 tests leave for a full primality proof. The
-    fmpz_divisor_in_residue_class_lenstra mode diffs `lenstra(n, r, s) = d` and `lenstra(n, r, s) =
-    none` lines against fmpz_divisor_in_residue_class_lenstra, which must find the same divisor d,
-    or none. All four modes are strict: a nonempty line of any other shape is an error, and so is an
-    input in which no line was checked.
+    Diffs `n is a probable prime` and `n is not a probable prime` lines against fmpz_is_probabprime,
+    and `n is a strong probable prime to base a` and `n is not a strong probable prime to base a`
+    lines against fmpz_is_strong_probabprime. The fmpz_is_prime mode diffs `n is prime` and `n is
+    not prime` lines, and the APR-CL demos' `n is proven prime` and `n is proven composite` lines,
+    against fmpz_is_prime. The fmpz_divisor_in_residue_class_lenstra mode diffs `lenstra(n, r, s) =
+    d` and `lenstra(n, r, s) = none` lines against fmpz_divisor_in_residue_class_lenstra, which must
+    find the same divisor d, or none. All four modes are strict: a nonempty line of any other shape
+    is an error, and so is an input in which no line was checked.
 */
 
 #include <string.h>
@@ -205,8 +204,6 @@ run_fmpz_is_strong_probabprime(const char * arg)
     return 0;
 }
 
-static long prove_prime_unsettled = 0;
-
 static int
 check_fmpz_is_prime_line(char * line, int line_number)
 {
@@ -216,16 +213,11 @@ check_fmpz_is_prime_line(char * line, int line_number)
         return 0;
     }
     int expected;
-    if (cut_suffix(line, " is not settled"))
-    {
-        prove_prime_unsettled += 1;
-        return 0;
-    }
-    else if (cut_suffix(line, " is proven composite"))
+    if (cut_suffix(line, " is not prime") || cut_suffix(line, " is proven composite"))
     {
         expected = 0;
     }
-    else if (cut_suffix(line, " is proven prime"))
+    else if (cut_suffix(line, " is prime") || cut_suffix(line, " is proven prime"))
     {
         expected = 1;
     }
@@ -263,7 +255,6 @@ int
 run_fmpz_is_prime(const char * arg)
 {
     probabprime_checked = 0;
-    prove_prime_unsettled = 0;
     int result = for_each_line(arg, check_fmpz_is_prime_line);
     if (result != 0)
     {
@@ -273,8 +264,7 @@ run_fmpz_is_prime(const char * arg)
     {
         return 1;
     }
-    flint_printf("fmpz_is_prime: %ld lines (%ld not settled, skipped)\n", probabprime_checked,
-        prove_prime_unsettled);
+    flint_printf("fmpz_is_prime: %ld lines\n", probabprime_checked);
     return 0;
 }
 

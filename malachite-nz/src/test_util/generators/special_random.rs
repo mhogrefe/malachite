@@ -5682,6 +5682,23 @@ pub fn special_random_natural_gen_var_8(config: &GenConfig) -> It<Natural> {
     )
 }
 
+pub fn special_random_natural_gen_var_10(config: &GenConfig) -> It<Natural> {
+    Box::new(
+        striped_random_naturals(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", 32),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_bits_n", 192),
+            config.get_or("mean_bits_d", 1),
+        )
+        .map(|n| n | Natural::power_of_2(128) | Natural::ONE),
+    )
+}
+
+pub fn special_random_natural_gen_var_11(config: &GenConfig) -> It<Natural> {
+    Box::new(special_random_natural_gen_var_10(config).filter(Natural::is_probable_prime))
+}
+
 pub fn special_random_natural_gen_var_9(config: &GenConfig) -> It<Natural> {
     Box::new(
         striped_random_naturals(

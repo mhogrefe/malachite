@@ -4942,6 +4942,21 @@ pub fn random_natural_gen_var_9(config: &GenConfig) -> It<Natural> {
     )
 }
 
+pub fn random_natural_gen_var_11(config: &GenConfig) -> It<Natural> {
+    Box::new(
+        random_naturals(
+            EXAMPLE_SEED,
+            config.get_or("mean_bits_n", 192),
+            config.get_or("mean_bits_d", 1),
+        )
+        .map(|n| n | Natural::power_of_2(128) | Natural::ONE),
+    )
+}
+
+pub fn random_natural_gen_var_12(config: &GenConfig) -> It<Natural> {
+    Box::new(random_natural_gen_var_11(config).filter(Natural::is_probable_prime))
+}
+
 pub fn random_natural_gen_var_10(config: &GenConfig) -> It<Natural> {
     Box::new(
         random_naturals(

@@ -3396,6 +3396,18 @@ pub fn random_unsigned_primitive_int_unsigned_triple_gen_var_1<
     })
 }
 
+pub fn random_unsigned_gen_var_37(_config: &GenConfig) -> It<u128> {
+    // A bit length from 65 to 128, then a random odd u128 of that length.
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| random_unsigned_inclusive_range(seed, 65u64, 128),
+            &random_primitive_ints::<u128>,
+        )
+        .map(|(bits, x)| (x >> (128 - bits)) | u128::power_of_2(bits - 1) | 1),
+    )
+}
+
 pub fn random_unsigned_gen_var_36(_config: &GenConfig) -> It<u128> {
     // A bit length from 65 to 128, then a random u128 of that length.
     Box::new(

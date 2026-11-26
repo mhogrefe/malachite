@@ -28,6 +28,11 @@ documented by git history.
   parameters. They are implemented for the primitive unsigned types; for those up to 64 bits wide,
   `is_probable_prime` decides primality exactly, as does the `u128` implementation below
   $3317044064679887385961981 \approx 2^{81.5}$.
+- `IsPrime` for `u128`, which proves primality: inputs below $3317044064679887385961981$ are
+  settled by strong probable prime tests, and larger ones by the $n - 1$ and $n + 1$ tests of
+  Pocklington, Morrison, and Brillhart, Lehmer, and Selfridge, with the APR-CL test as the
+  fallback, following FLINT 3.7's `fmpz_is_prime`. `PrimitiveUnsigned` now has `IsPrime` as a
+  supertrait.
 - `is_prime` on the primitive unsigned types follows FLINT 3.7's `n_is_prime`. It is about 1.5 to 3
   times faster than before on random inputs, and 2 to 5.5 times faster on primes.
 - The prime iterators of the `Primes` trait read the primes below $2^{20}$ from a precomputed
@@ -39,6 +44,9 @@ documented by git history.
 
 - `IsProbablePrime`, `IsStrongProbablePrime`, and `IsLucasProbablePrime` for `Natural`, following
   FLINT's `fmpz_is_probabprime`, `fmpz_is_strong_probabprime`, and `fmpz_is_probabprime_lucas`.
+- `IsPrime` for `Natural`, which proves primality following FLINT 3.7's `fmpz_is_prime`: trial
+  division, a base-2 strong probable prime test, and the $n - 1$ and $n + 1$ tests, with the
+  Jacobi-sum APR-CL test as the fallback at every size.
 - Dividing by a one-limb number is faster for short dividends: the reciprocal of the divisor is now
   computed with a table lookup and Newton iteration rather than a two-limb division. On aarch64,
   the remainder of a 2- to 8-limb `Natural` modulo a one-limb `Natural` is about 1.5 to 2 times

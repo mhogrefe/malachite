@@ -559,7 +559,7 @@ crate_test_fn! {limbs_div_mod_by_two_limb_normalized(
 // $M(n) = O(1)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
-fn limbs_div_mod_by_two_limb_normalized_preinverted(
+pub(crate) fn limbs_div_mod_by_two_limb_normalized_preinverted(
     qs: &mut [Limb],
     ns: &mut [Limb],
     ds: &[Limb],

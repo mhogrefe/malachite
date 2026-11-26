@@ -17,7 +17,6 @@ use crate::natural::arithmetic::add::limbs_slice_add_same_length_in_place_left;
 use crate::natural::arithmetic::shr::limbs_slice_shr_in_place;
 use crate::natural::arithmetic::sub::limbs_sub_same_length_in_place_left;
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
-use crate::natural::factorization::is_probable_prime::limbs_factor_trial;
 use crate::natural::modular::mod_op::limbs_mod_limb;
 use crate::natural::modular::mod_pow::LimbsRedc;
 use crate::natural::{LIMB_HIGH_BIT, Natural};
@@ -33,7 +32,6 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::comparison::traits::OrdProduct;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
-use malachite_base::num::factorization::is_prime_n_pm_1::u128_prove_prime;
 use malachite_base::num::factorization::traits::{
     IsProbablePrime, IsSquare, IsStrongProbablePrime, Primes, RemovePowerAssign,
 };
@@ -186,7 +184,7 @@ crate_test_fn! {natural_is_prime_pocklington(
 }}
 
 // x - y mod m, for x, y < m, all with the same number of limbs.
-fn limbs_sub_mod(xs: &[Limb], ys: &[Limb], ms: &[Limb]) -> Vec<Limb> {
+pub(crate) fn limbs_sub_mod(xs: &[Limb], ys: &[Limb], ms: &[Limb]) -> Vec<Limb> {
     let mut out = xs.to_vec();
     if limbs_sub_same_length_in_place_left(&mut out, ys) {
         limbs_slice_add_same_length_in_place_left(&mut out, ms);
@@ -195,7 +193,7 @@ fn limbs_sub_mod(xs: &[Limb], ys: &[Limb], ms: &[Limb]) -> Vec<Limb> {
 }
 
 // x + y mod m, for x, y < m, all with the same number of limbs.
-fn limbs_add_mod(xs: &[Limb], ys: &[Limb], ms: &[Limb]) -> Vec<Limb> {
+pub(crate) fn limbs_add_mod(xs: &[Limb], ys: &[Limb], ms: &[Limb]) -> Vec<Limb> {
     let mut out = xs.to_vec();
     if limbs_slice_add_same_length_in_place_left(&mut out, ys)
         || limbs_cmp_same_length(&out, ms) != Less
@@ -670,27 +668,4 @@ crate_test_fn! {natural_is_prime_n_pm_1(
         return Some(!composite);
     }
     None
-}}
-
-// Proves an n prime or composite, or returns `None` if the available tests cannot settle it.
-//
-// This is fmpz_is_prime from fmpz/is_prime.c, FLINT 3.7.0-dev, except that it returns `None` where
-// FLINT calls _fmpz_is_prime_proof.
-crate_test_fn! {natural_prove_prime(n: &Natural) -> Option<bool> {
-    if let Ok(x) = u128::try_from(n) {
-        return u128_prove_prime(x);
-    }
-    let xs = n.as_limbs_asc();
-    if xs[0].even() {
-        return Some(false);
-    }
-    let trial_primes = usize::exact_from(n.significant_bits() + 64);
-    // Trial division, a square test, and a single base-2 test rule out most composites.
-    if limbs_factor_trial(xs, 1, trial_primes) != 0
-        || n.is_square()
-        || !n.is_strong_probable_prime(&Natural::TWO)
-    {
-        return Some(false);
-    }
-    natural_is_prime_n_pm_1(n, natural_prove_prime)
 }}

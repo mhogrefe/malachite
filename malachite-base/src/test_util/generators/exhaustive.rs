@@ -2082,6 +2082,13 @@ pub fn exhaustive_unsigned_primitive_int_unsigned_triple_gen_var_3<
     ))
 }
 
+pub fn exhaustive_unsigned_gen_var_36() -> It<u128> {
+    Box::new(
+        primitive_int_increasing_inclusive_range(u128::power_of_2(64), u128::MAX)
+            .filter(|x: &u128| x.odd()),
+    )
+}
+
 pub fn exhaustive_unsigned_gen_var_35() -> It<u128> {
     Box::new(
         primitive_int_increasing_inclusive_range(1 << 64, u128::MAX)

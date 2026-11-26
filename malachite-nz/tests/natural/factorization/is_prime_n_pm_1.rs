@@ -11,7 +11,7 @@ use malachite_base::num::arithmetic::traits::{CeilingRoot, FloorSqrt};
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::factorization::is_prime_n_pm_1::{
     u128_divisor_in_residue_class_lenstra, u128_is_prime_morrison, u128_is_prime_n_pm_1,
-    u128_is_prime_pocklington, u128_prove_prime,
+    u128_is_prime_pocklington,
 };
 use malachite_base::num::factorization::traits::{
     IsPrime, IsProbablePrime, IsStrongProbablePrime, Primes,
@@ -56,59 +56,6 @@ fn carmichael_pseudoprimes(start: u64) -> impl Iterator<Item = Natural> {
             None
         }
     })
-}
-
-#[test]
-fn test_natural_prove_prime() {
-    let test = |s, out: Option<bool>| {
-        assert_eq!(natural_prove_prime(&Natural::from_str(s).unwrap()), out);
-    };
-    // n < 2^128
-    test("0", Some(false));
-    test("97", Some(true));
-    // the largest prime below 2^128: neither n - 1 nor n + 1 has a large enough factored part
-    test("340282366920938463463374607431768211297", None);
-    // n even
-    test("340282366920938463463374607431768211458", Some(false));
-    // trial division finds a factor
-    test("1235679190629732963253495290965596683049", Some(false));
-    // n is not a base-2 strong probable prime
-    test("2512243197273404973128543252749318682333", Some(false));
-    // - 2^128 + 1, a base-2 strong pseudoprime: the n ± 1 tests
-    // - q | n - 1
-    // - q | n + 1
-    // - a cofactor of n ∓ 1 is 1
-    // - a base fails for some q in the Pocklington test, so the next base is tried
-    // - a^(n - 1) != 1 mod n in the Pocklington test
-    test("340282366920938463463374607431768211457", Some(false));
-    // 2^128 + 51
-    test("340282366920938463463374607431768211507", Some(true));
-    // - Lenstra's search: i even and i odd, q < c1, s1 in range, d a square, a1 == 0, i even && a0
-    //   == 0, the chain ending, and no divisor found
-    // - F1 and F2 are both even in the combined test
-    // - lcm(F1, F2)^3 > n: Lenstra's divisors in residue classes
-    test(
-        "711077930961772430278273020597743461199094952693191409663",
-        Some(true),
-    );
-    // (F2 - 1)^3 > n: the improved n + 1 test
-    test(
-        "36202327674806051080147073122864486363860901248239399365855455404627",
-        Some(true),
-    );
-    // a cofactor of n ∓ 1 needs a full primality proof
-    test(
-        "2561057508037765751645002084668727897769761021341326081261567",
-        Some(true),
-    );
-    // 2^521 - 1
-    test(
-        "686479766013060971498190079908139321726943530014330540939446345918554318339765605212255964\
-        0661454554977296311391480858037121987999716643812574028291115057151",
-        Some(true),
-    );
-    // a base-2 strong pseudoprime
-    test("1971171711155257004609808164365888160584741", None);
 }
 
 #[test]
@@ -209,9 +156,9 @@ fn test_natural_divisor_in_residue_class_lenstra() {
 }
 
 #[test]
-fn natural_prove_prime_properties() {
+fn natural_is_prime_n_pm_1_properties() {
     natural_gen_var_10().test_properties(|n| {
-        assert_ne!(natural_prove_prime(&n), Some(false));
+        assert!(n.is_prime());
     });
 
     // The Natural n ± 1 tests agree with the u128 ones on two-limb inputs.
@@ -221,11 +168,11 @@ fn natural_prove_prime_properties() {
             natural_is_prime_n_pm_1(&n, natural_u128_bpsw),
             u128_is_prime_n_pm_1(x, u128_bpsw)
         );
-        assert_eq!(natural_prove_prime(&n), u128_prove_prime(x));
+        assert_eq!(n.is_prime(), x.is_prime());
     });
 
     for n in carmichael_pseudoprimes(10_000_000_000_000).take(20) {
-        assert_ne!(natural_prove_prime(&n), Some(true));
+        assert!(!n.is_prime());
         assert_ne!(natural_is_prime_n_pm_1(&n, natural_bpsw), Some(true));
     }
 }

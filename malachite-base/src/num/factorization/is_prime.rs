@@ -33,6 +33,8 @@ use crate::num::arithmetic::traits::{
 use crate::num::basic::integers::{PrimitiveInt, USIZE_IS_U32};
 use crate::num::conversion::half::{wide_join_halves, wide_split_in_half, wide_upper_half};
 use crate::num::conversion::traits::{ExactFrom, JoinHalves, SplitInHalf, WrappingFrom};
+use crate::num::factorization::is_prime_aprcl::u128_is_prime_aprcl;
+use crate::num::factorization::is_prime_n_pm_1::u128_is_prime_n_pm_1;
 use crate::num::factorization::is_prime_tables::{
     BASE_2_PSEUDOPRIMES, BASE_2_PSEUDOPRIMES_HASH_KEYS, MOD_30_PRIME_LOOKUP, ODD_PRIME_LOOKUP,
     WITNESS_BASES,
@@ -1537,5 +1539,53 @@ impl IsPrime for usize {
         } else {
             u64::wrapping_from(*self).is_prime()
         }
+    }
+}
+
+impl IsPrime for u128 {
+    /// Tests whether a `u128` is prime.
+    ///
+    /// Inputs less than $2^{64}$ are tested as `u64`s. A larger input is checked for divisibility
+    /// by the odd primes up to 137, or up to 313 above $357913941 \cdot 2^{64}$, and must pass a
+    /// strong probable prime test to base 2. Below $3317044064679887385961981 \approx 2^{81.5}$,
+    /// strong probable prime tests to the bases 2, 3, 5, …, 41 then prove primality, by a result
+    /// of Sorenson and Webster. A larger input is proven prime or composite by the $n - 1$ and $n +
+    /// 1$ tests of Pocklington, Morrison, and Brillhart, Lehmer, and Selfridge, which use the
+    /// primes found by trial division of $n - 1$ and $n + 1$, together with Lenstra's search for
+    /// divisors in residue classes. If those tests cannot settle it, the APR-CL test with Jacobi
+    /// sums, of Adleman, Pomerance, Rumely, Cohen, and Lenstra, does.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`: each test
+    /// is a bounded number of modular powerings, each costing a bounded number of modular
+    /// multiplications per bit.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::factorization::traits::IsPrime;
+    ///
+    /// assert_eq!(5u128.is_prime(), true);
+    /// assert_eq!(6u128.is_prime(), false);
+    /// // 2^127 - 1
+    /// assert_eq!(170141183460469231731687303715884105727u128.is_prime(), true);
+    /// // the largest prime less than 2^128
+    /// assert_eq!(340282366920938463463374607431768211297u128.is_prime(), true);
+    /// // a strong pseudoprime to each of the first 13 prime bases
+    /// assert_eq!(3317044064679887385961981u128.is_prime(), false);
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_is_prime` from `fmpz.h`, FLINT 3.7.0-dev, for two-limb inputs.
+    fn is_prime(&self) -> bool {
+        let n = *self;
+        if let Ok(n) = u64::try_from(n) {
+            return n.is_prime();
+        }
+        ll_is_prime(n)
+            .or_else(|| u128_is_prime_n_pm_1(n, |m| Some(m.is_prime())))
+            .unwrap_or_else(|| u128_is_prime_aprcl(n))
     }
 }

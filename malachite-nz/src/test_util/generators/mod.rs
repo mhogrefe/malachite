@@ -2564,6 +2564,24 @@ pub fn natural_gen_var_9() -> Generator<Natural> {
     Generator::new_no_special(&exhaustive_natural_gen, &random_natural_gen_var_9)
 }
 
+// All odd `Natural`s that are at least $2^{128}$.
+pub fn natural_gen_var_11() -> Generator<Natural> {
+    Generator::new(
+        &exhaustive_natural_gen_var_10,
+        &random_natural_gen_var_11,
+        &special_random_natural_gen_var_10,
+    )
+}
+
+// All `Natural`s that are probable primes and at least $2^{128}$.
+pub fn natural_gen_var_12() -> Generator<Natural> {
+    Generator::new(
+        &exhaustive_natural_gen_var_11,
+        &random_natural_gen_var_12,
+        &special_random_natural_gen_var_11,
+    )
+}
+
 // All `Natural`s that are probable primes.
 pub fn natural_gen_var_10() -> Generator<Natural> {
     Generator::new(
