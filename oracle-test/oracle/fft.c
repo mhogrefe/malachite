@@ -1455,28 +1455,9 @@ check_set_fft(const char * s, sb_t * b)
     ulong ** p = residue_pointers(&f);
     fmpz * xs = _fmpz_vec_init(FLINT_MAX(f.len, 1));
     _fmpz_vec_set_fft(xs, f.len, (const nn_ptr *) p, limbs, sign);
-    /* FLINT 3.6.0 tests only `coeffs_f[i][limbs - 1] > halflimb`, which reads a residue whose top
-       limb is `halflimb` and whose lower limbs are not all zero, the representation of a negative
-       coefficient whose absolute value is within 2^(N - FLINT_BITS) of 2^(N - 1), as positive.
-       FLINT fixed this after 3.6.0, in commit 7ad753d51c, and Malachite tests as the fix does;
-       subtract p = 2^N + 1 from what FLINT computed for those residues. */
-    if (sign)
-    {
-        for (slong i = 0; i < f.len; i++)
-        {
-            if (p[i][limbs] == 0 && p[i][limbs - 1] == UWORD(1) << (FLINT_BITS - 1)
-                && !flint_mpn_zero_p(p[i], limbs - 1))
-            {
-                fmpz_t modulus;
-                fmpz_init(modulus);
-                fmpz_one(modulus);
-                fmpz_mul_2exp(modulus, modulus, limbs * FLINT_BITS);
-                fmpz_add_ui(modulus, modulus, 1);
-                fmpz_sub(xs + i, xs + i, modulus);
-                fmpz_clear(modulus);
-            }
-        }
-    }
+    /* FLINT 3.6.0 tested only `coeffs_f[i][limbs - 1] > halflimb`, misreading some negative
+       coefficients as positive, and this wrapper used to correct for that; FLINT 3.7 has the fix
+       (commit 7ad753d51c), which Malachite follows, so FLINT's output is compared as it is. */
     sb_fmpz_vec(b, xs, f.len);
     _fmpz_vec_clear(xs, FLINT_MAX(f.len, 1));
     residue_pointers_clear(p, f.len);

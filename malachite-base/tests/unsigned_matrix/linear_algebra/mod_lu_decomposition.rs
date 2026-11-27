@@ -193,10 +193,10 @@ fn test_mod_lu_decomposition_large() {
     let mut seed = 0;
     for (h, w, r, m) in [
         (40, 40, 40, 2),
-        (70, 70, 70, 2),
-        (70, 70, 30, 2),
-        (70, 70, 10, 2),
-        (70, 70, 50, 2),
+        (100, 100, 100, 2),
+        (100, 100, 40, 2),
+        (100, 100, 10, 2),
+        (100, 100, 70, 2),
         (30, 70, 30, 2),
         (100, 80, 50, 1099511627791),
         (40, 30, 30, 1099511627791),
@@ -235,6 +235,30 @@ fn test_mod_lu_decomposition_large() {
         );
         let (p, l, u) = (&a).mod_lu_decomposition(251);
         verify_lu(&a, 251, &p, &l, &u);
+    }
+    // - two words, accumulated in a `u64` for narrow types
+    // - three words, accumulated in a `u128` for narrow types
+    // - recursive, for narrow types
+    let narrow = |a: &UnsignedMatrix<u64>| {
+        UnsignedMatrix::<u32>::from_owned_elements(
+            a.height(),
+            a.width(),
+            a.elements_ref()
+                .iter()
+                .map(|&x| u32::exact_from(x))
+                .collect(),
+        )
+    };
+    for (n, m) in [(60, 1048573), (60, 4294967291), (100, 536870909)] {
+        let b = pseudorandom_matrix(n, n, m, &mut seed);
+        let a = narrow(&b);
+        let m_32 = u32::exact_from(m);
+        let (p, l, u) = (&a).mod_lu_decomposition(m_32);
+        verify_lu(&a, m_32, &p, &l, &u);
+        let (p_64, l_64, u_64) = (&b).mod_lu_decomposition(m);
+        assert_eq!(p, p_64);
+        assert_eq!(l, narrow(&l_64));
+        assert_eq!(u, narrow(&u_64));
     }
 }
 

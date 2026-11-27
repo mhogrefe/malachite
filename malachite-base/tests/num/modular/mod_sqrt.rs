@@ -33,26 +33,25 @@ fn test_mod_sqrt() {
     // - m >= 600 and even, or a perfect square
     test(4u32, 600, None);
     test(4u64, 841, None);
-    // - composite m = 3 mod 4 with Jacobi symbol 1: a value that is not a root; matches FLINT
-    test(3u16, 611, Some(183));
+    // - composite m = 3 mod 4 with Jacobi symbol 1: the candidate 183 is not a root
+    test(3u16, 611, None);
     // - composite m = 1 mod 8: the Tonelli-Shanks iteration cap; matches FLINT
     test(2u32, 609, None);
-    // - prime m = 1 mod 8: Tonelli-Shanks
-    test(12909u32, 65537, Some(50618));
-    test(12909u64, 65537, Some(50618));
-    test(12909u128, 65537, Some(50618));
-    // The largest moduli, where FLINT's `n_sqrtmod` computes `(m + 1) / 4` and `(m + 3) / 8` with
-    // wrapping arithmetic. These exponents are instead computed exactly here, matching what FLINT's
-    // `fmpz_sqrtmod` computes for the same moduli. All these moduli are composite, so the results
-    // do not mean much; the tests pin the behavior down.
+    // - prime m = 1 mod 8: Tonelli-Shanks, finding 50618, larger than m / 2
+    test(12909u32, 65537, Some(14919));
+    test(12909u64, 65537, Some(14919));
+    test(12909u128, 65537, Some(14919));
+    // The largest moduli, where FLINT 3.6's `n_sqrtmod` computes `(m + 1) / 4` and `(m + 3) / 8`
+    // with wrapping arithmetic. These exponents are instead computed exactly here. All these moduli
+    // are composite, and the candidates are not roots.
     // - m = u32::MAX = 3 mod 4
-    test(2u32, u32::MAX, Some(1));
+    test(2u32, u32::MAX, None);
     // - m = u64::MAX = 3 mod 4
-    test(2u64, u64::MAX, Some(1));
+    test(2u64, u64::MAX, None);
     // - m = 2 ^ 32 - 3 = 5 mod 8
-    test(3u32, u32::MAX - 2, Some(3858954816));
+    test(3u32, u32::MAX - 2, None);
     // - m = 2 ^ 64 - 3 = 5 mod 8
-    test(3u64, u64::MAX - 2, Some(7342525817502822421));
+    test(3u64, u64::MAX - 2, None);
 }
 
 fn mod_sqrt_fail_helper<T: ModSqrt<T, Output = T> + PrimitiveUnsigned>() {
@@ -70,21 +69,18 @@ fn mod_sqrt_properties_helper<T: ModSqrt<T, Output = T> + PrimitiveUnsigned>() {
     unsigned_pair_gen_var_16::<T>().test_properties(|(x, m)| {
         let result = x.mod_sqrt(m);
         if let Some(r) = result {
-            assert!(r < m);
+            assert!(r <= m >> 1);
+            assert_eq!(r.mod_mul(r, m), x);
         }
         if x <= T::ONE {
             assert_eq!(result, Some(x));
         }
         // For odd moduli the sub-600 search is exhaustive.
-        if m.odd() && m < T::saturating_from(600u16) {
-            if let Some(r) = result {
-                assert_eq!(r.mod_mul(r, m), x);
-            } else {
-                let mut t = T::ZERO;
-                while t < m {
-                    assert_ne!(t.mod_mul(t, m), x);
-                    t += T::ONE;
-                }
+        if m.odd() && m < T::saturating_from(600u16) && result.is_none() {
+            let mut t = T::ZERO;
+            while t < m {
+                assert_ne!(t.mod_mul(t, m), x);
+                t += T::ONE;
             }
         }
     });

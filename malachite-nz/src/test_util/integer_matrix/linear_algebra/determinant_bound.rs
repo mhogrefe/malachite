@@ -40,21 +40,29 @@ pub fn integer_matrix_hadamard_bound_naive(a: &IntegerMatrix, include_zero_norms
     row_product.min(column_product).ceiling_sqrt()
 }
 
-/// The bounds of `IntegerMatrix::solve_bounds`, computed with the exact Hadamard bound from
-/// `integer_matrix_hadamard_bound_naive` in place of the determinant bound: the bound times the
-/// ceiling of the largest Euclidean norm of a column of `b`, and the bound.
+/// The bounds of `IntegerMatrix::solve_bounds`, computed exactly: the exact Hadamard bound from
+/// `integer_matrix_hadamard_bound_naive` for the denominator, and for the numerators the ceiling of
+/// the square root of the product of the squared Euclidean norms of the columns of `a` times the
+/// largest squared Euclidean norm of a column of `b`. Both are 1 if `a` has no elements.
 pub fn integer_matrix_solve_bounds_naive(
     a: &IntegerMatrix,
     b: &IntegerMatrix,
 ) -> (Natural, Natural) {
+    if a.height() == 0 {
+        return (Natural::ONE, Natural::ONE);
+    }
     let d = integer_matrix_hadamard_bound_naive(a, true);
+    let column_norm = |m: &IntegerMatrix, j| {
+        m.column_iter(j)
+            .map(|x| x.unsigned_abs_ref().square())
+            .sum::<Natural>()
+    };
+    let column_product = (0..a.width())
+        .map(|j| column_norm(a, j))
+        .fold(Natural::ONE, |p, n| p * n);
     let max = (0..b.width())
-        .map(|j| {
-            b.column_iter(j)
-                .map(|x| x.unsigned_abs_ref().square())
-                .sum::<Natural>()
-        })
+        .map(|j| column_norm(b, j))
         .max()
         .unwrap_or(Natural::ZERO);
-    (&d * max.ceiling_sqrt(), d)
+    ((column_product * max).ceiling_sqrt(), d)
 }

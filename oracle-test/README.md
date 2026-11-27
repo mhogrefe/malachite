@@ -16,20 +16,23 @@ Use it when no good Rust oracle exists — in particular for FLINT-specific func
 ## Prerequisites
 
 - A **built FLINT source tree**. The FLINT source is deliberately not part of this repository.
-  The default location is `../../flint-3.6.0` relative to this directory (that is,
-  `~/rust/flint-3.6.0` when the Malachite repository is at `~/rust/malachite`); override it with
-  the `MALACHITE_FLINT_DIR` environment variable. To build one:
+  The default location is `../../flint-3.7.0-dev` relative to this directory (that is,
+  `~/rust/flint-3.7.0-dev` when the Malachite repository is at `~/rust/malachite`); override it
+  with the `MALACHITE_FLINT_DIR` environment variable. To build one:
 
   ```
-  cd ~/rust/flint-3.6.0
+  cd ~/rust/flint-3.7.0-dev
   ./bootstrap.sh
   ./configure --with-gmp=/opt/homebrew --with-mpfr=/opt/homebrew
   make -j 4
+  make build/include
   ```
 
-  Do not use a development snapshot: a 3.3.0-dev snapshot was found to have a memory-corruption
-  bug in its `fmpz` mpz allocator (flaky segfaults after a few thousand promotions), which the
-  `sqrtmod_stress` oracle mode reproduces.
+  This is a development snapshot, because the elliptic curve primality proving that the `ecpp_*`
+  modes check is not in a FLINT release yet. Snapshots need care: a 3.3.0-dev snapshot was found to
+  have a memory-corruption bug in its `fmpz` mpz allocator (flaky segfaults after a few thousand
+  promotions), which the `sqrtmod_stress` oracle mode reproduces, so run the full FLINT oracle,
+  including that mode, after moving to a new snapshot.
 
 - For the Azurite oracle, an **Azurite checkout** that has fetched its Mathlib cache
   (`lake exe cache get`) and been built once (`lake build`), with the Lean toolchain (`elan`)
@@ -71,6 +74,11 @@ cargo run --release -- plan azurite
 print the ordered checks of both backends, or of one, without building or running anything. Set
 `MALACHITE_ORACLE_FILTER` to run (or print) only the checks whose description, as printed, contains
 it: `MALACHITE_ORACLE_FILTER=ln_gamma cargo run --release -- azurite`.
+
+A run normally stops at the first failure. Set `MALACHITE_ORACLE_KEEP_GOING` to run every check
+anyway, printing each failure as it happens and all of them at the end; the output of each failed
+demo is kept in `target/oracle-out/failed-<n>.txt`. This is meant for moving to a new FLINT
+snapshot, where several modes may change at once.
 
 ## Unit rows
 
@@ -134,7 +142,7 @@ still check them, and the run says how many it left out.
 | `fmpq_poly_add` | `fmpq_poly_add` | `demo_rational_polynomial_add` and its `_val_ref`, `_ref_val`, `_ref_ref`, `_assign`, and `_assign_ref` versions (malachite-q), plus unit rows; identically written operands take FLINT's aliased path |
 | `fmpq_poly_sub` | `fmpq_poly_sub` | the same six `demo_rational_polynomial_sub` demos (malachite-q), plus unit rows |
 | `fmpz_poly_add_series` | `fmpz_poly_add_series` | `demo_integer_polynomial_add_truncated`, `demo_natural_polynomial_add_truncated`, and their `_val_ref`, `_ref_val`, `_ref_ref`, `_assign`, and `_assign_ref` versions (malachite-nz), plus unit rows |
-| `_fmpz_poly_mul`, `_fmpz_poly_mullow`, `_fmpz_poly_mulhigh`, `_fmpz_poly_mulmid`, `_fmpz_poly_sqr`, `_fmpz_poly_sqrlow`, and their `_classical`, `_karatsuba`, `_KS`, and `_SS` versions, and `_fmpz_poly_mul_mid_default_mpn_ctx` | the FLINT function of the same name (`_sqr_SS` and `_sqrlow_SS` call `_fmpz_poly_mul_SS` and `_fmpz_poly_mullow_SS` with the same operand twice) | the slice-level `IntegerPolynomial` multiplication demos (malachite-nz), plus unit rows; see `oracle/fmpz_poly_mul_slices.c`. Where FLINT's Schönhage–Strassen result differs from its classical product (FLINT 3.6.0's `_fmpz_vec_set_fft` can get a sign wrong), the classical product is compared |
+| `_fmpz_poly_mul`, `_fmpz_poly_mullow`, `_fmpz_poly_mulhigh`, `_fmpz_poly_mulmid`, `_fmpz_poly_sqr`, `_fmpz_poly_sqrlow`, and their `_classical`, `_karatsuba`, `_KS`, and `_SS` versions, and `_fmpz_poly_mul_mid_default_mpn_ctx` | the FLINT function of the same name (`_sqr_SS` and `_sqrlow_SS` call `_fmpz_poly_mul_SS` and `_fmpz_poly_mullow_SS` with the same operand twice), except the `_karatsuba` modes: FLINT 3.7 has no Karatsuba versions, so they call the general function (`_mulhigh_karatsuba_n` calls `_fmpz_poly_mulhigh_classical` from n − 1 on) | the slice-level `IntegerPolynomial` multiplication demos (malachite-nz), plus unit rows; see `oracle/fmpz_poly_mul_slices.c`. Where FLINT's Schönhage–Strassen result differs from its classical product (FLINT 3.6.0's `_fmpz_vec_set_fft` can get a sign wrong), the classical product is compared |
 | `fmpz_poly_mulmid` | `fmpz_poly_mulmid`, with bounds past the end of the product clamped to it; where FLINT's result differs from `fmpz_poly_mulmid_classical`, the classical one is compared | `demo_integer_polynomial_mul_middle`, `demo_natural_polynomial_mul_middle`, and their `_val_ref`, `_ref_val`, `_ref_ref`, `_assign`, and `_assign_ref` versions (malachite-nz), plus unit rows |
 | `fmpz_poly_inv_series` | `fmpz_poly_inv_series`, `_basecase`, and `_newton`, where the constant coefficient is 1 or -1; `None` must be exactly where it is not (FLINT does not check), and length 0 must give 0 | `demo_integer_polynomial_inverse_truncated`, `_ref`, `_unit`, and `_unit_ref` (malachite-nz), plus unit rows |
 | `fmpz_poly_div_series` | `fmpz_poly_div_series`, `_basecase`, and `_divconquer`; since FLINT throws on a non-integral quotient, `fmpq_poly_div_series` first decides whether there is one, and `None` must be exactly where there is not or the divisor's constant coefficient is 0; length 0 must give 0 | `demo_integer_polynomial_div_truncated`, its `_val_ref`, `_ref_val`, `_ref_ref`, `_assign`, and `_assign_ref` versions, and `demo_integer_polynomial_checked_div_truncated`, `_ref_ref`, and `_exact` (malachite-nz), plus unit rows |

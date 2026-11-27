@@ -17,12 +17,19 @@
     mul (`mul_to_out_*`, `mul_greater_to_out`)           xs, ys          -> _fmpz_poly_mul*
     mullow (`mul_truncated_to_out*`)                     xs, ys          -> _fmpz_poly_mullow*
     mulhigh (`mul_high_to_out*`)                         xs, ys, start   -> _fmpz_poly_mulhigh*
-    mulhigh_n (`mul_high_to_out_karatsuba_n`)            xs, ys          -> _fmpz_poly_mulhigh_karatsuba_n
+    mulhigh_n (`mul_high_to_out_karatsuba_n`)            xs, ys          -> _fmpz_poly_mulhigh_classical
     mulmid (`mul_middle_to_out*`)                        xs, ys, lo, hi  -> _fmpz_poly_mulmid*
     fft (`mul_middle_to_out_fft`)                        xs, ys, lo, hi  -> ..._mul_mid_default_mpn_ctx
     SS (`*_schonhage_strassen`)                          as above        -> _fmpz_poly_*_SS
     sqr (`square_to_out*`)                               xs              -> _fmpz_poly_sqr*
     sqrlow (`square_truncated_to_out*`)                  xs              -> _fmpz_poly_sqrlow*
+
+    FLINT 3.7 has no Karatsuba versions of these functions any more, so the Karatsuba modes, which
+    keep the names of the FLINT 3.6 functions they were written against, check Malachite's Karatsuba
+    algorithms against FLINT's general functions: _fmpz_poly_mul, _fmpz_poly_mullow, _fmpz_poly_sqr,
+    and _fmpz_poly_sqrlow, and, for mulhigh_n, _fmpz_poly_mulhigh_classical from n - 1 on, which
+    zeroes the coefficients below as the Karatsuba algorithm did. A product is unique, so the checks
+    are as exact as before.
 
     For the truncated functions, the length is that of the output. Each mode accepts the lines
     of the Malachite functions that correspond to its FLINT function: the classical, Karatsuba, and
@@ -314,7 +321,7 @@ check_line(char * line, int line_number)
                 }
                 else if (v == VARIANT_KARATSUBA)
                 {
-                    _fmpz_poly_mul_karatsuba(out, xs, len1, y, len2);
+                    _fmpz_poly_mul(out, xs, len1, y, len2);
                 }
                 else if (len1 >= len2)
                 {
@@ -340,11 +347,11 @@ check_line(char * line, int line_number)
                 }
                 else if (v == VARIANT_KARATSUBA)
                 {
-                    _fmpz_poly_mullow_karatsuba(out, xs, len1, y, len2, out_len);
+                    _fmpz_poly_mullow(out, xs, len1, y, len2, out_len);
                 }
                 else if (v == VARIANT_KARATSUBA_N)
                 {
-                    _fmpz_poly_mullow_karatsuba_n(out, xs, y, out_len);
+                    _fmpz_poly_mullow(out, xs, out_len, y, out_len, out_len);
                 }
                 else
                 {
@@ -358,7 +365,7 @@ check_line(char * line, int line_number)
                 }
                 else if (v == VARIANT_KARATSUBA_N)
                 {
-                    _fmpz_poly_mulhigh_karatsuba_n(out, xs, y, len1);
+                    _fmpz_poly_mulhigh_classical(out, xs, len1, y, len1, len1 - 1);
                 }
                 else
                 {
@@ -409,7 +416,7 @@ check_line(char * line, int line_number)
                 }
                 else if (v == VARIANT_KARATSUBA)
                 {
-                    _fmpz_poly_sqr_karatsuba(out, xs, len1);
+                    _fmpz_poly_sqr(out, xs, len1);
                 }
                 else
                 {
@@ -431,11 +438,11 @@ check_line(char * line, int line_number)
                 }
                 else if (v == VARIANT_KARATSUBA)
                 {
-                    _fmpz_poly_sqrlow_karatsuba(out, xs, len1, out_len);
+                    _fmpz_poly_sqrlow(out, xs, len1, out_len);
                 }
                 else if (v == VARIANT_KARATSUBA_N)
                 {
-                    _fmpz_poly_sqrlow_karatsuba_n(out, xs, out_len);
+                    _fmpz_poly_sqrlow(out, xs, out_len, out_len);
                 }
                 else
                 {
@@ -446,8 +453,9 @@ check_line(char * line, int line_number)
         /* FLINT 3.6.0's Schönhage–Strassen functions, which its dispatchers call for some
            inputs of medium size, can get the sign of a coefficient wrong: `_fmpz_vec_set_fft`
            reads a negative coefficient whose absolute value is just below 2^(N - 1) as positive.
-           Malachite's port fixes that, so where FLINT's result differs from its classical
-           product, the classical product is compared instead. */
+           Malachite's port fixes that, and so does FLINT 3.7, so where FLINT's result differs from
+           its classical product, the classical product is compared instead (with FLINT 3.7 they
+           no longer differ; this keeps the oracle usable with 3.6.0). */
         if (result == 0 && (v == VARIANT_SS || v == VARIANT_DISPATCHER))
         {
             fmpz * reference = _fmpz_vec_init(out_len);

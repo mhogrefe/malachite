@@ -10,12 +10,12 @@
 // output is captured to a text file, and an oracle recomputes every line and fails on the first
 // disagreement. The FLINT oracle is a small C program (the sources in `oracle/`) built against a
 // FLINT source tree located through the `MALACHITE_FLINT_DIR` environment variable, defaulting to
-// `../../flint-3.6.0`, and against the MPFR installation that FLINT links, located through
+// `../../flint-3.7.0-dev`, and against the MPFR installation that FLINT links, located through
 // `MALACHITE_MPFR_DIR`, defaulting to Homebrew's `/opt/homebrew/opt/mpfr`. The Azurite oracle is
 // the `oracle` executable of the Azurite repository (formally verified Lean arithmetic), located
 // through `MALACHITE_AZURITE_DIR`, defaulting to `../../../azurite`. `cargo run --release -- flint`
-// or `-- azurite` runs one backend; with no argument both run. The checks of a backend are collected
-// first, ordered by the paths of the files that register their demos, and run on
+// or `-- azurite` runs one backend; with no argument both run. The checks of a backend are
+// collected first, ordered by the paths of the files that register their demos, and run on
 // `MALACHITE_ORACLE_JOBS` workers (4 by default), with a `[done/total]` count; `-- plan` prints
 // them without running anything. See README.md.
 
@@ -36,7 +36,8 @@ const LIMIT: usize = 10000;
 const OUT_DIR: &str = "target/oracle-out";
 
 fn flint_dir() -> PathBuf {
-    let dir = env::var("MALACHITE_FLINT_DIR").unwrap_or_else(|_| "../../flint-3.6.0".to_string());
+    let dir =
+        env::var("MALACHITE_FLINT_DIR").unwrap_or_else(|_| "../../flint-3.7.0-dev".to_string());
     fs::canonicalize(&dir).unwrap_or_else(|_| {
         panic!(
             "no built FLINT tree at {dir}; build one (bootstrap.sh, configure, make) or set \
@@ -72,8 +73,21 @@ fn build_oracle() -> PathBuf {
         newest = Some(newest.map_or(modified, |n: std::time::SystemTime| n.max(modified)));
     }
     sources.sort();
+    // The library counts as a source, and the binary is also stale if it was built against another
+    // FLINT tree, which a stamp file next to it records.
+    for lib in ["libflint.dylib", "libflint.so"] {
+        if let Ok(meta) = fs::metadata(flint.join(lib)) {
+            let modified = meta.modified().unwrap();
+            newest = Some(newest.map_or(modified, |n: std::time::SystemTime| n.max(modified)));
+        }
+    }
+    let stamp = Path::new("target").join("flint-oracle.flint-dir");
+    let flint_name = flint.display().to_string();
     let stale = match (fs::metadata(&binary), newest) {
-        (Ok(bin), Some(newest)) => newest >= bin.modified().unwrap(),
+        (Ok(bin), Some(newest)) => {
+            newest >= bin.modified().unwrap()
+                || fs::read_to_string(&stamp).ok().as_deref() != Some(flint_name.as_str())
+        }
         _ => true,
     };
     if stale {
@@ -99,6 +113,7 @@ fn build_oracle() -> PathBuf {
             .status()
             .expect("failed to run cc");
         assert!(status.success(), "failed to build flint-oracle");
+        fs::write(&stamp, &flint_name).unwrap();
     }
     binary
 }
@@ -676,8 +691,8 @@ fn print_plan() {
     }
 }
 
-// How a crate's demos are run: its demo binary directly, built once before the checks start, or,
-// if running the binary directly failed to load a library (a binary that links a library through
+// How a crate's demos are run: its demo binary directly, built once before the checks start, or, if
+// running the binary directly failed to load a library (a binary that links a library through
 // `@rpath` needs the library path that `cargo run` sets), through `cargo run`.
 struct DemoRunner {
     crate_dir: String,
@@ -855,14 +870,17 @@ fn run_plan() {
     fs::create_dir_all(OUT_DIR).unwrap();
     let next = AtomicUsize::new(0);
     let done = AtomicUsize::new(0);
-    let failure: Mutex<Option<String>> = Mutex::new(None);
+    // `MALACHITE_ORACLE_KEEP_GOING` runs every check even after failures, printing each failure as
+    // it happens and all of them at the end; a failed demo's output is kept in its own file.
+    let keep_going = env::var_os("MALACHITE_ORACLE_KEEP_GOING").is_some();
+    let failure: Mutex<Vec<String>> = Mutex::new(Vec::new());
     thread::scope(|scope| {
         for worker in 0..jobs() {
             let (checks, runners, next, done, failure) =
                 (&checks, &runners, &next, &done, &failure);
             scope.spawn(move || {
                 let out = Path::new(OUT_DIR).join(format!("test-out-{worker}.txt"));
-                while failure.lock().unwrap().is_none() {
+                while keep_going || failure.lock().unwrap().is_empty() {
                     let i = next.fetch_add(1, Ordering::Relaxed);
                     if i >= total {
                         break;
@@ -878,19 +896,29 @@ fn run_plan() {
                         }
                         Err(message) => {
                             let mut failure = failure.lock().unwrap();
-                            if failure.is_none() {
+                            if keep_going || failure.is_empty() {
                                 let demo_output = match check.input {
                                     CheckInput::TestRows { ref rows, .. } => {
                                         format!(" (the recorded rows are in {})", rows.display())
+                                    }
+                                    CheckInput::Demo { .. } if keep_going => {
+                                        let kept =
+                                            Path::new(OUT_DIR).join(format!("failed-{n}.txt"));
+                                        fs::copy(&out, &kept).unwrap();
+                                        format!(" (the demo's output is in {})", kept.display())
                                     }
                                     CheckInput::Demo { .. } => {
                                         format!(" (the demo's output is in {})", out.display())
                                     }
                                 };
-                                *failure = Some(format!(
+                                let message = format!(
                                     "[{n}/{total}] {} failed{demo_output}: {message}",
                                     describe(check)
-                                ));
+                                );
+                                if keep_going {
+                                    println!("{message}");
+                                }
+                                failure.push(message);
                             }
                         }
                     }
@@ -898,8 +926,14 @@ fn run_plan() {
             });
         }
     });
-    if let Some(message) = failure.into_inner().unwrap() {
-        eprintln!("{message}");
+    let failures = failure.into_inner().unwrap();
+    if !failures.is_empty() {
+        if keep_going {
+            eprintln!("{} of {total} checks failed:", failures.len());
+        }
+        for message in &failures {
+            eprintln!("{message}");
+        }
         process::exit(1);
     }
 }
@@ -3924,9 +3958,8 @@ const AZURITE_FLOAT_STAGES: &[(&str, &str)] = &[
         "demo_float_reciprocal_gamma_round_debug",
         "az_float_reciprocal_gamma",
     ),
-    // `demo_float_ln_abs_gamma_extreme_debug` is not run against Azurite, whose `lnAbsGamma`
-    // takes about |e| bits of working precision for a negative argument near -2^e with e far below
-    // 0.
+    // `demo_float_ln_abs_gamma_extreme_debug` is not run against Azurite, whose `lnAbsGamma` takes
+    // about |e| bits of working precision for a negative argument near -2^e with e far below 0.
     (
         "demo_float_ln_abs_gamma_assign_debug",
         "az_float_ln_abs_gamma",
@@ -8978,9 +9011,9 @@ const AZURITE_BIG_EXPONENT_FLOAT_STAGES: &[(&str, &str)] = &[
         "demo_big_exponent_float_reciprocal_gamma_rational_prec_round_debug",
         "az_big_exponent_float_reciprocal_gamma_rational",
     ),
-    // `demo_big_exponent_float_ln_abs_gamma_prec_debug` and `_prec_round_debug` are not run
-    // against Azurite, whose `lnAbsGamma` takes about |e| bits of working precision for a negative
-    // argument near -2^e with e far below 0, which the generators produce; FLINT checks them.
+    // `demo_big_exponent_float_ln_abs_gamma_prec_debug` and `_prec_round_debug` are not run against
+    // Azurite, whose `lnAbsGamma` takes about |e| bits of working precision for a negative argument
+    // near -2^e with e far below 0, which the generators produce; FLINT checks them.
     (
         "demo_big_exponent_float_ln_abs_gamma_rational_prec_debug",
         "az_big_exponent_float_ln_abs_gamma_rational",
@@ -11488,6 +11521,20 @@ fn test_against_azurite(build: bool) {
         &MODES,
         AZURITE_APRCL_PRIMES_LIMIT,
     );
+    // Elliptic curve primality certificates, checked by Azurite's proven certificate checker, and
+    // printed in the Pari format, which Azurite must read and print back unchanged.
+    check_demo_against_azurite(
+        &oracle,
+        "../malachite-nz",
+        "demo_ecpp_certificate_verify",
+        "az_ecpp_cert_check",
+    );
+    check_demo_against_azurite(
+        &oracle,
+        "../malachite-nz",
+        "demo_ecpp_certificate_to_pari_string",
+        "az_ecpp_cert_roundtrip",
+    );
     // The primitive unsigned is_probable_prime, checked against Azurite's proven primality test.
     for demo in [
         "demo_u8_is_probable_prime",
@@ -13741,7 +13788,8 @@ fn test_against_flint(build: bool) {
     ] {
         check_demo_against_flint(&oracle, "../malachite-float", demo_name, "arf_gamma");
     }
-    // `BigExponentFloat`'s forward trigonometric functions, checked with FLINT's arb ball arithmetic.
+    // `BigExponentFloat`'s forward trigonometric functions, checked with FLINT's arb ball
+    // arithmetic.
     for demo_name in [
         "demo_big_exponent_float_cos_pi_prec_debug",
         "demo_big_exponent_float_cos_pi_prec_round_debug",
@@ -13830,7 +13878,8 @@ fn test_against_flint(build: bool) {
     ] {
         check_demo_against_flint(&oracle, "../malachite-float", demo_name, "arf_trig");
     }
-    // `BigExponentFloat`'s inverse trigonometric functions, checked with FLINT's arb ball arithmetic.
+    // `BigExponentFloat`'s inverse trigonometric functions, checked with FLINT's arb ball
+    // arithmetic.
     for demo_name in [
         "demo_big_exponent_float_acos_pi_prec_debug",
         "demo_big_exponent_float_acos_pi_prec_round_debug",
@@ -14601,6 +14650,21 @@ fn test_against_flint(build: bool) {
     ] {
         check_demo_against_flint(&oracle, "../malachite-nz", demo_name, "fmpz_is_prime");
     }
+    // Elliptic curve primality certificates: fixture certificates from FLINT's ecpp_prove,
+    // unchanged and corrupted, verified, printed, and read back.
+    for (demo_name, flint_mode) in [
+        ("demo_ecpp_certificate_verify", "ecpp_verify"),
+        ("demo_ecpp_step_verify", "ecpp_verify_step"),
+        ("demo_ecpp_certificate_to_string", "ecpp_cert_get_str"),
+    ] {
+        check_demo_against_flint(&oracle, "../malachite-nz", demo_name, flint_mode);
+    }
+    check_demo_against_flint_no_special(
+        &oracle,
+        "../malachite-nz",
+        "demo_ecpp_certificate_from_str",
+        "ecpp_cert_set_str",
+    );
     check_demo_against_flint_no_special(
         &oracle,
         "../malachite-nz",
@@ -15256,7 +15320,8 @@ fn test_against_flint(build: bool) {
     }
 
     // Every case from test_mul_to_out_karatsuba in malachite-nz's IntegerPolynomial tests, and the
-    // generated cases from its demo, against _fmpz_poly_mul_karatsuba.
+    // generated cases from its demo, against _fmpz_poly_mul (FLINT 3.7 has no
+    // _fmpz_poly_mul_karatsuba; the mode keeps that name).
     check_demo_against_flint(
         &oracle,
         "../malachite-nz",
@@ -15265,7 +15330,8 @@ fn test_against_flint(build: bool) {
     );
 
     // Every case from test_mul_truncated_to_out_karatsuba_n in malachite-nz's IntegerPolynomial
-    // tests, and the generated cases from its demo, against _fmpz_poly_mullow_karatsuba_n.
+    // tests, and the generated cases from its demo, against _fmpz_poly_mullow (FLINT 3.7 has no
+    // _fmpz_poly_mullow_karatsuba_n; the mode keeps that name).
     check_demo_against_flint(
         &oracle,
         "../malachite-nz",
@@ -15274,7 +15340,8 @@ fn test_against_flint(build: bool) {
     );
 
     // Every case from test_mul_truncated_to_out_karatsuba in malachite-nz's IntegerPolynomial
-    // tests, and the generated cases from its demo, against _fmpz_poly_mullow_karatsuba.
+    // tests, and the generated cases from its demo, against _fmpz_poly_mullow (FLINT 3.7 has no
+    // _fmpz_poly_mullow_karatsuba; the mode keeps that name).
     check_demo_against_flint(
         &oracle,
         "../malachite-nz",
@@ -15283,7 +15350,8 @@ fn test_against_flint(build: bool) {
     );
 
     // Every case from test_mul_high_to_out_karatsuba_n in malachite-nz's IntegerPolynomial tests,
-    // and the generated cases from its demo, against _fmpz_poly_mulhigh_karatsuba_n.
+    // and the generated cases from its demo, against _fmpz_poly_mulhigh_classical (FLINT 3.7 has no
+    // _fmpz_poly_mulhigh_karatsuba_n; the mode keeps that name).
     check_demo_against_flint(
         &oracle,
         "../malachite-nz",
@@ -15301,7 +15369,8 @@ fn test_against_flint(build: bool) {
     );
 
     // Every case from test_square_to_out_karatsuba in malachite-nz's IntegerPolynomial tests, and
-    // the generated cases from its demo, against _fmpz_poly_sqr_karatsuba.
+    // the generated cases from its demo, against _fmpz_poly_sqr (FLINT 3.7 has no
+    // _fmpz_poly_sqr_karatsuba; the mode keeps that name).
     check_demo_against_flint(
         &oracle,
         "../malachite-nz",
@@ -15310,7 +15379,8 @@ fn test_against_flint(build: bool) {
     );
 
     // Every case from test_square_truncated_to_out_karatsuba_n in malachite-nz's IntegerPolynomial
-    // tests, and the generated cases from its demo, against _fmpz_poly_sqrlow_karatsuba_n.
+    // tests, and the generated cases from its demo, against _fmpz_poly_sqrlow (FLINT 3.7 has no
+    // _fmpz_poly_sqrlow_karatsuba_n; the mode keeps that name).
     check_demo_against_flint(
         &oracle,
         "../malachite-nz",
@@ -15319,7 +15389,8 @@ fn test_against_flint(build: bool) {
     );
 
     // Every case from test_square_truncated_to_out_karatsuba in malachite-nz's IntegerPolynomial
-    // tests, and the generated cases from its demo, against _fmpz_poly_sqrlow_karatsuba.
+    // tests, and the generated cases from its demo, against _fmpz_poly_sqrlow (FLINT 3.7 has no
+    // _fmpz_poly_sqrlow_karatsuba; the mode keeps that name).
     check_demo_against_flint(
         &oracle,
         "../malachite-nz",

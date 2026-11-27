@@ -1349,8 +1349,8 @@ pub mod mod_shr;
 ///
 /// assert_eq!(4u32.mod_sqrt(5), Some(2));
 /// assert_eq!(2u32.mod_sqrt(3), None);
-/// assert_eq!(12909u64.mod_sqrt(65537), Some(50618));
-/// assert_eq!(3u16.mod_sqrt(611), Some(183));
+/// assert_eq!(12909u64.mod_sqrt(65537), Some(14919));
+/// assert_eq!(3u16.mod_sqrt(611), None);
 /// ```
 pub mod mod_sqrt;
 /// Traits for squaring a number modulo another number.

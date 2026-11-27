@@ -16,13 +16,19 @@ use malachite_base::num::linear_algebra::traits::{
 };
 
 crate_test_mod! {
+    /// Solving a linear system of any shape by solving the system of the pivot rows and columns of
+    /// an LU decomposition modulo a prime. Internal machinery for [`Solve`], public only under
+    /// `test_build`.
+    can_solve_auto
+}
+crate_test_mod! {
     /// Solving a linear system of any shape by Dixon's p-adic lifting. Internal machinery for
     /// malachite-q's `RationalMatrix` solvers, public only under `test_build`.
     can_solve_dixon
 }
 crate_test_mod! {
     /// Solving a linear system of any shape with the multimodular algorithm. Internal machinery for
-    /// [`Solve`], public only under `test_build`.
+    /// malachite-q's `RationalMatrix` solvers, public only under `test_build`.
     can_solve_multi_mod
 }
 crate_test_mod! {

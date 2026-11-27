@@ -143,7 +143,9 @@ pub fn can_solve_multi_mod<'a>(
 //
 // This is equivalent to `fmpz_mat_can_solve_multi_mod_den` from
 // `fmpz_mat/can_solve_multi_mod_den.c`, FLINT 3.6.0, except that it panics if the dimensions are
-// incompatible.
+// incompatible. FLINT 3.7 rewrote this function on top of `_fmpz_mat_can_solve_generic` (see
+// `can_solve_auto_den`), but its results are the same, since its square solver also returns the
+// least common denominator.
 crate_test_fn! {
 can_solve_multi_mod_den<'a>(
     a: &IntegerMatrix,

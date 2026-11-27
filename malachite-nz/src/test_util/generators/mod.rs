@@ -8261,3 +8261,38 @@ pub fn natural_polynomial_vec_natural_polynomial_pair_unsigned_quadruple_gen_var
         &special_random_natural_polynomial_vec_natural_polynomial_pair_unsigned_quadruple_gen_var_1,
     )
 }
+
+// -- (EcppCertificate, Natural) --
+
+// Elliptic curve primality certificates paired with the Natural they are claimed to prove prime:
+// fixture certificates, unchanged or corrupted.
+pub fn ecpp_certificate_natural_pair_gen() -> Generator<(
+    crate::natural::factorization::ecpp::EcppCertificate,
+    Natural,
+)> {
+    Generator::new(
+        &exhaustive_ecpp_certificate_natural_pair_gen,
+        &random_ecpp_certificate_natural_pair_gen,
+        &special_random_ecpp_certificate_natural_pair_gen,
+    )
+}
+
+// -- EcppStep --
+
+// Steps of elliptic curve primality certificates: steps of fixture certificates, unchanged or
+// corrupted.
+pub fn ecpp_step_gen() -> Generator<crate::natural::factorization::ecpp::EcppStep> {
+    Generator::new(
+        &exhaustive_ecpp_step_gen,
+        &random_ecpp_step_gen,
+        &special_random_ecpp_step_gen,
+    )
+}
+
+// -- String --
+
+// Elliptic curve primality certificates as text, in either format: fixture certificates, unchanged
+// or corrupted.
+pub fn ecpp_string_gen() -> Generator<alloc::string::String> {
+    Generator::new_no_special(&exhaustive_ecpp_string_gen, &random_ecpp_string_gen)
+}

@@ -6,11 +6,12 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::num::arithmetic::traits::WrappingAddAssign;
 use crate::num::basic::integers::PrimitiveInt;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::logic::traits::LeadingZeros;
 use crate::num::modular::mod_mul::{limbs_invert_limb_u64, mod_preinverted_double};
-use crate::num::modular::traits::{DivisibleBy, ModDot, ModIsReduced};
+use crate::num::modular::traits::{ModDot, ModIsReduced};
 use crate::unsigned_vector::UnsignedVector;
 
 // Dot products of vectors whose elements are words reduced modulo a word $m$. As in FLINT's
@@ -144,6 +145,60 @@ pub(crate) fn accumulate<T: PrimitiveUnsigned>(acc: &mut (T, T, T), x: T, y: T) 
     *acc = T::xxx_add_yyy_to_zzz(a2, a1, a0, T::ZERO, hi, lo);
 }
 
+// The sum of the products of the pairs, as a two-word value; the sum must fit in two words. Words
+// of at most 32 bits are summed in a `u64`, which, unlike pairs of words, the compiler can
+// vectorize.
+#[inline]
+fn sum_2<T: PrimitiveUnsigned>(pairs: impl Iterator<Item = (T, T)>) -> (T, T, T) {
+    if T::WIDTH <= u32::WIDTH {
+        let mut sum = 0u64;
+        for (x, y) in pairs {
+            let x: u64 = x.wrapping_into();
+            let y: u64 = y.wrapping_into();
+            sum.wrapping_add_assign(x * y);
+        }
+        (
+            T::ZERO,
+            T::wrapping_from(sum >> T::WIDTH),
+            T::wrapping_from(sum),
+        )
+    } else {
+        let (mut hi, mut lo) = (T::ZERO, T::ZERO);
+        for (x, y) in pairs {
+            let (p_hi, p_lo) = T::x_mul_y_to_zz(x, y);
+            (hi, lo) = T::xx_add_yy_to_zz(hi, lo, p_hi, p_lo);
+        }
+        (T::ZERO, hi, lo)
+    }
+}
+
+// Adds the products of the pairs to the three-word accumulator `acc`; the sum must fit in three
+// words. Words of at most 32 bits are summed in a `u128`.
+#[inline]
+fn add_products_3<T: PrimitiveUnsigned>(acc: &mut (T, T, T), pairs: impl Iterator<Item = (T, T)>) {
+    if T::WIDTH <= u32::WIDTH {
+        let (a2, a1, a0) = *acc;
+        let a2: u128 = a2.wrapping_into();
+        let a1: u128 = a1.wrapping_into();
+        let a0: u128 = a0.wrapping_into();
+        let mut sum = (a2 << (T::WIDTH << 1)) | (a1 << T::WIDTH) | a0;
+        for (x, y) in pairs {
+            let x: u64 = x.wrapping_into();
+            let y: u64 = y.wrapping_into();
+            sum.wrapping_add_assign(u128::from(x * y));
+        }
+        *acc = (
+            T::wrapping_from(sum >> (T::WIDTH << 1)),
+            T::wrapping_from(sum >> T::WIDTH),
+            T::wrapping_from(sum),
+        );
+    } else {
+        for (x, y) in pairs {
+            accumulate(acc, x, y);
+        }
+    }
+}
+
 // The sum of the products of `xs[i]` and `ys[ys.len() - 1 - i]`, for `i` less than `xs.len()`, as a
 // three-word value, accumulated in `d.words` words; `xs` and `ys` must have the same length, at
 // most the number of terms `d` was made for. When three words are used, whenever the number of
@@ -159,14 +214,7 @@ pub(crate) fn column_sum<T: PrimitiveUnsigned>(xs: &[T], ys: &[T], d: &ModData<T
             }
             (T::ZERO, T::ZERO, sum)
         }
-        2 => {
-            let (mut hi, mut lo) = (T::ZERO, T::ZERO);
-            for (&x, &y) in xs.iter().zip(ys.iter().rev()) {
-                let (p_hi, p_lo) = T::x_mul_y_to_zz(x, y);
-                (hi, lo) = T::xx_add_yy_to_zz(hi, lo, p_hi, p_lo);
-            }
-            (T::ZERO, hi, lo)
-        }
+        2 => sum_2(xs.iter().copied().zip(ys.iter().rev().copied())),
         _ => {
             let mut acc = (T::ZERO, T::ZERO, T::ZERO);
             for (i, (x_chunk, y_chunk)) in xs
@@ -177,9 +225,10 @@ pub(crate) fn column_sum<T: PrimitiveUnsigned>(xs: &[T], ys: &[T], d: &ModData<T
                 if i != 0 {
                     acc = (T::ZERO, T::ZERO, d.reduce(acc.0, acc.1, acc.2));
                 }
-                for (&x, &y) in x_chunk.iter().zip(y_chunk.iter().rev()) {
-                    accumulate(&mut acc, x, y);
-                }
+                add_products_3(
+                    &mut acc,
+                    x_chunk.iter().copied().zip(y_chunk.iter().rev().copied()),
+                );
             }
             acc
         }
@@ -198,14 +247,7 @@ pub(crate) fn dot_sum<T: PrimitiveUnsigned>(xs: &[T], ys: &[T], d: &ModData<T>) 
             }
             (T::ZERO, T::ZERO, sum)
         }
-        2 => {
-            let (mut hi, mut lo) = (T::ZERO, T::ZERO);
-            for (&x, &y) in xs.iter().zip(ys) {
-                let (p_hi, p_lo) = T::x_mul_y_to_zz(x, y);
-                (hi, lo) = T::xx_add_yy_to_zz(hi, lo, p_hi, p_lo);
-            }
-            (T::ZERO, hi, lo)
-        }
+        2 => sum_2(xs.iter().copied().zip(ys.iter().copied())),
         _ => {
             let mut acc = (T::ZERO, T::ZERO, T::ZERO);
             for (i, (x_chunk, y_chunk)) in xs
@@ -216,9 +258,10 @@ pub(crate) fn dot_sum<T: PrimitiveUnsigned>(xs: &[T], ys: &[T], d: &ModData<T>) 
                 if i != 0 {
                     acc = (T::ZERO, T::ZERO, d.reduce(acc.0, acc.1, acc.2));
                 }
-                for (&x, &y) in x_chunk.iter().zip(y_chunk) {
-                    accumulate(&mut acc, x, y);
-                }
+                add_products_3(
+                    &mut acc,
+                    x_chunk.iter().copied().zip(y_chunk.iter().copied()),
+                );
             }
             acc
         }
@@ -246,21 +289,15 @@ pub(crate) fn dot_sum_strided<T: PrimitiveUnsigned>(
             }
             (T::ZERO, T::ZERO, sum)
         }
-        2 => {
-            let (mut hi, mut lo) = (T::ZERO, T::ZERO);
-            for (&x, &y) in xs.iter().zip(ys) {
-                let (p_hi, p_lo) = T::x_mul_y_to_zz(x, y);
-                (hi, lo) = T::xx_add_yy_to_zz(hi, lo, p_hi, p_lo);
-            }
-            (T::ZERO, hi, lo)
-        }
+        2 => sum_2(xs.iter().copied().zip(ys.copied())),
         _ => {
+            let mut ys = ys;
             let mut acc = (T::ZERO, T::ZERO, T::ZERO);
-            for (i, (&x, &y)) in xs.iter().zip(ys).enumerate() {
-                if i != 0 && i.divisible_by(d.max_terms) {
+            for (i, x_chunk) in xs.chunks(d.max_terms).enumerate() {
+                if i != 0 {
                     acc = (T::ZERO, T::ZERO, d.reduce(acc.0, acc.1, acc.2));
                 }
-                accumulate(&mut acc, x, y);
+                add_products_3(&mut acc, x_chunk.iter().copied().zip((&mut ys).copied()));
             }
             acc
         }

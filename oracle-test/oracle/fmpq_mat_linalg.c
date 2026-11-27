@@ -57,6 +57,24 @@ error(const char * message, int line_number)
     return 1;
 }
 
+/*
+    FLINT 3.7.0-dev's `fmpq_mat_can_solve` returns 1 when `a` has no columns, more than 15 rows,
+    and `b` is nonzero, although there is no solution: its row-wise conversion to integer matrices
+    returns before it fills in `b` when `a` is empty (pending-bug-reports/
+    flint-fmpq-mat-can-solve-zero-columns.md). FLINT 3.6.0 and the `fmpq_mat_can_solve_*` variants
+    are correct, so this handles the empty case the way they do.
+*/
+static int
+can_solve(fmpq_mat_t x, const fmpq_mat_t a, const fmpq_mat_t b)
+{
+    if (fmpq_mat_ncols(a) == 0)
+    {
+        fmpq_mat_zero(x);
+        return fmpq_mat_is_zero(b);
+    }
+    return fmpq_mat_can_solve(x, a, b);
+}
+
 static int
 compute(fmpq_mat_t x, const fmpq_mat_t a, const fmpq_mat_t b)
 {
@@ -77,14 +95,14 @@ compute(fmpq_mat_t x, const fmpq_mat_t a, const fmpq_mat_t b)
         case KIND_CAN_SOLVE_DIXON:
             return fmpq_mat_can_solve_dixon(x, a, b);
         case KIND_CAN_SOLVE:
-            return fmpq_mat_can_solve(x, a, b);
+            return can_solve(x, a, b);
         case KIND_SOLVE_OR_CAN_SOLVE:
             if (fmpq_mat_is_square(a) && fmpq_mat_solve(x, a, b))
             {
                 return 1;
             }
             fmpq_mat_zero(x);
-            return fmpq_mat_can_solve(x, a, b);
+            return can_solve(x, a, b);
         default:
             return fmpq_mat_inv(x, a);
     }

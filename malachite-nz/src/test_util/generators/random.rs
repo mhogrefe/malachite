@@ -15956,3 +15956,33 @@ pub fn random_natural_polynomial_vec_natural_polynomial_pair_unsigned_quadruple_
         }),
     )
 }
+
+// -- (EcppCertificate, Natural) --
+
+pub fn random_ecpp_certificate_natural_pair_gen(
+    _config: &GenConfig,
+) -> It<(
+    crate::natural::factorization::ecpp::EcppCertificate,
+    Natural,
+)> {
+    Box::new(
+        crate::test_util::natural::factorization::ecpp::random_ecpp_certificate_pairs(
+            EXAMPLE_SEED,
+            false,
+        ),
+    )
+}
+
+// -- EcppStep --
+
+pub fn random_ecpp_step_gen(
+    _config: &GenConfig,
+) -> It<crate::natural::factorization::ecpp::EcppStep> {
+    Box::new(crate::test_util::natural::factorization::ecpp::random_ecpp_steps(EXAMPLE_SEED, false))
+}
+
+// -- String --
+
+pub fn random_ecpp_string_gen(_config: &GenConfig) -> It<alloc::string::String> {
+    Box::new(crate::test_util::natural::factorization::ecpp::random_ecpp_strings(EXAMPLE_SEED))
+}

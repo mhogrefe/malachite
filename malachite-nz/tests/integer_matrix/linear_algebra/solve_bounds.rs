@@ -8,10 +8,11 @@
 
 use core::str::FromStr;
 use malachite_base::matrix::Matrix;
-use malachite_base::num::arithmetic::traits::{CeilingSqrt, Square};
+use malachite_base::num::arithmetic::traits::UnsignedAbs;
+use malachite_base::num::linear_algebra::traits::{Determinant, Solve};
+use malachite_base::num::number_theory::traits::Gcd;
 use malachite_base::oracle_row;
 use malachite_nz::integer_matrix::IntegerMatrix;
-use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::integer_matrix_pair_gen_var_7;
 use malachite_nz::test_util::integer_matrix::linear_algebra::determinant_bound::*;
 use std::panic::catch_unwind;
@@ -31,18 +32,26 @@ fn test_solve_bounds() {
         assert_eq!(n.to_string(), out_n);
         assert_eq!(d.to_string(), out_d);
     };
-    test("[]_{0,0}", "[]_{0,2}", "0", "1");
-    test("[1]", "[5]", "10", "2");
-    test("[1, 2; 3, 4]", "[5; 6]", "96", "12");
-    test("[1, 2; 3, 4]", "[5, 0; 6, 0]", "96", "12");
+    test("[]_{0,0}", "[]_{0,2}", "1", "1");
+    test("[1]", "[5]", "6", "2");
+    test("[1, 2; 3, 4]", "[5; 6]", "111", "12");
+    test("[1, 2; 3, 4]", "[5, 0; 6, 0]", "111", "12");
     test("[2, 0; 0, 2]", "[]_{2,0}", "0", "5");
     test("[1, 2; 3, 4]", "[0; 0]", "0", "12");
     test(
         "[1267650600228229401496703205376, 1; 1, 1267650600228229401496703205376]",
         "[1267650600228229401496703205376; 1]",
-        "20370360066886875272954624215275773932371555430551145863300108038156959859215417541342003\
-        20",
-        "1606938068204233101571475504190334901745783987825591619420160",
+        "203703602945433860806572497136341467575706349716924825596808048358362687856150075476331724\
+        8",
+        "1606938074190543808078853857152627976551679236336291315449856",
+    );
+    // - the row Hadamard bound is smaller than the column bound, but doesn't bound the numerators:
+    //   the solution is (-9, 14, -26, -275), and the row bound times the norm of B is 264
+    test(
+        "[1, 1, 0, 0; -1, 1, 1, 0; 1, 0, 0, 0; 0, 3, -9, 1]",
+        "[5; -3; -9; 1]",
+        "561",
+        "24",
     );
     test("[0, 0; 0, 0]", "[1; 1]", "0", "0");
 }
@@ -61,18 +70,20 @@ fn solve_bounds_fail() {
 fn solve_bounds_properties() {
     integer_matrix_pair_gen_var_7().test_properties(|(a, b)| {
         let (n, d) = a.solve_bounds(&b);
-        assert_eq!(d, a.determinant_bound());
-        let max = (0..b.width())
-            .map(|j| {
-                b.column_iter(j)
-                    .map(|x| x.unsigned_abs_ref().square())
-                    .sum::<Natural>()
-            })
-            .max()
-            .unwrap_or_default();
-        assert_eq!(n, &d * max.ceiling_sqrt());
+        // The bounds are computed with a few bits of precision, rounding up.
         let (n_exact, d_exact) = integer_matrix_solve_bounds_naive(&a, &b);
         assert!(n >= n_exact);
         assert!(d >= d_exact);
+        // They bound the reduced numerators and denominators of the solution.
+        if (&a).determinant() != 0u32 {
+            let (x, den) = (&a).solve(&b).unwrap();
+            let den = den.unsigned_abs();
+            for y in x.elements_ref() {
+                let y = y.unsigned_abs_ref();
+                let g = y.gcd(&den);
+                assert!(y / &g <= n);
+                assert!(&den / g <= d);
+            }
+        }
     });
 }

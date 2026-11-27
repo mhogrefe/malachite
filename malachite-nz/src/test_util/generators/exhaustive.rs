@@ -9656,3 +9656,24 @@ pub fn exhaustive_natural_polynomial_vec_natural_polynomial_pair_unsigned_quadru
         }),
     )
 }
+
+// -- (EcppCertificate, Natural) --
+
+pub fn exhaustive_ecpp_certificate_natural_pair_gen() -> It<(
+    crate::natural::factorization::ecpp::EcppCertificate,
+    Natural,
+)> {
+    Box::new(crate::test_util::natural::factorization::ecpp::exhaustive_ecpp_certificate_pairs())
+}
+
+// -- EcppStep --
+
+pub fn exhaustive_ecpp_step_gen() -> It<crate::natural::factorization::ecpp::EcppStep> {
+    Box::new(crate::test_util::natural::factorization::ecpp::exhaustive_ecpp_steps())
+}
+
+// -- String --
+
+pub fn exhaustive_ecpp_string_gen() -> It<alloc::string::String> {
+    Box::new(crate::test_util::natural::factorization::ecpp::exhaustive_ecpp_strings())
+}

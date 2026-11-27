@@ -6,6 +6,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+/// Elliptic curve primality certificates: [`EcppCertificate`](ecpp::EcppCertificate), a proof that
+/// a number is prime, its steps, and functions for checking, printing, and reading them.
+pub mod ecpp;
 /// An implementation of
 /// [`IsLucasProbablePrime`](malachite_base::num::factorization::traits::IsLucasProbablePrime), a
 /// trait for testing whether a number is a Lucas probable prime.

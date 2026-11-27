@@ -14,11 +14,13 @@
 
 use crate::natural::InnerNatural::Small;
 use crate::natural::Natural;
+use core::cmp::Ordering::*;
 use malachite_base::num::arithmetic::traits::{CheckedSqrt, Parity};
 use malachite_base::num::basic::traits::{One, Two, Zero};
+use malachite_base::num::comparison::traits::OrdDouble;
 use malachite_base::num::modular::traits::{
-    ModMulPrecomputed, ModMulPrecomputedAssign, ModPow, ModPowerOf2, ModSqrt, ModSquarePrecomputed,
-    ModSquarePrecomputedAssign,
+    ModMulPrecomputed, ModMulPrecomputedAssign, ModPow, ModPowerOf2, ModSqrt, ModSquare,
+    ModSquarePrecomputed, ModSquarePrecomputedAssign,
 };
 use malachite_base::num::number_theory::traits::JacobiSymbol;
 
@@ -34,13 +36,15 @@ const THREE: Natural = Natural::const_from(3);
 // except that for even moduli between 50 and 600 FLINT consults a Jacobi-symbol routine whose
 // behavior for even moduli is undefined, and this function does not.
 //
+// FLINT 3.7 rewrote `fmpz_sqrtmod`, and its results for composite moduli differ from 3.6.0's, e.g.
+// it finds no root of 4 modulo 6.
+//
 // The structure follows FLINT's: an exhaustive search below 600 (from `n_sqrtmod` in
 // `ulong_extras/sqrtmod.c`), and above that the Jacobi test, the two fast exponentiation cases, and
 // the Tonelli-Shanks loop of `_fmpz_sqrtmod`, with its iteration cap. The perfect-square test is
 // load-bearing: modulo an odd square, no value has Jacobi symbol -1, so without the test the
 // quadratic-nonresidue search could not terminate.
-fn mod_sqrt_ref_ref(x: &Natural, m: &Natural) -> Option<Natural> {
-    assert!(x < m, "x must be reduced mod m, but {x} >= {m}");
+fn mod_sqrt_unnormalized(x: &Natural, m: &Natural) -> Option<Natural> {
     // Since x < m, a `Small` modulus implies a `Small` x. The `Limb` implementation is the same
     // algorithm, so this delegation does not change any output. It also handles the exhaustive
     // search for moduli below 600: a `Large` modulus is always far above that threshold.
@@ -119,18 +123,39 @@ fn mod_sqrt_ref_ref(x: &Natural, m: &Natural) -> Option<Natural> {
     if root == 0u32 { None } else { Some(root) }
 }
 
+// Computes the square root of `x` modulo `m` in $[0, m/2]$, where `x` must be reduced modulo `m`,
+// or returns `None` if none is found. The result of `mod_sqrt_unnormalized` is checked by squaring,
+// since for composite moduli it may not be a root, and replaced by `m` minus it if it is larger
+// than $m/2$.
+//
+// For prime moduli, this returns a root exactly when `fmpz_sqrtmod` from `fmpz/sqrtmod.c`, FLINT
+// 3.7.0-dev, does, and the same root up to negation: FLINT returns the root in [0, m/2] for
+// one-word moduli, as `n_sqrtmod` does, but may return the other one for larger moduli.
+fn mod_sqrt_ref_ref(x: &Natural, m: &Natural) -> Option<Natural> {
+    assert!(x < m, "x must be reduced mod m, but {x} >= {m}");
+    let root = mod_sqrt_unnormalized(x, m)?;
+    if (&root).mod_square(m) != *x {
+        return None;
+    }
+    Some(if m.cmp_double(&root) == Less {
+        m - root
+    } else {
+        root
+    })
+}
+
 macro_rules! natural_mod_sqrt_doc {
     ($f:item) => {
         /// Computes a square root of a [`Natural`] modulo another [`Natural`] $m$: a $y$ with $y^2
         /// \equiv x \pmod m$. The input must be already reduced modulo $m$.
         ///
+        /// The root returned is the one in $[0, m/2]$: of the roots $y$ and $m - y$, the smaller.
         /// If $m$ is an odd prime, a root is returned whenever one exists, and `None` is returned
         /// exactly when $x$ is a quadratic nonresidue. For other moduli the function still
-        /// terminates and is deterministic, but it may return `None` even though a root exists, and
-        /// it may return a value that is not a root, so if $m$ is not known to be prime, a returned
-        /// root should be verified by squaring. The behavior for such moduli matches FLINT's.
+        /// terminates and is deterministic, and a returned value is always a root, but `None` may
+        /// be returned even though a root exists, and which root is returned is unspecified.
         ///
-        /// $f(x, m) = y$, where $x, y < m$ and $y^2 \equiv x \mod m$, if such a $y$ is found.
+        /// $f(x, m) = y$, where $y \leq m/2$ and $y^2 \equiv x \mod m$, if such a $y$ is found.
         ///
         /// # Worst-case complexity
         /// $T(n) = O(n^3 \log n \log\log n)$
@@ -157,12 +182,13 @@ macro_rules! natural_mod_sqrt_doc {
         /// assert_eq!((&Natural::TWO).mod_sqrt(&Natural::from(3u32)), None);
         /// assert_eq!(
         ///     (&Natural::from(12909u32)).mod_sqrt(&Natural::from(65537u32)),
-        ///     Some(Natural::from(50618u32))
+        ///     Some(Natural::from(14919u32))
         /// );
         /// ```
         ///
-        /// This is equivalent to `fmpz_sqrtmod` from `fmpz/sqrtmod.c`, FLINT 3.6.0, returning an
-        /// `Option` where FLINT sets an output and returns a flag.
+        /// This is equivalent to `fmpz_sqrtmod` from `fmpz/sqrtmod.c`, FLINT 3.7.0-dev, when \$m\$
+        /// is prime, up to the choice between a root and its negation, returning an `Option` where
+        /// FLINT sets an output and returns a flag.
         $f
     };
 }

@@ -2,7 +2,7 @@
 //
 // Uses code adopted from the FLINT Library.
 //
-//      Copyright © 2010 Fredrik Johansson
+//      Copyright © 2010, 2018, 2026 Fredrik Johansson
 //
 // This file is part of Malachite.
 //
@@ -12,29 +12,32 @@
 
 use crate::integer_matrix::IntegerMatrix;
 use crate::integer_matrix::arithmetic::fraction_matrix::RightHandSide;
-use crate::integer_matrix::linear_algebra::determinant_bound::determinant_bound_helper;
+use crate::mag::Mag;
 use crate::natural::Natural;
 use alloc::vec;
-use malachite_base::num::arithmetic::traits::{CeilingSqrt, Square};
-use malachite_base::num::basic::traits::Zero;
+use core::cmp::min;
+use malachite_base::num::basic::traits::One;
 
 impl IntegerMatrix {
     /// Returns bounds $(N, D)$ for the solution of $AX = B$, where $A$ is a square
     /// [`IntegerMatrix`] and $B$ is an [`IntegerMatrix`] of the same height.
     ///
     /// If $A$ is nonsingular, every element of $X = A^{-1}B$, written as a fraction $p/q$ in lowest
-    /// terms with $q > 0$, satisfies $|p| \leq N$ and $q \leq D$. The denominator bound $D$ is
-    /// [`determinant_bound`](IntegerMatrix::determinant_bound) of $A$, since $\det A$ is a common
-    /// denominator, and $N$ is $D$ times the ceiling of the largest Euclidean norm of a column of
-    /// $B$.
+    /// terms with $q > 0$, satisfies $|p| \leq N$ and $q \leq D$. By Cramer's rule, $\det A$ is a
+    /// common denominator, and each numerator is the determinant of $A$ with one column replaced by
+    /// a column of $B$. So $D$ bounds the smaller of the two Hadamard bounds for $|\det A|$, the
+    /// product of the Euclidean norms of the rows of $A$ and the product of the Euclidean norms of
+    /// its columns; and $N$ bounds the product of the column norms of $A$ times the largest
+    /// Euclidean norm of a column of $B$. The norms are accumulated with a few bits of precision,
+    /// rounding up. If $A$ is empty, both bounds are 1.
     ///
     /// # Worst-case complexity
-    /// $T(n, k, b) = O(n^2 + nkb \log b \log\log b)$
+    /// $T(n, k, b) = O(n^2 + nk + nb)$
     ///
-    /// $M(n, k, b) = O(n + b)$
+    /// $M(n, b) = O(n + nb)$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `self.height()`, $k$ is `b.width()`, and
-    /// $b$ is the maximum number of significant bits of the elements of $B$.
+    /// $b$ is the maximum number of significant bits of the elements of `self` and $B$.
     ///
     /// # Panics
     /// Panics if `self` is not square, or if its height is not the height of `b`.
@@ -48,11 +51,11 @@ impl IntegerMatrix {
     /// let a = IntegerMatrix::from_str("[1, 2; 3, 4]").unwrap();
     /// let b = IntegerMatrix::from_str("[5; 6]").unwrap();
     /// let (n, d) = a.solve_bounds(&b);
-    /// assert_eq!(n, 96u32);
+    /// assert_eq!(n, 111u32);
     /// assert_eq!(d, 12u32);
     /// ```
     ///
-    /// This is equivalent to `fmpz_mat_solve_bound` from `fmpz_mat/solve_bound.c`, FLINT 3.6.0,
+    /// This is equivalent to `fmpz_mat_solve_bound` from `fmpz_mat/solve_bound.c`, FLINT 3.7.0-dev,
     /// except that it panics if the dimensions are incompatible.
     #[inline]
     pub fn solve_bounds(&self, b: &Self) -> (Natural, Natural) {
@@ -60,22 +63,50 @@ impl IntegerMatrix {
     }
 }
 
+// This is equivalent to `fmpz_mat_solve_bound` from `fmpz_mat/solve_bound.c`, FLINT 3.7.0-dev,
+// except that it panics if the dimensions are incompatible.
 pub(crate) fn solve_bounds_helper(a: &IntegerMatrix, b: RightHandSide<'_>) -> (Natural, Natural) {
     assert!(a.height == a.width, "the matrix must be square");
     assert_eq!(
         a.height, b.height,
         "the height of the matrix must equal the height of the right-hand side"
     );
-    let denominator_bound = determinant_bound_helper(a, true);
-    // The squared Euclidean norms of the columns of `b`, accumulated row by row.
-    let mut norms = vec![Natural::ZERO; b.width];
-    if b.width != 0 {
-        for row in b.elements.chunks_exact(b.width) {
-            for (norm, x) in norms.iter_mut().zip(row) {
-                *norm += x.unsigned_abs_ref().square();
-            }
-        }
+    let m = a.height;
+    if m == 0 {
+        return (Natural::ONE, Natural::ONE);
     }
-    let max = norms.into_iter().max().unwrap_or_default();
-    (&denominator_bound * max.ceiling_sqrt(), denominator_bound)
+    // The squared Euclidean norms of the rows of `a`, and the product of the norms of its columns.
+    let mut row_norms = vec![Mag::ZERO; m];
+    let mut column_bound = Mag::ONE;
+    for j in 0..m {
+        let mut u = Mag::ZERO;
+        for (i, row_norm) in row_norms.iter_mut().enumerate() {
+            let t = Mag::from(a.elements[i * m + j].unsigned_abs_ref());
+            row_norm.add_mul_assign(t, t);
+            u.add_mul_assign(t, t);
+        }
+        column_bound = Mag::mul(column_bound, u.sqrt());
+    }
+    let mut row_bound = Mag::ONE;
+    for row_norm in row_norms {
+        row_bound = Mag::mul(row_bound, row_norm.sqrt());
+    }
+    // Both Hadamard products bound |det(A)|.
+    let denominator_bound = min(row_bound, column_bound).ceiling();
+    // The largest squared Euclidean norm of a column of `b`.
+    let mut max = Mag::ZERO;
+    for j in 0..b.width {
+        let mut t = Mag::ZERO;
+        for i in 0..m {
+            let x = Mag::from(b.elements[i * b.width + j].unsigned_abs_ref());
+            t.add_mul_assign(x, x);
+        }
+        max = max.max(t);
+    }
+    // A numerator is the determinant of A with one column replaced by a column of B, so only the
+    // column Hadamard bound applies to it.
+    (
+        Mag::mul(max.sqrt(), column_bound).ceiling(),
+        denominator_bound,
+    )
 }

@@ -102,6 +102,10 @@ int run_n_is_prime(const char * arg);
 int run_fmpz_is_probabprime(const char * arg);
 int run_fmpz_is_strong_probabprime(const char * arg);
 int run_fmpz_is_prime(const char * arg);
+int run_ecpp_verify(const char * arg);
+int run_ecpp_verify_step(const char * arg);
+int run_ecpp_cert_get_str(const char * arg);
+int run_ecpp_cert_set_str(const char * arg);
 int run_fmpz_divisor_in_residue_class_lenstra(const char * arg);
 
 /* sqrtmod.c */

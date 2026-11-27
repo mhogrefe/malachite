@@ -6,5 +6,6 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+pub mod ecpp;
 pub mod is_lucas_probable_prime;
 pub mod is_strong_probable_prime;

@@ -8,6 +8,7 @@
 
 use core::str::FromStr;
 use malachite_base::matrix::Matrix;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::modular::traits::{ModAdd, ModMul, ModMulAssign};
 use malachite_base::oracle_row;
 use malachite_base::test_util::generators::{
@@ -146,6 +147,29 @@ fn test_mod_mul_matrix_algorithms() {
     // The inner dimension is 0, and the modulus is 1.
     test(3, 0, 2, 5, 6);
     test(4, 5, 6, 1, 7);
+    // Narrow types, whose sums of two or three words are accumulated in a `u64` or a `u128`: the
+    // products agree with those of `u64` matrices.
+    let narrow = |a: &UnsignedMatrix<u64>| {
+        UnsignedMatrix::<u32>::from_owned_elements(
+            a.height(),
+            a.width(),
+            a.elements_ref()
+                .iter()
+                .map(|&x| u32::exact_from(x))
+                .collect(),
+        )
+    };
+    for m in [1000, 1048573, 4294967291] {
+        for (height, inner, width, seed) in [(3, 4, 5, 10), (12, 13, 11, 11), (21, 22, 23, 12)] {
+            let a = pseudorandom_matrix(height, inner, m, seed);
+            let b = pseudorandom_matrix(inner, width, m, seed + 100);
+            let m_32 = u32::exact_from(m);
+            assert_eq!(
+                narrow(&a).mod_mul(narrow(&b), m_32),
+                narrow(&(&a).mod_mul(&b, m))
+            );
+        }
+    }
 }
 
 #[test]

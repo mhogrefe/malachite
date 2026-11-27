@@ -54,6 +54,9 @@ fn mod_pow_full_width<T: PrimitiveUnsigned>(
 //   what `fmpz_sqrtmod` computes for such moduli. (Both moduli are composite at every width, so
 //   both behaviors are anyway outside the odd-prime domain.)
 //
+// FLINT 3.7 rewrote `n_sqrtmod`, and its results for composite moduli differ from 3.6.0's, e.g. it
+// finds no root of 4 modulo 6.
+//
 // See `mod_sqrt_ref_ref` in `malachite-nz` for the structure; this is the same algorithm.
 //
 // # Worst-case complexity
@@ -66,13 +69,12 @@ fn mod_pow_full_width<T: PrimitiveUnsigned>(
 // with an inner adjustment chain of at most $n$ squarings, all on words. The bound assumes that the
 // quadratic-nonresidue search does not dominate; under the extended Riemann hypothesis the search
 // inspects $O((\log m)^2)$ candidates.
-private_test_fn! {mod_sqrt_unsigned<
+fn mod_sqrt_unsigned_unnormalized<
     T: CheckedSqrt<Output = T> + JacobiSymbol<T> + PrimitiveUnsigned,
 >(
     x: T,
     m: T,
 ) -> Option<T> {
-    assert!(x < m, "x must be reduced mod m, but {x} >= {m}");
     if x <= T::ONE {
         return Some(x);
     }
@@ -159,6 +161,30 @@ private_test_fn! {mod_sqrt_unsigned<
         iter -= 1;
     }
     if root == T::ZERO { None } else { Some(root) }
+}
+
+// Computes the square root of `x` modulo `m` in $[0, m/2]$, where `x` must be reduced modulo `m`,
+// or returns `None` if none is found. The result of `mod_sqrt_unsigned_unnormalized` is checked by
+// squaring, since for composite moduli it may not be a root, and replaced by `m` minus it if it is
+// larger than $m/2$.
+//
+// For prime moduli, this has the same behavior as `n_sqrtmod` from `ulong_extras/sqrtmod.c`, FLINT
+// 3.7.0-dev.
+//
+// # Worst-case complexity
+// Same as `mod_sqrt_unsigned_unnormalized`.
+private_test_fn! {mod_sqrt_unsigned<
+    T: CheckedSqrt<Output = T> + JacobiSymbol<T> + PrimitiveUnsigned,
+>(
+    x: T,
+    m: T,
+) -> Option<T> {
+    assert!(x < m, "x must be reduced mod m, but {x} >= {m}");
+    let root = mod_sqrt_unsigned_unnormalized(x, m)?;
+    if root.mod_square(m) != x {
+        return None;
+    }
+    Some(if root > m >> 1 { m - root } else { root })
 }}
 
 macro_rules! impl_mod_sqrt {
@@ -169,18 +195,14 @@ macro_rules! impl_mod_sqrt {
             /// Computes a square root of a number modulo another number $m$: a $y$ with $y^2 \equiv
             /// x \pmod m$. The input must be already reduced modulo $m$.
             ///
-            /// If $m$ is an odd prime, a root is returned whenever one exists, and `None` is
-            /// returned exactly when $x$ is a quadratic nonresidue. For other moduli the function
-            /// still terminates and is deterministic, but it may return `None` even though a root
-            /// exists, and it may return a value that is not a root, so if $m$ is not known to be
-            /// prime, a returned root should be verified by squaring. The behavior for such moduli
-            /// matches FLINT's, with two exceptions, both involving only composite moduli: for even
-            /// moduli between 50 and 600 FLINT consults a Jacobi-symbol routine whose behavior for
-            /// even moduli is undefined, and for the two largest odd moduli of a width FLINT's
-            /// exponent computations wrap, while this function computes them exactly, as FLINT's
-            /// own multiprecision path does.
+            /// The root returned is the one in $[0, m/2]$: of the roots $y$ and $m - y$, the
+            /// smaller. If $m$ is an odd prime, a root is returned whenever one exists, and `None`
+            /// is returned exactly when $x$ is a quadratic nonresidue. For other moduli the
+            /// function still terminates and is deterministic, and a returned value is always a
+            /// root, but `None` may be returned even though a root exists, and which root is
+            /// returned is unspecified.
             ///
-            /// $f(x, m) = y$, where $x, y < m$ and $y^2 \equiv x \mod m$, if such a $y$ is found.
+            /// $f(x, m) = y$, where $y \leq m/2$ and $y^2 \equiv x \mod m$, if such a $y$ is found.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n^2)$
@@ -197,8 +219,9 @@ macro_rules! impl_mod_sqrt {
             /// # Examples
             /// See [here](super::mod_sqrt#mod_sqrt).
             ///
-            /// This is equivalent to `n_sqrtmod` from `ulong_extras/sqrtmod.c`, FLINT 3.6.0,
-            /// returning an `Option` where FLINT returns 0 for both a failure and a root of 0.
+            /// This is equivalent to `n_sqrtmod` from `ulong_extras/sqrtmod.c`, FLINT 3.7.0-dev,
+            /// when $m$ is prime, returning an `Option` where FLINT returns 0 for both a failure
+            /// and a root of 0.
             #[inline]
             fn mod_sqrt(self, m: $t) -> Option<$t> {
                 mod_sqrt_unsigned(self, m)
@@ -218,18 +241,14 @@ macro_rules! impl_mod_sqrt_promoted {
             /// Computes a square root of a number modulo another number $m$: a $y$ with $y^2 \equiv
             /// x \pmod m$. The input must be already reduced modulo $m$.
             ///
-            /// If $m$ is an odd prime, a root is returned whenever one exists, and `None` is
-            /// returned exactly when $x$ is a quadratic nonresidue. For other moduli the function
-            /// still terminates and is deterministic, but it may return `None` even though a root
-            /// exists, and it may return a value that is not a root, so if $m$ is not known to be
-            /// prime, a returned root should be verified by squaring. The behavior for such moduli
-            /// matches FLINT's, with two exceptions, both involving only composite moduli: for even
-            /// moduli between 50 and 600 FLINT consults a Jacobi-symbol routine whose behavior for
-            /// even moduli is undefined, and for the two largest odd moduli of a width FLINT's
-            /// exponent computations wrap, while this function computes them exactly, as FLINT's
-            /// own multiprecision path does.
+            /// The root returned is the one in $[0, m/2]$: of the roots $y$ and $m - y$, the
+            /// smaller. If $m$ is an odd prime, a root is returned whenever one exists, and `None`
+            /// is returned exactly when $x$ is a quadratic nonresidue. For other moduli the
+            /// function still terminates and is deterministic, and a returned value is always a
+            /// root, but `None` may be returned even though a root exists, and which root is
+            /// returned is unspecified.
             ///
-            /// $f(x, m) = y$, where $x, y < m$ and $y^2 \equiv x \mod m$, if such a $y$ is found.
+            /// $f(x, m) = y$, where $y \leq m/2$ and $y^2 \equiv x \mod m$, if such a $y$ is found.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n^2)$
@@ -246,8 +265,9 @@ macro_rules! impl_mod_sqrt_promoted {
             /// # Examples
             /// See [here](super::mod_sqrt#mod_sqrt).
             ///
-            /// This is equivalent to `n_sqrtmod` from `ulong_extras/sqrtmod.c`, FLINT 3.6.0,
-            /// returning an `Option` where FLINT returns 0 for both a failure and a root of 0.
+            /// This is equivalent to `n_sqrtmod` from `ulong_extras/sqrtmod.c`, FLINT 3.7.0-dev,
+            /// when $m$ is prime, returning an `Option` where FLINT returns 0 for both a failure
+            /// and a root of 0.
             #[inline]
             fn mod_sqrt(self, m: $t) -> Option<$t> {
                 u32::from(self)
@@ -266,17 +286,13 @@ impl ModSqrt<Self> for usize {
     /// Computes a square root of a number modulo another number $m$: a $y$ with $y^2 \equiv x \pmod
     /// m$. The input must be already reduced modulo $m$.
     ///
-    /// If $m$ is an odd prime, a root is returned whenever one exists, and `None` is returned
-    /// exactly when $x$ is a quadratic nonresidue. For other moduli the function still terminates
-    /// and is deterministic, but it may return `None` even though a root exists, and it may return
-    /// a value that is not a root, so if $m$ is not known to be prime, a returned root should be
-    /// verified by squaring. The behavior for such moduli matches FLINT's, with two exceptions,
-    /// both involving only composite moduli: for even moduli between 50 and 600 FLINT consults a
-    /// Jacobi-symbol routine whose behavior for even moduli is undefined, and for the two largest
-    /// odd moduli of a width FLINT's exponent computations wrap, while this function computes them
-    /// exactly, as FLINT's own multiprecision path does.
+    /// The root returned is the one in $[0, m/2]$: of the roots $y$ and $m - y$, the smaller. If
+    /// $m$ is an odd prime, a root is returned whenever one exists, and `None` is returned exactly
+    /// when $x$ is a quadratic nonresidue. For other moduli the function still terminates and is
+    /// deterministic, and a returned value is always a root, but `None` may be returned even though
+    /// a root exists, and which root is returned is unspecified.
     ///
-    /// $f(x, m) = y$, where $x, y < m$ and $y^2 \equiv x \mod m$, if such a $y$ is found.
+    /// $f(x, m) = y$, where $y \leq m/2$ and $y^2 \equiv x \mod m$, if such a $y$ is found.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n^2)$
@@ -293,8 +309,8 @@ impl ModSqrt<Self> for usize {
     /// # Examples
     /// See [here](super::mod_sqrt#mod_sqrt).
     ///
-    /// This is equivalent to `n_sqrtmod` from `ulong_extras/sqrtmod.c`, FLINT 3.6.0, returning an
-    /// `Option` where FLINT returns 0 for both a failure and a root of 0.
+    /// This is equivalent to `n_sqrtmod` from `ulong_extras/sqrtmod.c`, FLINT 3.7.0-dev, when $m$
+    /// is prime, returning an `Option` where FLINT returns 0 for both a failure and a root of 0.
     #[inline]
     fn mod_sqrt(self, m: Self) -> Option<Self> {
         if USIZE_IS_U32 {

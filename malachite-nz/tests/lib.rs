@@ -811,6 +811,12 @@ pub mod natural {
         pub mod log_base_power_of_2;
     }
     pub mod factorization {
+        pub mod ecpp {
+            pub mod from_string;
+            pub mod point;
+            pub mod to_string;
+            pub mod verify;
+        }
         pub mod is_lucas_probable_prime;
         pub mod is_power;
         pub mod is_prime;

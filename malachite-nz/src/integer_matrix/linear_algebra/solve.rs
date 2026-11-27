@@ -15,7 +15,7 @@
 use crate::integer::Integer;
 use crate::integer_matrix::IntegerMatrix;
 use crate::integer_matrix::arithmetic::fraction_matrix::RightHandSide;
-use crate::integer_matrix::linear_algebra::can_solve_multi_mod::can_solve_multi_mod_den;
+use crate::integer_matrix::linear_algebra::can_solve_auto::can_solve_auto_den;
 use crate::integer_matrix::linear_algebra::fraction_free_lu_decomposition::*;
 use crate::integer_matrix::linear_algebra::solve_dixon::solve_dixon_den;
 use crate::integer_matrix::linear_algebra::solve_multi_mod::solve_multi_mod_den;
@@ -626,8 +626,8 @@ pub fn can_solve_fflu<'a>(
 // Solves AX = dB for a matrix A of any shape, returning a solution X and d, or `None` if there is
 // none.
 //
-// This is equivalent to `fmpz_mat_can_solve` from `fmpz_mat/can_solve.c`, FLINT 3.6.0, except that
-// it panics if the dimensions are incompatible.
+// This is equivalent to `fmpz_mat_can_solve` from `fmpz_mat/can_solve.c`, FLINT 3.7.0-dev, except
+// that it panics if the dimensions are incompatible.
 crate_test_fn! {
 can_solve<'a>(
     a: &IntegerMatrix,
@@ -637,7 +637,7 @@ can_solve<'a>(
     if a.height <= FFLU_MAX_DIMENSION {
         can_solve_fflu(a, b)
     } else {
-        can_solve_multi_mod_den(a, b)
+        can_solve_auto_den(a, b)
     }
 }}
 
@@ -701,7 +701,10 @@ impl Solve<Self> for IntegerMatrix {
     /// Square systems of dimension at most 3 are solved by Cramer's rule, and other systems of
     /// height at most 15 by fraction-free LU decomposition. Larger square nonsingular systems are
     /// solved by Dixon's $p$-adic lifting when the right-hand side has at most 32 columns and
-    /// otherwise with a multimodular algorithm, which also solves the remaining larger systems.
+    /// otherwise with a multimodular algorithm. Other systems of height greater than 15 are solved
+    /// by computing LU decompositions of $A$ modulo primes, solving the square system formed by the
+    /// pivot rows and columns of one of them in the same way, and checking the remaining equations;
+    /// $d$ is then the denominator found for that square system.
     ///
     /// # Worst-case complexity
     /// $T(n, b) = O(n^4 (b + \log n)^2 + n^4 (b + \log n) \log^2 (nb) \log\log (nb))$
@@ -770,7 +773,10 @@ impl Solve<&Self> for IntegerMatrix {
     /// Square systems of dimension at most 3 are solved by Cramer's rule, and other systems of
     /// height at most 15 by fraction-free LU decomposition. Larger square nonsingular systems are
     /// solved by Dixon's $p$-adic lifting when the right-hand side has at most 32 columns and
-    /// otherwise with a multimodular algorithm, which also solves the remaining larger systems.
+    /// otherwise with a multimodular algorithm. Other systems of height greater than 15 are solved
+    /// by computing LU decompositions of $A$ modulo primes, solving the square system formed by the
+    /// pivot rows and columns of one of them in the same way, and checking the remaining equations;
+    /// $d$ is then the denominator found for that square system.
     ///
     /// # Worst-case complexity
     /// $T(n, b) = O(n^4 (b + \log n)^2 + n^4 (b + \log n) \log^2 (nb) \log\log (nb))$
@@ -839,7 +845,10 @@ impl Solve<IntegerMatrix> for &IntegerMatrix {
     /// Square systems of dimension at most 3 are solved by Cramer's rule, and other systems of
     /// height at most 15 by fraction-free LU decomposition. Larger square nonsingular systems are
     /// solved by Dixon's $p$-adic lifting when the right-hand side has at most 32 columns and
-    /// otherwise with a multimodular algorithm, which also solves the remaining larger systems.
+    /// otherwise with a multimodular algorithm. Other systems of height greater than 15 are solved
+    /// by computing LU decompositions of $A$ modulo primes, solving the square system formed by the
+    /// pivot rows and columns of one of them in the same way, and checking the remaining equations;
+    /// $d$ is then the denominator found for that square system.
     ///
     /// # Worst-case complexity
     /// $T(n, b) = O(n^4 (b + \log n)^2 + n^4 (b + \log n) \log^2 (nb) \log\log (nb))$
@@ -908,7 +917,10 @@ impl Solve<&IntegerMatrix> for &IntegerMatrix {
     /// Square systems of dimension at most 3 are solved by Cramer's rule, and other systems of
     /// height at most 15 by fraction-free LU decomposition. Larger square nonsingular systems are
     /// solved by Dixon's $p$-adic lifting when the right-hand side has at most 32 columns and
-    /// otherwise with a multimodular algorithm, which also solves the remaining larger systems.
+    /// otherwise with a multimodular algorithm. Other systems of height greater than 15 are solved
+    /// by computing LU decompositions of $A$ modulo primes, solving the square system formed by the
+    /// pivot rows and columns of one of them in the same way, and checking the remaining equations;
+    /// $d$ is then the denominator found for that square system.
     ///
     /// # Worst-case complexity
     /// $T(n, b) = O(n^4 (b + \log n)^2 + n^4 (b + \log n) \log^2 (nb) \log\log (nb))$
@@ -976,7 +988,10 @@ impl Solve<IntegerVector> for IntegerMatrix {
     /// Square systems of dimension at most 3 are solved by Cramer's rule, and other systems of
     /// height at most 15 by fraction-free LU decomposition. Larger square nonsingular systems are
     /// solved by Dixon's $p$-adic lifting when the right-hand side has at most 32 columns and
-    /// otherwise with a multimodular algorithm, which also solves the remaining larger systems.
+    /// otherwise with a multimodular algorithm. Other systems of height greater than 15 are solved
+    /// by computing LU decompositions of $A$ modulo primes, solving the square system formed by the
+    /// pivot rows and columns of one of them in the same way, and checking the remaining equations;
+    /// $d$ is then the denominator found for that square system.
     ///
     /// # Worst-case complexity
     /// $T(n, b) = O(n^4 (b + \log n)^2 + n^4 (b + \log n) \log^2 (nb) \log\log (nb))$
@@ -1046,7 +1061,10 @@ impl Solve<&IntegerVector> for IntegerMatrix {
     /// Square systems of dimension at most 3 are solved by Cramer's rule, and other systems of
     /// height at most 15 by fraction-free LU decomposition. Larger square nonsingular systems are
     /// solved by Dixon's $p$-adic lifting when the right-hand side has at most 32 columns and
-    /// otherwise with a multimodular algorithm, which also solves the remaining larger systems.
+    /// otherwise with a multimodular algorithm. Other systems of height greater than 15 are solved
+    /// by computing LU decompositions of $A$ modulo primes, solving the square system formed by the
+    /// pivot rows and columns of one of them in the same way, and checking the remaining equations;
+    /// $d$ is then the denominator found for that square system.
     ///
     /// # Worst-case complexity
     /// $T(n, b) = O(n^4 (b + \log n)^2 + n^4 (b + \log n) \log^2 (nb) \log\log (nb))$
@@ -1116,7 +1134,10 @@ impl Solve<IntegerVector> for &IntegerMatrix {
     /// Square systems of dimension at most 3 are solved by Cramer's rule, and other systems of
     /// height at most 15 by fraction-free LU decomposition. Larger square nonsingular systems are
     /// solved by Dixon's $p$-adic lifting when the right-hand side has at most 32 columns and
-    /// otherwise with a multimodular algorithm, which also solves the remaining larger systems.
+    /// otherwise with a multimodular algorithm. Other systems of height greater than 15 are solved
+    /// by computing LU decompositions of $A$ modulo primes, solving the square system formed by the
+    /// pivot rows and columns of one of them in the same way, and checking the remaining equations;
+    /// $d$ is then the denominator found for that square system.
     ///
     /// # Worst-case complexity
     /// $T(n, b) = O(n^4 (b + \log n)^2 + n^4 (b + \log n) \log^2 (nb) \log\log (nb))$
@@ -1186,7 +1207,10 @@ impl Solve<&IntegerVector> for &IntegerMatrix {
     /// Square systems of dimension at most 3 are solved by Cramer's rule, and other systems of
     /// height at most 15 by fraction-free LU decomposition. Larger square nonsingular systems are
     /// solved by Dixon's $p$-adic lifting when the right-hand side has at most 32 columns and
-    /// otherwise with a multimodular algorithm, which also solves the remaining larger systems.
+    /// otherwise with a multimodular algorithm. Other systems of height greater than 15 are solved
+    /// by computing LU decompositions of $A$ modulo primes, solving the square system formed by the
+    /// pivot rows and columns of one of them in the same way, and checking the remaining equations;
+    /// $d$ is then the denominator found for that square system.
     ///
     /// # Worst-case complexity
     /// $T(n, b) = O(n^4 (b + \log n)^2 + n^4 (b + \log n) \log^2 (nb) \log\log (nb))$

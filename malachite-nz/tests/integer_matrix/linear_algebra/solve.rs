@@ -304,8 +304,9 @@ fn same_rational_solution(x: &(IntegerMatrix, Integer), y: &(IntegerMatrix, Inte
 }
 
 // Checks `can_solve_fflu`, `can_solve_multi_mod_den`, and `can_solve` for AX = dB: their results
-// are solutions, they agree on whether there is one, and `can_solve` is one of the others. Returns
-// the result of `can_solve`.
+// are solutions, they agree on whether there is one, and `can_solve` is `can_solve_fflu` up to 15
+// rows and the same rational solution as `can_solve_multi_mod_den` above that. Returns the result
+// of `can_solve`.
 fn verify_can_solve(a: &IntegerMatrix, b: &IntegerMatrix) -> Option<(IntegerMatrix, Integer)> {
     let fflu = can_solve_fflu(a, b);
     let multi_mod = can_solve_multi_mod_den(a, b);
@@ -324,7 +325,17 @@ fn verify_can_solve(a: &IntegerMatrix, b: &IntegerMatrix) -> Option<(IntegerMatr
         assert_eq!(g, 1u32);
     }
     let result = can_solve(a, b);
-    assert_eq!(result, if a.height() <= 15 { fflu } else { multi_mod });
+    if a.height() <= 15 {
+        assert_eq!(result, fflu);
+    } else {
+        // Above 15 rows, `can_solve` solves the pivot system, whose denominator need not be the
+        // least common one.
+        assert_eq!(result.is_some(), multi_mod.is_some());
+        if let (Some(x), Some(y)) = (&result, &multi_mod) {
+            assert!(same_rational_solution(x, y));
+        }
+        check_solution(a, b, &result);
+    }
     result
 }
 
@@ -504,6 +515,22 @@ fn test_can_solve() {
     test("[2, 4; 1, 2]", "[1; 1]", "None");
     test("[1, 2, 3; 2, 4, 6]", "[1; 2]", "Some(([1; 0; 0], 1))");
     test("[2, 1; 1, 1; 1, 2]", "[3; 2; 4]", "None");
+    // - more than 15 rows: the square system of the pivot rows and columns of an LU decomposition
+    //   modulo a prime, here [14] X = [2], is solved by Cramer's rule, so X and d have a common
+    //   factor
+    test(
+        "[14, 28; 28, 56; 42, 84; 56, 112; 70, 140; 84, 168; 98, 196; 112, 224; 126, 252; 140, 280\
+            ; 154, 308; 168, 336; 182, 364; 196, 392; 210, 420; 224, 448]",
+        "[2; 4; 6; 8; 10; 12; 14; 16; 18; 20; 22; 24; 26; 28; 30; 32]",
+        "Some(([2; 0], 14))",
+    );
+    // - more than 15 rows, and the last equation is inconsistent with the pivot system
+    test(
+        "[14, 28; 28, 56; 42, 84; 56, 112; 70, 140; 84, 168; 98, 196; 112, 224; 126, 252; 140, 280\
+            ; 154, 308; 168, 336; 182, 364; 196, 392; 210, 420; 224, 448]",
+        "[2; 4; 6; 8; 10; 12; 14; 16; 18; 20; 22; 24; 26; 28; 30; 33]",
+        "None",
+    );
 }
 
 #[test]

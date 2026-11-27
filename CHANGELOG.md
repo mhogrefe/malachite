@@ -19,6 +19,20 @@ documented by git history.
   `polynomial::mod_polynomial`, and `polynomial::calculus`, or `ModPolynomialData` and
   `ModComposeModPolynomialData`; and malachite-q's `rational::arithmetic::traits` module, which held
   only the re-exports of `rational::number_theory::traits`, is removed.
+- `IntegerMatrix::solve_bounds` now follows FLINT 3.7's `fmpz_mat_solve_bound`. The denominator
+  bound is the smaller of the row and column Hadamard bounds of $A$, and the numerator bound is the
+  column Hadamard bound times the largest column norm of $B$, both computed with a few bits of
+  precision and rounded up. The old numerator bound used the smaller of the two Hadamard bounds,
+  which does not always bound the numerators, so the new one can be larger. An empty $A$ now gives
+  $(1, 1)$.
+- `mod_sqrt` (`ModSqrt`), for the primitive unsigned types and `Natural`, now returns the root in
+  $[0, m/2]$, the smaller of a root and its negation, as FLINT 3.7's `n_sqrtmod` does, and checks
+  its result by squaring, so for a composite modulus it returns `None` instead of a value that is
+  not a root.
+- `Solve` for `IntegerMatrix`, on systems with more than 15 rows that are not square and
+  nonsingular, now follows FLINT 3.7's `fmpz_mat_can_solve`: it solves the square system of the
+  pivot rows and columns of an LU decomposition modulo a prime, and returns that system's
+  denominator. The solution $X/d$ is unchanged, but $X$ and $d$ can now have a common factor there.
 
 ### malachite-base
 
@@ -47,6 +61,11 @@ documented by git history.
 - `IsPrime` for `Natural`, which proves primality following FLINT 3.7's `fmpz_is_prime`: trial
   division, a base-2 strong probable prime test, and the $n - 1$ and $n + 1$ tests, with the
   Jacobi-sum APR-CL test as the fallback at every size.
+- Elliptic curve primality certificates, following FLINT 3.7's `ecpp` module: `EcppCertificate`, a
+  chain of `EcppStep`s, in `natural::factorization::ecpp`. `verify` checks a certificate for a
+  given `Natural`, or one step; `Display` writes FLINT's certificate format and `to_pari_string`
+  the `primecert` format of PARI/GP; and `FromStr` reads either. Certificates can be checked, but
+  Malachite cannot yet produce them.
 - Dividing by a one-limb number is faster for short dividends: the reciprocal of the divisor is now
   computed with a table lookup and Newton iteration rather than a two-limb division. On aarch64,
   the remainder of a 2- to 8-limb `Natural` modulo a one-limb `Natural` is about 1.5 to 2 times

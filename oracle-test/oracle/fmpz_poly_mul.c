@@ -39,8 +39,9 @@
 static long checked;
 
 /* FLINT 3.6.0's fmpz_poly_mul and relatives can get the sign of a coefficient wrong when they
-   choose Schönhage–Strassen (see fmpz_poly_mul_slices.c); Malachite's port fixes that. Replaces
-   `r` by `reference` if they differ, so that the correct product is compared. */
+   choose Schönhage–Strassen (see fmpz_poly_mul_slices.c); Malachite's port fixes that, and so does
+   FLINT 3.7. Replaces `r` by `reference` if they differ, so that the correct product is compared
+   (with FLINT 3.7 they no longer differ; this keeps the oracle usable with 3.6.0). */
 static void
 use_reference_if_different(fmpz_poly_t r, fmpz_poly_t reference)
 {

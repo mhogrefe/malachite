@@ -9,6 +9,7 @@
 use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
+    ecpp::register(runner);
     is_lucas_probable_prime::register(runner);
     is_power::register(runner);
     is_prime::register(runner);
@@ -20,6 +21,7 @@ pub(crate) fn register(runner: &mut Runner) {
     primes::register(runner);
 }
 
+mod ecpp;
 mod is_lucas_probable_prime;
 mod is_power;
 mod is_prime;

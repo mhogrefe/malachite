@@ -326,8 +326,9 @@ general-case tests — every one of them corresponds to a real bug class found i
   naive reference before assuming the port is at fault. FLINT 3.6.0's `_fmpz_vec_set_fft` misreads
   some negative coefficients as positive, so `_fmpz_poly_mul_SS`, and `fmpz_poly_mul` when it
   chooses Schönhage–Strassen, can return a coefficient with the wrong sign. FLINT fixed it after
-  3.6.0 (commit 7ad753d51c); Malachite's port uses the fixed test, and the oracle compares against
-  FLINT's classical product there. Patch the oracle's wrapper; never
+  3.6.0 (commit 7ad753d51c), and the 3.7 snapshot the oracle now uses has the fix; Malachite's
+  port uses the fixed test, and the oracle still compares against FLINT's classical product where
+  Schönhage–Strassen disagrees with it, so that it also runs against 3.6.0. Patch the oracle's wrapper; never
   skip the inputs.
 - **Preconditions live in the callers.** FLINT's transform functions assume what their callers
   guarantee (an even `trunc`; `trunc` a multiple of `2 * n1` for the matrix Fourier transforms; a

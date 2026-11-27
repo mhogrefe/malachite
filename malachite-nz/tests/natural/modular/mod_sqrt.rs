@@ -53,36 +53,36 @@ fn test_mod_sqrt() {
     // - m >= 600 and a perfect square (841 = 29 ^ 2): None, even though 2 ^ 2 = 4; this test also
     //   keeps the quadratic-nonresidue search terminating
     test("4", "841", None);
-    // - composite m = 611 = 13 * 47 = 3 mod 4 with Jacobi symbol 1: the fast path returns a value
-    //   that is not a root (183 ^ 2 = 495 mod 611) without noticing; this matches FLINT
-    test("3", "611", Some("183"));
+    // - composite m = 611 = 13 * 47 = 3 mod 4 with Jacobi symbol 1: the fast path finds a value
+    //   that is not a root (183 ^ 2 = 495 mod 611), which the final check rejects
+    test("3", "611", None);
     // - composite m = 609 = 3 * 7 * 29 = 1 mod 8 with Jacobi symbol 1: the Tonelli-Shanks iteration
     //   cap trips and reports failure; this matches FLINT
     test("2", "609", None);
-    // - prime m = 65537 = 1 mod 8: Tonelli-Shanks
-    test("12909", "65537", Some("50618"));
+    // - prime m = 65537 = 1 mod 8: Tonelli-Shanks, finding 50618, larger than m / 2
+    test("12909", "65537", Some("14919"));
     // - prime m = 2 ^ 224 - 2 ^ 96 + 1 = 1 mod 8: Tonelli-Shanks
     test(
         "15241578750190521",
         "26959946667150639794667015087019630673557916260026308143510066298881",
-        Some("26959946667150639794667015087019630673557916260026308143509942842092"),
+        Some("123456789"),
     );
     // - prime m = 2 ^ 255 - 19 = 5 mod 8
     test(
         "15241578750190521",
         "57896044618658097711785492504343953926634992332820282019728792003956564819949",
-        Some("57896044618658097711785492504343953926634992332820282019728792003956441363160"),
+        Some("123456789"),
     );
     // - odd m in (50, 600) with Jacobi symbol -1: the shortcut skips the search
     test("2", "53", None);
     // - large odd m with Jacobi symbol -1
     test("3", "65537", None);
     // - m = 5 mod 8 where the first candidate is not a root and the adjustment by a power of 2
-    //   applies; note that the result is the root 2 ^ 255 - 21, not its negation 2
+    //   applies, finding the root 2 ^ 255 - 21, whose negation is 2
     test(
         "4",
         "57896044618658097711785492504343953926634992332820282019728792003956564819949",
-        Some("57896044618658097711785492504343953926634992332820282019728792003956564819947"),
+        Some("2"),
     );
     // - prime m = 2 ^ 521 - 1 = 3 mod 4
     test(
@@ -108,22 +108,19 @@ fn mod_sqrt_properties() {
         assert_eq!(x.clone().mod_sqrt(&m), result);
         assert_eq!(x.clone().mod_sqrt(m.clone()), result);
         if let Some(r) = &result {
-            assert!(*r < m);
+            assert!(*r <= (&m >> 1u32));
+            assert_eq!(r.mod_mul(r, &m), x);
         }
         if x <= 1u32 {
             assert_eq!(result, Some(x.clone()));
         }
         // For odd moduli the sub-600 search is exhaustive: roots come in pairs t and m - t, so
         // scanning half the range decides existence.
-        if m.odd() && m < 600u32 {
-            if let Some(r) = &result {
-                assert_eq!(r.mod_mul(r, &m), x);
-            } else {
-                let mut t = Natural::ZERO;
-                while t < m {
-                    assert_ne!((&t).mod_mul(&t, &m), x);
-                    t += Natural::ONE;
-                }
+        if m.odd() && m < 600u32 && result.is_none() {
+            let mut t = Natural::ZERO;
+            while t < m {
+                assert_ne!((&t).mod_mul(&t, &m), x);
+                t += Natural::ONE;
             }
         }
     });
@@ -142,7 +139,7 @@ fn mod_sqrt_properties() {
             let x = x % &p;
             let square = (&x).mod_mul(&x, &p);
             let root = (&square).mod_sqrt(&p).unwrap();
-            assert_eq!((&root).mod_mul(&root, &p), square);
+            assert_eq!(root, (&x).min(&(&p - &x)).clone());
             if x > 1u32 && (&x).jacobi_symbol(&p) == -1 {
                 assert_eq!((&x).mod_sqrt(&p), None);
             }

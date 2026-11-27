@@ -37,13 +37,22 @@ check_fmpz_sqrtmod_line(char * line, int line_number)
     fmpz_set_str(a, pieces[0], 10);
     fmpz_set_str(p, pieces[1], 10);
     int has_expected = parse_option_fmpz(rest, expected);
-    /* Documented divergence: even moduli in (50, 600) hit n_jacobi_unsigned with an even
-       modulus, whose behavior is undefined; Malachite runs the exhaustive search instead. */
-    int skip = fmpz_is_even(p) && fmpz_cmp_ui(p, 50) > 0 && fmpz_cmp_ui(p, 600) < 0
-        && fmpz_cmp_ui(a, 1) > 0;
-    if (!skip)
+    /* For composite moduli the result is unspecified, and FLINT 3.7's rewrite of fmpz_sqrtmod
+       gives different results from Malachite (e.g. no root of 4 modulo 6), so only prime moduli
+       are compared. Malachite returns the root in [0, p/2]; FLINT documents only "a square root",
+       and above one word it may return the other one, so FLINT's root is normalized first. */
+    if (fmpz_is_probabprime(p))
     {
         int ok = fmpz_sqrtmod(b, a, p);
+        if (ok)
+        {
+            fmpz_t c;
+            fmpz_init(c);
+            fmpz_sub(c, p, b);
+            if (fmpz_cmp(c, b) < 0)
+                fmpz_swap(b, c);
+            fmpz_clear(c);
+        }
         if (ok != has_expected || (ok && !fmpz_equal(b, expected)))
         {
             flint_printf("error in fmpz_sqrtmod test, line %d. FLINT: ok=%d b=", line_number, ok);
@@ -79,11 +88,11 @@ check_n_sqrtmod_line(char * line, int line_number)
     ulong p = strtoul(pieces[1], &end, 10);
     ulong expected = 0;
     int has_expected = parse_option_ulong(rest, &expected);
-    /* Documented divergences: even moduli in (50, 600) hit n_jacobi_unsigned with an even
-       modulus, whose behavior is undefined; and for p = 2^64 - 1 and 2^64 - 3 the exponents
-       (p + 1) / 4 and (p + 3) / 8 wrap, while Malachite computes them exactly, as fmpz_sqrtmod
-       does. */
-    if ((p % 2 == 0 && p > 50 && p < 600 && a > 1) || p == UWORD_MAX || p == UWORD_MAX - 2)
+    /* For composite moduli the result is unspecified (it need not even be a root), and FLINT
+       3.7's rewrite of n_sqrtmod gives different results from Malachite's port of 3.6.0 (e.g. no
+       root of 4 modulo 6), so only prime moduli are compared. This also skips 3.6.0's documented
+       divergences, which involve only composite moduli. */
+    if (!n_is_prime(p))
     {
         return 0;
     }

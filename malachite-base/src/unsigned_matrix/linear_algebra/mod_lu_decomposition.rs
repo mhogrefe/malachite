@@ -10,6 +10,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::num::arithmetic::traits::WrappingAddAssign;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::ExactFrom;
 use crate::num::linear_algebra::traits::ModLuDecomposition;
@@ -240,10 +241,65 @@ impl<T: PrimitiveUnsigned> Unreduced<T> for (T, T, T) {
     }
 }
 
+// An unreduced element of a type of at most 32 bits, accumulated in two words: a `u64`, which,
+// unlike a pair of words, the compiler can update in vectorized loops.
+#[derive(Clone, Copy)]
+struct NarrowUnreduced2(u64);
+
+impl<T: PrimitiveUnsigned> Unreduced<T> for NarrowUnreduced2 {
+    #[inline]
+    fn from_word(x: T) -> Self {
+        Self(x.wrapping_into())
+    }
+
+    #[inline]
+    fn add_product(&mut self, x: T, y: T) {
+        let x: u64 = x.wrapping_into();
+        let y: u64 = y.wrapping_into();
+        self.0.wrapping_add_assign(x * y);
+    }
+
+    #[inline]
+    fn reduce(self, d: &ModData<T>) -> T {
+        d.reduce_2(
+            T::wrapping_from(self.0 >> T::WIDTH),
+            T::wrapping_from(self.0),
+        )
+    }
+}
+
+// An unreduced element of a type of at most 32 bits, accumulated in three words: a `u128`.
+#[derive(Clone, Copy)]
+struct NarrowUnreduced3(u128);
+
+impl<T: PrimitiveUnsigned> Unreduced<T> for NarrowUnreduced3 {
+    #[inline]
+    fn from_word(x: T) -> Self {
+        Self(x.wrapping_into())
+    }
+
+    #[inline]
+    fn add_product(&mut self, x: T, y: T) {
+        let x: u64 = x.wrapping_into();
+        let y: u64 = y.wrapping_into();
+        self.0.wrapping_add_assign(u128::from(x * y));
+    }
+
+    #[inline]
+    fn reduce(self, d: &ModData<T>) -> T {
+        d.reduce(
+            T::wrapping_from(self.0 >> (T::WIDTH << 1)),
+            T::wrapping_from(self.0 >> T::WIDTH),
+            T::wrapping_from(self.0),
+        )
+    }
+}
+
 // This is equivalent to `nmod_mat_lu_classical_delayed_2` and `nmod_mat_lu_classical_delayed_3`
 // from `nmod_mat/lu_classical_delayed.c`, FLINT 3.6.0, which differ only in the number of words in
-// which the unreduced elements are accumulated: two or three, given by `U`. The unreduced elements
-// are kept in a separate matrix, `b`.
+// which the unreduced elements are accumulated: two or three, given by `U`; for types of at most 32
+// bits, `U` is a `u64` or `u128` rather than a tuple of words. The unreduced elements are kept in a
+// separate matrix, `b`.
 fn lu_classical_delayed_unreduced<T: PrimitiveUnsigned, U: Unreduced<T>>(
     perm: &mut [usize],
     a: &mut LuBlock<'_, T>,
@@ -329,11 +385,17 @@ pub(crate) fn lu_classical_delayed<T: PrimitiveUnsigned>(
         // FLINT only handles moduli below 2^(W - 1) with two words; this case is normally only
         // reachable when n <= 3, where the classical algorithm is used anyway.
         2 if m.get_highest_bit() => lu_classical(perm, a, m, rank_check),
+        2 if T::WIDTH <= 32 => {
+            lu_classical_delayed_unreduced::<T, NarrowUnreduced2>(perm, a, m, rank_check, &d)
+        }
         2 => lu_classical_delayed_unreduced::<T, (T, T)>(perm, a, m, rank_check, &d),
         // Three words hold the unreduced sums only when there are fewer than 2^(W - 1) of them.
         // FLINT's words have 64 bits, so for it this is always the case, but it can fail for narrow
         // types.
         3 if n > d.max_terms => lu_classical(perm, a, m, rank_check),
+        _ if T::WIDTH <= 32 => {
+            lu_classical_delayed_unreduced::<T, NarrowUnreduced3>(perm, a, m, rank_check, &d)
+        }
         _ => lu_classical_delayed_unreduced::<T, (T, T, T)>(perm, a, m, rank_check, &d),
     }
 }
@@ -476,17 +538,39 @@ pub(crate) fn lu_recursive<T: PrimitiveUnsigned>(
     r1 + r2
 }
 
-// The dimension at which LU decomposition switches from the classical algorithm with delayed
-// reduction to the recursive algorithm, indexed by the number of bits of the modulus minus 1.
+// The dimension min(height, width) from which LU decomposition uses the recursive algorithm rather
+// than the classical algorithm with delayed reduction, given the number of bits of the modulus.
+// Recursion pays off when the products of its blocks use Strassen's algorithm, or when it keeps the
+// unreduced sums of the classical algorithm in fewer words: with b bits and dimension n, they need
+// about 2b + log_2(n) bits, so for words of 64 bits and b = 28 or 29 (or 60 or 61, with two words),
+// and for words of 32 bits and b = 13 or 29, recursion is much faster from the dimension where the
+// sums of the whole matrix need another word but those of its halves do not. `usize::MAX` means
+// that recursion is never faster for dimensions up to 2048. The cutoffs were measured on aarch64
+// with `u32` and `u64` elements; the first table is used for types of at most 32 bits and the
+// second for the others.
 //
-// This is the first `lu_cutoff_tab` from `nmod_mat/lu.c`, FLINT 3.6.0, the one used without BLAS or
-// AVX2.
-const LU_CUTOFF_TAB: [usize; 64] = [
-    64, 64, 244, 280, 296, 320, 332, 792, 800, 800, 800, 400, 400, 400, 400, 404, 404, 400, 408,
-    416, 400, 412, 424, 408, 484, 1352, 1032, 260, 68, 56, 56, 56, 148, 160, 148, 156, 156, 156,
-    120, 168, 160, 124, 156, 124, 156, 148, 112, 156, 148, 136, 156, 160, 116, 136, 168, 148, 156,
-    160, 120, 128, 68, 64, 104, 104,
-];
+// FLINT 3.7.0-dev's `lu_rec_cutoff` from `nmod_mat/lu.c` has cutoffs from 48 to 192, chosen for its
+// own matrix multiplication.
+const fn lu_recursive_cutoff<T: PrimitiveUnsigned>(bits: u64) -> usize {
+    if T::WIDTH <= 32 {
+        match bits {
+            0..=4 => 208,
+            13 | 29 => 80,
+            14..=28 => 192,
+            _ => 256,
+        }
+    } else {
+        match bits {
+            0..=7 => 96,
+            8..=12 => 144,
+            13..=26 => usize::MAX,
+            27 => 1280,
+            28 | 60 => 320,
+            29 | 61 => 80,
+            _ => 768,
+        }
+    }
+}
 
 // Computes the LU decomposition of the block `a`, with elements reduced modulo the prime `m`, in
 // place, and returns its rank. Afterwards, `perm[i]` is the row of the original block that ended up
@@ -495,7 +579,7 @@ const LU_CUTOFF_TAB: [usize; 64] = [
 // `rank_check` is `true`, the decomposition stops and 0 is returned as soon as the block is found
 // not to have full rank.
 //
-// This is equivalent to `nmod_mat_lu` from `nmod_mat/lu.c`, FLINT 3.6.0, without BLAS or AVX2.
+// This is equivalent to `nmod_mat_lu` from `nmod_mat/lu.c`, FLINT 3.7.0-dev.
 pub(crate) fn lu<T: PrimitiveUnsigned>(
     perm: &mut [usize],
     a: &mut LuBlock<'_, T>,
@@ -506,7 +590,7 @@ pub(crate) fn lu<T: PrimitiveUnsigned>(
     let bits = m.significant_bits();
     if n <= 3 || (bits > 28 && n <= 7) {
         lu_classical(perm, a, m, rank_check)
-    } else if n < LU_CUTOFF_TAB[usize::exact_from(bits.min(64)) - 1] {
+    } else if n < lu_recursive_cutoff::<T>(bits) {
         lu_classical_delayed(perm, a, m, rank_check)
     } else {
         lu_recursive(perm, a, m, rank_check)
@@ -653,7 +737,7 @@ impl<T: PrimitiveUnsigned> ModLuDecomposition<T> for UnsignedMatrix<T> {
     /// assert_eq!(u.to_string(), "[1, 2, 3; 0, 5, 5]");
     /// ```
     ///
-    /// This is equivalent to `nmod_mat_lu` from `nmod_mat/lu.c`, FLINT 3.6.0, without BLAS or AVX2,
+    /// This is equivalent to `nmod_mat_lu` from `nmod_mat/lu.c`, FLINT 3.7.0-dev,
     /// except that $L$ and $U$ are returned as separate matrices rather than packed into one, and
     /// that it panics if an element is not reduced.
     #[inline]
@@ -713,7 +797,7 @@ impl<T: PrimitiveUnsigned> ModLuDecomposition<T> for &UnsignedMatrix<T> {
     /// assert_eq!(u.to_string(), "[1, 2, 3; 0, 5, 5]");
     /// ```
     ///
-    /// This is equivalent to `nmod_mat_lu` from `nmod_mat/lu.c`, FLINT 3.6.0, without BLAS or AVX2,
+    /// This is equivalent to `nmod_mat_lu` from `nmod_mat/lu.c`, FLINT 3.7.0-dev,
     /// except that $L$ and $U$ are returned as separate matrices rather than packed into one, and
     /// that it panics if an element is not reduced.
     #[inline]
